@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://nicofox/locale/nicofox.dtd">
+<overlay id="nicofox-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicofox_urlparser.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/common.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/xmlhttprequester.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/prefman.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/script-compiler.js" />
+
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
+    <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
+  </stringbundleset>
+
+  <menupopup id="menu_ToolsPopup">
+    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;"
+              oncommand="nicofox.onMenuItemCommand(event);" position="6"/>
+  </menupopup>
+
+ <statusbar id="status-bar">
+   <statusbarpanel id="nicofox-status"
+     label="Test"
+     tooltiptext=""
+     style="display:none;"
+   />
+ </statusbar>
+
+</overlay>

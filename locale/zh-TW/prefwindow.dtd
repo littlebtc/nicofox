@@ -1,0 +1,21 @@
+<!ENTITY prefwindow.title "NicoFox 偏好設定">
+<!ENTITY pane1.title "NicoFox 偏好設定">
+<!ENTITY nicomonkey "頁面注入">
+<!ENTITY nicomonkey.enable.label "啟動頁面注入">
+<!ENTITY nicomonkey.enable.accesskey "E">
+<!ENTITY nicomonkey.options "注入選項">
+<!ENTITY nicomonkey.toolbar.label "使用工具列">
+<!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.player_killer.label "隱藏被刪除影片的播放器">
+<!ENTITY nicomonkey.player_killer.accesskey "H">
+<!ENTITY downloader "下載管理員">
+<!ENTITY downloader.options "下載選項">
+<!ENTITY downloader.save_path.label "將影片儲存到">
+<!ENTITY downloader.save_path.accesskey "S">
+<!ENTITY downloader.save_path.browse.label "瀏覽...">
+<!ENTITY downloader.save_path.browse.accesskey "B">
+<!ENTITY downloader.confirm_before_download.label "下載前顯示確認對話框">
+<!ENTITY downloader.confirm_before_download.accesskey "C">
+<!ENTITY downloader.boon_comment.label "讓評論檔案與BOON Player相容">
+<!ENTITY downloader.boon_comment.accesskey "B">
+

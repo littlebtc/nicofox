@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://nicofox/skin/smilefox.css" type="text/css"?>
+<!DOCTYPE dialog SYSTEM "chrome://nicofox/locale/smilefox.dtd">
+<window id="smilefox" title="&window.title;"  windowtype="smilefox:dlmanager"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" onload="load();" onclose="return close();" onunload="unload();">
+  <script type="application/x-javascript" src="chrome://nicofox/content/common.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/smilefox.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/smilefox_downloader.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicofox_urlparser.js" /> 
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
+  </stringbundleset>
+  <toolbox>
+    <toolbar id="download_toolbar">
+      <toolbarbutton id="start" accesskey="&start.accesskey;" label="&start.label;" oncommand="start();"  />
+      <!--<toolbarbutton id="pause" accesskey="p" label="Pause"/>-->
+      <toolbarbutton id="stop" accesskey="&stop.accesskey;" label="&stop.label;" oncommand="stop();" disabled="true" />
+    </toolbar>
+  </toolbox>
+
+<tree id="smilefox-tree" flex="1" context="popup">
+  <treecols>
+    <treecol label="&tree.videoTitle;" id="tree-title" flex="5"/>
+    <splitter class="tree-splitter"/>
+    <treecol label="&tree.comment;" id="tree-comment" />
+    <splitter class="tree-splitter"/>
+    <treecol label="&tree.economy;" id="tree-economy"/>
+    <splitter class="tree-splitter"/>
+    <treecol label="&tree.progress;" id="tree-progress" flex="2"  type="progressmeter"/>
+    <splitter class="tree-splitter"/>
+    <treecol label="&tree.status;" id="tree-status" flex="1"/>
+    <splitter class="tree-splitter"/>
+    <treecol label="&tree.size;" id="tree-size" flex="1"/>
+    <splitter class="tree-splitter"/>
+    <treecol label="&tree.speed;" id="tree-speed" flex="1"/>
+  </treecols>
+  <treechildren/>
+</tree>
+
+  <menupopup id="popup">
+   <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="popup_command.cancel()" />
+   <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="popup_command.retry()" style="font-weight: bold;"  />
+   <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="" disabled="true" style="font-weight: bold;" />
+   <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="popup_command.openExternal()" />
+   <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="popup_command.openFolder();" id="popup-open-folder"/>
+   <menuseparator />
+   <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="popup_command.go();" />
+   <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="popup-copy" oncommand="popup_command.copy();" />
+   <menuseparator />
+   <menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="popup-select-all" oncommand="popup_command.selectAll();" />
+   <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="popup-remove" oncommand="popup_command.remove();"/>
+  </menupopup>
+
+</window>
+

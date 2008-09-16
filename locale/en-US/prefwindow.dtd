@@ -1,0 +1,20 @@
+<!ENTITY prefwindow.title "NicoFox preferences">
+<!ENTITY pane1.title "NicoFox preferences">
+<!ENTITY nicomonkey "Page Injection">
+<!ENTITY nicomonkey.enable.label "Enable Page Injection">
+<!ENTITY nicomonkey.enable.accesskey "E">
+<!ENTITY nicomonkey.options "Inject Options">
+<!ENTITY nicomonkey.toolbar.label "Use Toolbar">
+<!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.player_killer.label "Hide Player for deleted videos">
+<!ENTITY nicomonkey.player_killer.accesskey "H">
+<!ENTITY downloader "Download Manager">
+<!ENTITY downloader.options "Download Options">
+<!ENTITY downloader.save_path.label "Save videos to">
+<!ENTITY downloader.save_path.accesskey "S">
+<!ENTITY downloader.save_path.browse.label "Browse...">
+<!ENTITY downloader.save_path.browse.accesskey "B">
+<!ENTITY downloader.confirm_before_download.label "Display confirm dialog before download">
+<!ENTITY downloader.confirm_before_download.accesskey "C">
+<!ENTITY downloader.boon_comment.label "Make comment files compatible with BOON Player">
+<!ENTITY downloader.boon_comment.accesskey "B">

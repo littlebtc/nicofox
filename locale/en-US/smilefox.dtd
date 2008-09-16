@@ -1,0 +1,30 @@
+<!ENTITY window.title "NicoFox Downloader">
+<!ENTITY start.label "Start">
+<!ENTITY start.accesskey "S">
+<!ENTITY stop.label "Stop">
+<!ENTITY stop.accesskey "P">
+<!ENTITY tree.videoTitle "Video Title">
+<!ENTITY tree.comment "Comment">
+<!ENTITY tree.economy "Economy">
+<!ENTITY tree.progress "Progress">
+<!ENTITY tree.status "Status">
+<!ENTITY tree.size "Size">
+<!ENTITY tree.speed "Speed">
+<!ENTITY popup.cancel.label "Cancel">
+<!ENTITY popup.cancel.accesskey "C">
+<!ENTITY popup.retry.label "Retry">
+<!ENTITY popup.retry.accesskey "R">
+<!ENTITY popup.open.label "Open">
+<!ENTITY popup.open.accesskey "O">
+<!ENTITY popup.openExternal.label "Open in External Player">
+<!ENTITY popup.openExternal.accesskey "E">
+<!ENTITY popup.openFolder.label "Open Containing Folder">
+<!ENTITY popup.openFolder.accesskey "F">
+<!ENTITY popup.go.label "Go to Video Page">
+<!ENTITY popup.go.accesskey "G">
+<!ENTITY popup.copy.label "Copy Video Page URL">
+<!ENTITY popup.copy.accesskey "C">
+<!ENTITY popup.selectAll.label "Select All">
+<!ENTITY popup.selectAll.accesskey "A">
+<!ENTITY popup.remove.label "Remove from List">
+<!ENTITY popup.remove.accesskey "R">

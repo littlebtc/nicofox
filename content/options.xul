@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
+<?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
+<prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
+ xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+ title="&prefwindow.title;" width="500"
+onload="updateUI();">
+<script src="options.js" />
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
+  </stringbundleset>
+  <prefpane id="pane11" label="&nicomonkey;" onpaneload="">
+    <preferences>
+      <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool"/>
+      <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool"/>
+      <preference id="pref-nicomonkey.player_killer" name="extensions.nicofox.nicomonkey.player_killer" type="bool"/>
+    </preferences>
+    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;" onclick="nicomonkeySwitch();" />
+    <groupbox>
+     <caption label="&nicomonkey.options;"/>
+     <checkbox id="nicomonkey.toolbar" preference="pref-nicomonkey.toolbar" label="&nicomonkey.toolbar.label;" accesskey="&nicomonkey.toolbar.accesskey;" />
+     <checkbox id="nicomonkey.player_killer" preference="pref-nicomonkey.player_killer" label="&nicomonkey.player_killer.label;" accesskey="&nicomonkey.player_killer.accesskey;" />
+    </groupbox>
+  </prefpane>
+  <prefpane id="pane12" label="&downloader;" onpaneload="">
+    <preferences>
+      <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
+      <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
+      <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
+    </preferences>
+    <groupbox>
+     <caption label="&downloader.options;" />
+     <hbox>
+     <label value="&downloader.save_path.label;" accesskey="&downloader.save_path.accesskey;" control="save_path" />
+     <filefield id="save_path" preference="pref-save_path"/>
+     <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectDir();" />
+     </hbox>
+     <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
+     <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
+    </groupbox>
+  </prefpane>
+</prefwindow>
