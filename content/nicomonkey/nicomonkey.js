@@ -14,16 +14,17 @@
 
 /* To let it be a light script, we won't use something like jQuery */
 function $$(xpath,root) { 
-  xpath=xpath.replace(/((^|\|)\s*)([^/|\s]+)/g,'$2.//$3').
-             replace(/\.([\w-]+)(?!([^\]]*]))/g,'[@class="$1" or @class$=" $1" or @class^="$1 " or @class~=" $1 "]').
-              replace(/#([\w-]+)/g,'[@id="$1"]').
-              replace(/\/\[/g,'/*[');/**/
-  str='(@\\w+|"[^"]*"|\'[^\']*\')'
-  xpath=xpath.replace(new RegExp(str+'\\s*~=\\s*'+str,'g'),'contains($1,$2)').
-              replace(new RegExp(str+'\\s*\\^=\\s*'+str,'g'),'starts-with($1,$2)').
-              replace(new RegExp(str+'\\s*\\$=\\s*'+str,'g'),'substring($1,string-length($1)-string-length($2)+1)=$2');
-  var got=document.evaluate(xpath,root||document,null,null,null), result=[];
-  while(next=got.iterateNext()) result.push(next);
+//  xpath=xpath.replace(/((^|\|)\s*)([^/|\s]+)/g,'$2.//$3').
+//             replace(/\.([\w-]+)(?!([^\]]*]))/g,'[@class="$1" or @class$=" $1" or @class^="$1 " or @class~=" $1 "]').
+//              replace(/#([\w-]+)/g,'[@id="$1"]').
+//              replace(/\/\[/g,'/*[');/**/
+//  str='(@\\w+|"[^"]*"|\'[^\']*\')'
+//  xpath=xpath.replace(new RegExp(str+'\\s*~=\\s*'+str,'g'),'contains($1,$2)').
+//              replace(new RegExp(str+'\\s*\\^=\\s*'+str,'g'),'starts-with($1,$2)').
+//              replace(new RegExp(str+'\\s*\\$=\\s*'+str,'g'),'substring($1,string-length($1)-string-length($2)+1)=$2');
+//	      alert(xpath);
+	  var got=document.evaluate(xpath,root||document,null,null,null), result=[];
+	  while(next=got.iterateNext()) result.push(next);
   return result;
 }
 
@@ -111,7 +112,6 @@ function prepare_inject(timer)
 function start_inject()
 {
 
-
 	var Video = 
 	{
 		v: document.getElementById('inject_video_v').value,
@@ -177,8 +177,10 @@ function start_inject()
 	html = html + '</ul></li>'+"\r\n"+
 		'</ul>';
 	video_utilities.innerHTML = html;
-	WATCHHEADER = document.getElementById('WATCHHEADER');
-	WATCHHEADER.parentNode.insertBefore(video_utilities, WATCHHEADER);
+	right_tools = $$('.//*[@id="WATCHHEADER"]/table/tbody/tr/td')[1];
+	right_tools.appendChild(video_utilities);
+	/*WATCHHEADER = document.getElementById('WATCHHEADER');
+	WATCHHEADER.parentNode.insertBefore(video_utilities, WATCHHEADER);*/
 
 }
 
@@ -195,11 +197,11 @@ function pushLinks(mainpage)
 	/* Fetching the video links */
 	if (mainpage)
 	{
-		videos = $$('a .video', document.getElementById('category_recent'));
+		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
 	}
 	else
 	{
-		videos = $$('a .video');
+		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]');
 	}
 	/* Run every link to check what we like */
 	for (i = 0; i < videos.length; i++)
