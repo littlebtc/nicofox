@@ -182,7 +182,7 @@ parseDownload: function(req)
 	this.persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
 	var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
                  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
+                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_FROM_CACHE;
 	this.persist.persistFlags = flags; 
 
 	if (prefs.getBoolPref('boon_comment'))
