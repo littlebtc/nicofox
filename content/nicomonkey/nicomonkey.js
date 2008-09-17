@@ -45,11 +45,9 @@ function start()
 
 	/* Inject CSS */
 		GM_addStyle('.fox-dl-link:link, .fox-dl-link:visited, .fox-dl-link:hover {color: #FFFFFF; background: #BBBBFF; margin-left: 0.2em;}'+"\r\n"+
-		   '#video_utilities { position:relative; font-size: 12px; height:2em; background: #FCFCFC; border: 1px solid #CCCCCC; color: #333333; } #video_utilities p {position: absolute; top:0.3em; left:0.3em; } #video_utilities_list {position: absolute; top:0; left: 10.5em; list-style-type: none; padding:0; margin:0;}'+
-'#video_utilities_list > li {float: left; position: relative; margin-left: 0.1em; margin-right: 0.1em; padding: 0.3em; background: #FAFAFA;} #video_utilities_list > li > ul {display:none; position: absolute; top:1.9em; left:0; width:20em; background: #FFFFFF; border: 1px solid #CCCCCC; margin:0; padding:0; list-style-type: none;} #video_utilities_list > li > ul > li > a { display:block; padding: 0.2em; text-decoration: none; } #video_utilities_list > li > ul > li > a:hover { background: #eeeeee; }'+
-'#video_utilities_list > li:hover {background: white; border: 1px solid #DDDDDD; } #video_utilities_list > li:hover > ul {display: block;}'+
-'#regenerate_player { background: #BBBBBB; border: 1px solid #CCCCCC; color: white; display: block; width: 100%; height: 540px; text-align: center; line-height: 540px; font-size: 200%; text-decoration: none; } #regenerate_player:hover {background: #999999;}'
+		   '#regenerate_player { background: #BBBBBB; border: 1px solid #CCCCCC; color: white; display: block; width: 100%; height: 540px; text-align: center; line-height: 540px; font-size: 200%; text-decoration: none; } #regenerate_player:hover {background: #999999;}'
 		);
+		GM_addStyle('#video_utilities_tabswitch {background: #CCCCCC;} a.fox-sw-link, a.fox-sw-link-selected { margin: 0.5em; padding: 0 0.2em 0 0.2em; text-decoration: none; } a.fox-sw-link {background: transparent; color: #333333; } a.fox-sw-link-selected {background: white; color: black; border: 2px solid #333333; border-bottom: 0; } ');
 
 	pushLinks(false);
 	if (document.getElementById('category_recent'))
@@ -160,28 +158,45 @@ function start_inject()
 	video_utilities.id = 'video_utilities';
 
 
-	html = '<p>'+NM_getString('toolbarTitle')+'</p><ul id="video_utilities_list">'+"\r\n"+
-		'<li>'+NM_getString('related')+''+"\r\n"+
-		'<ul>'+"\r\n"+
-		'<li><a href="http://d.hatena.ne.jp/video/niconico/'+Video.v+'" target="_blank">'+NM_getString('relatedHatena')+'</a></li>'+"\r\n"+
+	html = 	'<div id="video_utilities_tabswitch" style="font-size: 14px;"><a href="#" id="video_utilities_sw1" class="fox-sw-link-selected" onclick="return false;">General</a><a href="#" id="video_utilities_sw2" onclick="return false;">'+NM_getString('related')+'</a><a href="#" id="video_utilities_sw3" class="fox-sw-link" onclick="return false;">'+NM_getString('tools')+'</a></div>'+
+		'<ul id="video_utilities_tab2" style="display: none;">'+"\r\n"+
+		'<li>'+NM_getString('relatedHatena')+'<br /><input type="text" value="http://d.hatena.ne.jp/video/niconico/'+Video.v+'" readonly="true" onclick="this.focus(); this.select();" /></li>'+"\r\n"+
 		'<li><a href="http://www.nicovideo.jp/watch/'+Video.id+'" target="_blank">'+NM_getString('relatedNicoWww')+'</a></li>'+"\r\n"+
 		'<li><a href="http://tw.nicovideo.jp/watch/'+Video.id+'" target="_blank">'+NM_getString('relatedNicoTw')+'</a></li>'+"\r\n"+
 		'<li><a href="http://es.nicovideo.jp/watch/'+Video.id+'" target="_blank">'+NM_getString('relatedNicoEs')+'</a></li>'+"\r\n"+
 		'<li><a href="http://de.nicovideo.jp/watch/'+Video.id+'" target="_blank">'+NM_getString('relatedNicoDe')+'</a></li>'+"\r\n"+
-		'</ul></li>'+"\r\n"+
-		'<li>'+NM_getString('tools')+"\r\n"+ 
-		'<ul>'+"\r\n"+
+		'</ul>'+"\r\n"+
+		'<ul id="video_utilities_tab3" style="display: none;">'+"\r\n"+
 		'<li><a href="http://nicosound.dip.jp/sound/'+Video.id+'" target="_blank">'+NM_getString('toolsNicoSound')+'</a></li>'+"\r\n"+
 		'<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" target="_blank">'+NM_getString('toolsNicoChart')+'</a></li>'+"\r\n";
 	html = html + niconicofarm; /* Niconico farm is general comment only */
-	html = html + '</ul></li>'+"\r\n"+
-		'</ul>';
+	html = html + '</ul></li>'+"\r\n"
+	;
 	video_utilities.innerHTML = html;
 	right_tools = $$('.//*[@id="WATCHHEADER"]/table/tbody/tr/td')[1];
-	right_tools.appendChild(video_utilities);
+	right_tools.getElementsByTagName('table')[0].id = 'video_utilities_tab1';
+	right_tools.insertBefore(video_utilities, right_tools.firstChild);
+
+	document.getElementById('video_utilities_sw1').addEventListener('click', videoUtilitiesTab, false);
+	document.getElementById('video_utilities_sw2').addEventListener('click', videoUtilitiesTab, false);
+	document.getElementById('video_utilities_sw3').addEventListener('click', videoUtilitiesTab, false);
 	/*WATCHHEADER = document.getElementById('WATCHHEADER');
 	WATCHHEADER.parentNode.insertBefore(video_utilities, WATCHHEADER);*/
 
+}
+
+function videoUtilitiesTab(e)
+{
+	tab_num = (e.target.id.match(/sw([0-9])$/)[1]);
+	if (!tab_num || isNaN(tab_num)) { return; }
+	for (i = 1; i <= 3; i++)
+	{
+		document.getElementById('video_utilities_tab'+i).style.display = 'none';
+		document.getElementById('video_utilities_sw'+i).className = 'fox-sw-link';
+	}
+	document.getElementById('video_utilities_tab'+tab_num).style.display = 'block';
+	document.getElementById('video_utilities_sw'+tab_num).className = 'fox-sw-link-selected';
+	return false;
 }
 
 function listenMainPage()
