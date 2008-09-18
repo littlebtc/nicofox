@@ -16,8 +16,8 @@
       <toolbarbutton id="start" accesskey="&start.accesskey;" label="&start.label;" oncommand="start();"  />
       <!--<toolbarbutton id="pause" accesskey="p" label="Pause"/>-->
       <toolbarbutton id="stop" accesskey="&stop.accesskey;" label="&stop.label;" oncommand="stop();" disabled="true" />
-      <spacer flex="1" />
-      <textbox value="" emptytext="Search videos" width="300" />
+<!--      <spacer flex="1" />
+      <textbox value="" emptytext="Search videos" width="300" />-->
       <!-- XXX: emptytext is Fx3 only -->
     </toolbar>
   </toolbox>

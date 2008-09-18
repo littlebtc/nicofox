@@ -272,6 +272,15 @@ var download_runner =
 
 						case 'stop':
 						/* It is "protected" by the below part so will be executed only for download completed */
+						
+						/* If the download is incomplete, we will consider it as failed */
+						if (rows[rows_num].current_bytes != rows[rows_num].max_bytes)
+						{
+							this.downloader.removeFiles();
+							this.processCallback('fail', {}, id);
+							prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
+							return;
+						}
 
 						/* Finialize download */
 						this.downloader.movie_prepare_file.remove(false);

@@ -267,6 +267,7 @@ failDownload: function(req)
 	prompts.alert(null, 'Download failed', 'Cannot render the API/page to get the download location.');
         this.callback('fail',{});
 },
+/* Cancel by download manager action */
 cancel: function()
 {
 	/* Prevent comment file deleted while updating Boon comments */
@@ -280,13 +281,18 @@ cancel: function()
 	{
 		this.persist2.cancelSave();
 	}
+	this.removeFiles();
+
+	this.canceled = true;
+        this.callback('cancel',{});
+},
+/* Remove all downloaded files */
+removeFiles: function()
+{
 	/* Remove files */
 	if (this.ms_file != undefined)	this.ms_file.remove(false);
 	if (this.movie_file != undefined) this.movie_file.remove(false);
 	if (this.movie_prepare_file != undefined) this.movie_prepare_file.remove(false);
-
-	this.canceled = true;
-        this.callback('cancel',{});
 },
 /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update */
 addBoonComment: function()
