@@ -45,7 +45,7 @@ var nicofox = {
 	else
 	{
 		window.open("chrome://nicofox/content/smilefox.xul",
-                  "smilefox", "chrome,centerscreen,width=800,height=450");
+                  "smilefox", "chrome,centerscreen,resizable=yes,width=800,height=450");
 	}
 
   },
@@ -116,7 +116,7 @@ var nicofox = {
 		if(!dlmanager)
 		{
 			var dlmanager = window.openDialog("chrome://nicofox/content/smilefox.xul",
-	                  "smilefox", "dialog=no,chrome,centerscreen,width=770,height=450", {Video: Video, url: url});
+	                  "smilefox", "dialog=no,chrome,centerscreen,resizable=yes,width=770,height=450", {Video: Video, url: url});
 		}
 		else
 		{
