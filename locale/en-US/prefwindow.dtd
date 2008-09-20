@@ -1,11 +1,13 @@
 <!ENTITY prefwindow.title "NicoFox preferences">
 <!ENTITY pane1.title "NicoFox preferences">
-<!ENTITY nicomonkey "Page Injection">
-<!ENTITY nicomonkey.enable.label "Enable Page Injection">
+<!ENTITY nicomonkey "Page content">
+<!ENTITY nicomonkey.enable.label "Add NicoFox features to pages">
 <!ENTITY nicomonkey.enable.accesskey "E">
-<!ENTITY nicomonkey.options "Inject Options">
-<!ENTITY nicomonkey.toolbar.label "Use Toolbar">
+<!ENTITY nicomonkey.options "Feature Customization">
+<!ENTITY nicomonkey.toolbar.label "Add Toolbar">
 <!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.comment_helper.label "Comment input helper">
+<!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "Hide Player for deleted videos">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
 <!ENTITY downloader "Download Manager">

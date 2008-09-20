@@ -6,6 +6,8 @@
 <!ENTITY nicomonkey.options "自定追加功能">
 <!ENTITY nicomonkey.toolbar.label "加上工具列">
 <!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.comment_helper.label "評論輸入輔助工具">
+<!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "隱藏被刪除影片的播放器">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
 <!ENTITY downloader "下載管理員">

@@ -6,6 +6,8 @@
 <!ENTITY nicomonkey.options "追加機能のカスタマイズ">
 <!ENTITY nicomonkey.toolbar.label "ツールバーを追加">
 <!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.comment_helper.label "コメント入力支援ツール">
+<!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "再生しようとした動画が削除されていたら、プレイヤーを読み込めしない。">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
 <!ENTITY downloader "ダウンロードマネージャー">

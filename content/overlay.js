@@ -102,9 +102,18 @@ var nicofox = {
 			/* Call the download confirm dialog */
 			var params = {url: url, Video: Video, out: null};       
 
-			window.openDialog("chrome://nicofox/content/download_confirm.xul", "",
-		    "centerscreen,modal", params).focus();
-
+			/* Easter Egg is here! */
+			if (this.prefs.getBoolPref('tsundere'))
+			{
+				window.openDialog("chrome://nicofox/content/tsundere_confirm.xul", "",
+				    "centerscreen,modal", params).focus();
+			}
+			/* Without Easter Egg... */
+			else
+			{
+				window.openDialog("chrome://nicofox/content/download_confirm.xul", "",
+				    "centerscreen,modal", params).focus();
+			}
 			 if (!params.out) { return; }
 		}
 

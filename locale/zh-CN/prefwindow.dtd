@@ -6,6 +6,8 @@
 <!ENTITY nicomonkey.options "自定追加功能">
 <!ENTITY nicomonkey.toolbar.label "加上工具栏">
 <!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.comment_helper.label "评论输入辅助工具">
+<!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "隐藏被删除视频的播放器">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
 <!ENTITY downloader "下载管理器">

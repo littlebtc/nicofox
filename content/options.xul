@@ -5,19 +5,21 @@
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
- title="&prefwindow.title;" width="500" height="250"
+ title="&prefwindow.title;" width="500" height="300"
 >
   <prefpane id="pane11" label="&nicomonkey;" onpaneload="updatePanel1();">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel1.js" />
     <preferences>
       <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool"/>
       <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool"/>
+      <preference id="pref-nicomonkey.comment_helper" name="extensions.nicofox.nicomonkey.comment_helper" type="bool"/>
       <preference id="pref-nicomonkey.player_killer" name="extensions.nicofox.nicomonkey.player_killer" type="bool"/>
     </preferences>
     <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;" onclick="nicomonkeySwitch();" />
     <groupbox>
      <caption label="&nicomonkey.options;"/>
      <checkbox id="nicomonkey.toolbar" preference="pref-nicomonkey.toolbar" label="&nicomonkey.toolbar.label;" accesskey="&nicomonkey.toolbar.accesskey;" />
+     <checkbox id="nicomonkey.comment_helper" preference="pref-nicomonkey.comment_helper" label="&nicomonkey.comment_helper.label;" accesskey="&nicomonkey.comment_helper.accesskey;" />
      <checkbox id="nicomonkey.player_killer" preference="pref-nicomonkey.player_killer" label="&nicomonkey.player_killer.label;" accesskey="&nicomonkey.player_killer.accesskey;" />
     </groupbox>
   </prefpane>

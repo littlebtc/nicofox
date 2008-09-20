@@ -60,20 +60,21 @@ parseDownload: function(req)
 		eval('params.'+key+' = value');
 	}
 
-	if (this.comment_type != 'www')
-	{
-		this.file_title = this.file_title + ' ['+this.comment_type+']';
-	}
 
 	/* Distinguish Economy mode */
 	if (params.url.match(/low$/))
 	{
 		this.economy = true;
-		this.file_title = this.file_title + ' [eco]';
 	}
 	else
 	{
 		this.economy = false;
+	}
+
+	/* Add comment filename */
+	if (this.comment_type != 'www')
+	{
+		this.file_title = this.file_title + '['+this.comment_type+']';
 	}
 
 	/* Distinguish what type of video we will download */

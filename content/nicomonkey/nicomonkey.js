@@ -69,7 +69,10 @@ function start()
 	  )
 	{
 		/* Add comment helper */
-		window.setTimeout(addCommentHelper, 10);
+		if(GM_getValue('comment_helper'))
+		{
+			window.setTimeout(addCommentHelper, 10);
+		}
 		if(GM_getValue('toolbar'))
 		{
 			/* Use Div to do something wrong */
@@ -131,7 +134,10 @@ function start_inject()
 
 	if (Video.isDeleted)
 	{
-		killPlayer();
+		if (GM_getValue('player_killer'))
+		{
+			window.setTimeout(killPlayer, 20);
+		}	
 		return;
 	}
 	
