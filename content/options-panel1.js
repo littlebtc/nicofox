@@ -23,11 +23,13 @@ function updatePanel1()
 	if (checked)
 	{
 		document.getElementById('nicomonkey.toolbar').disabled = false;
+		document.getElementById('nicomonkey.comment_helper').disabled = false;
 		document.getElementById('nicomonkey.player_killer').disabled = false;
 	}
 	else
 	{
 		document.getElementById('nicomonkey.toolbar').disabled = true;
+		document.getElementById('nicomonkey.comment_helper').disabled = true;
 		document.getElementById('nicomonkey.player_killer').disabled = true;
 	}
 }
