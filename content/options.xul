@@ -6,12 +6,12 @@
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
  title="&prefwindow.title;" width="500" height="250"
-onload="updateUI();">
+>
 <script src="options.js" />
   <stringbundleset id="stringbundleset">
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
   </stringbundleset>
-  <prefpane id="pane11" label="&nicomonkey;" onpaneload="">
+  <prefpane id="pane11" label="&nicomonkey;" onpaneload="updatePanel1();">
     <preferences>
       <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool"/>
       <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool"/>
@@ -24,7 +24,7 @@ onload="updateUI();">
      <checkbox id="nicomonkey.player_killer" preference="pref-nicomonkey.player_killer" label="&nicomonkey.player_killer.label;" accesskey="&nicomonkey.player_killer.accesskey;" />
     </groupbox>
   </prefpane>
-  <prefpane id="pane12" label="&downloader;" onpaneload="">
+  <prefpane id="pane12" label="&downloader;" onpaneload="updatePanel2();">
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />

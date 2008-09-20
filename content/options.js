@@ -15,16 +15,8 @@ function nicomonkeySwitch()
 		document.getElementById('nicomonkey.player_killer').disabled = true;
 	}
 }
-function updateUI()
+function updatePanel1()
 {
-	var save_path = document.getElementById("pref-save_path").value;
-	if (save_path)
-	{
-		var save_path_element = document.getElementById("save_path");
-		save_path_element.file = save_path;
-		save_path_element.label = save_path.path;
-	}
-
 	checked = document.getElementById('nicomonkey.enable').checked;
 	if (checked)
 	{
@@ -36,6 +28,17 @@ function updateUI()
 		document.getElementById('nicomonkey.toolbar').disabled = true;
 		document.getElementById('nicomonkey.player_killer').disabled = true;
 	}
+}
+function updatePanel2()
+{
+	var save_path = document.getElementById("pref-save_path").value;
+	if (save_path)
+	{
+		var save_path_element = document.getElementById("save_path");
+		save_path_element.file = save_path;
+		save_path_element.label = save_path.path;
+	}
+
 
 }
 function selectDir(title)
@@ -46,7 +49,7 @@ function selectDir(title)
 	if (file_picker.show() == Ci.nsIFilePicker.returnOK)
 	{
 		document.getElementById("pref-save_path").value = file_picker.file;
-	updateUI();
+	updatePanel2();
 	}
 }
 
