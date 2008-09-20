@@ -1,0 +1,20 @@
+<!ENTITY prefwindow.title "NicoFox オプション">
+<!ENTITY pane1.title "NicoFox オプション">
+<!ENTITY nicomonkey "ページ表示">
+<!ENTITY nicomonkey.enable.label "ページにNicoFox機能を追加します">
+<!ENTITY nicomonkey.enable.accesskey "E">
+<!ENTITY nicomonkey.options "追加機能のカスタマイズ">
+<!ENTITY nicomonkey.toolbar.label "ツールバーを追加">
+<!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.player_killer.label "再生しようとした動画が削除されていたら、プレイヤーを読み込めしない。">
+<!ENTITY nicomonkey.player_killer.accesskey "H">
+<!ENTITY downloader "ダウンロードマネージャー">
+<!ENTITY downloader.options "ダウンロードオプション">
+<!ENTITY downloader.save_path.label "動画保存フォルダ">
+<!ENTITY downloader.save_path.accesskey "S">
+<!ENTITY downloader.save_path.browse.label "参造…">
+<!ENTITY downloader.save_path.browse.accesskey "B">
+<!ENTITY downloader.confirm_before_download.label "ダウンロードするとき、確認ダイアローグを表示する">
+<!ENTITY downloader.confirm_before_download.accesskey "C">
+<!ENTITY downloader.boon_comment.label "BOON Player 互換のコメントを生成する">
+<!ENTITY downloader.boon_comment.accesskey "B">

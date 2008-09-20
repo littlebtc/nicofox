@@ -1,0 +1,20 @@
+<!ENTITY prefwindow.title "NicoFox 选项">
+<!ENTITY pane1.title "NicoFox 选项">
+<!ENTITY nicomonkey "页面显示">
+<!ENTITY nicomonkey.enable.label "在页面中加入NicoFox追加的功能">
+<!ENTITY nicomonkey.enable.accesskey "E">
+<!ENTITY nicomonkey.options "自定追加功能">
+<!ENTITY nicomonkey.toolbar.label "加上工具栏">
+<!ENTITY nicomonkey.toolbar.accesskey "T">
+<!ENTITY nicomonkey.player_killer.label "隐藏被删除视频的播放器">
+<!ENTITY nicomonkey.player_killer.accesskey "H">
+<!ENTITY downloader "下载管理器">
+<!ENTITY downloader.options "下载选项">
+<!ENTITY downloader.save_path.label "将视频储存到">
+<!ENTITY downloader.save_path.accesskey "S">
+<!ENTITY downloader.save_path.browse.label "浏览...">
+<!ENTITY downloader.save_path.browse.accesskey "B">
+<!ENTITY downloader.confirm_before_download.label "下载前显示确认对话框">
+<!ENTITY downloader.confirm_before_download.accesskey "C">
+<!ENTITY downloader.boon_comment.label "使评论档案兼容BOON Player">
+<!ENTITY downloader.boon_comment.accesskey "B">

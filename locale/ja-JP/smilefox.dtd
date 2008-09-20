@@ -1,0 +1,30 @@
+<!ENTITY window.title "NicoFox ダウンロードマネージャー">
+<!ENTITY start.label "開始">
+<!ENTITY start.accesskey "S">
+<!ENTITY stop.label "中止">
+<!ENTITY stop.accesskey "P">
+<!ENTITY tree.videoTitle "動画タイトル">
+<!ENTITY tree.comment "コメント">
+<!ENTITY tree.economy "エコノミー">
+<!ENTITY tree.progress "進行状況">
+<!ENTITY tree.status "状態">
+<!ENTITY tree.size "サイズ">
+<!ENTITY tree.speed "転送速度">
+<!ENTITY popup.cancel.label "キャンセル">
+<!ENTITY popup.cancel.accesskey "C">
+<!ENTITY popup.retry.label "再試行">
+<!ENTITY popup.retry.accesskey "R">
+<!ENTITY popup.open.label "NicoFox Playerで再生">
+<!ENTITY popup.open.accesskey "O">
+<!ENTITY popup.openExternal.label "外部プレイヤーで再生">
+<!ENTITY popup.openExternal.accesskey "E">
+<!ENTITY popup.openFolder.label "保存フォルダを開く">
+<!ENTITY popup.openFolder.accesskey "F">
+<!ENTITY popup.go.label "動画ページを開く">
+<!ENTITY popup.go.accesskey "G">
+<!ENTITY popup.copy.label "動画ページのURLをコピー">
+<!ENTITY popup.copy.accesskey "C">
+<!ENTITY popup.selectAll.label "すべて選択">
+<!ENTITY popup.selectAll.accesskey "A">
+<!ENTITY popup.remove.label "リストから削除">
+<!ENTITY popup.remove.accesskey "R">

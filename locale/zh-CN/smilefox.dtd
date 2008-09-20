@@ -1,30 +1,30 @@
-<!ENTITY window.title "NicoFox 下載管理員">
-<!ENTITY start.label "開始">
+<!ENTITY window.title "NicoFox 下载管理器">
+<!ENTITY start.label "开始">
 <!ENTITY start.accesskey "S">
 <!ENTITY stop.label "停止">
 <!ENTITY stop.accesskey "P">
-<!ENTITY tree.videoTitle "影片標題">
-<!ENTITY tree.comment "評論">
-<!ENTITY tree.economy "經濟模式">
-<!ENTITY tree.progress "進度">
-<!ENTITY tree.status "狀態">
+<!ENTITY tree.videoTitle "影片标题">
+<!ENTITY tree.comment "评论">
+<!ENTITY tree.economy "经济模式">
+<!ENTITY tree.progress "进度">
+<!ENTITY tree.status "状态">
 <!ENTITY tree.size "大小">
 <!ENTITY tree.speed "速度">
 <!ENTITY popup.cancel.label "取消">
 <!ENTITY popup.cancel.accesskey "C">
-<!ENTITY popup.retry.label "重試">
+<!ENTITY popup.retry.label "重试">
 <!ENTITY popup.retry.accesskey "R">
 <!ENTITY popup.open.label "以 NicoFox Player 播放">
 <!ENTITY popup.open.accesskey "P">
 <!ENTITY popup.openExternal.label "在外部播放器播放">
 <!ENTITY popup.openExternal.accesskey "E">
-<!ENTITY popup.openFolder.label "開啟所在資料夾">
+<!ENTITY popup.openFolder.label "打开所在文件夹">
 <!ENTITY popup.openFolder.accesskey "F">
-<!ENTITY popup.go.label "連到影片網頁">
+<!ENTITY popup.go.label "连到视频网页">
 <!ENTITY popup.go.accesskey "G">
-<!ENTITY popup.copy.label "複製影片網頁連結">
+<!ENTITY popup.copy.label "复制视频网页链接">
 <!ENTITY popup.copy.accesskey "C">
-<!ENTITY popup.selectAll.label "全選">
+<!ENTITY popup.selectAll.label "全选">
 <!ENTITY popup.selectAll.accesskey "A">
-<!ENTITY popup.remove.label "從清單移除">
+<!ENTITY popup.remove.label "从列表中移除">
 <!ENTITY popup.remove.accesskey "R">

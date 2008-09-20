@@ -14,9 +14,9 @@
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "Retry">
 <!ENTITY popup.retry.accesskey "R">
-<!ENTITY popup.open.label "Open">
-<!ENTITY popup.open.accesskey "O">
-<!ENTITY popup.openExternal.label "Open in External Player">
+<!ENTITY popup.open.label "Play">
+<!ENTITY popup.open.accesskey "P">
+<!ENTITY popup.openExternal.label "Play in External Player">
 <!ENTITY popup.openExternal.accesskey "E">
 <!ENTITY popup.openFolder.label "Open Containing Folder">
 <!ENTITY popup.openFolder.accesskey "F">

@@ -1,5 +1,7 @@
 content	nicofox		content/
 locale	nicofox		en-US	locale/en-US/
+locale	nicofox		ja-JP	locale/ja-JP/
+locale	nicofox		zh-CN	locale/zh-CN/
 locale	nicofox		zh-TW	locale/zh-TW/
 skin	nicofox		classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay.xul
