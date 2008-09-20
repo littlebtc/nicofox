@@ -4,13 +4,15 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.1b2pre</em:version>
+    <em:version>0.1b2</em:version>
 
-    <em:description>Downloader and convenient utilities for Nico Nico douga.</em:description>
+    <em:description>Download videos with its comments from Nico Nico Douga and change your watching experience.</em:description>
     <em:creator>Littlebtc</em:creator>
     <em:contributor>Using some Greasemonkey source code, (http://www.greasespot.net/)</em:contributor>
     <em:contributor>Using Greasemonkey compiler, by Anthony Lieuallen (http://arantius.com/)</em:contributor>
-    <em:homepageURL>http://nicofox.openfoundry.org/</em:homepageURL>
+    <em:translator>alexsh</em:translator>
+    <em:translator>imfafa</em:translator>
+    <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
     <em:optionsURL>chrome://nicofox/content/options.xul</em:optionsURL>
     <em:targetApplication>
       <Description>
@@ -23,13 +25,40 @@
       <Description>
         <em:locale>zh-TW</em:locale>
         <em:name>NicoFox</em:name>
-        <em:description>NICONICO動畫的下載器和方便工具。</em:description>
+        <em:description>從NICONICO動畫中下載影片和評論，並改變你的NICO觀賞經驗！ </em:description>
         <em:creator>Littlebtc</em:creator>
         <em:contributor>使用了一些Greasemonkey的原始碼 (http://www.greasespot.net/)</em:contributor>
         <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
-        <em:homepageURL>http://nicofox.openfoundry.org/</em:homepageURL>
+	<em:translator>alexsh</em:translator>
+	<em:translator>imfafa</em:translator>
+        <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
       </Description>
      </em:localized>
-
+    <em:localized>
+      <Description>
+        <em:locale>zh-CN</em:locale>
+        <em:name>NicoFox</em:name>
+        <em:description>从NICONICO动画中下载视频，并改变你的NICO观赏经验！ </em:description>
+        <em:creator>Littlebtc</em:creator>
+        <em:contributor>使用了一些Greasemonkey的源代码  (http://www.greasespot.net/)</em:contributor>
+        <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
+	<em:translator>alexsh</em:translator>
+	<em:translator>imfafa</em:translator>
+        <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
+      </Description>
+     </em:localized>
+    <em:localized>
+      <Description>
+        <em:locale>ja-JP</em:locale>
+        <em:name>NicoFox</em:name>
+        <em:description>ニコニコ動画から動画とコメントを保存し、あなたのニコ体験を更に！</em:description>
+        <em:creator>Littlebtc</em:creator>
+        <em:contributor>Using some Greasemonkey source code, (http://www.greasespot.net/)</em:contributor>
+        <em:contributor>Using Greasemonkey compiler, by Anthony Lieuallen (http://arantius.com/)</em:contributor>
+	<em:translator>alexsh</em:translator>
+	<em:translator>imfafa</em:translator>
+        <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
+      </Description>
+     </em:localized>
   </Description>
 </RDF>
