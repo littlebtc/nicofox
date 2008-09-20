@@ -5,7 +5,7 @@ pref("extensions.nicofox.confirm_before_download", true);
 pref("extensions.nicofox.boon_comment", true);
 pref("extensions.nicofox.nicomonkey.enable", true);
 pref("extensions.nicofox.nicomonkey.toolbar", true);
-pref("extensions.nicofox.nicomonkey.comment_helper", true);
+pref("extensions.nicofox.nicomonkey.comment_helper", false);
 pref("extensions.nicofox.nicomonkey.player_killer", false);
 // Easter Egg!
 pref("extensions.nicofox.tsundere", false);
