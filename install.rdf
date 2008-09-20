@@ -53,8 +53,8 @@
         <em:name>NicoFox</em:name>
         <em:description>ニコニコ動画から動画とコメントを保存し、あなたのニコ体験を更に！</em:description>
         <em:creator>Littlebtc</em:creator>
-        <em:contributor>Using some Greasemonkey source code, (http://www.greasespot.net/)</em:contributor>
-        <em:contributor>Using Greasemonkey compiler, by Anthony Lieuallen (http://arantius.com/)</em:contributor>
+        <em:contributor>Greasemonkeyのソースコードを参考していただきました。 (http://www.greasespot.net/)</em:contributor>
+        <em:contributor>Anthony Lieuallen様のGreasemonkey Compilerを使わせていただきました。 (http://arantius.com/)</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
