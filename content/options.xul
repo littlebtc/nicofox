@@ -5,7 +5,7 @@
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
- title="&prefwindow.title;" width="500" height="120"
+ title="&prefwindow.title;" width="500" height="250"
 onload="updateUI();">
 <script src="options.js" />
   <stringbundleset id="stringbundleset">
@@ -26,7 +26,7 @@ onload="updateUI();">
   </prefpane>
   <prefpane id="pane12" label="&downloader;" onpaneload="">
     <preferences>
-      <preference id="pref-save_path" name="extensions.nicofox.save_path" width="250" type="file"/> 
+      <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
       <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
     </preferences>
@@ -34,7 +34,7 @@ onload="updateUI();">
      <caption label="&downloader.options;" />
      <hbox>
      <label value="&downloader.save_path.label;" accesskey="&downloader.save_path.accesskey;" control="save_path" />
-     <filefield id="save_path" preference="pref-save_path"/>
+     <filefield id="save_path" preference="pref-save_path" width="200"/>
      <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectDir();" />
      </hbox>
      <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
