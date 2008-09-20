@@ -32,7 +32,7 @@
     <splitter class="tree-splitter"/>
     <treecol label="&tree.progress;" id="tree-progress" flex="2"  type="progressmeter"/>
     <splitter class="tree-splitter"/>
-    <treecol label="&tree.status;" id="tree-status" flex="1"/>
+    <treecol label="&tree.status;" id="tree-status" flex="2"/>
     <splitter class="tree-splitter"/>
     <treecol label="&tree.size;" id="tree-size" flex="1"/>
     <splitter class="tree-splitter"/>
