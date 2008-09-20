@@ -4,7 +4,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.1b1</em:version>
+    <em:version>0.1b2pre</em:version>
 
     <em:description>Downloader and convenient utilities for Nico Nico douga.</em:description>
     <em:creator>Littlebtc</em:creator>
