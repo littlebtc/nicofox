@@ -73,6 +73,27 @@ function start()
 		{
 			window.setTimeout(addCommentHelper, 10);
 		}
+
+		/* Fetching Nico Nico's video title */
+		var h1 = document.getElementsByTagName('h1')[0];
+
+		/* inject the video download link */
+		if (h1.hasChildNodes())
+		{
+			var download_link = document.createElement('a');
+			download_link.className = 'fox-dl-link';
+			download_link.id = 'fox-dl-this';
+
+			href = window.location.href;
+			/* There will be some problem if the premium user uses the normal user network (?lo=1), dirty fix */
+			href = href.split("?")[0];
+
+			download_link.href = href + '?smilefox=get';
+			download_link.textContent = 'DL';
+			
+			h1.appendChild(download_link);
+		}
+
 		if(GM_getValue('toolbar'))
 		{
 			/* Use Div to do something wrong */
@@ -124,11 +145,28 @@ function start_inject()
 
 	var Video = 
 	{
+		title: document.getElementsByTagName('h1')[0].getElementsByTagName('a')[0].textContent,	    
 		v: document.getElementById('inject_video_v').value,
 		id: document.getElementById('inject_video_id').value,
 		isDeleted: false,
 		isMymemory: false,
 	}
+	
+	/* XXX it should not be here, but it is used to reduce the render times */
+	if (Video.isMymemory)
+	{
+		Video.comment_type = 'mymemory' + Video.v;
+	}
+	else if (window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[0-9]+/))
+	{
+		Video.comment_type = 'comment' + Video.v;
+	}
+	else
+	{
+		Video.comment_type = window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{2}[0-9]+/)[1] ;
+	}
+
+
 	if (document.getElementById('inject_video_isDeleted').value=='true') { Video.isDeleted = true; }
 	if (document.getElementById('inject_video_isMymemory').value=='true') { Video.isMymemory = true; }
 
@@ -140,7 +178,7 @@ function start_inject()
 		}	
 		return;
 	}
-	
+
 	var niconicofarm = "\r\n";
 	/* check if Video.v is a pure integer... (mymemory / community / other countries ver.), (for hatena::diary and niconicofarm) */
 
@@ -149,24 +187,14 @@ function start_inject()
 		niconicofarm = '<li><a href="http://nico.xii.jp/comment/?url='+Video.id+'" target="_blank">'+NM_getString('toolsNicoNicoFarm')+"\r\n"; // Use Nico Nico Farm (support)
 	}
 
-	/* Fetching Nico Nico's video title */
-	h1 = document.getElementsByTagName('h1')[0];
-
-	/* inject the video download link */
-	if (h1.hasChildNodes())
+	document.getElementById('fox-dl-this').addEventListener('click', function(e)
 	{
-			download_link = document.createElement('a');
-			download_link.className = 'fox-dl-link';
+		NM_goDownload(Video, window.location.href);
+		e.stopPropagation();
+		e.preventDefault();
 
-				href = window.location.href;
-				/* There will be some problem if the premium user uses the normal user network (?lo=1), dirty fix */
-				href = href.split("?")[0];
-
-			download_link.href = href + '?smilefox=get';
-			download_link.textContent = 'DL';
-
-			h1.appendChild(download_link);
 	}
+	, true);
 
 	/* Inject Video Utilities */
 	video_utilities = document.createElement('div');

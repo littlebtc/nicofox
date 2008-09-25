@@ -183,7 +183,7 @@ parseDownload: function(req)
 	this.persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
 	var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
                  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_FROM_CACHE;
+                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
 	this.persist.persistFlags = flags; 
 
 	if (prefs.getBoolPref('boon_comment'))
@@ -216,9 +216,14 @@ parseDownload: function(req)
 	/* Don't waste time */
 	if (this.canceled) { return; }
 
-	//new obj_URI object
-	var movie_uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(params.url, null, null);
+	/* Make URI and cache key */
+	var movie_uri = Cc["@mozilla.org/network/io-service;1"]
+	                .getService(Ci.nsIIOService).newURI(params.url, null, null);
 
+	//var cache_key = Cc['@mozilla.org/supports-string;1']
+	//                .createInstance(Ci.nsISupportsString);
+	//cache_key.data = params.url;
+	//cache_key = null;
 	this.persist2 = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
 	                createInstance(Ci.nsIWebBrowserPersist);
 

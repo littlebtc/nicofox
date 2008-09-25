@@ -231,6 +231,7 @@ var download_runner =
 				new_query = {id: rows[i].id, rows_num: i};
 				var k = this.query.push(new_query) - 1;
 				
+				this.query[k].progress_change_count = 0;	
 				this.query[k].processCallback = function(type, content, id)
 				{
 					if (rows_lock == true)

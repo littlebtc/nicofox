@@ -77,6 +77,21 @@ var nicofox = {
 		urlparser.goParse(url);
 	},
 
+	goDownloadFromVideoPage: function(Video, url)
+	{
+		/* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
+		var value = this.prefs.getComplexValue("save_path",
+		Components.interfaces.nsISupportsString).data;
+		if (!value)
+		{
+			this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorPathNotDefined'));
+			pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', 'chrome,titlebar,toolbar,centerscreen,modal');
+			pref_window.focus();
+			return;
+		}
+		this.confirmDownload(Video, url);
+	},
+
 	confirmDownload: function(Video, url)
 		{
 

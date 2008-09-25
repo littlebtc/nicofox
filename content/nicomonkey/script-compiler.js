@@ -86,8 +86,9 @@ injectScript: function(script, url, unsafeContentWin) {
 	sandbox.GM_getResourceURL=function(){};
 	sandbox.GM_getResourceText=function(){};
 	
-	// A nicomonkey dirty hack
+	// Nicomonkey dirty hacks
 	sandbox.NM_getString = nicomonkey_gmCompiler.hitch(this, 'getString');
+	sandbox.NM_goDownload = nicomonkey_gmCompiler.hitch(nicofox, 'goDownloadFromVideoPage');
 
 	sandbox.__proto__=sandbox.window;
 
