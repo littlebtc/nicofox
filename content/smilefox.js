@@ -757,20 +757,20 @@ function popup(e)
 /* Fix common reserved characters in filesystems by converting to full-width */
 function fixReservedCharacters(title)
 {
-	title = title.replace(/\//, '／');
-	title = title.replace(/\\/, '＼');
-	title = title.replace(/\?/, '？');
-	title = title.replace(/\%/, '％');
-	title = title.replace(/\*/, '＊');
-	title = title.replace(/\:/, '：');
-	title = title.replace(/\|/, '｜');
-	title = title.replace(/\"/, '”');
-	title = title.replace(/\</, '＜');
-	title = title.replace(/\>/, '＞');
-	title = title.replace(/\+/, '＋');
+	title = title.replace(/\//g, '／');
+	title = title.replace(/\\/g, '＼');
+	title = title.replace(/\?/g, '？');
+	title = title.replace(/\%/g, '％');
+	title = title.replace(/\*/g, '＊');
+	title = title.replace(/\:/g, '：');
+	title = title.replace(/\|/g, '｜');
+	title = title.replace(/\"/g, '”');
+	title = title.replace(/\</g, '＜');
+	title = title.replace(/\>/g, '＞');
+	title = title.replace(/\+/g, '＋');
 	/* Windows FAT specified... */
-	title = title.replace(/\[/, '〔');
-	title = title.replace(/\]/, '〕');
+	title = title.replace(/\[/g, '〔');
+	title = title.replace(/\]/g, '〕');
 	return title;
 }
 
