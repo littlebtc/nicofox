@@ -145,7 +145,7 @@ function start_inject()
 
 	var Video = 
 	{
-		title: document.getElementsByTagName('h1')[0].getElementsByTagName('a')[0].textContent,	    
+		title: document.getElementsByTagName('h1')[0].getElementsByTagName('a')[0].textContent.replace(/\&\#039\;/g, '\''),	    
 		v: document.getElementById('inject_video_v').value,
 		id: document.getElementById('inject_video_id').value,
 		isDeleted: false,
