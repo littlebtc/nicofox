@@ -13,6 +13,10 @@ var Nicowatcher = {
   // nsIContentPolicy interface implementation
   shouldLoad: function(contentType, contentLocation, requestOrigin, requestingNode, mimeTypeGuess, extra)
 	{
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+		            .getService(Components.interfaces.nsIPrefService);
+		prefs = prefs.getBranch("extensions.nicofox.");
+
 		if (contentType == Components.interfaces.nsIContentPolicy.TYPE_DOCUMENT)
 		{
 			url = contentLocation.spec;
@@ -22,14 +26,22 @@ var Nicowatcher = {
 			var winWat = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
 		    .getService(Components.interfaces.nsIWindowWatcher);
 
-		if (winWat.activeWindow && winWat.activeWindow.nicofox) {
-	    winWat.activeWindow.nicofox.goDownload(url);
-		}
+			if (winWat.activeWindow && winWat.activeWindow.nicofox) {
+			    winWat.activeWindow.nicofox.goDownload(url);
+			}
 			
+			return Components.interfaces.nsIContentPolicy.REJECT_REQUEST;
+			}
+		}
+		/* Block NicoWa if needed */
+		else if (contentType == Components.interfaces.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST)
+		{
+			url = contentLocation.spec;
+			if(prefs.getBoolPref('nicowa_blocker') && url.match(/^http:\/\/www.nicovideo.jp\/api\/getmarquee/))
+			{
 				return Components.interfaces.nsIContentPolicy.REJECT_REQUEST;
 			}
 		}
-
    return Components.interfaces.nsIContentPolicy.ACCEPT;
 	},
   // this is now for urls that directly load media, and meta-refreshes (before activation)
