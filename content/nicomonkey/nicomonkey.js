@@ -20,6 +20,10 @@ var transparent_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAM
 var comment_big_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAwBQTFRFAAAADAwMGRkZJiYmMzMzQEBATk5OXFxca2trenp6i4uLnJycrq6uw8PD2tra////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXPSJjgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAI9JREFUKFO1UssSwiAMTBHBStj9/7812NBOEQ+O05xCln2EQeS/AuIXAfBaBF5k73oU+ORAepTokcD7ljoMGSO5zvfJZJ0jyl1uuAAm6Iy0mpYyfUILmCXMHrWwKRlxGViFuLWRxTgvU9gdKvE4WLnSTLys1zddJFkPf5d2Nj7KBimeJ9dUd68wLuFqP3+rF1cIBqcTr1DKAAAAAElFTkSuQmCC';
 var comment_medium_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAwBQTFRFAAAAGRkZJiYmMzMzenp6i4uLnJycrq6uw8PD2tra////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqdvPiAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAF5JREFUKFPNktsKgEAIRG3XVsf//+DEIDD0JQqah0E54gUk+pMEs1lnx9YQRgEQsnBJHMLMAjeGZsKent3eIFBVmJtamjOsIzTHtUGEN5WXRs0TsqwYEd2WduTLXzkAiLICs4gIfn8AAAAASUVORK5CYII=';
 var comment_small_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAwBQTFRFAAAAJiYmQEBAXFxca2trenp6i4uLnJycrq6uw8PD2traAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtz0ECwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAE5JREFUKFPV0UEOACEIA8AKopb/P3gx3gjuXY5MaCAAr5et2wXGH5HKHMbmBfUVgl4EUreAlvNGdLeIJ1FvR6B5JuBIVcJ5kTlef2Ls/wFimQEWbWcdnAAAAABJRU5ErkJggg==';
+
+var tag_add_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIxSURBVDjLfZLPi1JRFMffPzGLNkW7Ni1aJUitI4IWLVpm0RTUohazqkVU0GhjGcGU1NA6dFQ0FX09QVHxVzr+eE9RRMw0NVslPcmn8517nulkOj44XO6953y+33Pf4SRJgiiKyOfzyOVyyGazyGQySKfTSKVSawC4VcEVCgWMx+OFaDabKiQej6+EcKRMBY1GQ1Wu1+szCJ0xF4hEIkdCOLJMyaRGB8lkMt3v96EoinpOwFgshmAwuBTCkeo0kRX/YZYbg8EAnb6CwLeJk1qthnA4jEAgsADhSHlqeTQagYp//B7j+d4+nn4BhMbkrlqtkgv4/f45CMd6lHu9npo0HA7RZsqGzD7eiMA7CdjaO4RUKhVyAY/HM4NwiUTiHOtR7na7alKhp6jKZgb4UALeF+ch5XKZXMDpdKoQlRKNRrWsR7nT6ahJxZ8K9OkxzNIhxJAB+K8TSKlUIhew2+1rs15CoZCW9Si32+0FyA4DPPpkx/23Otx6eRk6/QU8MW9gd3f3xNyLsv60giDIrVZrBnnGIA8cH/HYeh1ucRvZ7zxMn+/gquk0zt49Zlz4rzzPa30+n0yTSBCJQa4ZLsJZeAVn8TXNCozCOkzCbQIMlk6X1+vVut1umSaRIJcenoFX3MG/nyu/TYCjZ9zlcmnYS8s0YOfvncQWfwObvE4t3vTrVjuYhsPh0NhsNnnDtI4rxlN4wd9UlWml/dI3+D+sVqvGYrEcZ8l6Fr/I9t9VT/cHUXogzRNu46kAAAAASUVORK5CYII=';
+
+var dl_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAABGdBTUEAALGPC/xhBQAAAwBQTFRFAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ3bsYwAAAQB0Uk5T////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AFP3ByUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAAYdEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My4zNqnn4iUAAAA1SURBVBhXY/gPBAxAAKZBmBEIwAyyOECTwAYADQRCEBNiHtA0KA/EQjcaJAd3Acg9INf8BwDzHUXnr0WTvAAAAABJRU5ErkJggg==';
 /* To let it be a light script, we won't use something like jQuery */
 function $$(xpath,root) { 
 //  xpath=xpath.replace(/((^|\|)\s*)([^/|\s]+)/g,'$2.//$3').
@@ -52,9 +56,14 @@ function start()
 	}
 
 	/* Inject CSS */
-		GM_addStyle('.fox-dl-link:link, .fox-dl-link:visited, .fox-dl-link:hover {color: #FFFFFF; background: #BBBBFF; margin-left: 0.2em;}'+"\r\n"+
-		   '#regenerate_player { background: #BBBBBB; border: 1px solid #CCCCCC; color: white; display: block; width: 100%; height: 540px; text-align: center; line-height: 540px; font-size: 200%; text-decoration: none; } #regenerate_player:hover {background: #999999;}'
+//		GM_addStyle('.fox-dl-link:link, .fox-dl-link:visited, .fox-dl-link:hover {color: #FFFFFF; background: #BBBBFF; margin-left: 0.2em;}'+"\r\n"+
+		GM_addStyle('.fox-dl-link{ cursor: pointer;}');
+		
+		GM_addStyle('#regenerate_player { background: #BBBBBB; border: 1px solid #CCCCCC; color: white; display: block; width: 100%; height: 540px; text-align: center; line-height: 540px; font-size: 200%; text-decoration: none; } #regenerate_player:hover {background: #999999;}'
 		);
+		//GM_addStyle('.fox-tag-link:link, .fox-tag-link:visited, .fox-tag-link:hover {color: #000000; background: yellow; margin-left: 0.2em;}');
+		GM_addStyle('.fox-tag-link {vertical-align: middle; padding-right: 0.1em; cursor: pointer;}');
+		
 		GM_addStyle('#video_utilities { position:relative; font-size: 12px; height:2em; background: #FCFCFC; border: 1px solid #CCCCCC; color: #333333; } #video_utilities p {position: absolute; top:0.3em; left:0.3em; } #video_utilities_list {position: absolute; top:0; left: 10.5em; list-style-type: none; padding:0; margin:0;} #video_utilities_list > li {float: left; position: relative; margin-left: 0.1em; margin-right: 0.1em; padding: 0.3em; background: #FAFAFA;} #video_utilities_list > li > ul {display:none; position: absolute; top:1.9em; left:0; width:20em; background: #FFFFFF; border: 1px solid #CCCCCC; margin:0; padding:0; list-style-type: none;} #video_utilities_list > li > ul > li > a { display:block; padding: 0.2em; text-decoration: none; } #video_utilities_list > li > ul > li > a:hover { background: #eeeeee; } #video_utilities_list > li:hover {background: white; border: 1px solid #DDDDDD; } #video_utilities_list > li:hover > ul {display: block;}');
 		GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
 	window.setTimeout(pushLinks, 10);
@@ -74,22 +83,46 @@ function start()
 			window.setTimeout(addCommentHelper, 10);
 		}
 
+		/* Bookmark helper */
+		document.getElementById('mylist_add_submit').addEventListener('click', function(e){NM_bookmark();}, true);
+
+		/* Tag helper */
+		tags = $$('.//a [@rel="tag"]', document.getElementById('video_tags'))
+		for (i=0; i < tags.length; i++)
+		{
+			var tag = tags[i];
+
+			var tag_helper = document.createElement('img');
+			tag_helper.className = 'fox-tag-link';
+			tag_helper.src=tag_add_uri;
+			tag_helper.title = 'Add Tag "'+tag.textContent+'" to Firefox bookmark';
+			tag_helper.alt = '';
+			tag_helper.id = "tag_helper_"+i;
+
+			tag_helper.addEventListener('click', function(e)
+			{
+				if (!e.target) {return;}
+				NM_tag(e.target.parentNode.getElementsByTagName('a')[0].textContent);
+				e.stopPropagation();
+				e.preventDefault();
+
+			}
+			, true);
+			tag.parentNode.appendChild(tag_helper);
+		}	
+
 		/* Fetching Nico Nico's video title */
 		var h1 = document.getElementsByTagName('h1')[0];
 
 		/* inject the video download link */
 		if (h1.hasChildNodes())
 		{
-			var download_link = document.createElement('a');
+			/* Use img to reduce the DOM use */
+			var download_link = document.createElement('img');
 			download_link.className = 'fox-dl-link';
 			download_link.id = 'fox-dl-this';
-
-			href = window.location.href;
-			/* There will be some problem if the premium user uses the normal user network (?lo=1), dirty fix */
-			href = href.split("?")[0];
-
-			download_link.href = href + '?smilefox=get';
-			download_link.textContent = 'DL';
+			download_link.title = 'Download this video using NicoFox';
+			download_link.src = dl_uri;
 			
 			h1.appendChild(download_link);
 		}
@@ -374,7 +407,7 @@ function pushLinks(mainpage)
 			download_link = document.createElement('a');
 			download_link.className = 'fox-dl-link';
 			download_link.href = href+'?smilefox=get';
-			download_link.textContent = 'DL';
+			download_link.innerHTML = '<img src="'+dl_uri+'" style="vertical-align: middle;">';
 
 			video.parentNode.insertBefore(download_link, video.nextSibling);
 		}

@@ -89,6 +89,8 @@ injectScript: function(script, url, unsafeContentWin) {
 	// Nicomonkey dirty hacks
 	sandbox.NM_getString = nicomonkey_gmCompiler.hitch(this, 'getString');
 	sandbox.NM_goDownload = nicomonkey_gmCompiler.hitch(nicofox, 'goDownloadFromVideoPage');
+	sandbox.NM_bookmark = nicomonkey_gmCompiler.hitch(this, 'bookmark');
+	sandbox.NM_tag = nicomonkey_gmCompiler.hitch(this, 'tag');
 
 	sandbox.__proto__=sandbox.window;
 
@@ -228,6 +230,45 @@ getString: function(str) {
 	return nicofox.monkeyStrings.getString(str);
 },
 
+/* Add bookmark (Firefox 3+ only) */
+bookmark: function()
+{
+	var bookmark_serv = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+	                    .getService(Components.interfaces.nsINavBookmarksService);
+
+	var uri =  Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(content.document.location.href, null, null)
+
+	/* Check if it was in bookmark */
+	var check_array = bookmark_serv.getBookmarkIdsForURI(uri, {});
+	if (check_array.length < 1)
+	{
+		var bookmark_id = bookmark_serv.insertBookmark(bookmark_serv.unfiledBookmarksFolder, uri, -1, "");
+		bookmark_serv.setItemTitle(bookmark_id, content.document.title);
+	}
+},
+/* Add tag to places */
+tag: function(str)
+{
+	/* XXX: security check */
+	var bookmark_serv = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+	                    .getService(Components.interfaces.nsINavBookmarksService);
+	var tagging_serv = Components.classes["@mozilla.org/browser/tagging-service;1"]
+	                           .getService(Components.interfaces.nsITaggingService);
+	var uri =  Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(content.document.location.href, null, null)
+	/* Check if it was in bookmark */
+	var check_array = bookmark_serv.getBookmarkIdsForURI(uri, {});
+	if (check_array.length >= 1)
+	{
+		tagging_serv.tagURI(uri, [str], 1); //First argument = URI
+	}	
+	else
+	{
+		var bookmark_id = bookmark_serv.insertBookmark(bookmark_serv.unfiledBookmarksFolder, uri, -1, "");
+		bookmark_serv.setItemTitle(bookmark_id, content.document.title);
+		tagging_serv.tagURI(uri, [str], 1); //First argument = URI
+	}
+
+},
 }; //object nicomonkey_gmCompiler
 
 
