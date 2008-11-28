@@ -5,3 +5,4 @@ locale	nicofox		zh-CN	locale/zh-CN/
 locale	nicofox		zh-TW	locale/zh-TW/
 skin	nicofox		classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay.xul
+resource nicofox content/modules/
