@@ -285,6 +285,10 @@ function start_inject()
 
 	}
 	, true);
+	/* Add sound website */
+	var sound_website = GM_getValue('sound_converter');
+	sound_website = sound_website.replace('%1', Video.id);
+
 	/* Inject Video Utilities */
 	video_utilities = document.createElement('div');
 	video_utilities.id = 'video_utilities';
@@ -295,7 +299,7 @@ function start_inject()
                 '<li><a href="http://tw.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoTw')+'"><img src="'+tw_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://es.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoEs')+'"><img src="'+es_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://de.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoDe')+'"><img src="'+de_uri+'" /></a></li>'+"\r\n"+
-                '<li><a href="http://nicosound.anyap.info/sound/'+Video.id+'" target="_blank" title="'+NM_getString('toolsNicoSound')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
+                '<li><a href="'+sound_website+'" target="_blank" title="'+NM_getString('toolsNicoSound')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
                '<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('toolsNicoChart')+'"><img src="'+chart_uri+'" /></a></li>'+"\r\n";
 
         html = html + niconicofarm; /* Niconico farm is general comment only */
