@@ -249,7 +249,7 @@ bookmark: function()
 /* Add tag to places */
 tag: function(str)
 {
-	/* XXX: security check */
+	if (typeof str != 'string') { return; }
 	var bookmark_serv = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
 	                    .getService(Components.interfaces.nsINavBookmarksService);
 	var tagging_serv = Components.classes["@mozilla.org/browser/tagging-service;1"]

@@ -143,11 +143,11 @@ function start()
 		}	
 
 		/* Use img to reduce the DOM use */
-		var download_link = document.createElement('img');
+		var download_link = document.createElement('a');
 		download_link.className = 'fox-dl-link';
 		download_link.id = 'fox-dl-this1';
 		download_link.title = 'Download this video using NicoFox';
-		download_link.src = dl_uri;
+		download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
 		/* Fetching Nico Nico's video title */
 		var h1 = document.getElementsByTagName('h1')[0];
@@ -158,17 +158,17 @@ function start()
 		}
 
 		/* Use img to reduce the DOM use */
-		var download_link = document.createElement('img');
+		var download_link = document.createElement('a');
 		download_link.className = 'fox-dl-link';
 		download_link.id = 'fox-dl-this2';
 		download_link.title = 'Download this video using NicoFox';
-		download_link.src = dl_uri;
+		download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
 		/* Find for non-expanded mode */
 		var des1 = document.getElementById('des_1');
 		if (des1 && des1.hasChildNodes())
 		{
-			var headera = des1.getElementsByTagName('a')[0];
+			var headera = des1.getElementsByTagName('a')[1];
 			if (headera)
 			{
 				headera.parentNode.insertBefore(download_link, headera.nextSibling);
