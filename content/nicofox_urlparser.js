@@ -11,13 +11,21 @@ nicoFoxUrlParser.prototype = {
 	{	
 		html = req.responseText;
 		/* fetch v and id parameter in javascript array 'Video'. The regex is dirty but can be easily understood! */
-	    reg_array = html.match(/<script type\=\"text\/javascript\">\s+<!--\s+var Video = \{([\s\S]*)\}\;\s+-->\s+<\/script>\s+<div id=\"flvplayer_container\"/);
+	    reg_array = html.match(/<script type\=\"text\/javascript\">\s+<!--\s+var Video = \{([\s0-9a-zA-Z\:\[\]\_\-\.\"\'\/\\\?\=\,<>]*)\}\;\s+-->\s+<\/script>/);
 		if(!reg_array)
 		{
 			this.return_to(false); return;
 		}
-		eval('this.Video = {'+reg_array[1]+'};');
-
+		/* Use sandbox for security */
+		var native_json = Components.classes["@mozilla.org/dom/json;1"]
+		                 .createInstance(Components.interfaces.nsIJSON);
+		var s = Components.utils.Sandbox("about:blank");			 
+		Components.utils.evalInSandbox('var Video = {'+reg_array[1]+'}', s);
+		if (typeof s.Video != "object")
+		{
+			this.return_to(false); return;
+		}
+		this.Video = s.Video;
 		/* Distinguish what type of comment we will download */
 		if (this.Video.isMymemory)
 		{
