@@ -138,7 +138,7 @@ var popup_command =
 				var unicode_converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
 				                        .createInstance(Ci.nsIScriptableUnicodeConverter);
 				unicode_converter.charset = 'utf-8';			
-				file_path = unicode_converter.convertFromUnicdoe(file.path);
+				file_path = unicode_converter.ConvertFromUnicdoe(file.path);
 			}
 			process.init(external_video_player_path);
 			var parameter = [file_path];
@@ -654,7 +654,7 @@ function popup(e)
 
 function doSearch()
 {
-	var keyword = document.getElementById('nicofox-search').value;
+	var keyword = document.getElementById('smilefox-search').value;
 	
 	updateTreeCount(0, -rows.length);
 	rows = nicofox_download_manager.getDownloads();
