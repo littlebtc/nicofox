@@ -138,7 +138,7 @@ var popup_command =
 				var unicode_converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
 				                        .createInstance(Ci.nsIScriptableUnicodeConverter);
 				unicode_converter.charset = 'utf-8';			
-				file_path = unicode_converter.ConvertFromUnicdoe(file.path);
+				file_path = unicode_converter.ConvertFromUnicode(file.path);
 			}
 			process.init(external_video_player_path);
 			var parameter = [file_path];
