@@ -24,7 +24,7 @@
       <toolbarbutton id="smilefox-toolbar-stop" label="&stop.label;" oncommand="stop();" disabled="true" />
       <toolbarbutton id="smilefox-toolbar-option" accesskey="" label="Options" oncommand="optionsWindow();" disabled="false" />
       <spacer flex="1" />
-      <textbox value="" emptytext="Search videos" width="300" id="smilefox-search" type="timed" oncommand="doSearch();"/>
+      <textbox value="" emptytext="Search videos" width="300" id="smilefox-search" type="timed" timeout="500" oncommand="doSearch();"/>
       <toolbarbutton id="smilefox-toolbar-close" oncommand="toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
 
     </toolbar>
