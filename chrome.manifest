@@ -7,4 +7,4 @@ skin	nicofox		classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay.xul
 overlay chrome://songbird/content/xul/mainScriptsOverlay.xul	chrome://nicofox/content/firefoxOverlay.xul
 
-resource nicofox content/modules/
+resource nicofox modules/
