@@ -649,7 +649,7 @@ function popup(e)
 
 function doSearch()
 {
-	var keyword = document.getElementById('search').value;
+	var keyword = document.getElementById('nicofox-search').value;
 	
 	updateTreeCount(0, -rows.length);
 	rows = nicofox_download_manager.getDownloads();
