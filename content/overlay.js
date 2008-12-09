@@ -1,5 +1,33 @@
+// An nsINavBookmarkObserver
+/*var nicofox_bookmark_listener = {
+  onBeginUpdateBatch: function() {},
+  onEndUpdateBatch: function() {},
+  onItemAdded: function(aItemId, aFolder, aIndex) {
+   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+                            .getService(Components.interfaces.nsINavBookmarksService);
+   var uri = bookmark_service.getBookmarkURI(aItemId).spec;
+   alert(uri);
+  },
+  onItemRemoved: function(aItemId, aFolder, aIndex) {},
+  onItemChanged: function(aBookmarkId, aProperty, aIsAnnotationProperty, aValue) {
+  },
+  onItemVisited: function(aBookmarkId, aVisitID, time) {},
+  onItemMoved: function(aItemId, aOldParent, aOldIndex, aNewParent, aNewIndex) {},
+  QueryInterface: function(iid) {
+    if (iid.equals(Ci.nsINavBookmarkObserver) || iid.equals(Ci.nsISupports)) {
+      return this;
+    }
+    throw Cr.NS_ERROR_NO_INTERFACE;
+  }
+};*/
+
 var nicofox = {
-  onLoad: function() {
+   /*official_tags: [
+'公式', '音楽', 'エンターテイメント', 'アニメ', 'ゲーム', 'ラジオ', 'スポーツ', '科学', '料理', '政治', '動物', '歴史', '自然',
+'ニコニコ動画講座', '演奏してみた', '歌ってみた', '踊ってみた', '投稿者コメント', '日記', 'アンケート', 'チャット', 'テスト', 'その他', 'R-18'],*/
+   onLoad: function() {
+   Components.utils.import("resource://nicofox/download_manager.js");
+//   this.nico_dl_observer = new nicofox_download_observer();
     /* initialization code */
     this.initialized = true;
     this.strings = document.getElementById("nicofox-strings");
@@ -31,7 +59,18 @@ var nicofox = {
 		this.prefs.setBoolPref('first_run', false);
     }
 
+
+// bookmark watcher
+/*   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+                            .getService(Components.interfaces.nsINavBookmarksService);
+	bookmark_service.addObserver(nicofox_bookmark_listener, false);
   },
+  onUnLoad: function() {
+   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+                            .getService(Components.interfaces.nsINavBookmarksService);
+	bookmark_service.removeObserver(nicofox_bookmark_listener);*/
+  },
+  
   onMenuItemCommand: function(e) {
 
 	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
@@ -167,3 +206,4 @@ var nicofox = {
 
 };
 window.addEventListener("load", function(e) { nicofox.onLoad(e); }, false);
+//window.addEventListener("unload", function(e) { nicofox.onUnLoad(e); }, false);

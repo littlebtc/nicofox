@@ -1,10 +1,54 @@
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
-var rows = new Array(); // Something to store the all rows
+/* Import Download manager Javascript code modules */
+Components.utils.import('resource://nicofox/download_manager.js');
 
-/* Prevent wrong update during add/remove */
-var rows_lock = false;
+var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+	              .getService(Ci.nsIPromptService);
+var all_rows = new Array();
+var rows = new Array();
+
+var listener = 
+{
+  add: function(id, content)
+  {
+    if ((typeof content) != 'object') return false;
+    content.id = id;
+    rows.unshift(content);
+    updateTree();
+  },
+  remove: function(id)
+  {
+    rows = rows.filter(function(element, index, array) {
+      if (element.id == id)
+      {
+        updateTreeRowRemoved(index);
+      }
+      else
+      {
+        return true;
+      }
+    });
+    
+  },
+  update: function(id, content)
+  {
+    rows.forEach(function(element, index, array) {
+      if (element.id == id)
+      {
+        for (key in content) {
+	  array[index][key] = content[key];
+	}
+        updateTreeRow(index);
+	updateRowSpeed(index);
+      }
+    });
+  }
+
+}
+
+nicofox_download_listener.addListener(listener);
 
 /* When unloading, don't clean query after canceling */
 var unloading = false;
@@ -18,353 +62,7 @@ var prefs = Components.classes["@mozilla.org/preferences-service;1"].
 
 var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 	              .getService(Ci.nsIPromptService);
-
-var smilefox_sqlite = 
-{
-	load: function()
-	{
-
-		var file = Cc["@mozilla.org/file/directory_service;1"]
-		           .getService(Ci.nsIProperties)
-		           .get("ProfD", Ci.nsIFile);
-		file.append("smilefox.sqlite");
-
-		var storageService = Components.classes["@mozilla.org/storage/service;1"]
-	                        .getService(Components.interfaces.mozIStorageService);
-		this.db_connect = storageService.openDatabase(file);
-
-	},
-
-	select: function()
-	{
-		old_rows_length = rows.length;
-		rows_lock = true;
-		var statement = this.db_connect.createStatement("SELECT * FROM smilefox ORDER BY id DESC");
-		statement.execute();
-		i = 0;
-		rows = new Array();
-
-		while (statement.executeStep())
-		{
-			rows[i] = new Object();
-			for (j = 0; j < statement.columnCount; j++)
-			{
-				name = statement.getColumnName(j);
-				switch(statement.getTypeOfIndex(j))
-				{
-					case 0: // VALUE_TYPE_NULL
-					value = null;
-					break;
-					case 1: // VALUE_TYPE_INTEGER 
-					if (name == 'start_time')
-					{
-						/* getInt64 implementation has a bug */
-						value = statement.getUTF8String(j).valueOf();
-					}
-					else
-					{
-						value = statement.getInt32(j);
-					}
-					break;
-					case 2: // VALUE_TYPE_FLOAT
-					value = statement.getDouble(j);
-					break;
-					case 3: // VALUE_TYPE_TEXT
-					value = statement.getUTF8String(j);
-					break;
-					case 4: // VALUE_TYPE_BLOB
-					statement.getBlob(j, size, data);
-				}
-				rows[i][name] = value;
-			}
-			/* Update query */
-			for (k = 0; k < download_runner.query.length; k++)
-			{
-				if (rows[i].id == download_runner.query[k].id)
-				{
-					download_runner.query[k].rows_num = i;
-				}
-			}
-			i++;
-		}
-		rows_lock = false;
-
-		boxobject = document.getElementById('smilefox-tree').boxObject;
-		boxobject.QueryInterface(Ci.nsITreeBoxObject);
-		boxobject.rowCountChanged(0, -old_rows_length);
-		boxobject.rowCountChanged(0, rows.length);
-	},
-	add: function (Video, url)
-	{
-		try
-		{
-			var statement = this.db_connect.createStatement("INSERT INTO smilefox (url, video_id, comment_id, comment_type, video_title, download_items, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)");
-			statement.bindUTF8StringParameter(0, url);
-			statement.bindUTF8StringParameter(1, Video.id);
-			statement.bindUTF8StringParameter(2, Video.v);
-			statement.bindUTF8StringParameter(3, Video.comment_type);
-			statement.bindUTF8StringParameter(4, Video.title);
-			statement.bindInt32Parameter(5, 2);
-			statement.bindInt32Parameter(6, 0);
-
-			statement.execute();
-			statement.reset();
-		}
-		catch(e)
-		{
-		}
-	},
-	updateStatus: function (row, stat)
-	{
-		try
-		{
-			var row_id = rows[row].id;
-			if(!row_id || isNaN(row_id)) { return false; }
-			var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1 WHERE `id` = ?2");
-			stmt.bindInt32Parameter(0, stat);
-			stmt.bindInt32Parameter(1, row_id);
-			stmt.execute();
-			stmt.reset();
-			rows[row].status = stat;
-		}
-		catch(e)
-		{
-		}
-	},
-	updateInfo: function(row)
-	{
-		/* Update info and set status = 7 (downloading)*/
-		var row_id = rows[row].id;
-		if(!row_id || isNaN(row_id)) { return false; }
-		var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1 , `video_type` = ?2 , `video_economy` = ?3 , `video_file` = ?4 , `comment_file` = ?5, `start_time` = ?6 WHERE `id` = ?7");
-		stmt.bindInt32Parameter(0, 7);
-		stmt.bindUTF8StringParameter(1, rows[row].video_type);
-		if (rows[row].video_economy)
-		{ stmt.bindInt32Parameter(2, 1); }
-		else
-		{ stmt.bindInt32Parameter(2, 0); }
-		stmt.bindUTF8StringParameter(3, rows[row].video_file);
-		stmt.bindUTF8StringParameter(4, rows[row].comment_file);
-		stmt.bindInt64Parameter(5, rows[row].start_time);
-		stmt.bindInt32Parameter(6, row_id);
-		stmt.execute();
-		stmt.reset();
-		rows[row].status = 7;
-	},
-	updateComplete: function(row)
-	{
-		/* Update info and set status = 1 (completed)*/
-		var row_id = rows[row].id;
-		if(!row_id || isNaN(row_id)) { return false; }
-		var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1, `end_time` = ?2 , `current_bytes` = ?3, `max_bytes` = ?4 WHERE `id` = ?5");
-		stmt.bindInt32Parameter(0, 1);
-		now_date = new Date();
-		rows[row].end_time = now_date.getTime();
-		stmt.bindInt64Parameter(1, rows[row].end_time);
-		stmt.bindUTF8StringParameter(2, rows[row].current_bytes);
-		stmt.bindUTF8StringParameter(3, rows[row].max_bytes);
-		stmt.bindInt32Parameter(4, row_id);
-		stmt.execute();
-		stmt.reset();
-		rows[row].status = 1;
-	},
-	remove: function (row)
-	{
-		try
-		{
-			var row_id = rows[row].id;
-			if(!row_id || isNaN(row_id)) { return false; }
-
-			var stmt = this.db_connect.createStatement("DELETE FROM `smilefox` WHERE `id` = ?1");
-			stmt.bindInt32Parameter(0, row_id);
-			stmt.execute();
-			stmt.reset();
-			/* we will re-select all soon so we don't remove rows */
-		}
-		catch(e)
-		{
-		}
-	},
-}
-
-var download_count = 0;
-var download_max = 1;
-var download_runner =
-{
-	ready: false,
-	query: new Array(),
-	initialize: function()
-	{
-		
-		if (this.ready)
-		{ return false; }
-		/* If there is something remained, we will let it fail */
-		for (i=0; i<rows.length; i++)
-		{
-			if (rows[i].status > 4)
-			{ smilefox_sqlite.updateStatus(i, 3); }
-		}
-		this.ready = true;
-	},
-	getRowNumById: function(id)
-	{
-		for (i = 0; i< rows.length; i++)
-		{
-			if (rows[i].id == id)
-			{
-				return i;
-			}
-		}
-	},
-	prepare: function() 
-	{
-		if (!this.ready)
-		{ this.initialize(); }
-
-		i = rows.length - 1;
-		while (i >= 0 && download_count < download_max)
-		{
-			if (rows[i].status == 0)
-			{
-				download_count++;
-				smilefox_sqlite.updateStatus(i, 5);
-				new_query = {id: rows[i].id, rows_num: i};
-				var k = this.query.push(new_query) - 1;
-				
-				this.query[k].progress_change_count = 0;	
-				this.query[k].processCallback = function(type, content, id)
-				{
-					if (rows_lock == true)
-					{ window.setTimeout(hitchFunction(this, 'processCallback', type, content, id), 50); return; }
-					
-					/* To prevent "stop" to be called when canceled */
-					if(this.downloader.canceled == true && type != 'cancel' && type != 'fail')
-					{ return; }
-
-					rows_num = this.rows_num;
-					switch(type)
-					{
-						/* Parsing is done, and file is ready to write */
-						case 'file_ready':
-						smilefox_sqlite.updateStatus(rows_num, 6);
-						rows[rows_num].video_type = content.video_type;
-						rows[rows_num].video_economy = content.video_economy;
-						rows[rows_num].video_file = content.video_file;
-						rows[rows_num].comment_file = content.comment_file;
-						updateTreeRow(rows_num);
-						break;
-
-						/* Video download is started */
-						case 'start':
-						rows[rows_num].current_bytes = 0;
-						rows[rows_num].speed = 0;
-						now = new Date();
-						rows[rows_num].start_time = now.getTime();
-						smilefox_sqlite.updateInfo(rows_num);
-						updateTreeRow(rows_num);
-						break;
-
-						case 'progress_change':
-						rows[rows_num].current_bytes = content.current;
-						rows[rows_num].max_bytes = content.max;
-						updateRowSpeed(rows_num);
-						updateTreeRow(rows_num);
-						break;
-
-						case 'stop':
-						/* It is "protected" by the below part so will be executed only for download completed */
-						
-						/* If the download is incomplete, we will consider it as failed */
-						if (rows[rows_num].current_bytes != rows[rows_num].max_bytes)
-						{
-							this.downloader.removeFiles();
-							this.processCallback('fail', {}, id);
-							prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
-							return;
-						}
-
-						/* Finialize download */
-						this.downloader.movie_prepare_file.remove(false);
-						this.downloader.movie_file.moveTo(null, this.downloader.file_title+'.'+this.downloader.type);
-
-						smilefox_sqlite.updateComplete(rows_num);
-						updateTreeRow(rows_num);
-						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-						download_count--;
-						download_runner.prepare();
-						break;
-
-						case 'fail':
-						smilefox_sqlite.updateStatus(rows_num, 3);
-						updateTreeRow(rows_num);
-						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-						download_count--;
-						download_runner.prepare();
-						break;
-
-						case 'cancel':
-						smilefox_sqlite.updateStatus(rows_num, 2);
-						updateTreeRow(rows_num);
-						/* For unloading, we should not remove it from query (We require to clean all query) */
-						if (!unloading)
-						{
-							var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-							download_count--;
-							download_runner.prepare();
-						}
-						break;
-					}
-				}
-
-				this.query[k].downloader = new smileFoxDownloader();
-				this.query[k].downloader.callback = hitchFunction(this.query[k], 'processCallback', rows[i].id); // query.length will be next query id
-				this.query[k].downloader.file_title = fixReservedCharacters(rows[i].video_title);
-				this.query[k].downloader.comment_type = rows[i].comment_type;
-				this.query[k].downloader.init(rows[i].comment_id);
-			}
-
-			i--;
-		}
-		/* When all done, display it */
-		if (download_count == 0)
-		{ allDone(); }
-	},
-	cancel: function(row)
-	{
-		for (i = 0; i < this.query.length; i++)
-		{
-			if (this.query[i].rows_num == row && this.query[i].downloader)
-			{
-				this.query[i].downloader.cancel();
-			}
-		}
-	},
-	cancelAll: function()
-	{
-		for (i = 0; i < this.query.length; i++)
-		{
-			if (this.query[i].downloader)
-			{
-				this.query[i].downloader.cancel();
-				this.query[i].processCallback = function() {} /* Prevent errors */
-			}
-		}
-		/* Dirty way :) */
-		this.query = [];
-		download_count = 0;
-	},
-	retry: function(row)
-	{
-		/* Reset, then retry query */
-		if (rows[row].status == 2 || rows[row].status == 3)
-		{
-			smilefox_sqlite.updateStatus(row, 0);
-			updateTreeRow(row);
-			start();
-		}
-	},
-};
-
+var recent_row = -1;
 var popup_command = 
 {
 	recent_row: -1,
@@ -372,23 +70,100 @@ var popup_command =
 	cancel: function()
 	{
 		if (recent_row < 0) { return; }	
-		download_runner.cancel(recent_row);
+		nicofox_download_manager.cancel(rows[recent_row].id);
 	},
 	retry: function()
 	{
 		if (recent_row < 0) { return; }	
-		download_runner.retry(recent_row);
+		nicofox_download_manager.retry(rows[recent_row].id);
 	},
-	open: function() {}, /* TODO */
-	openExternal: function()
-	{
+	open: function() {
 		if (recent_row < 0) { return; }
 		if (!rows[recent_row].video_file) { return; }
-		
+		if (!rows[recent_row].video_file.match(/\.(flv|mp4)$/)) { return; }
+
 		var file = Cc["@mozilla.org/file/local;1"]
 		           .createInstance(Ci.nsILocalFile);
 		file.initWithPath(rows[recent_row].video_file);
 		if (!file.exists()) { return false; }
+		var video_uri = Cc["@mozilla.org/network/io-service;1"]
+	          .getService(Ci.nsIIOService).newFileURI(file);
+
+		var file = Cc["@mozilla.org/file/local;1"]
+		           .createInstance(Ci.nsILocalFile);
+		file.initWithPath(rows[recent_row].comment_file);
+		if (!file.exists()) { return false; }
+		var comment_uri = Cc["@mozilla.org/network/io-service;1"]
+	          .getService(Ci.nsIIOService).newFileURI(file);
+		
+		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri.spec, comment: comment_uri.spec, title: rows[recent_row].video_title});	
+	
+	
+	}, /* TODO */
+	openExternal: function()
+	{
+		if (recent_row < 0) { return; }
+		if (!rows[recent_row].video_file) { return; }
+
+		var file = Cc["@mozilla.org/file/local;1"]
+		           .createInstance(Ci.nsILocalFile);
+		file.initWithPath(rows[recent_row].video_file);
+		if (!file.exists()) { return false; }
+
+		/*  flv/mp4/swf detection and custom player */
+		if (prefs.getBoolPref("external_video_player") && rows[recent_row].video_file.match(/(flv|mp4)$/))
+		{
+			var external_video_player_path = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
+
+			var os_string = Cc["@mozilla.org/xre/app-info;1"]  
+			.getService(Ci.nsIXULRuntime).OS;  
+			var process;
+			if (os_string == 'WINNT')
+			{
+				/* Using IWinProcess by dafi to fix the poor Unicode support of nsIProcss 
+				   See: http://dafizilla.wordpress.com/2008/10/08/nsiprocess-windows-and-unicode/ */
+				process = Cc["@dafizilla.sourceforge.net/winprocess;1"]
+				.createInstance()
+				.QueryInterface(Ci.IWinProcess);
+				
+			}
+			else
+			{
+				process = Components.classes["@mozilla.org/process/util;1"]
+				.createInstance(Components.interfaces.nsIProcess);
+			}
+			process.init(external_video_player_path);
+			var parameter = [file.path];
+			process.run(false, parameter, 1);
+			return;
+		}
+		if (prefs.getBoolPref("external_swf_player") && rows[recent_row].video_file.match(/(swf)$/))
+		{
+			var external_swf_player_path = prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
+
+			var os_string = Cc["@mozilla.org/xre/app-info;1"]  
+			.getService(Ci.nsIXULRuntime).OS;  
+			var process;
+			if (os_string == 'WINNT')
+			{
+				/* Using IWinProcess by dafi to fix the poor Unicode support of nsIProcss 
+				   See: http://dafizilla.wordpress.com/2008/10/08/nsiprocess-windows-and-unicode/ */
+				process = Cc["@dafizilla.sourceforge.net/winprocess;1"]
+				.createInstance()
+				.QueryInterface(Ci.IWinProcess);
+				
+			}
+			else
+			{
+				process = Components.classes["@mozilla.org/process/util;1"]
+				.createInstance(Components.interfaces.nsIProcess);
+			}
+			process.init(external_swf_player_path);
+			var parameter = [file.path];
+			process.run(false, parameter, 1);
+			return;
+		}
+		/* Normal approach */
 		try
 		{
 			file.launch();
@@ -405,6 +180,74 @@ var popup_command =
 
 		}
 
+	},
+	buggy: function()
+	{
+		if (recent_row < 0) { return; }
+		if (!rows[recent_row].video_file) { return; }
+
+		var file = Cc["@mozilla.org/file/local;1"]
+		           .createInstance(Ci.nsILocalFile);
+		file.initWithPath(rows[recent_row].video_file);
+		if (!file.exists()) { return false; }
+
+		/* TODO: flv/mp4/swf detection */
+		if (prefs.getComplexValue("external_video_player",
+		Components.interfaces.nsISupportsString).data && rows[recent_row].video_file.match(/(flv|mp4)$/))
+		{
+			var external_video_player = prefs.getComplexValue("external_video_player", Components.interfaces.nsILocalFile);
+
+			var os_string = Cc["@mozilla.org/xre/app-info;1"]  
+			.getService(Ci.nsIXULRuntime).OS;  
+			var process;
+			process = Components.classes["@mozilla.org/process/util;1"]
+			.createInstance(Components.interfaces.nsIProcess);
+			process.init(external_video_player);
+			var parameter = [file.path];
+			process.run(false, parameter, 1);
+			return;
+		}
+
+		/* Normal approach */
+		try
+		{
+			file.launch();
+		}
+		catch(e)
+		/* For *nix, launch() didn't work, so...  */
+		/* See also: http://mxr.mozilla.org/seamonkey/source/toolkit/mozapps/downloads/content/downloads.js */
+		{
+			var uri = Cc["@mozilla.org/network/io-service;1"]
+			          .getService(Ci.nsIIOService).newFileURI(file);
+			var protocol_service = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
+			                       .getService(Ci.nsIExternalProtocolService);
+			protocol_service.loadUrl(uri);
+
+		}
+
+	},
+	openSwfPlayer: function()
+	{
+
+		if (recent_row < 0) { return; }
+		if (!rows[recent_row].video_file) { return; }
+	//	if (!rows[recent_row].video_file.match(/\.swf$/)) { return; }
+
+		var file = Cc["@mozilla.org/file/local;1"]
+		           .createInstance(Ci.nsILocalFile);
+		file.initWithPath(rows[recent_row].video_file);
+		if (!file.exists()) { return false; }
+		var video_uri = Cc["@mozilla.org/network/io-service;1"]
+	          .getService(Ci.nsIIOService).newFileURI(file);
+
+		var file = Cc["@mozilla.org/file/local;1"]
+		           .createInstance(Ci.nsILocalFile);
+		file.initWithPath(rows[recent_row].comment_file);
+		if (!file.exists()) { return false; }
+		var comment_uri = Cc["@mozilla.org/network/io-service;1"]
+	          .getService(Ci.nsIIOService).newFileURI(file);
+		
+		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=560,height=500, resizable=yes', {video: video_uri.spec, comment: comment_uri.spec, title: rows[recent_row].video_title});
 	},
 	openFolder: function()
 	{
@@ -449,7 +292,8 @@ var popup_command =
 	},
 	selectAll: function()
 	{
-		document.getElementById('smilefox-tree').view.selection.rangedSelect(0, rows.length, true)
+		document.getElementById('smilefox-tree').view.selection.rangedSelect(0, rows.length, true);
+		document.getElementById('smilefox-tree').focus();
 	},
 	remove: function()
 	{
@@ -465,26 +309,23 @@ var popup_command =
 				/* when it is failed, completed, canceled or waiting, we can remove it */
 				if(rows[j].status <= 4)
 				{
-					smilefox_sqlite.remove(j);
-					count--;
+					nicofox_download_manager.remove(rows[j].id);
 				}
 			}
 		}
-		smilefox_sqlite.select();
 	
 	}
 	
 }
-
 function assignTreeView()
 {
-/* Initialize tree view */
+
 var tree_view = {
     treeBox: null,
     selection: null,
     rowCount : rows.length,
     getCellText : function(row,column){
-	/* Display something ... */
+
       switch(column.id)
 	{
 	case 'progress':
@@ -497,7 +338,7 @@ var tree_view = {
 	return rows[row].comment_type;
 
 	case 'tree-economy':
-	/* We didn't know it until donwloading XML */
+
 	if (rows[row].status == 1 || rows[row].status >= 6)
 	{
 		if (rows[row].video_economy == 1) return  strings.getString('economyYes');
@@ -516,7 +357,7 @@ var tree_view = {
 		return strings.getString('progressCanceled');
 		case 3:
 		return strings.getString('progressFailed');
-		/* 4 is reserved */
+
 		case 5:
 		return strings.getString('progressLoading');
 		case 6:
@@ -539,7 +380,7 @@ var tree_view = {
 	return;	
 
 	case 'tree-speed':
-	if (rows[row].status == 7) return rows[row].speed+'KB/s';
+	if (rows[row].status == 7 && rows[row].speed) return rows[row].speed+'KB/s';
 	else return;
 	break;
 	
@@ -548,13 +389,13 @@ var tree_view = {
 	}
     },
     getCellValue : function(row,column){
-      if (column.id == "tree-progress" &&( rows[row].status == 5 || rows[row].status == 6)) return 20; /* 1: determined, 2: undetermined, 3: none*/
+      if (column.id == "tree-progress" &&( rows[row].status == 5 || rows[row].status == 6)) return 20;
       else if (column.id == "tree-progress"){progress = Math.floor(rows[row].current_bytes / rows[row].max_bytes * 100); return progress; }
       else return;
     },
     getProgressMode : function(row,column){
-      if (column.id == "tree-progress" &&( rows[row].status == 5 || rows[row].status == 6)) return 2; /* 1: determined, 2: undetermined, 3: none*/
-      else if (column.id == "tree-progress") return 1; /* 1: determined, 2: undetermined, 3: none*/
+      if (column.id == "tree-progress" &&( rows[row].status == 5 || rows[row].status == 6)) return 2; 
+      else if (column.id == "tree-progress") return 1; 
       else return;
     },
     setTree: function(treeBox){ this.treeBox = treeBox; },
@@ -565,12 +406,16 @@ var tree_view = {
     getImageSrc: function(row,col){ return null; },
     getRowProperties: function(row,props){},
     getCellProperties: function(row,col,props){},
-    getColumnProperties: function(colid,col,props){}
+    getColumnProperties: function(colid,col,props){},
 };
 
-	/* So we can load the treeview, here we go! */
+
     	document.getElementById('smilefox-tree').view = tree_view;
 
+}
+
+function createTree(rows)
+{
 }
 
 function updateRowSpeed(num)
@@ -588,48 +433,85 @@ function updateRowSpeed(num)
 	rows[num].speed = speed;
 }
 
-function updateTreeRow(num)
+function updateTreeRow(index)
+{
+	boxobject = document.getElementById('smilefox-tree').boxObject;
+	boxobject.QueryInterface(Ci.nsITreeBoxObject);
+	boxobject.invalidateRow(index);
+}
+
+function updateTree()
 {
 	boxobject = document.getElementById('smilefox-tree').boxObject;
 	boxobject.QueryInterface(Ci.nsITreeBoxObject);
 	boxobject.invalidate();
 }
 
-function load()
+function updateTreeRowRemoved(index)
+{
+	boxobject = document.getElementById('smilefox-tree').boxObject;
+	boxobject.QueryInterface(Ci.nsITreeBoxObject);
+	boxobject.rowCountChanged(index, -1);
+}
+
+function updateTreeNumbers(num)
+{
+	boxobject = document.getElementById('smilefox-tree').boxObject;
+	boxobject.QueryInterface(Ci.nsITreeBoxObject);
+	boxobject.rowCountChanged(0, num);
+}
+
+function smilefox_load()
 {
 	/* Load strings */
 	strings = document.getElementById('nicofox-strings');
-
-	/* Load treeview */
+	all_rows = nicofox_download_manager.getDownloads();
+        rows = all_rows;
 	assignTreeView();
 
-	/* Load the database */
-	smilefox_sqlite.load();
-
-	/* Then, load the SQLite database */
-	smilefox_sqlite.select();
-
 	/* Find the download request */
-	if(window.arguments && window.arguments[0])
+/*	if(window.arguments && window.arguments[0])
 	{
-		addDownload(window.arguments[0].Video, window.arguments[0].url)
-	}
+		nicofox_download_manager.add(window.arguments[0].Video, window.arguments[0].url)
+	}*/
 
-	download_runner.prepare();
+	nicofox_download_manager.go();
+//	download_runner.prepare();
 	document.getElementById('smilefox-tree').oncontextmenu = function(e) { popup(e); };
+	document.getElementById('smilefox-tree').focus();
 
 }
 
 function close()
 {
-	if(download_count == 0 ) {return true;}
 
 	/* If downloading, confirm */
-	if (!prompts.confirm(null, strings.getString('closeSmileFoxTitle'), strings.getString('closeSmileFoxMsg')))
-	{return false;}
+//	if (!prompts.confirm(null, strings.getString('closeSmileFoxTitle'), strings.getString('closeSmileFoxMsg')))
+//	{return false;}
+
+	/* Check if we can close without notifying, modified from globalOverlay.js */
+	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+	                   .getService(Components.interfaces.nsIWindowMediator);
+	var count_window = 0;		   
+	var enumerator = wm.getEnumerator(null);
+	while(enumerator.hasMoreElements()) {
+ 	  var win = enumerator.getNext();
+	  count_window++;
+	  if (count_window == 2) break;
+	}
+	if (count_window == 1) {
+		var observer_service = Cc["@mozilla.org/observer-service;1"]
+               .getService(Ci.nsIObserverService);
+		var cancel_quit = Components.classes["@mozilla.org/supports-PRBool;1"]
+		                .createInstance(Components.interfaces.nsISupportsPRBool);
+	       
+	       observer_service.notifyObservers(cancel_quit, 'quit-application-requested', null);
+	       if( cancel_quit.data == true)
+	       { return false; }
+	}
 
 	unloading = true;
-	download_runner.cancelAll();
+//	download_runner.cancelAll();
 }
 
 function start()
@@ -663,16 +545,16 @@ function allDone()
 	document.getElementById('stop').disabled = true;
 }
 
-function unload()
+function smilefox_unload()
 {
+	nicofox_download_listener.removeListener(listener);
 }
 /* This is trigged from nicofox.confirmDownload */
 function addDownload(Video, url)
 {
+	nicofox_download_manager.add(Video, url)
 	/* The filename is almost free in NicoNico douga... :P */
 	//filename = fixReservedCharacters(Video.title);
-	smilefox_sqlite.add(Video, url);
-	smilefox_sqlite.select();
 
 	/* Update the download runner relation */
 	start();
@@ -694,7 +576,7 @@ function popup(e)
 		if (recent_row == -1)
 		{
 			/* Nothing selected */
-			document.getElementById('popup').style.display='none';
+			document.getElementById('smilefox-popup').style.display='none';
 			return;
 		}
 	}
@@ -707,7 +589,7 @@ function popup(e)
 			popup_command.multiple_select = true;
 		}
 	}
-	document.getElementById('popup').style.display='-moz-popup';
+	document.getElementById('smilefox-popup').style.display='-moz-popup';
 	selected_row = rows[recent_row];
 	popup_command.recent_row = recent_row;
 
@@ -754,29 +636,44 @@ function popup(e)
 }
 
 
-/* Fix common reserved characters in filesystems by converting to full-width */
-function fixReservedCharacters(title)
-{
-	title = title.replace(/\//g, '／');
-	title = title.replace(/\\/g, '＼');
-	title = title.replace(/\?/g, '？');
-	title = title.replace(/\%/g, '％');
-	title = title.replace(/\*/g, '＊');
-	title = title.replace(/\:/g, '：');
-	title = title.replace(/\|/g, '｜');
-	title = title.replace(/\"/g, '”');
-	title = title.replace(/\</g, '＜');
-	title = title.replace(/\>/g, '＞');
-	title = title.replace(/\+/g, '＋');
-	/* Windows FAT specified... */
-	title = title.replace(/\[/g, '〔');
-	title = title.replace(/\]/g, '〕');
-	return title;
-}
 
+
+function doSearch()
+{
+	var keyword = document.getElementById('search').value;
+	
+	updateTreeNumbers(-rows.length);
+	rows = nicofox_download_manager.getDownloads();
+	updateTreeNumbers(rows.length);
+	
+	if (keyword) {
+          keyword = keyword.replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]]/g, '\\$1');
+	  var keywords = keyword.replace(/\s(.*)\s/, '$1').split(/\s/);
+	  for (var i = 0; i < keywords.length; i++) {
+  	    keywords[i] = new RegExp(keywords[i], 'ig');
+	  }
+	  /* Trim and split keywords */
+          rows = rows.filter(function(element, index, array) {
+	var result = true;
+	for (var i = 0; i < keywords.length; i++) {
+	  result = result & Boolean(element.video_title.match(keywords[i]));
+	}  
+        if (result)
+	{
+	  return true;
+	}
+	else
+	{
+          updateTreeRowRemoved(index);
+	}
+        }); }
+	updateTree();
+}
 function myDump(aMessage) {
   var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
                                  .getService(Components.interfaces.nsIConsoleService);
   consoleService.logStringMessage("Smilefox: " + aMessage);
 }
+window.addEventListener("load", function(e) { smilefox_load(); }, false);
+window.addEventListener("unload", function(e) { smilefox_unload(); }, false);
 

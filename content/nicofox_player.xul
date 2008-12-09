@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://nicofox/skin/smilefox.css" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://nicofox/locale/smilefox.dtd">
+<window id="test-player" title="NicoFox player" 
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml" onload="load();" style="margin: 0; padding:0;">
+<script type="application/x-javascript" src="chrome://nicofox/content/nicofox_player.js" />
+</window>	

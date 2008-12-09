@@ -1,10 +1,72 @@
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
+var EXPORTED_SYMBOLS = ['smileFoxDownloader', 'hitchFunction', 'goAjax'];
 
 var prefs = Components.classes["@mozilla.org/preferences-service;1"].
                     getService(Components.interfaces.nsIPrefService);
 	prefs = prefs.getBranch("extensions.nicofox.");
+
+var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
+var strings = 
+{
+  bundle: null, 
+  init: function() {
+   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicofox.properties');
+  }, 
+  getString: function(str) {
+    if (this.bundle === null) this.init();
+    return this.bundle.GetStringFromName(str);
+  }
+
+}
+
+function goAjax(url, type, funcok, funcerr)
+{
+	var httpRequest;
+	type = 'GET'; // TODO: DIRTY
+
+   httpRequest =
+      Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+      .createInstance(Components.interfaces.nsIXMLHttpRequest);
+   
+	httpRequest.onreadystatechange = function() {
+		if (httpRequest.readyState == 4)
+		{
+			if (httpRequest.status == 200)
+			{
+				funcok(httpRequest);
+			}
+			else
+			{
+				funcerr(httpRequest);
+			}
+	        }
+	};
+	httpRequest.open(type, url, true);
+	httpRequest.send('');
+}
+
+/* AJAX work will require some dirty way to call function
+   The idea is from GM_hitch @ Greasemoneky and it is almost the same ||| */
+function hitchFunction(object, name)
+	{
+		if(!object || !object[name]) {alert('OUCH!');}
+		var args = Array.prototype.slice.call(arguments, 2);
+
+		/* What a dirty way! */
+		dirty_function =  function()
+		{
+			/* Combine the argument */
+			var args_inner = Array.prototype.slice.call(arguments);
+			args_inner = args_inner.concat(args);
+
+			/* Then hit the function */
+			object[name].apply(object, args_inner);
+		}
+		return dirty_function;
+	}
+
 
 function smileFoxDownloader()
 {
@@ -276,8 +338,8 @@ failDownload: function(req)
 /* Cancel by download manager action */
 cancel: function()
 {
-	/* Prevent comment file deleted while updating Boon comments */
-	if (this.ms_lock == true) { window.setTimeout(hitchFunction(this, 'cancel')); return; } 
+	this.canceled = true;
+        this.callback('cancel',{});
 
 	if(this.persist != undefined)
 	{
@@ -289,8 +351,6 @@ cancel: function()
 	}
 	this.removeFiles();
 
-	this.canceled = true;
-        this.callback('cancel',{});
 },
 /* Remove all downloaded files */
 removeFiles: function()

@@ -1,7 +1,7 @@
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
-function goAjax(url, type, funcok, funcerr)
+function goAjax(url, type, funcok, funcerr, goxml)
 {
 	var httpRequest;
 	type = 'GET'; // TODO: DIRTY
@@ -21,6 +21,8 @@ function goAjax(url, type, funcok, funcerr)
 			}
 	        }
 	};
+	if (goxml)
+	  httpRequest.overrideMimeType('text/xml');
 	httpRequest.open(type, url, true);
 	httpRequest.send('');
 }

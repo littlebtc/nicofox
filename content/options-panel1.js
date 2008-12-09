@@ -3,7 +3,7 @@ var Ci = Components.interfaces;
 
 function nicomonkeySwitch()
 {
-	checked = document.getElementById('nicomonkey.enable').checked;
+	checked = document.getElementById('pref-nicomonkey.enable').value;
 	if (!checked)
 	{
 		document.getElementById('nicomonkey.toolbar').disabled = false;

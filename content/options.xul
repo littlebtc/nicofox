@@ -5,40 +5,110 @@
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
- title="&prefwindow.title;" width="500" height="300"
+ title="&prefwindow.title;" width="500" height="500"
 >
-  <prefpane id="pane11" label="&nicomonkey;" onpaneload="updatePanel1();">
+  <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();" image="chrome://nicofox/skin/nicofox_content.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel1.js" />
     <preferences>
       <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool"/>
       <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool"/>
       <preference id="pref-nicomonkey.comment_helper" name="extensions.nicofox.nicomonkey.comment_helper" type="bool"/>
       <preference id="pref-nicomonkey.player_killer" name="extensions.nicofox.nicomonkey.player_killer" type="bool"/>
+      <preference id="pref-nicomonkey.sound_converter" name="extensions.nicofox.nicomonkey.sound_converter" type="string"/>
+      <preference id="pref-nicowa_blocker" name="extensions.nicofox.nicowa_blocker" type="bool"/>
     </preferences>
-    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;" onclick="nicomonkeySwitch();" />
-    <groupbox>
+    <checkbox id="nicowa_blocker" preference="pref-nicowa_blocker" label="Block Nicowa (except User Nicowa)" accesskey="W" />
+    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;" oncommand="nicomonkeySwitch();" />
+    <groupbox align="start">
      <caption label="&nicomonkey.options;"/>
      <checkbox id="nicomonkey.toolbar" preference="pref-nicomonkey.toolbar" label="&nicomonkey.toolbar.label;" accesskey="&nicomonkey.toolbar.accesskey;" />
+     <hbox class="indent">
+     <label value="Preferred sound converter website:" />
+      <menulist id="nicomonkey.sound_converter" preference="pref-nicomonkey.sound_converter" >
+     <menupopup>
+     <menuitem value="http://nicosound.anyap.info/sound/%1" label="にこ☆さうんど＃" />
+     <menuitem value="http://www.nicomimi.com/play/%1" label="nicomimi-にこみみ-" />
+     <menuitem value="http://tunes.labolo.net/mp3/%1" label="NicoTunes" />
+     </menupopup>
+     </menulist>
+     </hbox>
      <checkbox id="nicomonkey.comment_helper" preference="pref-nicomonkey.comment_helper" label="&nicomonkey.comment_helper.label;" accesskey="&nicomonkey.comment_helper.accesskey;" />
      <checkbox id="nicomonkey.player_killer" preference="pref-nicomonkey.player_killer" label="&nicomonkey.player_killer.label;" accesskey="&nicomonkey.player_killer.accesskey;" />
+     <checkbox label="Enable One-click Firefox Bookmark Tag Adding" />
+     <checkbox label="When Adding Mylist, Add the Video Page URL to Firefox Bookmark" />
     </groupbox>
   </prefpane>
-  <prefpane id="pane12" label="&downloader;" onpaneload="updatePanel2();">
+  <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/blank.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel2.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
       <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
+      <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="string" />
     </preferences>
-    <groupbox>
+    <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
+    <groupbox align="start">
      <caption label="&downloader.options;" />
-     <hbox>
+     <grid>
+     <columns>
+       <column flex="1"/>
+       <column flex="2"/>
+       <column flex="1"/>
+     </columns>
+     <rows>
+     <row>
      <label value="&downloader.save_path.label;" accesskey="&downloader.save_path.accesskey;" control="save_path" />
      <filefield id="save_path" preference="pref-save_path" width="200"/>
      <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectDir();" />
-     </hbox>
-     <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
+     </row>
+     <row>
+     <label value="Filename scheme:" />
+     <textbox width="200" />
+     </row>
+     <row>
+       <label value="Also Download:" />
+       <hbox>
+        <checkbox label="Comments" />
+        <checkbox label="Thumbnail" />
+       </hbox>
+     </row>  
+     </rows></grid>
+     </groupbox>
+     <groupbox align="start">
+     <caption label="Nico Nico Douga specific functions" />
+           <checkbox label="Download Uploader's Comment" />
+ 	   <vbox class="indent"><checkbox label="Download all User Nicowa Videos" /></vbox>
      <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
+     <checkbox label="Make NicoPlayer compatible description textfile" />
+     <label value="Auto login using the username saved in password manager:" />
+
+     <hbox>
+     <menulist id="autologin_username" disabled="true" preference="pref-autologin_username" height="25" >
+     <menupopup>
+     </menupopup>
+     </menulist>
+
+     <button image="chrome://nicofox/skin/lock_break.png" id="autologin_select" oncommand="readUsernames();" />
+          <button image="chrome://nicofox/skin/cross.png" id="autologin_remove" oncommand="removeUsername();" />
+     </hbox>
+     </groupbox>
+  </prefpane>
+  <prefpane id="pane3" label="Media Viewer" onpaneload="updatePanel3();">
+  <script type="application/x-javascript" src="chrome://nicofox/content/options-panel3.js" />
+    <preferences>
+      <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" />
+      <preference id="pref-external_video_player_path" name="extensions.nicofox.external_video_player_path" type="file" />
+      <preference id="pref-external_swf_player" name="extensions.nicofox.external_swf_player" type="bool" />
+      <preference id="pref-external_swf_player_path" name="extensions.nicofox.external_swf_player_path" type="file" />
+    </preferences>
+     <groupbox>
+     <caption label="Custom External Player Setting" />
+     <hbox><checkbox id="external_video_player" preference="pref-external_video_player" label="For FLV/MP4 Videos:" />
+     <filefield id="external_video_player_path" preference="pref-external_video_player_path" />
+     <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectVideoPlayer();" /></hbox>
+     <hbox><checkbox id="external_swf_player" preference="pref-external_swf_player" label="For SWF movies:" />
+     <filefield id="external_swf_player_path" preference="pref-external_swf_player_path" />
+     <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectSwfPlayer();" /></hbox>
     </groupbox>
   </prefpane>
   <stringbundleset id="stringbundleset">

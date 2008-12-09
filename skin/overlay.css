@@ -1,5 +1,11 @@
-/* This is just an example.  You shouldn't do this. */
-#niconicofox-hello
+#nicofox-splitter
 {
-  color: red ! important;
+  border-top: 1px solid #CCCCCC !important;
+  border-bottom: 1px solid #EEEEEE !important;
+  min-height: 3px;
+  max-height: 3px;
+  background-color; #EEEEEE;
 }
+#toolbar-close
+  {list-style-image: url("chrome://nicofox/skin/cross.png");}
+

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
+<?xul-overlay href="chrome://nicofox/content/smilefoxOverlay.xul" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://nicofox/locale/nicofox.dtd">
+
 <overlay id="nicofox-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
@@ -21,11 +23,17 @@
   </menupopup>
 
  <statusbar id="status-bar">
+   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png"/>
    <statusbarpanel id="nicofox-status"
      label="Test"
      tooltiptext=""
      style="display:none;"
    />
  </statusbar>
-
+ <vbox id="appcontent">
+ <splitter id="nicofox-splitter" />
+  <vbox id="smilefox-main" persist="height">
+  
+  </vbox>
+ </vbox>
 </overlay>
