@@ -17,7 +17,7 @@ var strings =
   }
 
 }
-
+var had_done = false;
 var unloading = false;
 /* Make a observer to check the private mode (for Fx 3.1b2+) and the quitting of the browser */
 var nicofox_download_observer = {
@@ -71,15 +71,9 @@ var nicofox_download_listener =
 {
   addListener: function(listener) {
     download_listeners.push(listener);
-    var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-	              .getService(Ci.nsIPromptService);
-    prompts.alert(null, 'FX3', download_listeners.length);
   },
   removeListener: function(listener) {
     download_listeners.splice(download_listeners.indexOf(listener), 1);
-    var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-	              .getService(Ci.nsIPromptService);
-    prompts.alert(null, 'FX3', download_listeners.length);
   },
 }
 
@@ -237,7 +231,7 @@ var smilefox_sqlite =
 	},
 	updateProgress: function(id, info) {
 		if(!id || isNaN(id)) { return false; }
-		var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `current_bytes` = ?1, `max_bytes` = ?2 WHERE `id` = ?5");
+		var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `current_bytes` = ?1, `max_bytes` = ?2 WHERE `id` = ?3");
 		stmt.bindUTF8StringParameter(0, info.current);
 		stmt.bindUTF8StringParameter(1, info.max);
 		stmt.bindInt32Parameter(2, id);
@@ -266,11 +260,11 @@ var smilefox_sqlite =
 	remove: function (id) {
 		try
 		{
-			if(!id || isNaN(id)) { return false; }
-
 			var stmt = this.db_connect.createStatement("DELETE FROM `smilefox` WHERE `id` = ?1");
 			stmt.bindInt32Parameter(0, id);
-		
+			stmt.execute();
+			stmt.reset();
+			return true;	
 		}
 		catch(e)
 		{
@@ -283,35 +277,44 @@ var smilefox_sqlite =
 */
 var nicofox_download_manager = 
 {
-   getDownloads: function()
-   {
+   getDownloads: function() {
 	rows = smilefox_sqlite.select();
 	return rows;
    },
 
-   searchDownloads: function(keywords)
-   {
+   searchDownloads: function(keywords) {
    	if (typeof keywords != 'Array') return new Array();
 	rows = smilefox_sqlite.search(keywords);
 	return rows;
    },
 
-   add: function(Video, url)
-   {
-	var content = smilefox_sqlite.add(Video, url);
-  	triggerDownloadListeners('add', content.id, content);
-	download_runner.prepare();
+   getDownloadCount: function() {
+     return download_count;
+
+   },
+   getWaitingCount: function() {
+     return (waiting_count - download_count);
+
+   },
+   add: function(Video, url) {
+     var content = smilefox_sqlite.add(Video, url);
+     triggerDownloadListeners('add', content.id, content);
+     download_runner.prepare();
    },
 
-   remove: function(id)
+   remove: function(id, dont_callback)
    {
-	if (smilefox_sqlite.remove(id)) {
+	if (smilefox_sqlite.remove(id) && !dont_callback) {
   	  triggerDownloadListeners('remove', id, {});
 	}  
    },
    cancel: function(id)
    {
      download_runner.cancel(id);
+   },
+   cancelAll: function()
+   {
+     download_runner.cancelAll();
    },
    retry: function(id)
    {
@@ -324,6 +327,7 @@ var nicofox_download_manager =
 }
 
 var download_count = 0;
+var waiting_count = 0;
 var download_max = 2;
 var download_runner =
 {
@@ -357,10 +361,16 @@ var download_runner =
 		/* Re-select so we can purge our content */
 		downloads = smilefox_sqlite.select();
 		i = downloads.length - 1;
-		while (i >= 0 && download_count < download_max)
+		waiting_count = 0;
+		while (i >= 0)
 		{
 			if (downloads[i].status == 0)
 			{
+				waiting_count++;
+				if (download_count >= download_max) {
+				  i--; continue;
+				}
+				had_done = false;
 				download_count++;
 				smilefox_sqlite.updateStatus(downloads[i].id, 5);
   			  	triggerDownloadListeners('update', downloads[i].id, {status: 5});
@@ -413,27 +423,30 @@ var download_runner =
 						this.downloader.movie_prepare_file.remove(false);
 						this.downloader.movie_file.moveTo(null, this.downloader.file_title+'.'+this.downloader.type);
 
-						var info = smilefox_sqlite.updateComplete(id, 1);
-  			  			triggerDownloadListeners('update', id, info);
 						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
 						download_count--;
+
+						var info = smilefox_sqlite.updateComplete(id, 1);
+  			  			triggerDownloadListeners('update', id, info);
+						had_done = true;
 						download_runner.prepare();
 						break;
 
 						case 'fail':
-						var info = smilefox_sqlite.updateComplete(id, 3);
-  			  			triggerDownloadListeners('update', id, info);
 						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
 						download_count--;
+
+						var info = smilefox_sqlite.updateComplete(id, 3);
+  			  			triggerDownloadListeners('update', id, info);
 						download_runner.prepare();
 						break;
 
 						case 'cancel':
+						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
+						download_count--;
+
 						var info = smilefox_sqlite.updateComplete(id, 2);
   			  			triggerDownloadListeners('update', id, info);
-						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-						
-						download_count--;
 						download_runner.prepare();
 						break;
 					}
@@ -450,8 +463,10 @@ var download_runner =
 			i--;
 		}
 		/* When all done, display it */
-		if (download_count == 0)
-		{ /*allDone();*/ }
+		if (download_count == 0 && had_done)
+		{ allDone(); }
+		else if (download_count == 0)
+  		{ triggerDownloadListeners('stop', null, null); }
 	},
 	cancel: function(id)
 	{
@@ -486,6 +501,16 @@ var download_runner =
 		}
 	},
 };
+/* All done message */
+function allDone() {
+  var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]
+                       .getService(Components.interfaces.nsIAlertsService);
+  alerts_service.showAlertNotification("chrome://nicofox/skin/nicofox_content.png", 
+                                    "NicoFox download completed", "NicoFox has done video downloads.", 
+                                    false, "", null);
+
+}
+
 /* Fix common reserved characters in filesystems by converting to full-width */
 function fixReservedCharacters(title)
 {

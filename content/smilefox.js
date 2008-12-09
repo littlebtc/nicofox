@@ -16,14 +16,14 @@ var listener =
     if ((typeof content) != 'object') return false;
     content.id = id;
     rows.unshift(content);
-    updateTree();
+    updateTreeCount(0, 1);
   },
   remove: function(id)
   {
     rows = rows.filter(function(element, index, array) {
       if (element.id == id)
       {
-        updateTreeRowRemoved(index);
+        updateTreeCount(index, -1);
       }
       else
       {
@@ -44,8 +44,11 @@ var listener =
 	updateRowSpeed(index);
       }
     });
+  },
+  stop: function()
+  {
+    updateToolbar();
   }
-
 }
 
 nicofox_download_listener.addListener(listener);
@@ -301,6 +304,7 @@ var popup_command =
 		var start = new Object();
 		var end = new Object();
 		var count = 0;
+		var removing_ids = [];
 		for (i = 0; i < tree.view.selection.getRangeCount(); i++)
 		{
 			tree.view.selection.getRangeAt(i, start, end);
@@ -309,11 +313,13 @@ var popup_command =
 				/* when it is failed, completed, canceled or waiting, we can remove it */
 				if(rows[j].status <= 4)
 				{
-					nicofox_download_manager.remove(rows[j].id);
+					removing_ids.push(rows[j].id);
 				}
 			}
 		}
-	
+		for(i = 0; i < removing_ids.length; i++) {
+		  nicofox_download_manager.remove(removing_ids[i]);	
+		}
 	}
 	
 }
@@ -323,7 +329,7 @@ function assignTreeView()
 var tree_view = {
     treeBox: null,
     selection: null,
-    rowCount : rows.length,
+    get rowCount()  {return rows.length;},
     getCellText : function(row,column){
 
       switch(column.id)
@@ -436,31 +442,40 @@ function updateRowSpeed(num)
 function updateTreeRow(index)
 {
 	boxobject = document.getElementById('smilefox-tree').boxObject;
-	boxobject.QueryInterface(Ci.nsITreeBoxObject);
+//	boxobject.QueryInterface(Ci.nsITreeBoxObject);
 	boxobject.invalidateRow(index);
+	updateToolbar();
 }
 
 function updateTree()
 {
 	boxobject = document.getElementById('smilefox-tree').boxObject;
-	boxobject.QueryInterface(Ci.nsITreeBoxObject);
+//	boxobject.QueryInterface(Ci.nsITreeBoxObject);
 	boxobject.invalidate();
+	updateToolbar();
 }
 
-function updateTreeRowRemoved(index)
+function updateTreeCount(index, num)
 {
 	boxobject = document.getElementById('smilefox-tree').boxObject;
-	boxobject.QueryInterface(Ci.nsITreeBoxObject);
-	boxobject.rowCountChanged(index, -1);
+//	boxobject.QueryInterface(Ci.nsITreeBoxObject);
+	boxobject.rowCountChanged(index, num);
+	updateToolbar();
 }
-
-function updateTreeNumbers(num)
-{
-	boxobject = document.getElementById('smilefox-tree').boxObject;
-	boxobject.QueryInterface(Ci.nsITreeBoxObject);
-	boxobject.rowCountChanged(0, num);
+var dog = 0;
+function updateToolbar() {
+  if (nicofox_download_manager.getDownloadCount() > 0) {
+    document.getElementById('smilefox-toolbar-start').disabled = true;
+    document.getElementById('smilefox-toolbar-stop').disabled = false;
+  }
+  else if (nicofox_download_manager.getWaitingCount() == 0) {
+    document.getElementById('smilefox-toolbar-start').disabled = true;
+    document.getElementById('smilefox-toolbar-stop').disabled = true;
+  } else {
+    document.getElementById('smilefox-toolbar-start').disabled = false;
+    document.getElementById('smilefox-toolbar-stop').disabled = true;
+  }
 }
-
 function smilefox_load()
 {
 	/* Load strings */
@@ -469,26 +484,36 @@ function smilefox_load()
         rows = all_rows;
 	assignTreeView();
 
-	/* Find the download request */
-/*	if(window.arguments && window.arguments[0])
-	{
-		nicofox_download_manager.add(window.arguments[0].Video, window.arguments[0].url)
-	}*/
+	/* For XULRunner 1.9.1+, use type="search" */
+	var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
+	           .getService(Ci.nsIXULAppInfo);  
+	if (xulapp_info.platformVersion.indexOf('1.9.0') != 0)
+	{ document.getElementById('smilefox-search').type = 'search'; }
 
 	nicofox_download_manager.go();
+	if (nicofox_download_manager.getDownloadCount() == 0) {
+	  document.getElementById('smilefox-toolbar-start').disabled = true;
+	  document.getElementById('smilefox-toolbar-stop').disabled = true;
+	}
 //	download_runner.prepare();
 	document.getElementById('smilefox-tree').oncontextmenu = function(e) { popup(e); };
 	document.getElementById('smilefox-tree').focus();
 
 }
-
+function toolbarClose()
+{
+	if(document.getElementsByTagName('window')[0].getAttribute('windowtype') == 'navigator:browser')
+	{
+		document.getElementById('nicofox-splitter').collapsed = !document.getElementById('nicofox-splitter').collapsed;
+		document.getElementById('smilefox-space').collapsed = !document.getElementById('smilefox-space').collapsed;
+	}
+	else
+	{
+		window.close();
+	}
+}
 function close()
 {
-
-	/* If downloading, confirm */
-//	if (!prompts.confirm(null, strings.getString('closeSmileFoxTitle'), strings.getString('closeSmileFoxMsg')))
-//	{return false;}
-
 	/* Check if we can close without notifying, modified from globalOverlay.js */
 	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 	                   .getService(Components.interfaces.nsIWindowMediator);
@@ -511,53 +536,37 @@ function close()
 	}
 
 	unloading = true;
-//	download_runner.cancelAll();
+	return true;
 }
 
 function start()
 {
 	/* Start will also be called after video is added, so ... */
 	download_runner.prepare();
-	if (download_count == 0)
-	{ allDone(); }
-	document.getElementById('start').disabled = true;
-	document.getElementById('stop').disabled = false;
+	document.getElementById('smilefox-toolbar-start').disabled = true;
+	document.getElementById('smilefox-toolbar-stop').disabled = false;
 }
 function stop()
 {
-	
 	/* If downloading, confirm */
 	if (!prompts.confirm(null, strings.getString('stopDownloadTitle'), strings.getString('stopDownloadMsg')))
 	{ return; }
-
-	download_runner.cancelAll();
-	download_runner.prepare();
-
-	if (download_count == 0)
-	{ allDone(); return; }
-
-	document.getElementById('start').disabled = false;
-	document.getElementById('stop').disabled = true;
+	nicofox_download_manager.cancelAll();
 }
-function allDone()
-{
-	document.getElementById('start').disabled = true;
-	document.getElementById('stop').disabled = true;
+
+function optionsWindow() {
+  pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', 'chrome,titlebar,toolbar,centerscreen,modal');
+  pref_window.focus();
+}
+
+function allDone() {
+  document.getElementById('start').disabled = true;
+  document.getElementById('stop').disabled = true;
 }
 
 function smilefox_unload()
 {
 	nicofox_download_listener.removeListener(listener);
-}
-/* This is trigged from nicofox.confirmDownload */
-function addDownload(Video, url)
-{
-	nicofox_download_manager.add(Video, url)
-	/* The filename is almost free in NicoNico douga... :P */
-	//filename = fixReservedCharacters(Video.title);
-
-	/* Update the download runner relation */
-	start();
 }
 
 function popup(e)
@@ -586,7 +595,7 @@ function popup(e)
 		if (tree.view.selection.getRangeCount() < 1)
 		{
 			tree.view.selection.select(recent_row);
-			popup_command.multiple_select = true;
+			popup_command.multiple_select = false;
 		}
 	}
 	document.getElementById('smilefox-popup').style.display='-moz-popup';
@@ -642,9 +651,9 @@ function doSearch()
 {
 	var keyword = document.getElementById('search').value;
 	
-	updateTreeNumbers(-rows.length);
+	updateTreeCount(0, -rows.length);
 	rows = nicofox_download_manager.getDownloads();
-	updateTreeNumbers(rows.length);
+	updateTreeCount(0, rows.length);
 	
 	if (keyword) {
           keyword = keyword.replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]]/g, '\\$1');
@@ -664,7 +673,7 @@ function doSearch()
 	}
 	else
 	{
-          updateTreeRowRemoved(index);
+          updateTreeCount(index, -1);
 	}
         }); }
 	updateTree();
@@ -674,6 +683,7 @@ function myDump(aMessage) {
                                  .getService(Components.interfaces.nsIConsoleService);
   consoleService.logStringMessage("Smilefox: " + aMessage);
 }
+
 window.addEventListener("load", function(e) { smilefox_load(); }, false);
 window.addEventListener("unload", function(e) { smilefox_unload(); }, false);
 

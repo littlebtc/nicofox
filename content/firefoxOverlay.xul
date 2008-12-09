@@ -23,7 +23,7 @@
   </menupopup>
 
  <statusbar id="status-bar">
-   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png"/>
+   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png" oncommand="nicofox.collapseBar();"/>
    <statusbarpanel id="nicofox-status"
      label="Test"
      tooltiptext=""
@@ -31,9 +31,10 @@
    />
  </statusbar>
  <vbox id="appcontent">
- <splitter id="nicofox-splitter" />
-  <vbox id="smilefox-main" persist="height">
-  
+ <splitter id="nicofox-splitter" collapsed="true" />
+  <vbox id="smilefox-space" persist="height" collapsed="true">
+  <vbox id="smilefox-main">
+  </vbox>
   </vbox>
  </vbox>
 </overlay>

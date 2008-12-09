@@ -5,10 +5,10 @@ pref("extensions.nicofox.confirm_before_download", true);
 pref("extensions.nicofox.boon_comment", true);
 pref("extensions.nicofox.nicowa_blocker", false);
 // New in 0.3
-//pref("extensions.nicofox.external_video_player", false);
-//pref("extensions.nicofox.external_video_player_path", '');
-//pref("extensions.nicofox.external_swf_player", false);
-//pref("extensions.nicofox.external_swf_player_path", '');
+pref("extensions.nicofox.external_video_player", false);
+pref("extensions.nicofox.external_video_player_path", '');
+pref("extensions.nicofox.external_swf_player", false);
+pref("extensions.nicofox.external_swf_player_path", '');
 
 // NicoMonkey
 pref("extensions.nicofox.nicomonkey.enable", true);

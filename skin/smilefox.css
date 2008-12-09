@@ -1,4 +1,31 @@
 treechildren::-moz-tree-progressmeter
 {
 }
+#smilefox-toolbar-start
+{
+list-style-image: url("chrome://nicofox/skin/resultset_next.png");
+}
+#smilefox-toolbar-stop
+{
+list-style-image: url("chrome://nicofox/skin/stop.png");
+}
+#smilefox-toolbar-download
+{
+list-style-image: url("chrome://nicofox/skin/film_go.png");
+}
+#smilefox-toolbar-option
+{
+list-style-image: url("chrome://nicofox/skin/wrench.png");
+}
+#smilefox-toolbar-close
+{
+list-style-image: url("chrome://nicofox/skin/close.png");
+-moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+
+#smilefox-toolbar-close:hover
+{
+list-style-image: url("chrome://nicofox/skin/close.png");
+-moz-image-region: rect(0px, 32px, 16px, 16px);
+}
 

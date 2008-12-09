@@ -4,8 +4,6 @@
   border-bottom: 1px solid #EEEEEE !important;
   min-height: 3px;
   max-height: 3px;
-  background-color; #EEEEEE;
+  background-color: #EEEEEE;
 }
-#toolbar-close
-  {list-style-image: url("chrome://nicofox/skin/cross.png");}
 

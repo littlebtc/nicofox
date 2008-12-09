@@ -183,12 +183,17 @@ var nicofox = {
 		}
 		else
 		{
-			dlmanager.addDownload(Video, url);
 		}
+		nicofox_download_manager.add(Video, url);
+		
 		dlmanager.focus();
 
 	},
-
+	collapseBar: function()
+	{
+		document.getElementById('nicofox-splitter').collapsed = !document.getElementById('nicofox-splitter').collapsed;
+		document.getElementById('smilefox-space').collapsed = !document.getElementById('smilefox-space').collapsed;
+	},
 	matchWatchUrl: function(url)
 	{
 		return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/);
