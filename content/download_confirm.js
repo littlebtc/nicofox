@@ -1,4 +1,3 @@
-
 function onLoad()
 {	
 	url = window.arguments[0].url;
