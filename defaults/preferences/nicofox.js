@@ -8,6 +8,7 @@ pref("extensions.nicofox.boon_comment", true);
 pref("extensions.nicofox.nicowa_blocker", false);
 // New in 0.3
 pref("extensions.nicofox.bar_autoopen", false);
+pref("extensions.nicofox.filename_scheme", "%ID% - %TITLE%%COMMENT%");
 pref("extensions.nicofox.uploader_comment", true);
 pref("extensions.nicofox.nicoplayer_txt", false);
 

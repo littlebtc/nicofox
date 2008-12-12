@@ -15,11 +15,13 @@
       <preference id="pref-nicomonkey.comment_helper" name="extensions.nicofox.nicomonkey.comment_helper" type="bool"/>
       <preference id="pref-nicomonkey.player_killer" name="extensions.nicofox.nicomonkey.player_killer" type="bool"/>
       <preference id="pref-nicomonkey.sound_converter" name="extensions.nicofox.nicomonkey.sound_converter" type="string"/>
+      <preference id="pref-nicomonkey.supertag" name="extensions.nicofox.nicomonkey.supertag" type="bool"/>
+      <preference id="pref-nicomonkey.superlist" name="extensions.nicofox.nicomonkey.superlist" type="bool"/>
       <preference id="pref-nicowa_blocker" name="extensions.nicofox.nicowa_blocker" type="bool"/>
     </preferences>
     <checkbox id="nicowa_blocker" preference="pref-nicowa_blocker" label="Block Nicowa (except User Nicowa)" accesskey="W" />
-    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;" oncommand="nicomonkeySwitch();" />
-    <groupbox align="start">
+    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="F" oncommand="nicomonkeySwitch();" />
+    <groupbox align="start" id="nicomonkey-groupbox">
      <caption label="&nicomonkey.options;"/>
      <checkbox id="nicomonkey.toolbar" preference="pref-nicomonkey.toolbar" label="&nicomonkey.toolbar.label;" accesskey="&nicomonkey.toolbar.accesskey;" />
      <hbox class="indent">
@@ -34,8 +36,8 @@
      </hbox>
      <checkbox id="nicomonkey.comment_helper" preference="pref-nicomonkey.comment_helper" label="&nicomonkey.comment_helper.label;" accesskey="&nicomonkey.comment_helper.accesskey;" />
      <checkbox id="nicomonkey.player_killer" preference="pref-nicomonkey.player_killer" label="&nicomonkey.player_killer.label;" accesskey="&nicomonkey.player_killer.accesskey;" />
-     <checkbox label="Enable One-click Firefox Bookmark Tag Adding" />
-     <checkbox label="When Adding Mylist, Add the Video Page URL to Firefox Bookmark" />
+     <checkbox id="nicomonkey.supertag" preference="pref-nicomonkey.supertag" label="Enable One-click Firefox Bookmark Tag Adding" accesskey="G" />
+     <checkbox id="nicomonkey.superlist" preference="pref-nicomonkey.superlist" label="When Adding Mylist, Add the Video Page URL to Firefox Bookmark" accesskey="M" />
     </groupbox>
   </prefpane>
   <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/blank.png">
@@ -43,11 +45,14 @@
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
+      <preference id="pref-bar_autoopen" name="extensions.nicofox.bar_autoopen" type="bool" />
+      <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
       <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
       <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
       <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="wstring" />
     </preferences>
     <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
+    <checkbox id="bar_autoopen" preference="pref-bar_autoopen" label="Open download manager automatically when I am in supported websites" accesskey="A" />
     <groupbox align="start">
      <caption label="&downloader.options;" />
      <grid>
@@ -64,7 +69,7 @@
      </row>
      <row>
      <label value="Filename scheme:" />
-     <textbox width="200" />
+     <textbox width="200" id="filename_scheme" preference="pref-filename_scheme" />
      </row>
      <row>
        <label value="Also Download:" />
@@ -77,10 +82,10 @@
      </groupbox>
      <groupbox align="start">
      <caption label="Nico Nico Douga specific functions" />
-           <checkbox label="Download Uploader's Comment" accesskey="U" />
+<!--           <checkbox label="Download Uploader's Comment" accesskey="U" />-->
 <!-- 	   <vbox class="indent"><checkbox label="Download all User Nicowa Videos" /></vbox>-->
      <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
-     <checkbox label="Make NicoPlayer compatible description textfile" accesskey="P" />
+<!--     <checkbox label="Make NicoPlayer compatible description textfile" accesskey="P" />-->
      <label value="Auto login using the username saved in password manager:" accesskey="L" control="autologin_username" />
 
      <hbox>
@@ -104,12 +109,12 @@
     </preferences>
      <groupbox>
      <caption label="Custom External Player Setting" />
-     <hbox><checkbox id="external_video_player" preference="pref-external_video_player" label="For FLV/MP4 Videos:" />
-     <filefield id="external_video_player_path" preference="pref-external_video_player_path" />
+     <checkbox id="external_video_player" preference="pref-external_video_player" label="For FLV/MP4 Videos:" accesskey="F" />
+     <hbox><filefield id="external_video_player_path" preference="pref-external_video_player_path" />
      <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectVideoPlayer();" /></hbox>
-     <hbox><checkbox id="external_swf_player" preference="pref-external_swf_player" label="For SWF movies:" />
-     <filefield id="external_swf_player_path" preference="pref-external_swf_player_path" />
-     <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectSwfPlayer();" /></hbox>
+     <checkbox id="external_swf_player" preference="pref-external_swf_player" label="For SWF movies:" accesskey="S" />
+     <hbox><filefield id="external_swf_player_path" preference="pref-external_swf_player_path" />
+     <button label="&downloader.save_path.browse.label;" accesskey="R" oncommand="selectSwfPlayer();" /></hbox>
     </groupbox>
   </prefpane>
   <stringbundleset id="stringbundleset">

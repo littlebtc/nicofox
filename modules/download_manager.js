@@ -19,6 +19,11 @@ var strings =
 }
 var had_done = false;
 var unloading = false;
+
+var prefs = Components.classes["@mozilla.org/preferences-service;1"].
+                    getService(Components.interfaces.nsIPrefService);
+	prefs = prefs.getBranch("extensions.nicofox.");
+
 /* Make a observer to check the private mode (for Fx 3.1b2+) and the quitting of the browser */
 var nicofox_download_observer = {
   quit_confirmed: false,
@@ -379,108 +384,117 @@ var download_runner =
 		waiting_count = 0;
 		while (i >= 0)
 		{
-			if (downloads[i].status == 0)
-			{
-				waiting_count++;
-				if (download_count >= download_max) {
-				  i--; continue;
-				}
-				had_done = false;
-				download_count++;
-				smilefox_sqlite.updateStatus(downloads[i].id, 5);
-  			  	triggerDownloadListeners('update', downloads[i].id, {status: 5});
-				new_query = {id: downloads[i].id};
-				var k = this.query.push(new_query) - 1;
+		  if (downloads[i].status == 0)
+		  {
+		    waiting_count++;
+		    if (download_count >= download_max) {
+		      i--;
+		      continue;
+		    }
+		    had_done = false;
+		    download_count++;
+		    smilefox_sqlite.updateStatus(downloads[i].id, 5);
+  		    triggerDownloadListeners('update', downloads[i].id, {status: 5});
+		    new_query = {id: downloads[i].id};
+		    var k = this.query.push(new_query) - 1;
 				
-				this.query[k].progress_change_count = 0;	
-				this.query[k].processCallback = function(type, content, id)
-				{
-					
-					/* To prevent "stop" to be called when canceled */
-					if(this.downloader.canceled == true && type != 'cancel' && type != 'fail')
-					{ return; }
+		    this.query[k].progress_change_count = 0;	
+		    this.query[k].processCallback = function(type, content, id) {
 
-					switch(type)
-					{
-						/* Parsing is done, and file is ready to write */
-						case 'file_ready':
-						var info = smilefox_sqlite.updateInfo(id, content);
-  			  			triggerDownloadListeners('update', id, info);
+		      /* To prevent "stop" to be called when canceled */
+		      if(this.downloader.canceled == true && type != 'cancel' && type != 'fail')
+		      { return; }
+
+		      switch(type)
+		      {
+		        /* Parsing is done, and file is ready to write */
+		        case 'file_ready':
+		        var info = smilefox_sqlite.updateInfo(id, content);
+  		        triggerDownloadListeners('update', id, info);
 						
-						break;
+		        break;
 
-						/* Video download is started */
-						case 'start':
-						var info = smilefox_sqlite.updateStatus(id, 7);
-  			  			triggerDownloadListeners('update', id, {status: 7});
-						break;
+		        /* Video download is started */
+		        case 'start':
+		        var info = smilefox_sqlite.updateStatus(id, 7);
+  		        triggerDownloadListeners('update', id, {status: 7});
+		        break;
 
-						case 'progress_change':
-						var info = smilefox_sqlite.updateProgress(id, content);
-  			  			triggerDownloadListeners('update', id, info);
-						break;
+		        case 'progress_change':
+		        var info = smilefox_sqlite.updateProgress(id, content);
+  		        triggerDownloadListeners('update', id, info);
+		        break;
 
-						case 'video_done':
-						/* It is "protected" by the below part so will be executed only for download completed */
-						var row = smilefox_sqlite.selectId(id);	
-						/* If the download is incomplete, we will consider it as failed */
-						if (row.current_bytes != row.max_bytes)
-						{
-							this.downloader.removeFiles();
-							this.downloader.fail();
-    							var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-						                      .getService(Ci.nsIPromptService);
-							prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
-							return;
-						}
-						var info = smilefox_sqlite.updateStatus(id, 6);
-  			  			triggerDownloadListeners('update', id, {status: 6});
-						break;
+		        case 'video_done':
+		        /* It is "protected" by the below part so will be executed only for download completed */
+		        var row = smilefox_sqlite.selectId(id);	
+		        /* If the download is incomplete, we will consider it as failed */
+		        if (row.current_bytes != row.max_bytes) {
+		          this.downloader.removeFiles();
+		          this.downloader.fail();
+    		          var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+		                       .getService(Ci.nsIPromptService);
+		          prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
+		          return;
+		        }
+		        var info = smilefox_sqlite.updateStatus(id, 6);
+  		        triggerDownloadListeners('update', id, {status: 6});
+		        break;
 
-						case 'completed':
-						/* Finialize download */
-						this.downloader.movie_prepare_file.remove(false);
-						this.downloader.movie_file.moveTo(null, this.downloader.file_title+'.'+this.downloader.type);
+		        case 'completed':
+		        /* Finialize download */
+		        this.downloader.movie_prepare_file.remove(false);
+		        this.downloader.movie_file.moveTo(null, this.downloader.file_title+'.'+this.downloader.type);
 
-						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-						download_count--;
+		        var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
+		        download_count--;
 
-						var info = smilefox_sqlite.updateComplete(id);
-  			  			triggerDownloadListeners('update', id, info);
-						had_done = true;
-						download_runner.prepare();
-						break;
+		        var info = smilefox_sqlite.updateComplete(id);
+  		        triggerDownloadListeners('update', id, info);
+		        had_done = true;
+		        download_runner.prepare();
+		        break;
 
-						case 'fail':
-						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-						download_count--;
-						this.downloader.removeFiles();
+		        case 'fail':
+		        var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
+		        download_count--;
+		        this.downloader.removeFiles();
 
-						var info = smilefox_sqlite.updateStopped(id, 3);
-  			  			triggerDownloadListeners('update', id, info);
-						download_runner.prepare();
-						break;
+		        var info = smilefox_sqlite.updateStopped(id, 3);
+		        triggerDownloadListeners('update', id, info);
+		        download_runner.prepare();
+		        break;
 
-						case 'cancel':
-						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-						download_count--;
+		        case 'cancel':
+		        var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
+		        download_count--;
 
-						var info = smilefox_sqlite.updateStopped(id, 2);
-  			  			triggerDownloadListeners('update', id, info);
-						download_runner.prepare();
-						break;
-					}
-				}
-
-
-				this.query[k].downloader = new smileFoxDownloader();
-				this.query[k].downloader.callback = hitchFunction(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
-				this.query[k].downloader.file_title = fixReservedCharacters(downloads[i].video_title);
-				this.query[k].downloader.comment_type = downloads[i].comment_type;
-				this.query[k].downloader.init(downloads[i].comment_id);
-			}
-
-			i--;
+		        var info = smilefox_sqlite.updateStopped(id, 2);
+		        triggerDownloadListeners('update', id, info);
+		        download_runner.prepare();
+			break;
+		      }
+		    }
+		    this.query[k].downloader = new smileFoxDownloader();
+		    this.query[k].downloader.callback = hitchFunction(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
+		    /* FIXME: Check the filename scheme! */
+		    var file_title = prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
+		    file_title = file_title.replace(/\%TITLE\%/, fixReservedCharacters(downloads[i].video_title));
+		    file_title = file_title.replace(/\%ID\%/, fixReservedCharacters(downloads[i].video_id));
+                    /* Add comment filename */
+		    if (downloads[i].comment_type != 'www')
+		    {
+		      file_title = file_title.replace(/\%COMMENT\%/, fixReservedCharacters('['+downloads[i].comment_type+']'));
+		    }
+		    else
+		    {
+		      file_title = file_title.replace(/\%COMMENT\%/, '');
+		    }
+		    this.query[k].downloader.file_title = file_title;
+		    this.query[k].downloader.comment_type = downloads[i].comment_type;
+		    this.query[k].downloader.init(downloads[i].comment_id);
+		  }
+		  i--;
 		}
 		/* When all done, display it */
 		if (download_count == 0 && had_done)
@@ -545,8 +559,8 @@ function fixReservedCharacters(title) {
 	title = title.replace(/\>/g, '＞');
 	title = title.replace(/\+/g, '＋');
 	/* Windows FAT specified... */
-	title = title.replace(/\[/g, '〔');
-	title = title.replace(/\]/g, '〕');
+	//title = title.replace(/\[/g, '〔');
+	//title = title.replace(/\]/g, '〕');
 	return title;
 }
 

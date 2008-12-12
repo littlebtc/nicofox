@@ -91,13 +91,14 @@ var popup_command =
 		var video_uri = Cc["@mozilla.org/network/io-service;1"]
 	          .getService(Ci.nsIIOService).newFileURI(file);
 
-		var file = Cc["@mozilla.org/file/local;1"]
-		           .createInstance(Ci.nsILocalFile);
-		file.initWithPath(rows[recent_row].comment_file);
-		if (!file.exists()) { return false; }
-		var comment_uri = Cc["@mozilla.org/network/io-service;1"]
-	          .getService(Ci.nsIIOService).newFileURI(file);
-		
+		if (rows[recent_row].comment_file) {
+		  var file = Cc["@mozilla.org/file/local;1"]
+		             .createInstance(Ci.nsILocalFile);
+		  file.initWithPath(rows[recent_row].comment_file);
+		  if (!file.exists()) { return false; }
+		  var comment_uri = Cc["@mozilla.org/network/io-service;1"]
+	            .getService(Ci.nsIIOService).newFileURI(file);
+		}
 		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri.spec, comment: comment_uri.spec, title: rows[recent_row].video_title});	
 	
 	

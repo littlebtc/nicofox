@@ -1,36 +1,38 @@
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
-function nicomonkeySwitch()
-{
-	checked = document.getElementById('pref-nicomonkey.enable').value;
-	if (!checked)
-	{
-		document.getElementById('nicomonkey.toolbar').disabled = false;
-		document.getElementById('nicomonkey.comment_helper').disabled = false;
-		document.getElementById('nicomonkey.player_killer').disabled = false;
-	}
-	else
-	{
-		document.getElementById('nicomonkey.toolbar').disabled = true;
-		document.getElementById('nicomonkey.comment_helper').disabled = true;
-		document.getElementById('nicomonkey.player_killer').disabled = true;
-	}
+function nicomonkeySwitch() {
+  checked = document.getElementById('pref-nicomonkey.enable').value;
+  var groupbox = document.getElementById('nicomonkey-groupbox');
+  if (!checked) { checked = false; }
+  else { checked = true; }
+
+  var checkboxes = groupbox.getElementsByTagName('checkbox');
+  for (i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].setAttribute('disabled', checked);
+  }
+
+  var menulists = groupbox.getElementsByTagName('menulist');
+  for (i = 0; i < menulists.length; i++) {
+    menulists[i].setAttribute('disabled', checked);
+  }
 }
-function updatePanel1()
-{
-	checked = document.getElementById('nicomonkey.enable').checked;
-	if (checked)
-	{
-		document.getElementById('nicomonkey.toolbar').disabled = false;
-		document.getElementById('nicomonkey.comment_helper').disabled = false;
-		document.getElementById('nicomonkey.player_killer').disabled = false;
-	}
-	else
-	{
-		document.getElementById('nicomonkey.toolbar').disabled = true;
-		document.getElementById('nicomonkey.comment_helper').disabled = true;
-		document.getElementById('nicomonkey.player_killer').disabled = true;
-	}
+function updatePanel1() {
+
+  checked = document.getElementById('pref-nicomonkey.enable').value;
+  var groupbox = document.getElementById('nicomonkey-groupbox');
+  if (checked) { var disabled = false; }
+  else { var disabled = true; }
+
+  var checkboxes = groupbox.getElementsByTagName('checkbox');
+  for (i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].setAttribute('disabled', disabled);
+  }
+
+  var menulists = groupbox.getElementsByTagName('menulist');
+  for (i = 0; i < menulists.length; i++) {
+    menulists[i].setAttribute('disabled', disabled);
+  }
+
 }
 

@@ -183,12 +183,6 @@ smileFoxDownloader.prototype = {
     else
     { this.economy = false; }
     
-    /* Add comment filename */
-    if (this.comment_type != 'www')
-    {
-      this.file_title = this.file_title + '['+this.comment_type+']';
-    }
-
     /* Distinguish what type of video we will download */
     if (params.url.match(/smile\?s\=/)) /* SWF from Nico Nico Movie Maker */
     { this.type = 'swf'; }
