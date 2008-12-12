@@ -25,6 +25,39 @@ var nicofox = {
    /*official_tags: [
 '公式', '音楽', 'エンターテイメント', 'アニメ', 'ゲーム', 'ラジオ', 'スポーツ', '科学', '料理', '政治', '動物', '歴史', '自然',
 'ニコニコ動画講座', '演奏してみた', '歌ってみた', '踊ってみた', '投稿者コメント', '日記', 'アンケート', 'チャット', 'テスト', 'その他', 'R-18'],*/
+  bar_opened: false,
+
+  nicofox_page_listener:
+  {
+    QueryInterface: function(aIID)
+    {
+     if (aIID.equals(Components.interfaces.nsIWebProgressListener) ||
+         aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
+         aIID.equals(Components.interfaces.nsISupports))
+       return this;
+     throw Components.results.NS_NOINTERFACE;
+    },
+    onLocationChange: function(aProgress, aRequest, aURI)
+    {
+     /* FIXME: Dirty */
+     if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)) {
+       document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
+       nicofox.openBar(true);
+     } else {
+       document.getElementById('smilefox-toolbar-download').setAttribute('disabled', true);
+       if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\//)) {
+         nicofox.openBar(true);
+       }
+     }
+     return 0;
+    },
+    onStateChange: function(aWebProgress, aRequest, aFlag, aStatus) {return 0;},
+    onProgressChange: function() {return 0;},
+    onStatusChange: function() {return 0;},
+    onSecurityChange: function() {return 0;},
+    onLinkIconAvailable: function() {return 0;}
+  },
+
    onLoad: function() {
    Components.utils.import("resource://nicofox/download_manager.js");
 //   this.nico_dl_observer = new nicofox_download_observer();
@@ -59,14 +92,19 @@ var nicofox = {
 		this.prefs.setBoolPref('first_run', false);
     }
 
-
+    gBrowser.addProgressListener(this.nicofox_page_listener,
+    Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+   
 // bookmark watcher
 /*   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                             .getService(Components.interfaces.nsINavBookmarksService);
-	bookmark_service.addObserver(nicofox_bookmark_listener, false);
+	bookmark_service.addObserver(nicofox_bookmark_listener, false);*/
+
   },
-  onUnLoad: function() {
-   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+  onUnload: function() {
+    gBrowser.removeProgressListener(this.nicofox_page_listener,
+    Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+   /*var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                             .getService(Components.interfaces.nsINavBookmarksService);
 	bookmark_service.removeObserver(nicofox_bookmark_listener);*/
   },
@@ -91,7 +129,23 @@ var nicofox = {
   onPageLoad: function(aEvent) {
 
   },
-    goDownload: function(url) 
+    openBar: function(auto_triggered)
+    {
+      /* Auto triggered and not dismissed */
+      if (auto_triggered
+      && this.prefs.getBoolPref("bar_autoopen", Components.interfaces.nsISupportsString)
+      && ! this.bar_opened)
+      {
+        document.getElementById('nicofox-splitter').collapsed = false;
+        document.getElementById('smilefox-space').collapsed = false;
+	this.bar_opened = true;
+      } else if (!auto_triggered) {
+        document.getElementById('nicofox-splitter').collapsed = false;
+        document.getElementById('smilefox-space').collapsed = false;
+	this.bar_opened = true;
+      }
+    },
+    goDownload: function(url, dont_confirm) 
 	{
 		/* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
 		var value = this.prefs.getComplexValue("save_path",
@@ -112,7 +166,7 @@ var nicofox = {
 		nicofox_status.label = this.strings.getString('processing');
 
 		urlparser = new nicoFoxUrlParser();
-		urlparser.return_to = hitchFunction(nicofox, 'confirmDownload', url);
+		urlparser.return_to = hitchFunction(nicofox, 'confirmDownload', url, dont_confirm);
 		urlparser.goParse(url);
 	},
 
@@ -128,10 +182,10 @@ var nicofox = {
 			pref_window.focus();
 			return;
 		}
-		this.confirmDownload(Video, url);
+		this.confirmDownload(Video, url, true);
 	},
 
-	confirmDownload: function(Video, url)
+	confirmDownload: function(Video, url, dont_confirm)
 		{
 
 		var nicofox_status = document.getElementById('nicofox-status');
@@ -151,7 +205,7 @@ var nicofox = {
 			return;
 		}
 
-		if(this.prefs.getBoolPref('confirm_before_download'))
+		if(this.prefs.getBoolPref('confirm_before_download') && !dont_confirm)
 		{
 			/* Call the download confirm dialog */
 			var params = {url: url, Video: Video, out: null};       
@@ -172,7 +226,7 @@ var nicofox = {
 		}
 
 		/* Send the add request to download manager */
-		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+/*		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
  			                   .getService(Components.interfaces.nsIWindowMediator);
 		var dlmanager = wm.getMostRecentWindow("smilefox:dlmanager");
 
@@ -183,10 +237,10 @@ var nicofox = {
 		}
 		else
 		{
-		}
+		}*/
 		nicofox_download_manager.add(Video, url);
-		
-		dlmanager.focus();
+		nicofox.openBar(false);
+		/*dlmanager.focus();*/
 
 	},
 	collapseBar: function()
@@ -211,4 +265,4 @@ var nicofox = {
 
 };
 window.addEventListener("load", function(e) { nicofox.onLoad(e); }, false);
-//window.addEventListener("unload", function(e) { nicofox.onUnLoad(e); }, false);
+window.addEventListener("unload", function(e) { nicofox.onUnload(e); }, false);

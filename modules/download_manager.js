@@ -77,7 +77,6 @@ var nicofox_download_listener =
   },
 }
 
-var dummy = {};
 /* A function to call all of the listeners */
 function triggerDownloadListeners(listener_event, id, content)
 {
@@ -88,23 +87,22 @@ var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
   for (i = 0; i < download_listeners.length; i++)
   { 
     if ((typeof download_listeners[i][listener_event]) == 'function')
-    { download_listeners[i][listener_event].call(dummy, id, content); }
+    { download_listeners[i][listener_event].call(null, id, content); }
   }
 }
-var smilefox_sqlite = 
-{
-	load: function() {
+var smilefox_sqlite = {
+  load: function() {
+    
+    var file = Cc["@mozilla.org/file/directory_service;1"]
+              .getService(Ci.nsIProperties)
+              .get("ProfD", Ci.nsIFile);
+    file.append("smilefox.sqlite");
+    
+    var storageService = Components.classes["@mozilla.org/storage/service;1"]
+                        .getService(Components.interfaces.mozIStorageService);
+    this.db_connect = storageService.openDatabase(file);
 
-		var file = Cc["@mozilla.org/file/directory_service;1"]
-		           .getService(Ci.nsIProperties)
-		           .get("ProfD", Ci.nsIFile);
-		file.append("smilefox.sqlite");
-
-		var storageService = Components.classes["@mozilla.org/storage/service;1"]
-	                        .getService(Components.interfaces.mozIStorageService);
-		this.db_connect = storageService.openDatabase(file);
-
-	},
+   },
 	fetchArray: function(statement) {
 		// FIXME: typeof check
 		var i = 0;
@@ -207,10 +205,9 @@ var smilefox_sqlite =
 		}
 	},
 	updateInfo: function(id, info) {
-		/* Update info and set status = 7 (downloading)*/
 		if(!id || isNaN(id)) { return false; }
 		var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1 , `video_type` = ?2 , `video_economy` = ?3 , `video_file` = ?4 , `comment_file` = ?5, `start_time` = ?6 WHERE `id` = ?7");
-		stmt.bindInt32Parameter(0, 7);
+		stmt.bindInt32Parameter(0, 5);
 		stmt.bindUTF8StringParameter(1, info.video_type);
 		if (info.video_economy)
 		{ stmt.bindInt32Parameter(2, 1); }
@@ -225,7 +222,7 @@ var smilefox_sqlite =
 		stmt.execute();
 		stmt.reset();
 		
-		info.status = 6;
+		info.status = 5;
 		info.video_economy = (info.video_economy)?1:0;
 		return info;
 	},
@@ -241,22 +238,41 @@ var smilefox_sqlite =
 		var content = {current_bytes: info.current, max_bytes: info.max};
 		return content;
 	},
-	updateComplete: function(id, stat) {
-		/* Update info and set status = 1 (completed) / 2 (canceled) / 3 (failed) */
-		if(!id) { return false; }
+  updateComplete: function(id) {
+    /* Update info and set status = 1 (completed) */
+    if(!id) { return false; }
+      
+    var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1, `end_time` = ?2 WHERE `id` = ?3");
+    stmt.bindInt32Parameter(0, 1);
+    now_date = new Date();
+    var end_time = now_date.getTime();
+    stmt.bindInt64Parameter(1, end_time);
+    stmt.bindInt32Parameter(2, id);
+    stmt.execute();
+    stmt.reset();
+    
+    var content = {status: 1, end_time: end_time};
+    return content;
+  },
 
-		var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1, `end_time` = ?2 WHERE `id` = ?3");
-		stmt.bindInt32Parameter(0, stat);
-		now_date = new Date();
-		var end_time = now_date.getTime();
-		stmt.bindInt64Parameter(1, end_time);
-		stmt.bindInt32Parameter(2, id);
-		stmt.execute();
-		stmt.reset();
-
-		var content = {status: stat, end_time: end_time};
-		return content;
-	},
+  updateStopped: function(id, stat) {
+    /* Update info and set status = 1 (completed) / 2 (canceled) / 3 (failed) */
+    if(!id) { return false; }
+      
+    var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1, `end_time` = ?2, `current_bytes` = ?3, `max_bytes` = ?4 WHERE `id` = ?5");
+    stmt.bindInt32Parameter(0, stat);
+    now_date = new Date();
+    var end_time = now_date.getTime();
+    stmt.bindInt64Parameter(1, end_time);
+    stmt.bindInt32Parameter(2, 0);
+    stmt.bindInt32Parameter(3, 0);
+    stmt.bindInt32Parameter(4, id);
+    stmt.execute();
+    stmt.reset();
+    
+    var content = {status: stat, end_time: end_time, current_bytes: 0, max_bytes: 0};
+    return content;
+  },
 	remove: function (id) {
 		try
 		{
@@ -331,18 +347,17 @@ var waiting_count = 0;
 var download_max = 2;
 var download_runner =
 {
-	ready: false,
-	query: new Array(),
-	initialize: function()
-	{
-		
-		if (this.ready)
-		{ return false; }
-		downloads = smilefox_sqlite.select();
-		/* If there is something remained unexpected status, we will let it fail */
-		for (i=0; i< downloads.length; i++)
-		{
-			if (downloads[i].status > 4)
+  ready: false,
+  query: new Array(),
+  initialize: function()
+  {
+  	
+  if (this.ready)
+  { return false; }
+  downloads = smilefox_sqlite.select();
+  /* If there is something remained unexpected status, we will let it fail */
+  for (i=0; i< downloads.length; i++) {
+  if (downloads[i].status > 4)
 			{
 			  smilefox_sqlite.updateStatus(downloads[i].id, 3); 
   			  triggerDownloadListeners('update', downloads[i].id, {status: 3});
@@ -405,20 +420,24 @@ var download_runner =
   			  			triggerDownloadListeners('update', id, info);
 						break;
 
-						case 'stop':
+						case 'video_done':
 						/* It is "protected" by the below part so will be executed only for download completed */
 						var row = smilefox_sqlite.selectId(id);	
 						/* If the download is incomplete, we will consider it as failed */
 						if (row.current_bytes != row.max_bytes)
 						{
 							this.downloader.removeFiles();
-							this.processCallback('fail', {}, id);
+							this.downloader.fail();
     							var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 						                      .getService(Ci.nsIPromptService);
 							prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
 							return;
 						}
+						var info = smilefox_sqlite.updateStatus(id, 6);
+  			  			triggerDownloadListeners('update', id, {status: 6});
+						break;
 
+						case 'completed':
 						/* Finialize download */
 						this.downloader.movie_prepare_file.remove(false);
 						this.downloader.movie_file.moveTo(null, this.downloader.file_title+'.'+this.downloader.type);
@@ -426,7 +445,7 @@ var download_runner =
 						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
 						download_count--;
 
-						var info = smilefox_sqlite.updateComplete(id, 1);
+						var info = smilefox_sqlite.updateComplete(id);
   			  			triggerDownloadListeners('update', id, info);
 						had_done = true;
 						download_runner.prepare();
@@ -435,8 +454,9 @@ var download_runner =
 						case 'fail':
 						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
 						download_count--;
+						this.downloader.removeFiles();
 
-						var info = smilefox_sqlite.updateComplete(id, 3);
+						var info = smilefox_sqlite.updateStopped(id, 3);
   			  			triggerDownloadListeners('update', id, info);
 						download_runner.prepare();
 						break;
@@ -445,7 +465,7 @@ var download_runner =
 						var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
 						download_count--;
 
-						var info = smilefox_sqlite.updateComplete(id, 2);
+						var info = smilefox_sqlite.updateStopped(id, 2);
   			  			triggerDownloadListeners('update', id, info);
 						download_runner.prepare();
 						break;
@@ -512,8 +532,7 @@ function allDone() {
 }
 
 /* Fix common reserved characters in filesystems by converting to full-width */
-function fixReservedCharacters(title)
-{
+function fixReservedCharacters(title) {
 	title = title.replace(/\//g, '／');
 	title = title.replace(/\\/g, '＼');
 	title = title.replace(/\?/g, '？');

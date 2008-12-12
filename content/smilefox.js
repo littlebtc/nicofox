@@ -6,7 +6,6 @@ Components.utils.import('resource://nicofox/download_manager.js');
 
 var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 	              .getService(Ci.nsIPromptService);
-var all_rows = new Array();
 var rows = new Array();
 
 var listener = 
@@ -189,57 +188,12 @@ var popup_command =
 		}
 
 	},
-	buggy: function()
-	{
-		if (recent_row < 0) { return; }
-		if (!rows[recent_row].video_file) { return; }
-
-		var file = Cc["@mozilla.org/file/local;1"]
-		           .createInstance(Ci.nsILocalFile);
-		file.initWithPath(rows[recent_row].video_file);
-		if (!file.exists()) { return false; }
-
-		/* TODO: flv/mp4/swf detection */
-		if (prefs.getComplexValue("external_video_player",
-		Components.interfaces.nsISupportsString).data && rows[recent_row].video_file.match(/(flv|mp4)$/))
-		{
-			var external_video_player = prefs.getComplexValue("external_video_player", Components.interfaces.nsILocalFile);
-
-			var os_string = Cc["@mozilla.org/xre/app-info;1"]  
-			.getService(Ci.nsIXULRuntime).OS;  
-			var process;
-			process = Components.classes["@mozilla.org/process/util;1"]
-			.createInstance(Components.interfaces.nsIProcess);
-			process.init(external_video_player);
-			var parameter = [file.path];
-			process.run(false, parameter, 1);
-			return;
-		}
-
-		/* Normal approach */
-		try
-		{
-			file.launch();
-		}
-		catch(e)
-		/* For *nix, launch() didn't work, so...  */
-		/* See also: http://mxr.mozilla.org/seamonkey/source/toolkit/mozapps/downloads/content/downloads.js */
-		{
-			var uri = Cc["@mozilla.org/network/io-service;1"]
-			          .getService(Ci.nsIIOService).newFileURI(file);
-			var protocol_service = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
-			                       .getService(Ci.nsIExternalProtocolService);
-			protocol_service.loadUrl(uri);
-
-		}
-
-	},
-	openSwfPlayer: function()
+/*	openSwfPlayer: function()
 	{
 
 		if (recent_row < 0) { return; }
 		if (!rows[recent_row].video_file) { return; }
-	//	if (!rows[recent_row].video_file.match(/\.swf$/)) { return; }
+		if (!rows[recent_row].video_file.match(/\.swf$/)) { return; }
 
 		var file = Cc["@mozilla.org/file/local;1"]
 		           .createInstance(Ci.nsILocalFile);
@@ -256,7 +210,7 @@ var popup_command =
 	          .getService(Ci.nsIIOService).newFileURI(file);
 		
 		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=560,height=500, resizable=yes', {video: video_uri.spec, comment: comment_uri.spec, title: rows[recent_row].video_title});
-	},
+	},*/
 	openFolder: function()
 	{
 		if (recent_row < 0) { return; }
@@ -485,8 +439,7 @@ function smilefox_load()
 {
 	/* Load strings */
 	strings = document.getElementById('nicofox-strings');
-	all_rows = nicofox_download_manager.getDownloads();
-        rows = all_rows;
+	rows = nicofox_download_manager.getDownloads();
 	assignTreeView();
 
 	/* For XULRunner 1.9.1+, use type="search" */

@@ -17,6 +17,6 @@
 <!ENTITY downloader.save_path.browse.label "Browse...">
 <!ENTITY downloader.save_path.browse.accesskey "B">
 <!ENTITY downloader.confirm_before_download.label "Display confirm dialog before download">
-<!ENTITY downloader.confirm_before_download.accesskey "C">
+<!ENTITY downloader.confirm_before_download.accesskey "D">
 <!ENTITY downloader.boon_comment.label "Make comment files compatible with BOON Player">
 <!ENTITY downloader.boon_comment.accesskey "B">

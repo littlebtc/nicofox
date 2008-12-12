@@ -43,8 +43,9 @@
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
+      <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
       <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
-      <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="string" />
+      <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="wstring" />
     </preferences>
     <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
     <groupbox align="start">
@@ -68,19 +69,19 @@
      <row>
        <label value="Also Download:" />
        <hbox>
-        <checkbox label="Comments" />
-        <checkbox label="Thumbnail" />
+        <checkbox id="download_comment" preference="pref-download_comment" label="Comments" accesskey="C" />
+        <!--<checkbox label="Thumbnail" accesskey="T" />-->
        </hbox>
      </row>  
      </rows></grid>
      </groupbox>
      <groupbox align="start">
      <caption label="Nico Nico Douga specific functions" />
-           <checkbox label="Download Uploader's Comment" />
- 	   <vbox class="indent"><checkbox label="Download all User Nicowa Videos" /></vbox>
+           <checkbox label="Download Uploader's Comment" accesskey="U" />
+<!-- 	   <vbox class="indent"><checkbox label="Download all User Nicowa Videos" /></vbox>-->
      <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
-     <checkbox label="Make NicoPlayer compatible description textfile" />
-     <label value="Auto login using the username saved in password manager:" />
+     <checkbox label="Make NicoPlayer compatible description textfile" accesskey="P" />
+     <label value="Auto login using the username saved in password manager:" accesskey="L" control="autologin_username" />
 
      <hbox>
      <menulist id="autologin_username" disabled="true" preference="pref-autologin_username" height="25" >
