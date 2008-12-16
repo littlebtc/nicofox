@@ -299,7 +299,7 @@ smileFoxDownloader.prototype = {
                                  aCurSelfProgress, aMaxSelfProgress,
                                  aCurTotalProgress, aMaxTotalProgress)
       {
-        this.downloaderCallback('progress_change', {current: aCurSelfProgress, max: aMaxSelfProgress});
+        this.downloaderCallback('progress_change', {current_bytes: aCurSelfProgress, max_bytes: aMaxSelfProgress});
       },
       onLocationChange: function (aWebProgress, aRequest, aLocation) {},
       onStatusChange  : function (aWebProgress, aRequest, aStatus, aMessage) {},

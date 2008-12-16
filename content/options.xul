@@ -5,8 +5,7 @@
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
- title="&prefwindow.title;" width="500" height="500"
->
+ title="&prefwindow.title;" width="600">
   <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();" image="chrome://nicofox/skin/nicofox_content.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel1.js" />
     <preferences>
@@ -75,17 +74,46 @@
        <label value="Also Download:" />
        <hbox>
         <checkbox id="download_comment" preference="pref-download_comment" label="Comments" accesskey="C" />
-        <!--<checkbox label="Thumbnail" accesskey="T" />-->
+        <checkbox label="Thumbnail" accesskey="T" />
        </hbox>
      </row>  
+    <row>
+    </row>
      </rows></grid>
+    <hbox>
+    <label value="Maximum parallel downloads per website:" />
+    <textbox type="number" min="1" max="5" style="width:5em" />
+    </hbox>
      </groupbox>
      <groupbox align="start">
      <caption label="Nico Nico Douga specific functions" />
-<!--           <checkbox label="Download Uploader's Comment" accesskey="U" />-->
+     <label value="When Economy Mode (Low-quality Video Mode) is on:" accesskey="E" control="economy"/>
+      <menulist id="economy" preference="pref-economy" >
+     <menupopup>
+     <menuitem value="0" label="Download Low-quality Videos Anyway" />
+     <menuitem value="1" label="Process Video Download after the Economy Mode is Off" />
+     <menuitem value="2" label="Download the Low-quality Video and Redownload Later" />
+     </menupopup>
+     </menulist>
+     <grid>
+     <columns>
+       <column flex="1"/>
+       <column flex="2"/>
+       <column flex="1"/>
+     </columns>
+     <rows>
+     <row>
+     <checkbox label="Download Uploader's Comment" accesskey="U" />
 <!-- 	   <vbox class="indent"><checkbox label="Download all User Nicowa Videos" /></vbox>-->
+     <checkbox id="replace_filter" preference="pref-replace_filter" label="Replace Filters in Comments" accesskey="F" />
+     </row>
+     <row>
      <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
-<!--     <checkbox label="Make NicoPlayer compatible description textfile" accesskey="P" />-->
+     <checkbox label="Make NicoPlayer compatible description textfile" accesskey="P" />
+     </row>
+     </rows>
+     </grid>
+     
      <label value="Auto login using the username saved in password manager:" accesskey="L" control="autologin_username" />
 
      <hbox>
@@ -99,7 +127,7 @@
      </hbox>
      </groupbox>
   </prefpane>
-  <prefpane id="pane3" label="Media Viewer" onpaneload="updatePanel3();">
+  <prefpane id="pane3" label="Media Viewer" onpaneload="updatePanel3();" image="chrome://nicofox/skin/blank.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel3.js" />
     <preferences>
       <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" />

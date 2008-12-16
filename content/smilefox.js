@@ -16,6 +16,8 @@ var listener =
     content.id = id;
     rows.unshift(content);
     updateTreeCount(0, 1);
+    document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
+
   },
   remove: function(id)
   {
@@ -90,6 +92,8 @@ var popup_command =
 		if (!file.exists()) { return false; }
 		var video_uri = Cc["@mozilla.org/network/io-service;1"]
 	          .getService(Ci.nsIIOService).newFileURI(file);
+		var video_uri_spec = video_uri.spec;
+		var comment_uri_spec = '';
 
 		if (rows[recent_row].comment_file) {
 		  var file = Cc["@mozilla.org/file/local;1"]
@@ -98,11 +102,13 @@ var popup_command =
 		  if (!file.exists()) { return false; }
 		  var comment_uri = Cc["@mozilla.org/network/io-service;1"]
 	            .getService(Ci.nsIIOService).newFileURI(file);
+		  comment_uri_spec = comment_uri.spec; 
 		}
-		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri.spec, comment: comment_uri.spec, title: rows[recent_row].video_title});	
+		
+		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: rows[recent_row].video_title});	
 	
 	
-	}, /* TODO */
+	}, 
 	openExternal: function()
 	{
 		if (recent_row < 0) { return; }
@@ -189,7 +195,7 @@ var popup_command =
 		}
 
 	},
-/*	openSwfPlayer: function()
+	openSwfPlayer: function()
 	{
 
 		if (recent_row < 0) { return; }
@@ -210,8 +216,8 @@ var popup_command =
 		var comment_uri = Cc["@mozilla.org/network/io-service;1"]
 	          .getService(Ci.nsIIOService).newFileURI(file);
 		
-		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=560,height=500, resizable=yes', {video: video_uri.spec, comment: comment_uri.spec, title: rows[recent_row].video_title});
-	},*/
+		window.open(video_uri.spec, 'nicofox_swf', 'width=512,height=384, resizable=yes');
+	},
 	openFolder: function()
 	{
 		if (recent_row < 0) { return; }
@@ -567,6 +573,7 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'none';
 		document.getElementById('popup-cancel').style.display = 'none';
 		document.getElementById('popup-open').style.display = 'none';
+		document.getElementById('popup-open-swf-player').style.display ='none';
 		document.getElementById('popup-open-external').style.display = 'none';
 		document.getElementById('popup-open-folder').style.display = 'none';
 		document.getElementById('popup-remove').style.display = 'block';
@@ -577,6 +584,14 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'none';
 		document.getElementById('popup-cancel').style.display = 'none';
 		document.getElementById('popup-open').style.display = 'block';
+		/* NicoFox player do not support SWF currently */
+		if (rows[recent_row].video_file.match(/\.swf$/)) {
+		  document.getElementById('popup-open').style.display ='none';
+		  document.getElementById('popup-open-swf-player').style.display ='block';
+		} else {
+		  document.getElementById('popup-open').style.display ='block';
+		  document.getElementById('popup-open-swf-player').style.display ='none';
+		}
 		document.getElementById('popup-open-external').style.display = 'block';
 		document.getElementById('popup-open-folder').style.display = 'block';
 		document.getElementById('popup-remove').style.display = 'block';
@@ -587,6 +602,7 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'none';
 		document.getElementById('popup-cancel').style.display = 'block';
 		document.getElementById('popup-open').style.display = 'none';
+		document.getElementById('popup-open-swf-player').style.display ='none';
 		document.getElementById('popup-open-external').style.display = 'none';
 		document.getElementById('popup-open-folder').style.display = 'none';
 		document.getElementById('popup-remove').style.display = 'none';
@@ -597,6 +613,7 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'block';
 		document.getElementById('popup-cancel').style.display = 'none';
 		document.getElementById('popup-open').style.display = 'none';
+		document.getElementById('popup-open-swf-player').style.display ='none';
 		document.getElementById('popup-open-external').style.display = 'none';
 		document.getElementById('popup-open-folder').style.display = 'none';
 		document.getElementById('popup-remove').style.display = 'block';
