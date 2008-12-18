@@ -68,8 +68,6 @@ var nicofox = {
     this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
                            .getService(Components.interfaces.nsIPrefService);
     this.prefs = this.prefs.getBranch("extensions.nicofox.");
-    this.root_prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                                .getService(Components.interfaces.nsIPrefBranch);
 
 
     /* Prepapre prompt service */
@@ -190,9 +188,12 @@ var nicofox = {
       var features;
       var instant_apply = true;
       try {
-        instant_apply = this.root_prefs.getBoolPref("browser.preferences.instantApply");
+        var root_prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                                   .getService(Components.interfaces.nsIPrefBranch);
+        instant_apply = root_prefs.getBoolPref("browser.preferences.instantApply");
+        features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
       } catch (e) {
-        instant_apply = false;
+        features = "chrome,titlebar,toolbar,centerscreen,modal");
       }
       features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
       			

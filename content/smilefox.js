@@ -137,14 +137,8 @@ var popup_command =
 				.createInstance()
 				.QueryInterface(Ci.IWinProcess);
 				file_path = file.path;
-			} else if (os_string == 'Darwin') {
-				/* MacOS X-specific Firefox bug (Bug 454022) */
-				var external_video_player_pref = prefs.getCharPref("external_video_player_path", Components.interfaces.nsISupportsString);
-				let external_video_player_path = Components.classes["@mozilla.org/file/local;1"]
-	 		                                         .createInstance(Components.interfaces.nsILocalFile);
-				external_video_player_path.initWithPath(external_video_player_pref);
-			}
-			else if (os_string != 'WINNT')
+			} 
+			else
 			{
 				process = Components.classes["@mozilla.org/process/util;1"]
 				.createInstance(Components.interfaces.nsIProcess);
@@ -530,13 +524,15 @@ function optionsWindow() {
       /* instantApply needs dialog = no */
       /* Copied from chrome://mozapps/content/extensions/extensions.js in Firefox */
       var features;
-      var instant_apply = true;
+      var instant_apply;
       try {
-        instant_apply = this.root_prefs.getBoolPref("browser.preferences.instantApply");
+        var root_prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                                   .getService(Components.interfaces.nsIPrefBranch);
+        instant_apply = root_prefs.getBoolPref("browser.preferences.instantApply");
+        features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
       } catch (e) {
-        instant_apply = false;
+        features = "chrome,titlebar,toolbar,centerscreen,modal");
       }
-      features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
       			
       pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
       pref_window.focus();
