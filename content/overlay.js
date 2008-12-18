@@ -193,10 +193,8 @@ var nicofox = {
         instant_apply = root_prefs.getBoolPref("browser.preferences.instantApply");
         features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
       } catch (e) {
-        features = "chrome,titlebar,toolbar,centerscreen,modal");
+        features = "chrome,titlebar,toolbar,centerscreen,modal";
       }
-      features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
-      			
       pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
       pref_window.focus();
     },
