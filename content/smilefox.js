@@ -122,7 +122,15 @@ var popup_command =
 		/*  flv/mp4/swf detection and custom player */
 		if (prefs.getBoolPref("external_video_player") && rows[recent_row].video_file.match(/(flv|mp4)$/))
 		{
+			/* We can't do this:
 			var external_video_player_path = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
+			because it didn't work on MacOS X (Bug 454022), so: */
+			var external_video_player_pref = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsISupportsString);
+			var external_video_player_path =
+			Components.classes["@mozilla.org/file/local;1"]
+			          .createInstance(Components.interfaces.nsILocalFile);
+			external_video_player_path.initWithPath(external_video_player_pref);
+
 
 			var os_string = Cc["@mozilla.org/xre/app-info;1"]  
 			.getService(Ci.nsIXULRuntime).OS;  
@@ -520,8 +528,19 @@ function stop()
 }
 
 function optionsWindow() {
-  pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', 'chrome,titlebar,toolbar,centerscreen,modal');
-  pref_window.focus();
+      /* instantApply needs dialog = no */
+      /* Copied from chrome://mozapps/content/extensions/extensions.js in Firefox */
+      var features;
+      var instant_apply = true;
+      try {
+        instant_apply = this.root_prefs.getBoolPref("browser.preferences.instantApply");
+      } catch (e) {
+        instant_apply = false;
+      }
+      features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
+      			
+      pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
+      pref_window.focus();
 }
 
 function allDone() {

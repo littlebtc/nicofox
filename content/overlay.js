@@ -65,9 +65,11 @@ var nicofox = {
     this.initialized = true;
     this.strings = document.getElementById("nicofox-strings");
     this.monkeyStrings = document.getElementById("nicomonkey-strings");
-    this.prefs = Components.classes["@mozilla.org/preferences-service;1"].
-                         getService(Components.interfaces.nsIPrefService);
+    this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                           .getService(Components.interfaces.nsIPrefService);
     this.prefs = this.prefs.getBranch("extensions.nicofox.");
+    this.root_prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                                .getService(Components.interfaces.nsIPrefBranch);
 
 
     /* Prepapre prompt service */
@@ -133,7 +135,7 @@ var nicofox = {
     {
       /* Auto triggered and not dismissed */
       if (auto_triggered
-      && this.prefs.getBoolPref("bar_autoopen", Components.interfaces.nsISupportsString)
+      && this.prefs.getBoolPref("bar_autoopen")
       && ! this.bar_opened)
       {
         document.getElementById('nicofox-splitter').collapsed = false;
@@ -153,8 +155,7 @@ var nicofox = {
 		if (!value)
 		{
 			this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorPathNotDefined'));
-			pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', 'chrome,titlebar,toolbar,centerscreen,modal');
-			pref_window.focus();
+			openOptions();
 			return;
 		}
 
@@ -178,13 +179,26 @@ var nicofox = {
 		if (!value)
 		{
 			this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorPathNotDefined'));
-			pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', 'chrome,titlebar,toolbar,centerscreen,modal');
-			pref_window.focus();
+			this.openOptions();
 			return;
 		}
 		this.confirmDownload(Video, url, true);
 	},
-
+    openOptions: function() {
+      /* instantApply needs dialog = no */
+      /* Copied from chrome://mozapps/content/extensions/extensions.js in Firefox */
+      var features;
+      var instant_apply = true;
+      try {
+        instant_apply = this.root_prefs.getBoolPref("browser.preferences.instantApply");
+      } catch (e) {
+        instant_apply = false;
+      }
+      features = "chrome,titlebar,toolbar,centerscreen" + (instant_apply ? ",dialog=no" : ",modal");
+      			
+      pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
+      pref_window.focus();
+    },
 	confirmDownload: function(Video, url, dont_confirm)
 		{
 
