@@ -6,8 +6,6 @@
 <overlay id="nicofox-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
-  <script type="application/x-javascript" src="chrome://nicofox/content/nicofox_urlparser.js" />
-  <script type="application/x-javascript" src="chrome://nicofox/content/common.js" />
   <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/xmlhttprequester.js" />
   <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/prefman.js" />
   <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/script-compiler.js" />

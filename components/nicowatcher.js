@@ -27,7 +27,11 @@ var Nicowatcher = {
 		    .getService(Components.interfaces.nsIWindowWatcher);
 
 			if (winWat.activeWindow && winWat.activeWindow.nicofox) {
-			    winWat.activeWindow.nicofox.goDownload(url);
+			  /* We have no setTimeout(), so... */
+			  var timer_event = { notify: function () {winWat.activeWindow.nicofox.goDownload(url);} }
+			  var timer = Components.classes["@mozilla.org/timer;1"]
+			                        .createInstance(Components.interfaces.nsITimer);
+ 			  timer.initWithCallback(timer_event, 10, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
 			}
 			
 			return Components.interfaces.nsIContentPolicy.REJECT_REQUEST;

@@ -1,7 +1,7 @@
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
-var EXPORTED_SYMBOLS = ['smileFoxDownloader', 'hitchFunction', 'goAjax'];
+var EXPORTED_SYMBOLS = ['smileFoxDownloader'];
 
 var prefs = Components.classes["@mozilla.org/preferences-service;1"].
                     getService(Components.interfaces.nsIPrefService);
@@ -20,78 +20,108 @@ var strings =
   }
 
 }
+Components.utils.import('resource://nicofox/common.js');
 
 var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
               .getService(Ci.nsIPromptService);
-
-function goAjax(url, type, funcok, funcerr, post_data)
-{
-  var http_request;
-
-  http_request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-               .createInstance(Components.interfaces.nsIXMLHttpRequest);
-
-  var key;
-  var data = '';
-  if (type == 'POST') {
-    /* Set POST parameters */
-    for (key in post_data) {
-      data += escape(key)+'='+escape(post_data[key])+'&';
+/* Multiple downloads helper, for simultaneously handle multiple persist without progress checking 
+   XXX: file checks
+*/
+function multipleDownloadsHelper() { }
+multipleDownloadsHelper.prototype = {
+  persists: [],
+  files: [],
+  adding: true,
+  download_count: 0,
+  doneCallback: function() {},
+  /* Add a download. NOTE: file should be a nsIFile, not a string!! */
+  addDownload: function(dl_url, referrer, post_string, file, bypass_cache, single_callback) {
+    this.download_count++;
+    if (referrer) {
+      var ref_uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService)
+                    .newURI(referrer, null, null);
+    } else {
+      var ref_uri = null;
     }
-  }
-  else {
-    type = 'GET';
-  }
+    var dl_uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(dl_url, null, null);
 
-  http_request.onreadystatechange = function() {
-    if (http_request.readyState == 4) {
-      if (http_request.status == 200) {
-       funcok(http_request);
-      } else {
-        funcerr(http_request);
-      }
+    /* POST header processing */
+    if (post_header) { 
+      var post_stream = Cc["@mozilla.org/io/string-input-stream;1"]
+                       .createInstance(Ci.nsIStringInputStream);
+      post_stream.setData(post_header, post_header.length); // NicoFox 0.3+ support Gecko/XULRunner 1.9+ only
+
+      var post_data = Cc["@mozilla.org/network/mime-input-stream;1"]
+                     .createInstance(Ci.nsIMIMEInputStream);
+  
+      post_data.addHeader("Content-Type", "application/x-www-form-urlencoded");
+      post_data.addContentLength = true;
+      post_data.setData(post_stream);
+    } else {
+      post_data = null;
     }
-  };
+    var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
+    var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
+                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
+    if (bypass_cache) {
+      flags = flags | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
+    }  
+    persist.persistFlags = flags; 
 
-  http_request.open(type, url, true);
-  if (type == 'POST') {
-    http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  }  
-  http_request.send(data);
-  /* For safety? */
-  data = '';
-  post_data = {};
-}
+    if (!single_callback || typeof single_callback != 'function') {
+      single_callback = function() {};
+    } 
+    var _this = this;
+    persist.progressListener = {
+      callback: single_callback,
+      onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
+        if (aStateFlags & 16) /* STATE_STOP = 16 */ {
+	  this.callback();
+	  hitchFunction(_this, 'completeDownload')();
+        }
+      },
+      onProgressChange: function (aWebProgress, aRequest,
+                                  aCurSelfProgress, aMaxSelfProgress,
+                                  aCurTotalProgress, aMaxTotalProgress) {},
+      onLocationChange: function (aWebProgress, aRequest, aLocation) {},
+      onStatusChange  : function (aWebProgress, aRequest, aStatus, aMessage) {},
+      onSecurityChange: function (aWebProgress, aRequest, aState) {},
+    };
 
-/* AJAX work will require some dirty way to call function
-   The idea is from GM_hitch @ Greasemoneky and it is almost the same ||| */
-function hitchFunction(object, name) {
-  if(!object || !object[name]) { return function(){}; }
-  var args = Array.prototype.slice.call(arguments, 2);
-
-  /* What a dirty way! */
-  dirty_function =  function() {
-    /* Combine the argument */
-    var args_inner = Array.prototype.slice.call(arguments);
-    args_inner = args_inner.concat(args);
-
-    /* Then hit the function */
-    object[name].apply(object, args_inner);
+    persist.saveURI(dl_uri, null, ref_uri, post_data, null, file);
+    this.persists.push(persist);
+  },
+  goAhead: function() {
+    this.adding = false;
+    if (this.download_count == 0) {
+      this.finalize();
+    }
+  },
+  completeDownload: function() {
+    this.download_count--;
+    if (this.download_count == 0 && !this.adding) {
+      this.finalize();
+    }
+  },
+  finalize: function() {
+    this.doneCallback();
+  },
+  cancelAll: function() {
+   this.persists.forEach(function (element, index, array) {
+     if (element) {
+       array[index].cancelSave(); 
+     }
+   });
   }
-  return dirty_function;
 }
 
-
-function smileFoxDownloader()
-{
-
-}
-
+function smileFoxDownloader() { }
 smileFoxDownloader.prototype = {
   download_comment: prefs.getBoolPref('download_comment'),
   canceled: false,
   ms_lock: false,
   login_trial: false,
+  download_helper: null,
   init: function(comment_id) {
     /* Save it to the object */
     this.comment_id = comment_id;
@@ -311,69 +341,28 @@ smileFoxDownloader.prototype = {
     this.persist.progressListener = listener;
     this.persist.saveURI(movie_uri, null, ref_uri, null, null, this.movie_file);
 
-
   },
   getComments: function(params) {
+    if (this.canceled) {
+      return;
+    }
     if (!this.download_comment)
     {
       this.callback('completed', {});
       return;
     }
 
-    var ref_uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService)
-                  .newURI('http://www.nicovideo.jp/flvplayer.swf?ts='+params.thread_id, null, null);
-
-
-    /* Getting the comment will need to send some POST header */
-    var ms_uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(params.ms, null, null);
-
     post_header = '<packet>'+
     '<thread click_revision="0" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
     '</packet>';
 
-    var post_stream = Cc["@mozilla.org/io/string-input-stream;1"]
-                     .createInstance(Ci.nsIStringInputStream);
-    if ("data" in post_stream) // Gecko 1.9 or newer
-    { post_stream.data = post_header; }
-    else // 1.8 or older
-    { post_stream.setData(post_header, post_header.length); }
-
-    var post_data = Cc["@mozilla.org/network/mime-input-stream;1"]
-                   .createInstance(Ci.nsIMIMEInputStream);
-  
-    post_data.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    post_data.addContentLength = true;
-    post_data.setData(post_stream);
-
-    this.persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
-    var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
-    this.persist.persistFlags = flags; 
-
-    var boon_comment_set = prefs.getBoolPref('boon_comment'); 
-    var _this = this;
-    this.persist.progressListener = {
-      downloaderCallback: this.callback,
-      boon_comment_set: boon_comment_set,
-      addBoonComment: hitchFunction(_this, 'addBoonComment'),
-      onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
-        if (aStateFlags & 16) /* STATE_STOP = 16 */ {
-          if (this.boon_comment_set) this.addBoonComment();
-          this.downloaderCallback('completed', {});
-        }
-      },
-      onProgressChange: function (aWebProgress, aRequest,
-                                  aCurSelfProgress, aMaxSelfProgress,
-                                  aCurTotalProgress, aMaxTotalProgress) {},
-      onLocationChange: function (aWebProgress, aRequest, aLocation) {},
-      onStatusChange  : function (aWebProgress, aRequest, aStatus, aMessage) {},
-      onSecurityChange: function (aWebProgress, aRequest, aState) {},
-    };
-    /* Don't waste time */
-    if (this.canceled) { return; }
-
-    this.persist.saveURI(ms_uri, null, ref_uri, post_data, null, this.ms_file);
+    owner_post_header = '<packet>'+
+    '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
+    '</packet>';
+    this.download_helper = new multipleDownloadsHelper();
+    this.download_helper.doneCallback = hitchFunction(this, 'callback', 'completed', {});
+    this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, hitchFunction(this, 'addBoonComment'));
+    this.download_helper.goAhead();
   },
 
 
@@ -394,6 +383,9 @@ smileFoxDownloader.prototype = {
       this.persist.cancelSave();
     }
     this.removeFiles();
+    if (this.download_helper) {
+      this.download_helper.cancelAll();
+    }
   },
 
   /* Cancel by download manager action */
@@ -405,14 +397,17 @@ smileFoxDownloader.prototype = {
       this.persist.cancelSave();
     }
     this.removeFiles();
+    if (this.download_helper) {
+      this.download_helper.cancelAll();
+    }
 
   },
 
   /* Remove all downloaded files */
   removeFiles: function() {
     /* Remove files */
-    if (this.ms_file != undefined)	this.ms_file.remove(false);
     if (this.movie_file != undefined) this.movie_file.remove(false);
+    if (this.ms_file != undefined) this.ms_file.remove(false);
     if (this.movie_prepare_file != undefined) this.movie_prepare_file.remove(false);
   },
 

@@ -60,6 +60,8 @@ var nicofox = {
 
    onLoad: function() {
    Components.utils.import("resource://nicofox/download_manager.js");
+   Components.utils.import("resource://nicofox/common.js");
+   Components.utils.import("resource://nicofox/urlparser_nico.js");
 //   this.nico_dl_observer = new nicofox_download_observer();
     /* initialization code */
     this.initialized = true;

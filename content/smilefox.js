@@ -2,6 +2,7 @@ var Cc = Components.classes;
 var Ci = Components.interfaces;
 
 /* Import Download manager Javascript code modules */
+Components.utils.import('resource://nicofox/common.js');
 Components.utils.import('resource://nicofox/download_manager.js');
 
 var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]

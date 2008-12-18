@@ -3,6 +3,7 @@ var Ci = Components.interfaces;
 
 var EXPORTED_SYMBOLS = ['nicofox_download_listener', 'nicofox_download_manager', 'nicofox_download_observer'];
 Components.utils.import('resource://nicofox/smilefox_downloader.js');
+Components.utils.import('resource://nicofox/common.js');
 
 var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
 var strings = 
@@ -355,6 +356,7 @@ var download_runner =
   ready: false,
   is_stopped: true,
   download_triggered: false,
+  economy_switch: false,
   last_canceled: false,
   query: new Array(),
   initialize: function()
@@ -397,7 +399,7 @@ var download_runner =
           continue;
         }
         /* Now download begins */
-	this.downloaded_triggered = true;
+	this.download_triggered = true;
         download_count++;
         smilefox_sqlite.updateStatus(downloads[i].id, 5);
         triggerDownloadListeners('update', downloads[i].id, {status: 5});
