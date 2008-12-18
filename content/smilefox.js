@@ -122,15 +122,8 @@ var popup_command =
 		/*  flv/mp4/swf detection and custom player */
 		if (prefs.getBoolPref("external_video_player") && rows[recent_row].video_file.match(/(flv|mp4)$/))
 		{
-			/* We can't do this:
-			var external_video_player_path = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
-			because it didn't work on MacOS X (Bug 454022), so: */
-			var external_video_player_pref = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsISupportsString);
-			var external_video_player_path =
-			Components.classes["@mozilla.org/file/local;1"]
-			          .createInstance(Components.interfaces.nsILocalFile);
-			external_video_player_path.initWithPath(external_video_player_pref);
 
+			var external_video_player_path = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
 
 			var os_string = Cc["@mozilla.org/xre/app-info;1"]  
 			.getService(Ci.nsIXULRuntime).OS;  
@@ -144,8 +137,14 @@ var popup_command =
 				.createInstance()
 				.QueryInterface(Ci.IWinProcess);
 				file_path = file.path;
+			} else if (os_string == 'Darwin') {
+				/* MacOS X-specific Firefox bug (Bug 454022) */
+				var external_video_player_pref = prefs.getCharPref("external_video_player_path", Components.interfaces.nsISupportsString);
+				let external_video_player_path = Components.classes["@mozilla.org/file/local;1"]
+	 		                                         .createInstance(Components.interfaces.nsILocalFile);
+				external_video_player_path.initWithPath(external_video_player_pref);
 			}
-			else
+			else if (os_string != 'WINNT')
 			{
 				process = Components.classes["@mozilla.org/process/util;1"]
 				.createInstance(Components.interfaces.nsIProcess);
