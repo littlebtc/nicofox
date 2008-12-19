@@ -44,7 +44,7 @@ contentLoad: function(e) {
 
 	if (
 		nicomonkey_gmCompiler.isGreasemonkeyable(href)
-		&& ( /http:\/\/www\.nicovideo\.jp\/.*/.test(href) || /http:\/\/tw\.nicovideo\.jp\/.*/.test(href) || /http:\/\/de\.nicovideo\.jp\/.*/.test(href) || /http:\/\/es\.nicovideo\.jp\/.*/.test(href) )
+		&& ( /http:\/\/www\.nicovideo\.jp\/.*/.test(href) || /http:\/\/tw\.nicovideo\.jp\/.*/.test(href) || /http:\/\/de\.nicovideo\.jp\/.*/.test(href) || /http:\/\/es\.nicovideo\.jp\/.*/.test(href) || /http:\/\/ch\.nicovideo\.jp\/.*/.test(href) )
 		&& true
 	) {
 		var script=nicomonkey_gmCompiler.getUrlContents(

@@ -5,6 +5,7 @@
 // @include        http://tw.nicovideo.jp/*
 // @include        http://de.nicovideo.jp/*
 // @include        http://es.nicovideo.jp/*
+// @include        http://ch.nicovideo.jp/*
 // ==/UserScript==
 
 /* Greasemonkey compatibility */
@@ -210,7 +211,17 @@ function start_inject()
 	}
 	
 	/* XXX it should not be here, but it is used to reduce the render times */
-	if (Video.isMymemory)
+	var community_nodes = $$('.//a[@class="community"]');
+
+	if (community_nodes.length > 0) {
+		alert('@@@');
+		/* XXX: Why Community name? */
+		var community_test = community_nodes[0].href.match(/^http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)$/i);	
+		Video.comment_type = community_test[2];
+		Video.community_name = community_nodes[0].textContent;
+		alert(Video.comment_type + '*' + Video.community_name);
+	}
+	else if (Video.isMymemory)
 	{
 		Video.comment_type = 'mymemory' + Video.v;
 	}
@@ -316,30 +327,30 @@ function addCommentHelper()
 	comment_helper_content.id = 'comment_helper_content';
 
 	comment_helper_content.innerHTML = 
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_naka"><img src="'+comment_naka_uri+'" class="fox-ch-selected" /></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_ue"><img src="'+comment_ue_uri+'" /></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_shita"><img src="'+comment_shita_uri+'" /></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_big"><img src="'+comment_big_uri+'" /></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_medium"><img src="'+comment_medium_uri+'"  class="fox-ch-selected"/></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_small"><img src="'+comment_small_uri+'" /></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_white"><img src="'+transparent_uri+'"  class="fox-ch-selected" style="background: #FFFFFF;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_red"><img src="'+transparent_uri+'" style="background: #FF0000;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_pink"><img src="'+transparent_uri+'" style="background: #FF8080;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_orange"><img src="'+transparent_uri+'" style="background: #FFCC00;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_yellow"><img src="'+transparent_uri+'" style="background: #FFFF00;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_green"><img src="'+transparent_uri+'" style="background: #00FF00;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_cyan"><img src="'+transparent_uri+'" style="background: #00FFFF;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_blue"><img src="'+transparent_uri+'" style="background: #0000FF;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_purple"><img src="'+transparent_uri+'" style="background: #C000FF;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_naka"><img src="'+comment_naka_uri+'" class="fox-ch-selected" /></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_ue"><img src="'+comment_ue_uri+'" /></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_shita"><img src="'+comment_shita_uri+'" /></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_big"><img src="'+comment_big_uri+'" /></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_medium"><img src="'+comment_medium_uri+'"  class="fox-ch-selected"/></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_small"><img src="'+comment_small_uri+'" /></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_white"><img src="'+transparent_uri+'"  class="fox-ch-selected" style="background: #FFFFFF;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_red"><img src="'+transparent_uri+'" style="background: #FF0000;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_pink"><img src="'+transparent_uri+'" style="background: #FF8080;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_orange"><img src="'+transparent_uri+'" style="background: #FFCC00;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_yellow"><img src="'+transparent_uri+'" style="background: #FFFF00;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_green"><img src="'+transparent_uri+'" style="background: #00FF00;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_cyan"><img src="'+transparent_uri+'" style="background: #00FFFF;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_blue"><img src="'+transparent_uri+'" style="background: #0000FF;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_purple"><img src="'+transparent_uri+'" style="background: #C000FF;"></a>'+
 	'<span id="comment_helper_premium" style="display: none;">'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_white2"><img src="'+transparent_uri+'" style="background: #CCCC99;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_red2"><img src="'+transparent_uri+'" style="background: #CC0033;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_orange2"><img src="'+transparent_uri+'" style="background: #FF6600;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_yellow2"><img src="'+transparent_uri+'" style="background: #999900;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_green2"><img src="'+transparent_uri+'" style="background: #00CC66;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_blue2"><img src="'+transparent_uri+'" style="background: #33FFFC;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_purple2"><img src="'+transparent_uri+'" style="background: #6633CC;"></a>'+
-	'<a href="#" class="ch_link" onclick="return false;" id="comment_helper_black"><img src="'+transparent_uri+'" style="background: #000000;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_white2"><img src="'+transparent_uri+'" style="background: #CCCC99;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_red2"><img src="'+transparent_uri+'" style="background: #CC0033;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_orange2"><img src="'+transparent_uri+'" style="background: #FF6600;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_yellow2"><img src="'+transparent_uri+'" style="background: #999900;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_green2"><img src="'+transparent_uri+'" style="background: #00CC66;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_blue2"><img src="'+transparent_uri+'" style="background: #33FFFC;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_purple2"><img src="'+transparent_uri+'" style="background: #6633CC;"></a>'+
+	'<a href="#" class="ch_link" id="comment_helper_black"><img src="'+transparent_uri+'" style="background: #000000;"></a>'+
 	'</span>'+
 	'<textarea rows="1" value="" onchange="$(\'flvplayer\').SetVariable(\'inputArea.ChatInput1.text\', this.value);" onkeyup="this.onchange();"></textarea>';
 
@@ -406,6 +417,8 @@ function commentHelperSelect(e)
 	mail_input = mail_inputs.join(' ');
 	js = '$(\'flvplayer\').SetVariable(\'inputArea.MailInput.text\',\''+mail_input+'\');'; 
 	location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
+	e.stopPropagation();
+	e.preventDefault();
 }
 
 function listenMainPage()
@@ -421,11 +434,11 @@ function pushLinks(mainpage)
 	/* Fetching the video links */
 	if (mainpage == true)
 	{
-		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
+		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*))]', document.getElementById('category_recent'));
 	}
 	else
 	{
-		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]');
+		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*)]');
 	}
 	/* Run every link to check what we like */
 	for (i = 0; i < videos.length; i++)
@@ -454,13 +467,15 @@ function killPlayer()
 		var flvplayer_container = document.getElementById('flvplayer_container')
 
 		player_deleted = document.createElement('div');
-		player_deleted.innerHTML = '<a href="'+window.location.href+'" id="regenerate_player" onclick="return false;">'+NM_getString('playerKillerMsg')+'</a>';
+		player_deleted.innerHTML = '<a href="'+window.location.href+'" id="regenerate_player">'+NM_getString('playerKillerMsg')+'</a>';
 		flvplayer_container.appendChild(player_deleted);
 
-		document.getElementById('regenerate_player').addEventListener('click', function(event)
+		document.getElementById('regenerate_player').addEventListener('click', function(e)
 		{
 			document.getElementById('flvplayer_container').removeChild(player_deleted);
 			document.getElementById('flvplayer_container').appendChild(flvplayer);
+			e.stopPropagation();
+			e.preventDefault();
 			return false;
 		}
 		, true
