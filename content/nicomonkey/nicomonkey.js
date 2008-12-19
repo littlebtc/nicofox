@@ -214,12 +214,10 @@ function start_inject()
 	var community_nodes = $$('.//a[@class="community"]');
 
 	if (community_nodes.length > 0) {
-		alert('@@@');
 		/* XXX: Why Community name? */
 		var community_test = community_nodes[0].href.match(/^http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)$/i);	
 		Video.comment_type = community_test[2];
 		Video.community_name = community_nodes[0].textContent;
-		alert(Video.comment_type + '*' + Video.community_name);
 	}
 	else if (Video.isMymemory)
 	{
