@@ -666,7 +666,6 @@ var download_runner =
 
             var info = smilefox_sqlite.updateComplete(id);
             triggerDownloadListeners('update', id, info);
-	    download_runner.download_canceled++;  
             download_runner.prepare();
             break;
 
