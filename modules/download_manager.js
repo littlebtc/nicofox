@@ -723,9 +723,9 @@ var download_runner =
     if (download_count == 0) {
       if (!this.is_stopped && (this.download_triggered - this.download_canceled) > 0) {
         allDone();
-        this.download_triggered = 0;
-        this.download_canceled = 0;
       }
+      this.download_triggered = 0;
+      this.download_canceled = 0;
       this.is_stopped = true;
       triggerDownloadListeners('stop', null, null); 
     }
