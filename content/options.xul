@@ -48,7 +48,11 @@
       <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
       <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
       <preference id="pref-download_max" name="extensions.nicofox.download_max" type="int" />
+      <preference id="pref-economy" name="extensions.nicofox.economy" type="int" />
+      <preference id="pref-uploader_comment" name="extensions.nicofox.uploader_comment" type="bool" />
       <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
+      <preference id="pref-replace_filters" name="extensions.nicofox.replace_filters" type="bool" />
+      <preference id="pref-nicoplayer_txt" name="extensions.nicofox.nicoplayer_txt" type="bool" />
       <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="wstring" />
     </preferences>
     <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
@@ -75,7 +79,7 @@
        <label value="Also Download:" />
        <hbox>
         <checkbox id="download_comment" preference="pref-download_comment" label="Comments" accesskey="C" />
-        <checkbox label="Thumbnail" accesskey="T" />
+        <!--<checkbox label="Thumbnail" accesskey="T" />-->
        </hbox>
      </row>  
     <row>
@@ -83,7 +87,7 @@
      </rows></grid>
     <hbox>
     <label value="Maximum parallel downloads per website:" />
-    <textbox type="number" min="1" max="5" style="width:5em" id="download_max" preference="pref-download_max" />
+    <textbox type="number" min="1" max="3" style="width:5em" id="download_max" preference="pref-download_max" />
     </hbox>
      </groupbox>
      <groupbox align="start">
@@ -93,7 +97,7 @@
      <menupopup>
      <menuitem value="0" label="Download Low-quality Videos Anyway" />
      <menuitem value="1" label="Process Video Download after the Economy Mode is Off" />
-     <menuitem value="2" label="Download the Low-quality Video and Redownload Later" />
+<!--     <menuitem value="2" label="Download the Low-quality Video and Redownload Later" />-->
      </menupopup>
      </menulist>
      <grid>
@@ -104,13 +108,13 @@
      </columns>
      <rows>
      <row>
-     <checkbox label="Download Uploader's Comment" accesskey="U" />
+     <checkbox id="uploader_comment" preference="pref-uploader_comment" label="Download Uploader's Comment" accesskey="U" />
 <!-- 	   <vbox class="indent"><checkbox label="Download all User Nicowa Videos" /></vbox>-->
-     <checkbox id="replace_filter" preference="pref-replace_filter" label="Replace Filters in Comments" accesskey="F" />
+     <checkbox id="replace_filters" preference="pref-replace_filters" label="Replace Filters in Comments" accesskey="F" />
      </row>
      <row>
      <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
-     <checkbox label="Make NicoPlayer compatible description textfile" accesskey="P" />
+<!--     <checkbox id="nicoplayer_txt" preference="pref-nicoplayer_txt" label="Make NicoPlayer compatible description textfile" accesskey="P" />-->
      </row>
      </rows>
      </grid>

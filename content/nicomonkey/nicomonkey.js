@@ -432,7 +432,7 @@ function pushLinks(mainpage)
 	/* Fetching the video links */
 	if (mainpage == true)
 	{
-		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*))]', document.getElementById('category_recent'));
+		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
 	}
 	else
 	{

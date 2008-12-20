@@ -336,6 +336,8 @@ var tree_view = {
 		return strings.getString('progressCanceled');
 		case 3:
 		return strings.getString('progressFailed');
+		case 4:
+		return 'Scheduled';
 
 		case 5:
 		return strings.getString('progressLoading');
@@ -381,6 +383,67 @@ var tree_view = {
     isContainer: function(row){ return false; },
     isSeparator: function(row){ return false; },
     isSorted: function(){ return false; },
+    canDrop: function(index, orientation) {
+      var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
+                        .getService(Ci.nsIDragService);
+      var drag_session = drag_service.getCurrentSession();
+
+      var supported = drag_session.isDataFlavorSupported("text/x-moz-url");
+
+      if (supported && gBrowser) {
+        return true;
+      }
+    },
+    drop: function(index, orientation) {
+      var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
+                         .getService(Ci.nsIDragService);
+      var drag_session = drag_service.getCurrentSession();
+
+      /* Drag & drop is OK only in browser */
+      if (drag_session.sourceNode == null) {
+        return;
+      }
+      /* Transfer data */
+      var trans = Cc["@mozilla.org/widget/transferable;1"]
+                 .createInstance(Ci.nsITransferable);
+      trans.addDataFlavor("text/x-moz-url");
+
+      var urls = [];
+      for (var i = 0; i < drag_session.numDropItems; i++) {
+        var url = null;
+
+        drag_session.getData(trans, i);
+        var flavor = {}, data = {}, length = {};
+        trans.getAnyTransferData(flavor, data, length);
+        if (data) {
+          try {
+            var str = data.value.QueryInterface(Ci.nsISupportsString);
+          }
+          catch(ex) {
+	    alert(ex);
+          }
+
+          if (str) {
+            url = str.data.split("\n")[0];
+          }
+  
+        }
+
+        if (url) {
+          /* Replace some common redirect */
+	  url = url.replace(/^http:\/\/ime\.nu\/(.*)$/, '$1');
+	  url = url.replace(/^http:\/\/www\.flog\.jp\/w\.php\/(.*)$/, '$1');
+          urls.push(url);
+        }	
+      }
+
+      /* XXX: Dirty way (why check URLs here)? */
+      if (urls[0].match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/) && gBrowser) {
+        nicofox.goDownload(urls[0]);
+      }
+      return;
+    },
+    getParentIndex: function(index){ return -1; },
     getLevel: function(row){ return 0; },
     getImageSrc: function(row,col){ return null; },
     getRowProperties: function(row,props){},
@@ -470,6 +533,8 @@ function smilefox_load()
 //	download_runner.prepare();
 	document.getElementById('smilefox-tree').oncontextmenu = function(e) { popup(e); };
 	document.getElementById('smilefox-tree').focus();
+
+	/* Drag & Drop */
 
 }
 function toolbarClose()
@@ -639,8 +704,6 @@ function popup(e)
 		document.getElementById('popup-remove').style.display = 'block';
 	}
 }
-
-
 
 
 function doSearch()

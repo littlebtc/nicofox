@@ -1,4 +1,4 @@
-var EXPORTED_SYMBOLS = ['hitchFunction', 'goAjax', 'openInNewTab', 'displayNicofoxMsg', 'nicoLogin'];
+var EXPORTED_SYMBOLS = ['hitchFunction', 'goAjax', 'openInNewTab', 'displayNicoFoxMsg', 'nicoLogin'];
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
@@ -80,13 +80,20 @@ function openInNewTab(url)
 
 }
 
-function displayNicofoxMsg() {
+function displayNicoFoxMsg(msg) {
+  var console_service = Components.classes["@mozilla.org/consoleservice;1"]
+                                  .getService(Components.interfaces.nsIConsoleService);
+  console_service.logStringMessage(msg);
 
 }
 
 /* Autologin, asking info from Password Manager 
    FIXME: Why not build a standalone password system? */
 function nicoLogin(funcok, funcerr) {
+  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                        .getService(Components.interfaces.nsIPrefService);
+  prefs = prefs.getBranch("extensions.nicofox.");
+
   var username = prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data;
   var password = '';
 

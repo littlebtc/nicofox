@@ -1,7 +1,8 @@
 var EXPORTED_SYMBOLS = ['nicoFoxUrlParser'];
 Components.utils.import('resource://nicofox/common.js');
 
-
+var Cc = Components.classes;
+var Ci = Components.interfaces;
 
 function nicoFoxUrlParser()
 {

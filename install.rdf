@@ -4,13 +4,15 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.3b1pre</em:version>
+    <em:version>0.3pre</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your watching experience.</em:description>
     <em:creator>Littlebtc</em:creator>
+    <em:contributor>Logo designed by FeAm in ptt.cc</em:contributor>
     <em:contributor>Using some Greasemonkey source code, (http://www.greasespot.net/)</em:contributor>
     <em:contributor>Using Greasemonkey compiler, by Anthony Lieuallen (http://arantius.com/)</em:contributor>
     <em:contributor>Using IWinProcess component by dafi (http://dafizilla.wordpress.com/)</em:contributor>
     <em:contributor>Using Silk Icons 1.3 by Mark James (http://www.famfamfam.com)</em:contributor>
+    <em:contributor>Using ObjectPool 1.1 by Michael Baczynski (http://lab.polygonal.de/)</em:contributor>
     <em:translator>alexsh</em:translator>
     <em:translator>imfafa</em:translator>
     <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
@@ -34,10 +36,12 @@
         <em:name>NicoFox</em:name>
         <em:description>從NICONICO動畫中下載影片和評論，並改變你的NICO觀賞經驗！ </em:description>
         <em:creator>Littlebtc</em:creator>
+        <em:contributor>Logo由ptt.cc的FeAm設計</em:contributor>
         <em:contributor>使用了一些Greasemonkey的原始碼 (http://www.greasespot.net/)</em:contributor>
         <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
 	<em:contributor>使用了dafi的IWinProcess component (http://dafizilla.wordpress.com/)</em:contributor>
         <em:contributor>使用了Mark James的Silk Icons 1.3 (http://www.famfamfam.com)</em:contributor>
+        <em:contributor>使用了Michael Baczynski的ObjectPool 1.1 (http://lab.polygonal.de/)</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
@@ -53,6 +57,7 @@
         <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
 	<em:contributor>使用了dafi的IWinProcess component (http://dafizilla.wordpress.com/)</em:contributor>
         <em:contributor>使用了Mark James的Silk Icons 1.3 (http://www.famfamfam.com)</em:contributor>
+        <em:contributor>使用了Michael Baczynski的ObjectPool 1.1 (http://lab.polygonal.de/)</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
@@ -68,6 +73,7 @@
         <em:contributor>Anthony Lieuallen様のGreasemonkey Compilerを使わせていただきました。 (http://arantius.com/)</em:contributor>
 	<em:contributor>dafi様のIWinProcess componentを使わせていただきました。 (http://dafizilla.wordpress.com/)</em:contributor>
         <em:contributor>Mark James様のSilk Icons 1.3を使わせていただきました。 (http://www.famfamfam.com)</em:contributor>
+        <em:contributor>Michael Baczynski様のObjectPool 1.1を使わせていただきました。 (http://lab.polygonal.de/)</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>

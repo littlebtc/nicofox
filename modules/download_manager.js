@@ -128,7 +128,6 @@ var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 }
 
 
-
 var smilefox_sqlite = {
   in_private: false,
   load: function() {
@@ -324,20 +323,20 @@ var smilefox_sqlite = {
     return rows[0];
   },
   add: function (Video, url) {
-    var statement = this.db_connect.createStatement("INSERT INTO smilefox (url, video_id, comment_id, comment_type, video_title, description, tags, add_time, status, in_private) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)");
+    var statement = this.db_connect.createStatement("INSERT INTO smilefox (url, video_id, comment_id, comment_type, video_title, add_time, status, in_private) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)");
     statement.bindUTF8StringParameter(0, url);
     statement.bindUTF8StringParameter(1, Video.id);
     statement.bindUTF8StringParameter(2, Video.v);
     statement.bindUTF8StringParameter(3, Video.comment_type);
     statement.bindUTF8StringParameter(4, Video.title);
-    statement.bindUTF8StringParameter(5, Video.description);
+//    statement.bindUTF8StringParameter(5, Video.description);
     /* XXX: Space-separated for all websites? */
-    statement.bindUTF8StringParameter(6, Video.tags.join(' '));
+//    statement.bindUTF8StringParameter(6, Video.tags.join(' '));
     var now_date = new Date();
     var add_time = now_date.getTime();
-    statement.bindInt32Parameter(7, add_time);
-    statement.bindInt32Parameter(8, 0);
-    statement.bindInt32Parameter(9, (this.in_private)?1:0);
+    statement.bindInt32Parameter(5, add_time);
+    statement.bindInt32Parameter(6, 0);
+    statement.bindInt32Parameter(7, (this.in_private)?1:0);
 
     statement.execute();
     statement.reset();
@@ -387,6 +386,7 @@ var smilefox_sqlite = {
     info.video_economy = (info.video_economy)?1:0;
     return info;
   },
+
   updateBytes: function(id, info) {
     if(!id || isNaN(id)) { return false; }
     var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `current_bytes` = ?1, `max_bytes` = ?2 WHERE `id` = ?3");
@@ -433,6 +433,20 @@ var smilefox_sqlite = {
     
     var content = {status: stat, end_time: end_time, current_bytes: 0, max_bytes: 0};
     return content;
+  },
+  updateScheduled: function(id, info) {
+    if(!id || isNaN(id)) { return false; }
+    var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1 , `video_economy` = ?2 WHERE `id` = ?3");
+    stmt.bindInt32Parameter(0, 4);
+    stmt.bindUTF8StringParameter(1, 1);
+    stmt.bindInt32Parameter(2, id);
+    stmt.execute();
+    stmt.reset();
+    
+    var info = new Object();
+    info.status = 4;
+    info.video_economy = 1;
+    return info;
   },
   remove: function (id) {
     try
@@ -512,9 +526,10 @@ var download_runner =
 {
   ready: false,
   is_stopped: true,
-  download_triggered: false,
+  download_triggered: 0,
+  download_canceled: 0,
+  timer: null,
   economy_switch: false,
-  last_canceled: false,
   query: new Array(),
   initialize: function()
   {
@@ -541,14 +556,14 @@ var download_runner =
     { this.initialize(); }
     if (unloading || this.is_stopped)
     { return; }
-
+    var economy_test = false;
     /* Re-select so we can purge our content */
     downloads = smilefox_sqlite.select();
     i = downloads.length - 1;
     waiting_count = 0;
     while (i >= 0)
     {
-      if (downloads[i].status == 0)
+      if (downloads[i].status == 0 || (downloads[i].status == 4 && !this.economy_switch))
       {
         waiting_count++;
         if (download_count >= download_max) {
@@ -556,7 +571,7 @@ var download_runner =
           continue;
         }
         /* Now download begins */
-	this.download_triggered = true;
+	this.download_triggered++;
         download_count++;
         smilefox_sqlite.updateStatus(downloads[i].id, 5);
         triggerDownloadListeners('update', downloads[i].id, {status: 5});
@@ -585,11 +600,29 @@ var download_runner =
             download_count--;
             this.downloader.removeFiles();
 
-            var info = smilefox_sqlite.updateStopped(id, 4);
+            var info = smilefox_sqlite.updateScheduled(id);
             triggerDownloadListeners('update', id, info);
-	    download_runner.last_canceled = true;  
+	    download_runner.download_canceled++;  
+	    download_runner.economy_switch = true;
+
+            /* Run the economy timer */
+	    if (!download_runner.timer) {
+              download_runner.timer = Cc["@mozilla.org/timer;1"]
+                                      .createInstance(Ci.nsITimer);
+              download_runner.timer.initWithCallback( nicofox_timer, 60000, Ci.nsITimer.TYPE_REPEATING_SLACK);
+	    }
             download_runner.prepare();
             break;
+
+            /* Economy mode is off */
+            case 'economy_off':
+	    download_runner.economy_switch = false;
+	    if (download_runner.timer) {
+              download_runner.timer.cancel();
+	      download_runner.timer = null;
+	    }
+	    download_runner.prepare();
+	    break;
 
             /* Video download is started */
             case 'start':
@@ -606,7 +639,6 @@ var download_runner =
 
             case 'video_done':
             /* It is "protected" by the below part so will be executed only for download completed */
-            var row = smilefox_sqlite.selectId(id);  
             /* If the download is incomplete, we will consider it as failed */
             if (this.downloader.current_bytes != this.downloader.max_bytes) {
               this.downloader.removeFiles();
@@ -631,7 +663,7 @@ var download_runner =
 
             var info = smilefox_sqlite.updateComplete(id);
             triggerDownloadListeners('update', id, info);
-	    download_runner.last_canceled = false;  
+	    download_runner.download_canceled++;  
             download_runner.prepare();
             break;
 
@@ -642,7 +674,7 @@ var download_runner =
 
             var info = smilefox_sqlite.updateStopped(id, 3);
             triggerDownloadListeners('update', id, info);
-	    download_runner.last_canceled = true;  
+	    download_runner.download_canceled++;  
             download_runner.prepare();
             break;
 
@@ -652,9 +684,9 @@ var download_runner =
 
             var info = smilefox_sqlite.updateStopped(id, 2);
             triggerDownloadListeners('update', id, info);
-	    download_runner.last_canceled = true;  
+	    download_runner.download_canceled++;  
             download_runner.prepare();
-      break;
+            break;
           }
         }
         this.query[k].downloader = new smileFoxDownloader();
@@ -672,6 +704,12 @@ var download_runner =
         {
           file_title = file_title.replace(/\%COMMENT\%/, '');
         }
+
+	if (downloads[i].video_economy) {
+	  this.query[k].downloader.has_economy = true;
+	} else {
+	  this.query[k].downloader.has_economy = false;
+	}
         this.query[k].downloader.file_title = file_title;
         this.query[k].downloader.comment_type = downloads[i].comment_type;
         this.query[k].downloader.init(downloads[i].comment_id);
@@ -680,10 +718,11 @@ var download_runner =
     }
     /* When all done, display it */
     if (download_count == 0) {
-      if (!this.is_stopped && this.download_triggered && !this.last_canceled) {
+      if (!this.is_stopped && (this.download_triggered - this.download_canceled) > 0) {
         allDone();
       }
-      this.download_triggered = false;
+      this.download_triggered = 0;
+      this.download_canceled = 0;
       this.is_stopped = true;
       triggerDownloadListeners('stop', null, null); 
     }
@@ -712,7 +751,7 @@ var download_runner =
   {
     var row = smilefox_sqlite.selectId(id);  
     /* Reset, then retry query */
-    if (row.status == 2 || row.status == 3)
+    if (row.status >= 2 || row.status <= 4)
     {
       smilefox_sqlite.updateStatus(id, 0);
       triggerDownloadListeners('update', id, {status: 0});
@@ -722,6 +761,30 @@ var download_runner =
     }
   },
 };
+
+/* Economy mode timer */
+var nicofox_timer = {
+  notify: function(timer) {
+    var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                  .getService(Ci.nsIPromptService);
+    var now = new Date();
+
+    /* Economy mode is fired when 19-2 in Japan time (UTC+9) => 10-17 in UTC time */
+    if (now.getUTCHours() >= 17 || now.getUTCHours() < 10) {
+      displayNicoFoxMsg('NicoFox Timer: Economy mode seems to be off by your system time!');
+      download_runner.economy_switch = false;
+      download_runner.timer.cancel();
+      download_runner.timer = null;
+      nicofox_download_manager.go();
+    } 
+    else
+    {
+      download_runner.economy_switch = true;
+    }
+  }
+};
+
+
 /* All done message */
 function allDone() {
   var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]

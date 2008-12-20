@@ -151,7 +151,8 @@ smileFoxDownloader.prototype = {
     }
     /* Is there any uploader's comment? */
     this.uploder_comment = false;	
-    if (html.match(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/)) {
+    if (html.match(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/)
+    && prefs.getBoolPref('uploader_comment')) {
       this.uploader_comment = true;
     }
 
@@ -177,14 +178,24 @@ smileFoxDownloader.prototype = {
       value = decodeURIComponent(array[1]);
       params[key] = value;
     }
- //   var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-//             .getService(Ci.nsIPromptService);
-//    prompts.alert(null, 'NF', params.ng_up);
+
     /* Distinguish Economy mode */
-    if (params.url.match(/low$/))
-    { this.economy = true; }
-    else
-    { this.economy = false; }
+    if (params.url.match(/low$/)) {
+      displayNicoFoxMsg('NicoFox: This is in economy!');
+      this.economy = true; 
+
+      if (prefs.getIntPref('economy') == 1) {
+        this.callback('economy_break',{});
+        return;
+      }	
+    } else {
+      this.economy = false;
+      /* It has been a economy but now it's not! */
+      if (this.has_economy) {
+        displayNicoFoxMsg('NicoFox: Economy mode seems to be off!');
+        this.callback('economy_off',{});
+      }
+    }
     
     /* Distinguish what type of video we will download */
     if (params.url.match(/smile\?s\=/)) /* SWF from Nico Nico Movie Maker */
@@ -196,7 +207,7 @@ smileFoxDownloader.prototype = {
     
     /* Don't waste time */
     if (this.canceled) { return; }
-    
+   
     if (this.download_comment) {
       /* Prepare target file */
       this.ms_file = prefs.getComplexValue("save_path", Ci.nsILocalFile);
@@ -214,26 +225,26 @@ smileFoxDownloader.prototype = {
       {
         this.ms_file.create(0x00,0644);
       }
-
-      /* Prepare target file */
-      if (this.uploader_comment) {
-        this.ms_file2 = prefs.getComplexValue("save_path", Ci.nsILocalFile);
-        this.ms_file2.append(this.file_title + '[Owner].xml');
-      
-        if(this.ms_file2.exists()) {
-          /* FIXME: there should have some other way to fix the conflict */
-          var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-                       .getService(Ci.nsIPromptService);
-          prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
-          this.callback('fail',{});
-          return;
-        }	
-        else
-        {
-          this.ms_file2.create(0x00,0644);
-        }
+    }
+    /* Prepare target file */
+    if (this.uploader_comment) {
+      this.ms_file2 = prefs.getComplexValue("save_path", Ci.nsILocalFile);
+      this.ms_file2.append(this.file_title + '[Owner].xml');
+    
+      if(this.ms_file2.exists()) {
+        /* FIXME: there should have some other way to fix the conflict */
+        var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                     .getService(Ci.nsIPromptService);
+        prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
+        this.callback('fail',{});
+        return;
+      }	
+      else
+      {
+        this.ms_file2.create(0x00,0644);
       }
     }
+    
     /* Make a file to prepare */
     this.movie_prepare_file = prefs.getComplexValue("save_path", Ci.nsILocalFile);
     this.movie_prepare_file.append(this.file_title+'.'+this.type);
@@ -352,7 +363,7 @@ smileFoxDownloader.prototype = {
     '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>';
     this.download_helper = new multipleDownloadsHelper();
     this.download_helper.doneCallback = hitchFunction(this, 'callback', 'completed', {});
-    this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, hitchFunction(this, 'addBoonComment'));
+    this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, hitchFunction(this, 'processNicoComment', params));
     if(this.uploader_comment) {
       this.download_helper.addDownload(params.ms, null , owner_post_header, this.ms_file2, true, function() {});
     }
@@ -406,10 +417,30 @@ smileFoxDownloader.prototype = {
     if (this.movie_prepare_file != undefined) this.movie_prepare_file.remove(false);
   },
 
-  /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update */
-  addBoonComment: function()
+  /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
+  processNicoComment: function(params)
   {
     if (this.cancelled) { return; }
+    var boon_comment = prefs.getBoolPref('boon_comment');
+    var replace_filters = prefs.getBoolPref('replace_filters'); 
+    if (!boon_comment && !replace_filters) { return; }
+
+    if (replace_filters && params.ng_up) {
+      var ng_ups = params.ng_up.split('&');
+
+      var filter_matches = [];
+      var filter_strings = [];
+      var filter_replaces = [];
+      for (var i = 0; i < ng_ups.length; i++) {
+        var array = ng_ups[i].split('=');
+	var target = decodeURIComponent(array[0]).replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]]/g, '\\$1');
+	var match = new RegExp(target, 'g'); // Case-sensitive
+	filter_strings.push(decodeURIComponent(array[0]));
+        filter_matches.push(match);
+        filter_replaces.push(decodeURIComponent(array[1]));
+      }
+    }
+
     this.ms_lock = true;
     var xml_contents = "";
     var charset = 'UTF-8';
@@ -424,22 +455,41 @@ smileFoxDownloader.prototype = {
     if (!(is instanceof Components.interfaces.nsIUnicharLineInputStream)) { return; }
 
     var line = {};
-    var lines = [];
+    var xml_string = '';
     var first_line = true;
     var no_eof;
     do {
       no_eof = is.readLine(line);
       if(first_line) {
-        /* We will only replace the first line */
-        line.value = line.value.replace(/^(<\?xml version=\"1.0\" encoding=\"UTF-8\"\?>)/, "$1"+'<!-- BoonSutazioData='+this.comment_id+' -->');
+        /* For E4X Parsing, we will need partial of the first line */
         first_line = false;
+	line.value = line.value.replace(/^(<\?xml version=\"1.0\" encoding=\"UTF-8\"\?>)/, '');
       }
-      lines.push(line.value);
+
+      xml_string = xml_string + line.value + "\n";
     } while (no_eof)
     	
     is.close();
     fistream.close();
 
+var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+              .getService(Ci.nsIPromptService);
+
+    if (replace_filters && params.ng_up) {
+
+      /* Go E4X and filter */
+      var xml_e4x = new XML(xml_string);
+      if (xml_e4x.chat) {
+        for (var i = 0; i < xml_e4x.chat.length(); i++) {
+          for (var j = 0; j < filter_strings.length; j++) {
+	    if (xml_e4x.chat[i].toString().indexOf(filter_strings[j]) != -1) {
+              xml_e4x.chat[i] = xml_e4x.chat[i].toString().replace(filter_matches[j], filter_replaces[j]);
+	    }  
+          }  
+        }
+      }
+      xml_string = xml_e4x.toXMLString();
+    }  
     /* Write back to XML file */
     var fostream = Cc["@mozilla.org/network/file-output-stream;1"]
                    .createInstance(Components.interfaces.nsIFileOutputStream);
@@ -450,13 +500,15 @@ smileFoxDownloader.prototype = {
              .createInstance(Ci.nsIConverterOutputStream);
 
     os.init(fostream, charset, 0, 0x0000);
-    
-    for(i = 0; i < lines.length; i++)
-    {
-      os.writeString(lines[i]+"\n");
+    if (boon_comment) {
+      os.writeString('<?xml version="1.0" encoding="UTF-8"?><!-- BoonSutazioData='+this.comment_id+' -->'+"\n");
+    } else {
+      os.writeString('<?xml version="1.0" encoding="UTF-8"?>'+"\n");
     }
+    os.writeString(xml_string);
     os.close();
     fostream.close();
     this.ms_lock = false;
   },
+
 };
