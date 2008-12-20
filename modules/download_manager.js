@@ -151,6 +151,9 @@ var smilefox_sqlite = {
                                       .getService(Components.interfaces.mozIStorageService);
       this.db_connect = storage_service.openDatabase(file);
       this.createTable();
+
+      prefs.setBoolPref('first_run', false);
+      prefs.setBoolPref('first_run_0.3', false);
     } else {
       /* Otherwise we will open the database */
       var storageService = Components.classes["@mozilla.org/storage/service;1"]
