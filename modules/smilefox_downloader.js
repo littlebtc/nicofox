@@ -46,10 +46,10 @@ multipleDownloadsHelper.prototype = {
     var dl_uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(dl_url, null, null);
 
     /* POST header processing */
-    if (post_header) { 
+    if (post_string) { 
       var post_stream = Cc["@mozilla.org/io/string-input-stream;1"]
                        .createInstance(Ci.nsIStringInputStream);
-      post_stream.setData(post_header, post_header.length); // NicoFox 0.3+ support Gecko/XULRunner 1.9+ only
+      post_stream.setData(post_string, post_string.length); // NicoFox 0.3+ support Gecko/XULRunner 1.9+ only
 
       var post_data = Cc["@mozilla.org/network/mime-input-stream;1"]
                      .createInstance(Ci.nsIMIMEInputStream);
@@ -121,6 +121,7 @@ smileFoxDownloader.prototype = {
   canceled: false,
   ms_lock: false,
   login_trial: false,
+  uploader_comment: false,
   download_helper: null,
   init: function(comment_id) {
     /* Save it to the object */
@@ -140,53 +141,23 @@ smileFoxDownloader.prototype = {
     {
       /* Try autologin */
       if (!this.login_trial && prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
-        hitchFunction(this, 'nicoLogin')();
+        nicoLogin(hitchFunction(this, 'retry'), hitchFunction(this, 'failParse'));
+	this.login_trial = true;
         return;
       }
       prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorParseFailed'));
       this.callback('fail',{});
       return;
     }
+    /* Is there any uploader's comment? */
+    this.uploder_comment = false;	
+    if (html.match(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/)) {
+      this.uploader_comment = true;
+    }
+
     goAjax('http://www.nicovideo.jp/api/getflv?v='+this.comment_id, 'GET', hitchFunction(this, 'parseDownload') , hitchFunction(this, 'failParse'));
   },
 
-  /* Autologin, asking info from Password Manager 
-     FIXME: Why not build a standalone password system? */
-  nicoLogin: function() {
-    var username = prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data;
-    var password = '';
-
-    var login_manager = Cc["@mozilla.org/login-manager;1"]
-                         .getService(Ci.nsILoginManager);
-
-    /* Nico uses secure.nicovideo.jp for login */
-    var logins = login_manager.findLogins({}, 'http://www.nicovideo.jp', 'https://secure.nicovideo.jp', null);
-    var login = null;
-
-    /* Access password manager */
-    for (var i = 0; i < logins.length; i++)
-    {
-      if (username == logins[i].username)
-      { login = logins[i]; }
-    }
-    if (!login) {
-      prompts.alert(null, strings.getString('errorTitle'), 'Can\'t find password found in Password Manager. Failed.');
-    }
-
-    /* Prepare data, go autologin! */
-    var post_data = {};
-    post_data[login.usernameField] = login.username;
-    post_data[login.passwordField] = login.password;
-
-    this.login_trial = true;
-    /* We don't need a XMLHttpRequest to be resent to init, so ... */
-    goAjax('https://secure.nicovideo.jp/secure/login?site=niconico', 'POST', hitchFunction(this, 'retry') , hitchFunction(this, 'failParse'), post_data) ;
-
-    /* Recycle instantly for security */
-    login = {};
-    logins = {};
-    post_data = {};
-  },
   retry: function(req) {
     /* Retry after autologin */
     goAjax('http://www.nicovideo.jp/watch/'+this.comment_id, 'GET', hitchFunction(this, 'goParse') , hitchFunction(this, 'failParse'));
@@ -206,7 +177,9 @@ smileFoxDownloader.prototype = {
       value = decodeURIComponent(array[1]);
       params[key] = value;
     }
-
+ //   var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+//             .getService(Ci.nsIPromptService);
+//    prompts.alert(null, 'NF', params.ng_up);
     /* Distinguish Economy mode */
     if (params.url.match(/low$/))
     { this.economy = true; }
@@ -240,6 +213,25 @@ smileFoxDownloader.prototype = {
       else
       {
         this.ms_file.create(0x00,0644);
+      }
+
+      /* Prepare target file */
+      if (this.uploader_comment) {
+        this.ms_file2 = prefs.getComplexValue("save_path", Ci.nsILocalFile);
+        this.ms_file2.append(this.file_title + '[Owner].xml');
+      
+        if(this.ms_file2.exists()) {
+          /* FIXME: there should have some other way to fix the conflict */
+          var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                       .getService(Ci.nsIPromptService);
+          prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
+          this.callback('fail',{});
+          return;
+        }	
+        else
+        {
+          this.ms_file2.create(0x00,0644);
+        }
       }
     }
     /* Make a file to prepare */
@@ -352,16 +344,18 @@ smileFoxDownloader.prototype = {
       return;
     }
 
-    post_header = '<packet>'+
+    var post_header = '<packet>'+
     '<thread click_revision="0" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
     '</packet>';
 
-    owner_post_header = '<packet>'+
-    '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
-    '</packet>';
+    var owner_post_header = 
+    '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>';
     this.download_helper = new multipleDownloadsHelper();
     this.download_helper.doneCallback = hitchFunction(this, 'callback', 'completed', {});
     this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, hitchFunction(this, 'addBoonComment'));
+    if(this.uploader_comment) {
+      this.download_helper.addDownload(params.ms, null , owner_post_header, this.ms_file2, true, function() {});
+    }
     this.download_helper.goAhead();
   },
 
@@ -408,6 +402,7 @@ smileFoxDownloader.prototype = {
     /* Remove files */
     if (this.movie_file != undefined) this.movie_file.remove(false);
     if (this.ms_file != undefined) this.ms_file.remove(false);
+    if (this.ms_file2 != undefined) this.ms_file2.remove(false);
     if (this.movie_prepare_file != undefined) this.movie_prepare_file.remove(false);
   },
 

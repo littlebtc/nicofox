@@ -11,17 +11,20 @@ var rows = new Array();
 
 var listener = 
 {
-  add: function(id, content)
-  {
+  add: function(id, content) {
     if ((typeof content) != 'object') return false;
+
     content.id = id;
     rows.unshift(content);
     updateTreeCount(0, 1);
-    document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
-
+    var keyword = document.getElementById('smilefox-search').value;
+    if (keyword) {
+      doSearch();
+    } else {
+      document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
+    }
   },
-  remove: function(id)
-  {
+  remove: function(id) {
     rows = rows.filter(function(element, index, array) {
       if (element.id == id)
       {
@@ -34,8 +37,7 @@ var listener =
     });
     
   },
-  update: function(id, content)
-  {
+  update: function(id, content) {
     rows.forEach(function(element, index, array) {
       if (element.id == id)
       {
@@ -47,9 +49,12 @@ var listener =
       }
     });
   },
-  stop: function()
-  {
+  stop: function() {
     updateToolbar();
+  },
+  rebuild: function() {
+    document.getElementById('smilefox-search').value = '';
+    doSearch();
   }
 }
 

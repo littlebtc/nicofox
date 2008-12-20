@@ -7,8 +7,10 @@ pref("extensions.nicofox.download_thumbnail", false);
 pref("extensions.nicofox.boon_comment", true);
 pref("extensions.nicofox.nicowa_blocker", false);
 // New in 0.3
+pref("extensions.nicofox.first_run_0.3", true);
 pref("extensions.nicofox.bar_autoopen", false);
 pref("extensions.nicofox.filename_scheme", "%ID% - %TITLE%%COMMENT%");
+pref("extensions.nicofox.download_max", 1);
 pref("extensions.nicofox.uploader_comment", true);
 pref("extensions.nicofox.nicoplayer_txt", false);
 

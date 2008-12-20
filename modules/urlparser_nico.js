@@ -1,13 +1,16 @@
 var EXPORTED_SYMBOLS = ['nicoFoxUrlParser'];
 Components.utils.import('resource://nicofox/common.js');
 
+
+
 function nicoFoxUrlParser()
 {
 
 }
 
 nicoFoxUrlParser.prototype = {
-
+  login_trial: false,
+  url: '',
   /* Received the AJAX request from the video page */
   parseVideoPage: function(req)
   {	
@@ -15,7 +18,16 @@ nicoFoxUrlParser.prototype = {
     /* fetch v and id parameter in javascript array 'Video'. The regex is dirty but can be easily understood! */
     reg_array = html.match(/<script type\=\"text\/javascript\">\s+<!--\s+var Video = \{([\s\S]*)\}\;\s+-->\s+<\/script>/);
     if(!reg_array) {
-       this.return_to(false); return;
+      /* Try autologin */
+      var prefs = Components.classes["@mozilla.org/preferences-service;1"].
+                    getService(Components.interfaces.nsIPrefService);
+      prefs = prefs.getBranch("extensions.nicofox.");
+      if (!this.login_trial && prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
+        nicoLogin(hitchFunction(this, 'retry'), hitchFunction(this, 'failLogin'));
+	this.login_trial = true;
+        return;
+      }
+      this.return_to(false); return;
     }
 
     /* Use sandbox for security */
@@ -27,9 +39,10 @@ nicoFoxUrlParser.prototype = {
     this.Video = s.Video;
 
     /* Test if this is a community video */
-    var community_test = html.match(/<a class=\"community\" href=\"http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)\">[^<]*<\/a>/i);
+    var community_test = html.match(/<a class=\"community\" href=\"http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)\">([^<]*)<\/a>/i);
     if (community_test) {
-      this.Video.comment_type = community_test[1];
+      this.Video.comment_type = community_test[2];
+      this.Video.community_name = community_test[3];
     }
     /* If not, Distinguish what type of comment we will download */
     else if (this.Video.isMymemory) {
@@ -41,17 +54,18 @@ nicoFoxUrlParser.prototype = {
     }
 
 
-    /* Is there any uploader's comment? */
-    this.Video.uploder_comment = false;	
-    if (html.match(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/)) {
-      this.Video.uploader_comment = true;
-    }
     /* Call the func */
     this.return_to(this.Video);
   },
-
+  retry: function(req) {
+    this.goParse(this.url);
+  },
+  failLogin: function(req) {
+    this.return_to(false);
+  },
 	goParse: function(url) 
 	{
+		this.url = url;
 		this.status = 0;
 		if (!url.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/))
 		{

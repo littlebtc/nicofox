@@ -1,4 +1,4 @@
-var EXPORTED_SYMBOLS = ['hitchFunction', 'goAjax', 'openInTab', 'displayNicofoxMsg'];
+var EXPORTED_SYMBOLS = ['hitchFunction', 'goAjax', 'openInNewTab', 'displayNicofoxMsg', 'nicoLogin'];
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
@@ -82,4 +82,41 @@ function openInNewTab(url)
 
 function displayNicofoxMsg() {
 
+}
+
+/* Autologin, asking info from Password Manager 
+   FIXME: Why not build a standalone password system? */
+function nicoLogin(funcok, funcerr) {
+  var username = prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data;
+  var password = '';
+
+  var login_manager = Cc["@mozilla.org/login-manager;1"]
+                       .getService(Ci.nsILoginManager);
+
+  /* Nico uses secure.nicovideo.jp for login */
+  var logins = login_manager.findLogins({}, 'http://www.nicovideo.jp', 'https://secure.nicovideo.jp', null);
+  var login = null;
+
+  /* Access password manager */
+  for (var i = 0; i < logins.length; i++)
+  {
+    if (username == logins[i].username)
+    { login = logins[i]; }
+  }
+  if (!login) {
+    prompts.alert(null, strings.getString('errorTitle'), 'Can\'t find password found in Password Manager. Failed.');
+  }
+
+  /* Prepare data, go autologin! */
+  var post_data = {};
+  post_data[login.usernameField] = login.username;
+  post_data[login.passwordField] = login.password;
+
+  /* We don't need a XMLHttpRequest to be resent to init, so ... */
+  goAjax('https://secure.nicovideo.jp/secure/login?site=niconico', 'POST', funcok, funcerr, post_data) ;
+
+  /* Recycle instantly for security */
+  login = {};
+  logins = {};
+  post_data = {};
 }

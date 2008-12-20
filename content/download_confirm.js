@@ -26,7 +26,16 @@ function onLoad()
 		notice.style.display = 'block';
 		notice.textContent = strings.getString('confirmEs');
 	}
-
+	else if (this.Video.comment_type.match(/^(co)/))
+	{
+		notice.style.display = 'block';
+		notice.textContent = '(From Community "'+this.Video.community_name+'")';
+	}
+	else if (this.Video.comment_type.match(/^(ch)/))
+	{
+		notice.style.display = 'block';
+		notice.textContent = '(From Channel "'+this.Video.community_name+'")';
+	}
 
 	/* Check the URL and find the thumb */
 	if (url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/))

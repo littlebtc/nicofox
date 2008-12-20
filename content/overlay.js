@@ -76,22 +76,9 @@ var nicofox = {
     this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                   .getService(Ci.nsIPromptService);
 
-    /* Add the smilefox table if it is not established */
-    if (this.prefs.getBoolPref('first_run'))
-    {
-		var file = Cc["@mozilla.org/file/directory_service;1"]
-		           .getService(Ci.nsIProperties)
-		           .get("ProfD", Ci.nsIFile);
-		file.append("smilefox.sqlite");
-
-		var storageService = Components.classes["@mozilla.org/storage/service;1"]
-	                        .getService(Components.interfaces.mozIStorageService);
-		var db_connect = storageService.openDatabase(file);
-
-		var sql = 'CREATE TABLE IF NOT EXISTS "smilefox" ("id" INTEGER PRIMARY KEY  NOT NULL  , "url" VARCHAR , "video_id" VARCHAR , "comment_id" VARCHAR , "comment_type" VARCHAR , "video_title" VARCHAR , "video_type" VARCHAR , "video_economy" VARCHAR , "video_file" VARCHAR , "comment_file" VARCHAR , "current_bytes" INTEGER , "max_bytes" INTEGER , "start_time" INTEGER , "end_time" INTEGER , "add_time" INTEGER , "download_items" INTEGER , "status" INTEGER )' ;
-		var statement = db_connect.createStatement(sql);
-		statement.execute();
-		this.prefs.setBoolPref('first_run', false);
+    /* Now first run has nothing to do? */
+    if (this.prefs.getBoolPref('first_run')) {
+//      this.prefs.setBoolPref('first_run', false);
     }
 
     gBrowser.addProgressListener(this.nicofox_page_listener,
@@ -102,6 +89,7 @@ var nicofox = {
                             .getService(Components.interfaces.nsINavBookmarksService);
 	bookmark_service.addObserver(nicofox_bookmark_listener, false);*/
 
+   nicofox_download_manager.go();
   },
   onUnload: function() {
     gBrowser.removeProgressListener(this.nicofox_page_listener,

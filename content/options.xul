@@ -47,6 +47,7 @@
       <preference id="pref-bar_autoopen" name="extensions.nicofox.bar_autoopen" type="bool" />
       <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
       <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
+      <preference id="pref-download_max" name="extensions.nicofox.download_max" type="int" />
       <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
       <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="wstring" />
     </preferences>
@@ -82,7 +83,7 @@
      </rows></grid>
     <hbox>
     <label value="Maximum parallel downloads per website:" />
-    <textbox type="number" min="1" max="5" style="width:5em" />
+    <textbox type="number" min="1" max="5" style="width:5em" id="download_max" preference="pref-download_max" />
     </hbox>
      </groupbox>
      <groupbox align="start">
