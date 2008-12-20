@@ -149,7 +149,7 @@ var smilefox_sqlite = {
       /* Add the smilefox database/ table if it is not established */
       var storage_service = Components.classes["@mozilla.org/storage/service;1"]
                                       .getService(Components.interfaces.mozIStorageService);
-      this.db_connect = storageService.openDatabase(file);
+      this.db_connect = storage_service.openDatabase(file);
       this.createTable();
     } else {
       /* Otherwise we will open the database */

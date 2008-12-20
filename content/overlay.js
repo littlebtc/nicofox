@@ -142,9 +142,14 @@ var nicofox = {
 		Components.interfaces.nsISupportsString).data;
 		if (!value)
 		{
-			this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorPathNotDefined'));
-			openOptions();
-			return;
+			var file_picker = Cc["@mozilla.org/filepicker;1"]
+			                  .createInstance(Ci.nsIFilePicker);
+			file_picker.init(window, this.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
+			if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
+			  this.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
+			} else {
+			  return;
+			}
 		}
 
 		/* Get the nicovideo page URL */
@@ -166,9 +171,14 @@ var nicofox = {
 		Components.interfaces.nsISupportsString).data;
 		if (!value)
 		{
-			this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorPathNotDefined'));
-			this.openOptions();
-			return;
+			var file_picker = Cc["@mozilla.org/filepicker;1"]
+			                  .createInstance(Ci.nsIFilePicker);
+			file_picker.init(window, this.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
+			if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
+			  this.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
+			} else {
+			  return;
+			}
 		}
 		this.confirmDownload(Video, url, true);
 	},

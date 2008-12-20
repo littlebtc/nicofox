@@ -17,7 +17,7 @@
   <toolbox>
     <toolbar id="download_toolbar">
       <toolbarbutton label="&window.title;" disabled="true"/>
-      <toolbarbutton id="smilefox-toolbar-download" label="Download" oncommand="nicofox.goDownload(gBrowser.selectedBrowser.contentDocument.location.href);" />
+      <toolbarbutton id="smilefox-toolbar-download" label="Download" oncommand="nicofox.goDownload(gBrowser.selectedBrowser.contentDocument.location.href, true);" />
       <toolbarbutton id="smilefox-toolbar-start" label="&start.label;" oncommand="start();" disabled="false"  />
       <!--<toolbarbutton id="pause" accesskey="p" label="Pause"/>-->
       <toolbarbutton id="smilefox-toolbar-stop" label="&stop.label;" oncommand="stop();" disabled="true" />
