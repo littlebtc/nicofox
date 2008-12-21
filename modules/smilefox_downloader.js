@@ -156,29 +156,55 @@ smileFoxDownloader.prototype = {
       this.uploader_comment = true;
     }
 
-    goAjax('http://www.nicovideo.jp/api/getflv?v='+this.comment_id, 'GET', hitchFunction(this, 'parseDownload') , hitchFunction(this, 'failParse'));
+    goAjax('http://www.nicovideo.jp/api/getflv?v='+this.comment_id, 'GET', hitchFunction(this, 'parseGetFlv') , hitchFunction(this, 'failParse'));
   },
 
   retry: function(req) {
     /* Retry after autologin */
     goAjax('http://www.nicovideo.jp/watch/'+this.comment_id, 'GET', hitchFunction(this, 'goParse') , hitchFunction(this, 'failParse'));
   },
-  parseDownload: function(req) {
+  parseGetFlv: function(req) {
     /* Don't waste time */
     if (this.canceled) { return; }
 
     /* take out the result query string */
-    api_out = req.responseText;
-    api_params = api_out.split('&');
+    var api_out = req.responseText;
+    var api_params = api_out.split('&');
 
-    params = new Object();
+    var params = new Object();
     for (i=0; i < api_params.length; i++) {
-      array = api_params[i].split('=');
-      key = array[0];
-      value = decodeURIComponent(array[1]);
+      var array = api_params[i].split('=');
+      var key = array[0];
+      var value = decodeURIComponent(array[1]);
       params[key] = value;
     }
 
+    /* :( for channel videos */
+    if (params.needs_key) {
+      goAjax('http://www.nicovideo.jp/api/getthreadkey?thread='+this.comment_id+'&ts='+new Date().getTime(),  'GET',
+      hitchFunction(this, 'parseThreadKey', params) , hitchFunction(this, 'failParse')); 
+    } else {
+      this.goDownload(params);
+    }
+  },
+  parseThreadKey: function(req, params) {
+    /* Don't waste time */
+    if (this.canceled) { return; }
+
+    /* take out the result query string */
+    var api_out = req.responseText;
+    var api_params = api_out.split('&');
+
+    for (i=0; i < api_params.length; i++) {
+      var array = api_params[i].split('=');
+      var key = array[0];
+      var value = decodeURIComponent(array[1]);
+      params[key] = value;
+    }
+
+    this.goDownload(params);
+  },
+  goDownload: function(params) {
     /* Distinguish Economy mode */
     if (params.url.match(/low$/)) {
       displayNicoFoxMsg('NicoFox: This is in economy!');
@@ -357,12 +383,20 @@ smileFoxDownloader.prototype = {
       return;
     }
 
-    var post_header = '<packet>'+
-    '<thread click_revision="0" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
-    '</packet>';
-
-    var owner_post_header = 
-    '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>';
+    if (params.needs_key) {
+      var post_header = '<packet>'+
+      '<thread click_revision="0" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.optional_thread_id+'"/>'+
+      '<thread force_184="'+params.force_184+'" threadkey="'+params.threadkey+'" click_revision="0" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
+      '</packet>';
+      var owner_post_header = 
+      '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.optional_thread_id+'"/>';
+    } else {
+      var post_header = '<packet>'+
+      '<thread click_revision="0" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>'+
+      '</packet>';
+      var owner_post_header = 
+      '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>';
+    }
     this.download_helper = new multipleDownloadsHelper();
     this.download_helper.doneCallback = hitchFunction(this, 'callback', 'completed', {});
     this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, hitchFunction(this, 'processNicoComment', params));
