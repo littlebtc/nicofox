@@ -208,7 +208,7 @@ var smilefox_sqlite = {
       } catch (e) {
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
-        prompts.alert(null, strings.getString('errorTitle'), 'Cannot backup the old database!' );
+        prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorBackup'));
 	return;
       }
       /* BOOM! */
@@ -793,7 +793,7 @@ function allDone() {
   var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]
                        .getService(Components.interfaces.nsIAlertsService);
   alerts_service.showAlertNotification("chrome://nicofox/skin/nicofox_content.png", 
-                                    "NicoFox download completed", "NicoFox has done video downloads.", 
+                                    strings.getString('alertCompleteTitle'), strings.getString('alertCompleteText'), 
                                     false, "", null);
 
 }

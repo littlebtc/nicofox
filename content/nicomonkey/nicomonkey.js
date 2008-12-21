@@ -68,8 +68,31 @@ function start()
 		window.setTimeout(listenMainPage, 10);
 	}
 
-	/* Player-related hack, need the 'watch' address and the flv player */
+	var link_alternate = $$('.//link [@rel="alternate"]');
+	/* Not logged in? Add a hatena video link :D */
 	if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
+	  && link_alternate.length > 0) /* Logged in */
+	{
+	  var vm = link_alternate[0].href.match(/^http:\/\/m\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/);
+	  if (vm) {
+  	    var v = vm[1];
+	    var download_link = document.createElement('a');
+	    download_link.className = 'fox-dl-link';
+	    download_link.title = NM_getString('relatedHatena');
+	    download_link.innerHTML = '<img src="'+hatena_uri+'" />';
+	    download_link.href = 'http://d.hatena.ne.jp/video/niconico/'+v;
+	    download_link.target = '_blank';
+
+	    /* Fetching Nico Nico's video title */
+	    var h2 = document.getElementsByTagName('h2')[0];
+	    /* inject the video download link */
+	    if (h2.hasChildNodes()) {
+	      h2.appendChild(download_link);
+	    }
+	  } 
+	}
+	/* Player-related hack, need the 'watch' address and the flv player */
+	else if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
 	  && document.getElementById('flvplayer_container') /* Logged in */
 	  )
 	{
