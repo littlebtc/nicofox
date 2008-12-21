@@ -39,7 +39,7 @@
      <checkbox id="nicomonkey.superlist" preference="pref-nicomonkey.superlist" label="&nicomonkey.superlist.label;" accesskey="&nicomonkey.superlist.accesskey;" />
     </groupbox>
   </prefpane>
-  <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/blank.png">
+  <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/nicofox_downloader.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel2.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
@@ -134,7 +134,7 @@
      </hbox>
      </groupbox>
   </prefpane>
-  <prefpane id="pane3" label="&video_player;" onpaneload="updatePanel3();" image="chrome://nicofox/skin/blank.png">
+  <prefpane id="pane3" label="&video_player;" onpaneload="updatePanel3();" image="chrome://nicofox/skin/nicofox_player.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel3.js" />
     <preferences>
       <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" />
