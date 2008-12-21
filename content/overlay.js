@@ -10,6 +10,7 @@ var icon_listener =
     refreshIcon();
   },
   remove: function(id) {
+    refreshIcon();
   },
   update: function(id, content) {
     refreshIcon();
