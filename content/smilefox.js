@@ -659,7 +659,7 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'none';
 		document.getElementById('popup-cancel').style.display = 'none';
 		document.getElementById('popup-open').style.display = 'none';
-		document.getElementById('popup-open-swf-player').style.display ='none';
+		//document.getElementById('popup-open-swf-player').style.display ='none';
 		document.getElementById('popup-open-external').style.display = 'none';
 		document.getElementById('popup-open-folder').style.display = 'none';
 		document.getElementById('popup-remove').style.display = 'block';
@@ -673,10 +673,10 @@ function popup(e)
 		/* NicoFox player do not support SWF currently */
 		if (rows[recent_row].video_file.match(/\.swf$/)) {
 		  document.getElementById('popup-open').style.display ='none';
-		  document.getElementById('popup-open-swf-player').style.display ='block';
+		  //document.getElementById('popup-open-swf-player').style.display ='block';
 		} else {
 		  document.getElementById('popup-open').style.display ='block';
-		  document.getElementById('popup-open-swf-player').style.display ='none';
+		  //document.getElementById('popup-open-swf-player').style.display ='none';
 		}
 		document.getElementById('popup-open-external').style.display = 'block';
 		document.getElementById('popup-open-folder').style.display = 'block';
@@ -688,7 +688,7 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'none';
 		document.getElementById('popup-cancel').style.display = 'block';
 		document.getElementById('popup-open').style.display = 'none';
-		document.getElementById('popup-open-swf-player').style.display ='none';
+		//document.getElementById('popup-open-swf-player').style.display ='none';
 		document.getElementById('popup-open-external').style.display = 'none';
 		document.getElementById('popup-open-folder').style.display = 'none';
 		document.getElementById('popup-remove').style.display = 'none';
@@ -699,7 +699,7 @@ function popup(e)
 		document.getElementById('popup-retry').style.display = 'block';
 		document.getElementById('popup-cancel').style.display = 'none';
 		document.getElementById('popup-open').style.display = 'none';
-		document.getElementById('popup-open-swf-player').style.display ='none';
+		//document.getElementById('popup-open-swf-player').style.display ='none';
 		document.getElementById('popup-open-external').style.display = 'none';
 		document.getElementById('popup-open-folder').style.display = 'none';
 		document.getElementById('popup-remove').style.display = 'block';

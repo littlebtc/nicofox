@@ -4,7 +4,7 @@ Components.utils.import("resource://nicofox/common.js");
 Components.utils.import("resource://nicofox/urlparser_nico.js");
 
 /* Download count refresh listener */
-var listener = 
+var icon_listener = 
 {
   add: function(id, content) {
     refreshIcon();
@@ -21,7 +21,6 @@ var listener =
   }
 }
 
-nicofox_download_listener.addListener(listener);
 
 var nicofox = {
   bar_opened: false,
@@ -80,11 +79,13 @@ var nicofox = {
     gBrowser.addProgressListener(this.nicofox_page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
+   nicofox_download_listener.addListener(icon_listener);
    nicofox_download_manager.go();
   },
   onUnload: function() {
     gBrowser.removeProgressListener(this.nicofox_page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+    nicofox_download_listener.removeListener(icon_listener);
   },
   
   onMenuItemCommand: function(e) {
