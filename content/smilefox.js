@@ -203,7 +203,7 @@ var popup_command =
 		}
 
 	},
-	openSwfPlayer: function()
+/*	openSwfPlayer: function()
 	{
 
 		if (recent_row < 0) { return; }
@@ -225,7 +225,7 @@ var popup_command =
 	          .getService(Ci.nsIIOService).newFileURI(file);
 		
 		window.open(video_uri.spec, 'nicofox_swf', 'width=512,height=384, resizable=yes');
-	},
+	},*/
 	openFolder: function()
 	{
 		if (recent_row < 0) { return; }

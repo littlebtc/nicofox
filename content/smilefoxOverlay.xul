@@ -54,7 +54,7 @@
    <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="popup_command.retry()" style="font-weight: bold;"  />
    <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="popup_command.open()" style="font-weight: bold;" />
    <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="popup_command.openExternal()" />
-   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="popup_command.openSwfPlayer()" />
+<!--   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="popup_command.openSwfPlayer()" />-->
    <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="popup_command.openFolder();" id="popup-open-folder"/>
    <menuseparator />
    <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="popup_command.go();" />

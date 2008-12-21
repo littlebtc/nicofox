@@ -1,8 +1,13 @@
 <!ENTITY window.title "NicoFox 下載管理員">
+<!ENTITY download.label "下載">
+<!ENTITY download.accesskey "D">
 <!ENTITY start.label "開始">
 <!ENTITY start.accesskey "S">
 <!ENTITY stop.label "停止">
 <!ENTITY stop.accesskey "P">
+<!ENTITY options.label "選項">
+<!ENTITY options.accesskey "O">
+<!ENTITY search.label "搜尋">
 <!ENTITY tree.videoTitle "影片標題">
 <!ENTITY tree.comment "評論">
 <!ENTITY tree.economy "經濟模式">
