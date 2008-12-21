@@ -1,30 +1,29 @@
-// An nsINavBookmarkObserver
-/*var nicofox_bookmark_listener = {
-  onBeginUpdateBatch: function() {},
-  onEndUpdateBatch: function() {},
-  onItemAdded: function(aItemId, aFolder, aIndex) {
-   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
-                            .getService(Components.interfaces.nsINavBookmarksService);
-   var uri = bookmark_service.getBookmarkURI(aItemId).spec;
-   alert(uri);
+
+Components.utils.import("resource://nicofox/download_manager.js");
+Components.utils.import("resource://nicofox/common.js");
+Components.utils.import("resource://nicofox/urlparser_nico.js");
+
+/* Download count refresh listener */
+var listener = 
+{
+  add: function(id, content) {
+    refreshIcon();
   },
-  onItemRemoved: function(aItemId, aFolder, aIndex) {},
-  onItemChanged: function(aBookmarkId, aProperty, aIsAnnotationProperty, aValue) {
+  remove: function(id) {
   },
-  onItemVisited: function(aBookmarkId, aVisitID, time) {},
-  onItemMoved: function(aItemId, aOldParent, aOldIndex, aNewParent, aNewIndex) {},
-  QueryInterface: function(iid) {
-    if (iid.equals(Ci.nsINavBookmarkObserver) || iid.equals(Ci.nsISupports)) {
-      return this;
-    }
-    throw Cr.NS_ERROR_NO_INTERFACE;
+  update: function(id, content) {
+    refreshIcon();
+  },
+  stop: function() {
+    refreshIcon();
+  },
+  rebuild: function() {
   }
-};*/
+}
+
+nicofox_download_listener.addListener(listener);
 
 var nicofox = {
-   /*official_tags: [
-'公式', '音楽', 'エンターテイメント', 'アニメ', 'ゲーム', 'ラジオ', 'スポーツ', '科学', '料理', '政治', '動物', '歴史', '自然',
-'ニコニコ動画講座', '演奏してみた', '歌ってみた', '踊ってみた', '投稿者コメント', '日記', 'アンケート', 'チャット', 'テスト', 'その他', 'R-18'],*/
   bar_opened: false,
 
   nicofox_page_listener:
@@ -59,9 +58,6 @@ var nicofox = {
   },
 
    onLoad: function() {
-   Components.utils.import("resource://nicofox/download_manager.js");
-   Components.utils.import("resource://nicofox/common.js");
-   Components.utils.import("resource://nicofox/urlparser_nico.js");
 //   this.nico_dl_observer = new nicofox_download_observer();
     /* initialization code */
     this.initialized = true;
@@ -83,38 +79,16 @@ var nicofox = {
 
     gBrowser.addProgressListener(this.nicofox_page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
-   
-// bookmark watcher
-/*   var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
-                            .getService(Components.interfaces.nsINavBookmarksService);
-	bookmark_service.addObserver(nicofox_bookmark_listener, false);*/
 
    nicofox_download_manager.go();
   },
   onUnload: function() {
     gBrowser.removeProgressListener(this.nicofox_page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
-   /*var bookmark_service = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
-                            .getService(Components.interfaces.nsINavBookmarksService);
-	bookmark_service.removeObserver(nicofox_bookmark_listener);*/
   },
   
   onMenuItemCommand: function(e) {
-
-	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                   .getService(Components.interfaces.nsIWindowMediator);
-	var dlmanager = wm.getMostRecentWindow("smilefox:dlmanager");
-
-	if(dlmanager)
-	{
-		dlmanager.focus();
-	}
-	else
-	{
-		window.open("chrome://nicofox/content/smilefox.xul",
-                  "smilefox", "chrome,centerscreen,resizable=yes,width=800,height=450");
-	}
-
+	nicofox.openBar(false);
   },
   onPageLoad: function(aEvent) {
 
@@ -155,9 +129,8 @@ var nicofox = {
 		/* Get the nicovideo page URL */
 		url = url.split("?")[0];		
 
-		var nicofox_status = document.getElementById('nicofox-status');
-		nicofox_status.style.display='block';
-		nicofox_status.label = this.strings.getString('processing');
+		var nicofox_icon = document.getElementById('nicofox-icon');
+		nicofox_icon.label = this.strings.getString('processing');
 
 		urlparser = new nicoFoxUrlParser();
 		urlparser.return_to = hitchFunction(nicofox, 'confirmDownload', url, dont_confirm);
@@ -201,10 +174,7 @@ var nicofox = {
 	confirmDownload: function(Video, url, dont_confirm)
 		{
 
-		var nicofox_status = document.getElementById('nicofox-status');
-		nicofox_status.style.display='none';
-
-
+		refreshIcon();
 		/* Download failed */
 		if(Video == false)
 		{
@@ -277,5 +247,15 @@ var nicofox = {
 	},
 
 };
+function refreshIcon() {
+  var nicofox_icon = document.getElementById('nicofox-icon');
+  var download_count = nicofox_download_manager.getDownloadCount();
+  var waiting_count = nicofox_download_manager.getWaitingCount();
+  if (download_count > 0) {
+    nicofox_icon.setAttribute ('label', download_count + '/' + (download_count + waiting_count));
+  } else {
+    nicofox_icon.setAttribute ('label', '');
+  }
+}
 window.addEventListener("load", function(e) { nicofox.onLoad(e); }, false);
 window.addEventListener("unload", function(e) { nicofox.onUnload(e); }, false);

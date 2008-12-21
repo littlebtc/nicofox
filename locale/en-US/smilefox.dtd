@@ -1,8 +1,13 @@
-<!ENTITY window.title "NicoFox Downloader">
+<!ENTITY window.title "NicoFox Download Manager">
+<!ENTITY download.label "Download">
+<!ENTITY download.accesskey "D">
 <!ENTITY start.label "Start">
 <!ENTITY start.accesskey "S">
 <!ENTITY stop.label "Stop">
 <!ENTITY stop.accesskey "P">
+<!ENTITY options.label "Options">
+<!ENTITY options.accesskey "O">
+<!ENTITY search.label "Search">
 <!ENTITY tree.videoTitle "Video Title">
 <!ENTITY tree.comment "Comment">
 <!ENTITY tree.economy "Economy">

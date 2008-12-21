@@ -93,7 +93,7 @@ function start()
 		    var tag_helper = document.createElement('img');
 		    tag_helper.className = 'fox-tag-link';
 		    tag_helper.src=tag_add_uri;
-		    tag_helper.title = 'Add Tag "'+tag.textContent+'" to Firefox bookmark';
+		    tag_helper.title = NM_getString('addTag');
 		    tag_helper.alt = '';
 		    tag_helper.id = "tag_helper_"+i;
 
@@ -123,7 +123,7 @@ function start()
 		var download_link = document.createElement('a');
 		download_link.className = 'fox-dl-link';
 		download_link.id = 'fox-dl-this1';
-		download_link.title = 'Download this video using NicoFox';
+		download_link.title = NM_getString('download');
 		download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
 		/* Fetching Nico Nico's video title */
@@ -138,7 +138,7 @@ function start()
 		var download_link = document.createElement('a');
 		download_link.className = 'fox-dl-link';
 		download_link.id = 'fox-dl-this2';
-		download_link.title = 'Download this video using NicoFox';
+		download_link.title = NM_getString('download');
 		download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
 		/* Find for non-expanded mode */
@@ -284,7 +284,7 @@ function start_inject()
                 '<li><a href="http://tw.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoTw')+'"><img src="'+tw_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://es.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoEs')+'"><img src="'+es_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://de.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoDe')+'"><img src="'+de_uri+'" /></a></li>'+"\r\n"+
-                '<li><a href="'+sound_website+'" target="_blank" title="'+NM_getString('toolsNicoSound')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
+                '<li><a href="'+sound_website+'" target="_blank" title="'+NM_getString('toolsSoundConverter')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
                '<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('toolsNicoChart')+'"><img src="'+chart_uri+'" /></a></li>'+"\r\n";
 
         html = html + niconicofarm; /* Niconico farm is general comment only */

@@ -21,12 +21,8 @@
   </menupopup>
 
  <statusbar id="status-bar">
-   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png" oncommand="nicofox.collapseBar();"/>
-   <statusbarpanel id="nicofox-status"
-     label="Test"
-     tooltiptext=""
-     style="display:none;"
-   />
+   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic-text" src="chrome://nicofox/skin/logo_16.png" label="" oncommand="nicofox.collapseBar();"/>
+
  </statusbar>
  <vbox id="appcontent">
  <splitter id="nicofox-splitter" collapsed="true" />

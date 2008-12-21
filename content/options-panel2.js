@@ -20,7 +20,7 @@ function updatePanel2()
 	}
 	else
 	{
-		document.getElementById('autologin_username').appendItem('(No autologin)', '', null);
+		document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
 		document.getElementById('autologin_username').selectedIndex = 0 ;
                 document.getElementById('autologin_remove').hidden = true;
 	}
@@ -49,7 +49,7 @@ function readUsernames()
                          .getService(Ci.nsILoginManager);
      /* Nico uses secure.nicovideo.jp for login */
      var logins = login_manager.findLogins({}, 'http://www.nicovideo.jp', 'https://secure.nicovideo.jp', null);
-     document.getElementById('autologin_username').appendItem('(No autologin)', '', null);
+     document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
      document.getElementById('autologin_username').selectedIndex = 0;
      for (var i = 0; i < logins.length; i++)
      {
@@ -76,7 +76,7 @@ function readUsernames()
 function removeUsername()
 {
      document.getElementById('autologin_username'). removeAllItems();
-     document.getElementById('autologin_username').appendItem('(No autologin)', '', null);
+     document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
      document.getElementById('autologin_username').selectedIndex = 0;
 
      /* Value will not auto updated :( */

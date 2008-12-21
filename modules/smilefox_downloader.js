@@ -306,8 +306,10 @@ smileFoxDownloader.prototype = {
                     createInstance(Ci.nsIWebBrowserPersist);
 
     var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
+                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
+    if (prefs.getBoolPref('video_bypass_cache')) {
+      flags = flags | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE; 
+    }
     this.persist.persistFlags = flags; 
 
     /* We need a listener to watch the download progress */

@@ -487,7 +487,7 @@ var nicofox_download_manager =
 
    },
    getWaitingCount: function() {
-     return (waiting_count - download_count);
+     return waiting_count;
 
    },
    add: function(Video, url) {
@@ -573,6 +573,7 @@ var download_runner =
           i--;
           continue;
         }
+	waiting_count--;
         /* Now download begins */
 	this.download_triggered++;
         download_count++;
@@ -612,7 +613,7 @@ var download_runner =
 	    if (!download_runner.timer) {
               download_runner.timer = Cc["@mozilla.org/timer;1"]
                                       .createInstance(Ci.nsITimer);
-              download_runner.timer.initWithCallback( nicofox_timer, 60000, Ci.nsITimer.TYPE_REPEATING_SLACK);
+              download_runner.timer.initWithCallback( nicofox_timer, 300000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 	    }
             download_runner.prepare();
             break;

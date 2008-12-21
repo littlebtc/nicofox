@@ -29,12 +29,12 @@ function onLoad()
 	else if (this.Video.comment_type.match(/^(co)/))
 	{
 		notice.style.display = 'block';
-		notice.textContent = '(From Community "'+this.Video.community_name+'")';
+		notice.textContent =  strings.getFormattedString('fromCommunity', [this.Video.community_name] );
 	}
 	else if (this.Video.comment_type.match(/^(ch)/))
 	{
 		notice.style.display = 'block';
-		notice.textContent = '(From Channel "'+this.Video.community_name+'")';
+		notice.textContent =  strings.getFormattedString('fromChannel', [this.Video.community_name] );
 	}
 
 	/* Check the URL and find the thumb */

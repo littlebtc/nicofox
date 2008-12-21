@@ -27,7 +27,7 @@ function selectVideoPlayer()
 {
 	var file_picker = Cc["@mozilla.org/filepicker;1"]
 	                  .createInstance(Ci.nsIFilePicker);
-	file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseFolder'), null);
+	file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseExecutable'), null);
 	file_picker.appendFilters(Ci.nsIFilePicker.filterApps);
 	if (file_picker.show() == Ci.nsIFilePicker.returnOK)
 	{
@@ -40,7 +40,7 @@ function selectSwfPlayer()
 {
 	var file_picker = Cc["@mozilla.org/filepicker;1"]
 	                  .createInstance(Ci.nsIFilePicker);
-	file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseFolder'), null);
+	file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseExecutable'), null);
 	file_picker.appendFilters(Ci.nsIFilePicker.filterApps);
 	if (file_picker.show() == Ci.nsIFilePicker.returnOK)
 	{

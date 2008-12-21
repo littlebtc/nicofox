@@ -48,6 +48,7 @@ var listener =
 	updateRowSpeed(index);
       }
     });
+    updateToolbar();
   },
   stop: function() {
     updateToolbar();
@@ -337,7 +338,7 @@ var tree_view = {
 		case 3:
 		return strings.getString('progressFailed');
 		case 4:
-		return 'Scheduled';
+		return strings.getString('progressScheduled');
 
 		case 5:
 		return strings.getString('progressLoading');
@@ -504,7 +505,7 @@ function updateToolbar() {
     document.getElementById('smilefox-toolbar-start').disabled = true;
     document.getElementById('smilefox-toolbar-stop').disabled = false;
   }
-  else if (nicofox_download_manager.getWaitingCount() == 0) {
+  else if ((nicofox_download_manager.getDownloadCount() + nicofox_download_manager.getWaitingCount()) == 0) {
     document.getElementById('smilefox-toolbar-start').disabled = true;
     document.getElementById('smilefox-toolbar-stop').disabled = true;
   } else {
