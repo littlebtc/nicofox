@@ -432,7 +432,7 @@ var tree_view = {
 
         if (url) {
           /* Replace some common redirect */
-	  url = url.replace(/^http:\/\/ime\.nu\/(.*)$/, '$1');
+	  url = url.replace(/^http:\/\/ime\.nu\/(.*)$/, 'http://$1');
 	  url = url.replace(/^http:\/\/www\.flog\.jp\/w\.php\/(.*)$/, '$1');
           urls.push(url);
         }	
