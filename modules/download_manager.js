@@ -792,7 +792,7 @@ var nicofox_timer = {
 function allDone() {
   var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]
                        .getService(Components.interfaces.nsIAlertsService);
-  alerts_service.showAlertNotification("chrome://nicofox/skin/nicofox_content.png", 
+  alerts_service.showAlertNotification("chrome://nicofox/skin/logo.png", 
                                     strings.getString('alertCompleteTitle'), strings.getString('alertCompleteText'), 
                                     false, "", null);
 
