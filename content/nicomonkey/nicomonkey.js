@@ -81,7 +81,6 @@ function start()
 	    download_link.title = NM_getString('relatedHatena');
 	    download_link.innerHTML = '<img src="'+hatena_uri+'" />';
 	    download_link.href = 'http://d.hatena.ne.jp/video/niconico/'+v;
-	    download_link.target = '_blank';
 
 	    /* Fetching Nico Nico's video title */
 	    var h2 = document.getElementsByTagName('h2')[0];
