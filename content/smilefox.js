@@ -396,6 +396,34 @@ var tree_view = {
       }
     },
     drop: function(index, orientation) {
+/*      dragDrop();*/
+      return;
+    },
+    getParentIndex: function(index){ return -1; },
+    getLevel: function(row){ return 0; },
+    getImageSrc: function(row,col){ return null; },
+    getRowProperties: function(row,props){},
+    getCellProperties: function(row,col,props){},
+    getColumnProperties: function(colid,col,props){},
+};
+
+
+    	document.getElementById('smilefox-tree').view = tree_view;
+
+}
+function dragOver() {
+      var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
+                        .getService(Ci.nsIDragService);
+      var drag_session = drag_service.getCurrentSession();
+
+      var supported = drag_session.isDataFlavorSupported("text/x-moz-url");
+
+      if (supported && gBrowser) {
+        drag_session.canDrop = true;
+      }
+}
+function dragDrop() {
+
       var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
                          .getService(Ci.nsIDragService);
       var drag_session = drag_service.getCurrentSession();
@@ -442,23 +470,6 @@ var tree_view = {
       if (urls[0].match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/) && gBrowser) {
         nicofox.goDownload(urls[0]);
       }
-      return;
-    },
-    getParentIndex: function(index){ return -1; },
-    getLevel: function(row){ return 0; },
-    getImageSrc: function(row,col){ return null; },
-    getRowProperties: function(row,props){},
-    getCellProperties: function(row,col,props){},
-    getColumnProperties: function(colid,col,props){},
-};
-
-
-    	document.getElementById('smilefox-tree').view = tree_view;
-
-}
-
-function createTree(rows)
-{
 }
 
 function updateRowSpeed(num)
@@ -536,6 +547,8 @@ function smilefox_load()
 	document.getElementById('smilefox-tree').focus();
 
 	/* Drag & Drop */
+	document.getElementById('smilefox-tree').addEventListener('dragover', dragOver, true);
+	document.getElementById('smilefox-tree').addEventListener('dragdrop', dragDrop, true);
 
 }
 function toolbarClose()

@@ -15,6 +15,7 @@ pref("extensions.nicofox.video_bypass_cache", false);
 pref("extensions.nicofox.economy", 1);
 pref("extensions.nicofox.uploader_comment", true);
 pref("extensions.nicofox.replace_filters", true);
+pref("extensions.nicofox.autologin_username", '');
 
 pref("extensions.nicofox.external_video_player", false);
 pref("extensions.nicofox.external_video_player_path", '');
