@@ -102,7 +102,7 @@ var popup_command =
 		var video_uri_spec = video_uri.spec;
 		var comment_uri_spec = '';
 
-		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: rows[recent_row].video_file, comment: rows[recent_row].comment_file, title: rows[recent_row].video_title});	
+		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: rows[recent_row].video_file, comment: encodeURIComponent(rows[recent_row].comment_file), title: rows[recent_row].video_title});	
 	
 	
 	}, 
