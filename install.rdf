@@ -4,10 +4,10 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.3pre</em:version>
+    <em:version>0.3</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your watching experience.</em:description>
     <em:creator>Littlebtc</em:creator>
-    <em:contributor>Logo designed by FeAm in ptt.cc</em:contributor>
+    <em:contributor>Logo and Icon designed by FeAm in ptt.cc</em:contributor>
     <em:contributor>Using some Greasemonkey source code, (http://www.greasespot.net/)</em:contributor>
     <em:contributor>Using Greasemonkey compiler, by Anthony Lieuallen (http://arantius.com/)</em:contributor>
     <em:contributor>Using IWinProcess component by dafi (http://dafizilla.wordpress.com/)</em:contributor>
@@ -22,12 +22,12 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>3.1pre</em:maxVersion>
+        <em:maxVersion>3.1b3pre</em:maxVersion>
       </Description>
       <Description>
         <em:id>songbird@songbirdnest.com</em:id>
         <em:minVersion>1.0</em:minVersion>
-        <em:maxVersion>1.0.*</em:maxVersion>
+        <em:maxVersion>1.1pre</em:maxVersion>
       </Description>
     </em:targetApplication>
     <em:localized>
@@ -36,7 +36,7 @@
         <em:name>NicoFox</em:name>
         <em:description>從NICONICO動畫中下載影片和評論，並改變你的NICO觀賞經驗！ </em:description>
         <em:creator>Littlebtc</em:creator>
-        <em:contributor>Logo由ptt.cc的FeAm設計</em:contributor>
+        <em:contributor>Logo和Icon由ptt.cc的FeAm設計</em:contributor>
         <em:contributor>使用了一些Greasemonkey的原始碼 (http://www.greasespot.net/)</em:contributor>
         <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
 	<em:contributor>使用了dafi的IWinProcess component (http://dafizilla.wordpress.com/)</em:contributor>
@@ -53,6 +53,7 @@
         <em:name>NicoFox</em:name>
         <em:description>从NICONICO动画中下载视频，并改变你的NICO观赏经验！ </em:description>
         <em:creator>Littlebtc</em:creator>
+        <em:contributor>Logo和Icon由ptt.cc的FeAm设计</em:contributor>
         <em:contributor>使用了一些Greasemonkey的源代码  (http://www.greasespot.net/)</em:contributor>
         <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
 	<em:contributor>使用了dafi的IWinProcess component (http://dafizilla.wordpress.com/)</em:contributor>
@@ -69,6 +70,7 @@
         <em:name>NicoFox</em:name>
         <em:description>ニコニコ動画から動画とコメントを保存し、あなたのニコ体験を更に！</em:description>
         <em:creator>Littlebtc</em:creator>
+        <em:contributor>ロゴ、アイコンはptt.ccのFeAmさんが提供してくれました。</em:contributor>
         <em:contributor>Greasemonkeyのソースコードを参考していただきました。 (http://www.greasespot.net/)</em:contributor>
         <em:contributor>Anthony Lieuallen様のGreasemonkey Compilerを使わせていただきました。 (http://arantius.com/)</em:contributor>
 	<em:contributor>dafi様のIWinProcess componentを使わせていただきました。 (http://dafizilla.wordpress.com/)</em:contributor>
