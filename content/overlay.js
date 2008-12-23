@@ -71,8 +71,7 @@ var nicofox = {
     this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                   .getService(Ci.nsIPromptService);
 
-    /* Now first run has nothing to do? */
-    if (this.prefs.getBoolPref('first_run')) {
+    if (this.prefs.getBoolPref('extensions.nicofox.nicomonkey.supertag') || this.prefs.getBoolPref('extensions.nicofox.nicomonkey.superlist')) {
       /* Check if we are in Firefox? */
       var app_info = Cc["@mozilla.org/xre/app-info;1"]
                      .getService(Ci.nsIXULAppInfo);
