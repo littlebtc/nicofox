@@ -22,7 +22,7 @@
 <!ENTITY downloader.options "ダウンロードオプション">
 <!ENTITY downloader.confirm_before_download.label "ダウンロードをするとき、確認ダイアローグを表示する（今見てるのは除く）">
 <!ENTITY downloader.confirm_before_download.accesskey "C">
-<!ENTITY downloader.bar_autoopen.label "Nicofoxが適用できるサイトに入るとき、ダウンロードマネージャーを開く">
+<!ENTITY downloader.bar_autoopen.label "適用できるサイトに入るとき、ダウンロードマネージャーを開く">
 <!ENTITY downloader.bar_autoopen.accesskey "A">
 <!ENTITY downloader.save_path.label "動画保存フォルダ">
 <!ENTITY downloader.save_path.accesskey "S">
@@ -30,12 +30,12 @@
 <!ENTITY downloader.save_path.browse.accesskey "B">
 <!ENTITY downloader.filename_scheme.label "ファイルの命名記法:">
 <!ENTITY downloader.filename_scheme.accesskey "N">
-<!ENTITY downloader.also_download "以下のも動画ファイルと一緒にダウンロードする:">
+<!ENTITY downloader.also_download "以下のも一緒に落とす:">
 <!ENTITY downloader.download_comment.label "コメント">
 <!ENTITY downloader.download_comment.accesskey "C">
 <!ENTITY downloader.download_max.label "最大同時ダウンロード数:">
 <!ENTITY downloader.download_max.accesskey "M">
-<!ENTITY downloader.video_bypass_cache.label "ファイルを保存するとき、ブラウザのキャッシュを使わない。">
+<!ENTITY downloader.video_bypass_cache.label "動画ファイルを保存するとき、ブラウザのキャッシュを使わない">
 <!ENTITY downloader.video_bypass_cache.accesskey "P">
 <!ENTITY downloader.nico_only "ニコニコ動画オンリー機能">
 <!ENTITY downloader.economy.label "動画はエコノミー（低画質）モードだったら（エコノミー保存回避機能）:">
