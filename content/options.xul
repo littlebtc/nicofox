@@ -5,7 +5,7 @@
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
- title="&prefwindow.title;" width="600">
+ title="&prefwindow.title;" width="600" style="height: 45em;">
   <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();" image="chrome://nicofox/skin/nicofox_content.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel1.js" />
     <preferences>
