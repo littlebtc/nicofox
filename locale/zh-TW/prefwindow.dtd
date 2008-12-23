@@ -1,6 +1,6 @@
 <!ENTITY prefwindow.title "NicoFox 選項">
 <!ENTITY pane1.title "NicoFox 選項">
-<!ENTITY nicowa_blocker.label "攔截NICO割（除了使用者自定者）">
+<!ENTITY nicowa_blocker.label "攔截NICO割（時報、情報局...等；用戶自訂NICO割除外）">
 <!ENTITY nicowa_blocker.accesskey "W">
 <!ENTITY nicomonkey "頁面顯示">
 <!ENTITY nicomonkey.enable.label "在頁面中加入NicoFox新增的功能">
@@ -14,21 +14,21 @@
 <!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "隱藏被刪除影片的播放器">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "啟動Firefox的書籤單鍵標籤新增">
+<!ENTITY nicomonkey.supertag.label "顯示「加入此標籤到Firefox書籤」按鈕">
 <!ENTITY nicomonkey.supertag.accesskey "G">
 <!ENTITY nicomonkey.superlist.label "當加入影片到我的清單時，將影片網址加入到Firefox書籤">
 <!ENTITY nicomonkey.superlist.accesskey "M">
 <!ENTITY downloader "下載管理員">
 <!ENTITY downloader.options "下載選項">
 <!ENTITY downloader.confirm_before_download.label "下載前顯示確認對話框（除了正在觀賞的影片）">
-<!ENTITY downloader.confirm_before_download.accesskey "C">
+<!ENTITY downloader.confirm_before_download.accesskey "D">
 <!ENTITY downloader.bar_autoopen.label "瀏覽支援的網站時自動開啟下載管理員">
 <!ENTITY downloader.bar_autoopen.accesskey "A">
 <!ENTITY downloader.save_path.label "將影片儲存到">
 <!ENTITY downloader.save_path.accesskey "S">
 <!ENTITY downloader.save_path.browse.label "瀏覽...">
 <!ENTITY downloader.save_path.browse.accesskey "B">
-<!ENTITY downloader.filename_scheme.label "檔案名稱慣例:">
+<!ENTITY downloader.filename_scheme.label "檔案命名方式:">
 <!ENTITY downloader.filename_scheme.accesskey "N">
 <!ENTITY downloader.also_download "一併下載:">
 <!ENTITY downloader.download_comment.label "評論">
@@ -38,7 +38,7 @@
 <!ENTITY downloader.video_bypass_cache.label "在下載影片時不使用快取">
 <!ENTITY downloader.video_bypass_cache.accesskey "P">
 <!ENTITY downloader.nico_only "NICONICO動畫特定功能">
-<!ENTITY downloader.economy.label "當經濟模式（低畫質模式）開啟時:">
+<!ENTITY downloader.economy.label "當遭遇經濟模式（低畫質模式）時段時:">
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "仍下載低畫質影片">
 <!ENTITY downloader.economy.2 "預約並在經濟模式解除後才進行下載">

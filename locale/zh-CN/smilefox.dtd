@@ -1,9 +1,14 @@
 <!ENTITY window.title "NicoFox 下载管理器">
+<!ENTITY download.label "下载">
+<!ENTITY download.accesskey "D">
 <!ENTITY start.label "开始">
 <!ENTITY start.accesskey "S">
 <!ENTITY stop.label "停止">
 <!ENTITY stop.accesskey "P">
-<!ENTITY tree.videoTitle "影片标题">
+<!ENTITY options.label "选项">
+<!ENTITY options.accesskey "O">
+<!ENTITY search.label "搜索">
+<!ENTITY tree.videoTitle "视频标题">
 <!ENTITY tree.comment "评论">
 <!ENTITY tree.economy "经济模式">
 <!ENTITY tree.progress "进度">

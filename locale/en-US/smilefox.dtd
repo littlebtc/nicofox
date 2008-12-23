@@ -19,7 +19,7 @@
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "Retry">
 <!ENTITY popup.retry.accesskey "R">
-<!ENTITY popup.open.label "Play">
+<!ENTITY popup.open.label "Play in NicoFox Player">
 <!ENTITY popup.open.accesskey "P">
 <!ENTITY popup.openExternal.label "Play in External Player">
 <!ENTITY popup.openExternal.accesskey "E">
