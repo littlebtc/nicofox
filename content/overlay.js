@@ -71,17 +71,6 @@ var nicofox = {
     this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                   .getService(Ci.nsIPromptService);
 
-    if (this.prefs.getBoolPref('extensions.nicofox.nicomonkey.supertag') || this.prefs.getBoolPref('extensions.nicofox.nicomonkey.superlist')) {
-      /* Check if we are in Firefox? */
-      var app_info = Cc["@mozilla.org/xre/app-info;1"]
-                     .getService(Ci.nsIXULAppInfo);
-      if(app_info.ID != '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}') {
-        this.prefs.setBoolPref("extensions.nicofox.nicomonkey.supertag", false);
-        this.prefs.setBoolPref("extensions.nicofox.nicomonkey.superlist", false); 
-      }
-      
-    }
-
     gBrowser.addProgressListener(this.nicofox_page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
