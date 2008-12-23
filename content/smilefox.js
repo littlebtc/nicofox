@@ -102,7 +102,17 @@ var popup_command =
 		var video_uri_spec = video_uri.spec;
 		var comment_uri_spec = '';
 
-		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: rows[recent_row].video_file, comment: encodeURIComponent(rows[recent_row].comment_file), title: rows[recent_row].video_title});	
+		if (rows[recent_row].comment_file) {
+		  var file = Cc["@mozilla.org/file/local;1"]
+		             .createInstance(Ci.nsILocalFile);
+		  file.initWithPath(rows[recent_row].comment_file);
+		  if (!file.exists()) { return false; }
+		  var comment_uri = Cc["@mozilla.org/network/io-service;1"]
+	            .getService(Ci.nsIIOService).newFileURI(file);
+		  comment_uri_spec = comment_uri.spec; 
+		}
+		
+		window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: rows[recent_row].video_title});	
 	
 	
 	}, 
