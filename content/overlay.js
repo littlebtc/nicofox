@@ -22,7 +22,6 @@ var icon_listener =
   }
 }
 
-
 var nicofox = {
   bar_opened: false,
 
@@ -74,7 +73,14 @@ var nicofox = {
 
     /* Now first run has nothing to do? */
     if (this.prefs.getBoolPref('first_run')) {
-//      this.prefs.setBoolPref('first_run', false);
+      /* Check if we are in Firefox? */
+      var app_info = Cc["@mozilla.org/xre/app-info;1"]
+                     .getService(Ci.nsIXULAppInfo);
+      if(app_info.ID != '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}') {
+        this.prefs.setBoolpref("extensions.nicofox.nicomonkey.supertag", false);
+        this.prefs.setBoolpref("extensions.nicofox.nicomonkey.superlist", false); 
+      }
+      
     }
 
     gBrowser.addProgressListener(this.nicofox_page_listener,
