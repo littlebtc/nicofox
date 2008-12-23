@@ -12,9 +12,9 @@
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
 <!ENTITY nicomonkey.comment_helper.label "コメント入力支援ツール">
 <!ENTITY nicomonkey.comment_helper.accesskey "C">
-<!ENTITY nicomonkey.player_killer.label "再生しようとした動画が削除されていたら、プレイヤーを読み込みしない。">
+<!ENTITY nicomonkey.player_killer.label "再生しようとした動画が削除されていたら、プレイヤーを読み込みしない">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "「ブックマークにこのタグを追加」ボタンを追加する。">
+<!ENTITY nicomonkey.supertag.label "「ブックマークにこのタグを追加」ボタンを追加する">
 <!ENTITY nicomonkey.supertag.accesskey "G">
 <!ENTITY nicomonkey.superlist.label "マイリストに追加するとき、Firefoxのブックマークにも追加する">
 <!ENTITY nicomonkey.superlist.accesskey "M">
