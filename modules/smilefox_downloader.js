@@ -117,13 +117,14 @@ multipleDownloadsHelper.prototype = {
 
 function smileFoxDownloader() { }
 smileFoxDownloader.prototype = {
-  download_comment: prefs.getBoolPref('download_comment'),
+  download_comment: false,
   canceled: false,
   ms_lock: false,
   login_trial: false,
   uploader_comment: false,
   download_helper: null,
   init: function(comment_id) {
+    this.download_comment = prefs.getBoolPref('download_comment');
     /* Save it to the object */
     this.comment_id = comment_id;
 
