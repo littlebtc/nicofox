@@ -77,8 +77,8 @@ var nicofox = {
       var app_info = Cc["@mozilla.org/xre/app-info;1"]
                      .getService(Ci.nsIXULAppInfo);
       if(app_info.ID != '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}') {
-        this.prefs.setBoolpref("extensions.nicofox.nicomonkey.supertag", false);
-        this.prefs.setBoolpref("extensions.nicofox.nicomonkey.superlist", false); 
+        this.prefs.setBoolPref("extensions.nicofox.nicomonkey.supertag", false);
+        this.prefs.setBoolPref("extensions.nicofox.nicomonkey.superlist", false); 
       }
       
     }
