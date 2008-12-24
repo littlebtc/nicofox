@@ -31,7 +31,7 @@ pref("extensions.nicofox.nicomonkey.player_killer", false);
 // New in 0.3
 pref("extensions.nicofox.nicomonkey.sound_converter", 'http://nicosound.anyap.info/sound/%1');
 pref("extensions.nicofox.nicomonkey.supertag", true);
-pref("extensions.nicofox.nicomonkey.superlist", true);
+pref("extensions.nicofox.nicomonkey.superlist", false);
 
 // Easter Egg!
 pref("extensions.nicofox.tsundere", false);
