@@ -248,10 +248,6 @@ smileFoxDownloader.prototype = {
         this.callback('fail',{});
         return;
       }	
-      else
-      {
-        this.ms_file.create(0x00,0644);
-      }
     }
     /* Prepare target file */
     if (this.uploader_comment) {
@@ -266,10 +262,6 @@ smileFoxDownloader.prototype = {
         this.callback('fail',{});
         return;
       }	
-      else
-      {
-        this.ms_file2.create(0x00,0644);
-      }
     }
     
     /* Make a file to prepare */
@@ -284,10 +276,6 @@ smileFoxDownloader.prototype = {
       this.callback('fail',{});
       return;
     }
-    else
-    {
-      this.movie_prepare_file.create(0x00,0644);
-    }
 
     /* Part file is what we will truly store the video download */
     this.movie_file = prefs.getComplexValue("save_path", Ci.nsILocalFile);
@@ -301,10 +289,12 @@ smileFoxDownloader.prototype = {
       this.callback('fail',{});
       return;
     }
-    else
-    {
-      this.movie_file.create(0x00,0644);
-    }
+    /* Now create our file */
+    this.movie_prepare_file.create(0x00,0644);
+    this.movie_file.create(0x00,0644);
+    if(this.download_comment) { this.ms_file.create(0x00,0644); }
+    if(this.uploader_comment) { this.ms_file2.create(0x00,0644); }
+
     if (this.ms_file) {
       this.callback('file_ready', {video_file: this.movie_prepare_file.path, comment_file: this.ms_file.path, video_type: this.type, video_economy: this.economy}); 
     } else {
