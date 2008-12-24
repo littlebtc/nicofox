@@ -245,7 +245,7 @@ smileFoxDownloader.prototype = {
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                      .getService(Ci.nsIPromptService);
         prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
-        this.callback('fail',{});
+        this.callback('fail2',{});
         return;
       }	
     }
@@ -259,7 +259,7 @@ smileFoxDownloader.prototype = {
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                      .getService(Ci.nsIPromptService);
         prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
-        this.callback('fail',{});
+        this.callback('fail2',{});
         return;
       }	
     }
@@ -273,7 +273,7 @@ smileFoxDownloader.prototype = {
       var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Ci.nsIPromptService);
       prompts.alert(null, strings.getString('errorTitle'), 'The video file exists.');
-      this.callback('fail',{});
+      this.callback('fail2',{});
       return;
     }
 
@@ -286,7 +286,7 @@ smileFoxDownloader.prototype = {
       var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                    .getService(Ci.nsIPromptService);
       prompts.alert(null, strings.getString('errorTitle'), 'The temp video file exists.');
-      this.callback('fail',{});
+      this.callback('fail2',{});
       return;
     }
     /* Now create our file */

@@ -681,6 +681,16 @@ var download_runner =
             download_runner.prepare();
             break;
 
+            case 'fail2': /* Do not remove files */
+            var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
+            download_count--;
+
+            var info = smilefox_sqlite.updateStopped(id, 3);
+            triggerDownloadListeners('update', id, info);
+	    download_runner.download_canceled++;  
+            download_runner.prepare();
+            break;
+             
             case 'cancel':
             var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
             download_count--;
