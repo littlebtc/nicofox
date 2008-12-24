@@ -111,7 +111,8 @@ function nicoLogin(funcok, funcerr) {
     { login = logins[i]; }
   }
   if (!login) {
-    prompts.alert(null, strings.getString('errorTitle'), 'Can\'t find password found in Password Manager. Failed.');
+    funcerr();
+    return;
   }
 
   /* Prepare data, go autologin! */
