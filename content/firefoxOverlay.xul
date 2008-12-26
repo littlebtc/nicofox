@@ -26,7 +26,7 @@
  </statusbar>
  <vbox id="appcontent">
  <splitter id="nicofox-splitter" collapsed="true" />
-  <vbox id="smilefox-space" persist="height" collapsed="true">
+  <vbox id="smilefox-space" persist="height" height="100" collapsed="true">
   <vbox id="smilefox-main">
   </vbox>
   </vbox>
