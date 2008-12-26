@@ -5,20 +5,26 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<script type="text/javascript" src="swfobject.js"></script>
 		<script type="text/javascript">
-		// FIXME: Security Check
-		matches = document.location.href.match(/\?video=(.*)\&comment=(.*)$/);
-		if (matches)
-		{
-			swfobject.embedSWF('breezevideo_player.swf', "myContent", "520", "470", "9.0.0", "expressInstall.swf",
-			{videoFile: matches[1],
-			/* Without encodeURI works in IE but not Firefox */
-			commentFile:  matches[2] 
-		
-			}, {allowFullScreen: 'true'});
-		}	
+
+if ("createEvent" in document) {
+  var element = document.createElement("NicoFoxEvent");
+  element.setAttribute("attribute1", "foobar");
+  element.setAttribute("attribute2", "hello world");
+  document.documentElement.appendChild(element);
+
+  var evt = document.createEvent("Events");
+  evt.initEvent("NicoFoxEvent", true, false);
+  element.dispatchEvent(evt);
+  var video_file = element.getAttribute('video_file');
+  var comment_file = element.getAttribute('comment_file');
+  swfobject.embedSWF('breezevideo_player.swf', "myContent", "520", "470", "9.0.0", "expressInstall.swf", {
+    videoFile: encodeURI(video_file),
+    /* Without encodeURI works in IE but not Firefox */
+    commentFile: encodeURI(comment_file),
+  }, {allowFullScreen: 'true'});
+}
 		</script>
 	</head>
-
 	<body style="margin:0; padding: 0;">
 		<div id="myContent">
 			<h1>Alternative content</h1>

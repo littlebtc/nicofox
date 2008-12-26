@@ -11,10 +11,8 @@ var uri = Cc["@mozilla.org/network/io-service;1"]
 .getService(Ci.nsIIOService).newFileURI(file);
 
 var player_src = uri.spec;
-
 function load()
 {
-
 	/* Find the path */
 	if(!window.arguments || !window.arguments[0])
 	{
@@ -24,7 +22,7 @@ function load()
   browser = document.createElement("browser");
   browser.setAttribute("id", "sample-browser");
   browser.setAttribute("name", "sample-browser");
-//  browser.setAttribute("type", "content-primary");
+  browser.setAttribute("type", "content-primary");
   browser.setAttribute("width", "520");
   browser.setAttribute("height", "500");
   document.documentElement.appendChild(browser);
@@ -36,8 +34,13 @@ function load()
   browser.webNavigation.allowPlugins = true;
   browser.webNavigation.allowSubframes = false;
 
-
 // load a page
- browser.contentDocument.location.href = player_src+'?video='+encodeURI(window.arguments[0].video)+'&comment='+encodeURI(window.arguments[0].comment);
+browser.contentDocument.location.href = player_src;
+document.addEventListener("NicoFoxEvent", function(e) {
+var obj = e.target;
+obj.setAttribute('video_file', window.arguments[0].video);
+obj.setAttribute('comment_file', window.arguments[0].comment);
+}, false, true);
+
 
 }

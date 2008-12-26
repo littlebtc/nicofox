@@ -677,6 +677,15 @@ var download_runner =
             triggerDownloadListeners('update', id, {status: 6});
             break;
 
+            case 'video_fail':
+            /* If the download observer says we fail */
+            this.downloader.removeFiles();
+            this.downloader.fail();
+            var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                         .getService(Ci.nsIPromptService);
+            prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
+            break;
+
             case 'completed':
             /* Finialize download */
             this.downloader.movie_prepare_file.remove(false);

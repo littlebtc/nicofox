@@ -18,6 +18,10 @@ var smilefox = {
                    .getService(Ci.nsIPromptService);
     /* Load strings */
     this.strings = document.getElementById('nicofox-strings');
+    this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                           .getService(Components.interfaces.nsIPrefService);
+    this.prefs = this.prefs.getBranch("extensions.nicofox.");
+    
     smilefox.rows = nicofox_download_manager.getDownloads();
     this.assignTreeView();
 
@@ -50,7 +54,7 @@ var smilefox = {
          smilefox.updateTreeCount(0, 1);
          var keyword = document.getElementById('smilefox-search').value;
          if (keyword) {
-           doSearch();
+           smilefox.doSearch();
          } else {
            document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
          }
@@ -370,10 +374,10 @@ var smilefox = {
   doSearch: function() {
     var keyword = document.getElementById('smilefox-search').value;
     
-    this.updateTreeCount(0, -rows.length);
-    smilefox.rows = nicofox_download_manager.getDownloads();
-    this.updateTreeCount(0, rows.length);
-  
+    this.updateTreeCount(0, -smilefox.rows.length);
+    this.rows = nicofox_download_manager.getDownloads();
+    this.updateTreeCount(0, smilefox.rows.length);
+
     if (keyword) {
       keyword = keyword.replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]]/g, '\\$1');
       var keywords = keyword.replace(/\s(.*)\s/, '$1').split(/\s/);
@@ -381,7 +385,7 @@ var smilefox = {
         keywords[i] = new RegExp(keywords[i], 'ig');
       }
       /* Trim and split keywords */
-      smilefox.rows = smilefox.rows.filter(function(element, index, array) {
+      this.rows = this.rows.filter(function(element, index, array) {
       var result = true;
       for (var i = 0; i < keywords.length; i++) {
         result = result & Boolean(element.video_title.match(keywords[i]));
@@ -389,9 +393,10 @@ var smilefox = {
       if (result) {
         return true;
       } else {
-        this.updateTreeCount(index, -1);
+        smilefox.updateTreeCount(index, -1);
       }
-    }); }
+    });
+    }
     this.updateTree();
   },
 
@@ -448,15 +453,14 @@ var smilefox_popup_command =
         
     var external_process = false;
     /*  flv/mp4/swf detection and custom player */
-    if (prefs.getBoolPref("external_video_player") && smilefox.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
+    if (smilefox.prefs.getBoolPref("external_video_player") && smilefox.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
       external_process = true;
-      var external_path = prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
+      var external_path = smilefox.prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
     }
-    else if (prefs.getBoolPref("external_swf_player") && smilefox.rows[this.recent_row].video_file.match(/(swf)$/)) {
+    else if (smilefox.prefs.getBoolPref("external_swf_player") && smilefox.rows[this.recent_row].video_file.match(/(swf)$/)) {
       external_process = true;
-      var external_path = prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
+      var external_path = smilefox.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
     }
-    
     if (external_process) {
       var os_string = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
       var process;

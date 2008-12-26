@@ -343,6 +343,7 @@ smileFoxDownloader.prototype = {
         }
         if (aStateFlags & 16) /* STATE_STOP = 16 */
         {
+	  if (aStatus != 0) { this.downloaderCallback('video_fail', {}) } /* NS_OK = 0 */
           this.downloaderCallback('video_done', {});
           this.stopCallback();
         }
