@@ -129,6 +129,8 @@ var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 
 
 var smilefox_sqlite = {
+  rows_cache: [],
+  cached: false,
   in_private: false,
   load: function() {
     /* Private Browsing checking */
@@ -176,6 +178,7 @@ var smilefox_sqlite = {
     var sql = 'CREATE TABLE IF NOT EXISTS "smilefox" ("id" INTEGER PRIMARY KEY  NOT NULL  , "url" VARCHAR , "video_id" VARCHAR , "comment_id" VARCHAR , "comment_type" VARCHAR , "video_title" VARCHAR , "description" TEXT, "tags" VARCHAR, "video_type" VARCHAR , "video_economy" VARCHAR , "video_file" VARCHAR , "comment_file" VARCHAR , "uploader_comment_file" VARCHAR, "thumbnail_file" VARCHAR, "current_bytes" INTEGER , "max_bytes" INTEGER , "start_time" INTEGER , "end_time" INTEGER , "add_time" INTEGER , "info" TEXT, "status" INTEGER, "in_private" INTEGER )' ;
     var statement = this.db_connect.createStatement(sql);
     statement.execute();
+    this.purgeCache();
     
   },
   /* 0.1 Database Upgrade check */
@@ -253,6 +256,7 @@ var smilefox_sqlite = {
 	statement.reset();
       }
     }
+    this.purgeCache();
     prefs.setBoolPref('first_run', false);
     prefs.setBoolPref('first_run_0.3', false);
   },
@@ -262,6 +266,8 @@ var smilefox_sqlite = {
     var sql = 'DELETE FROM smilefox WHERE in_private = 1';
     var statement = this.db_connect.createStatement(sql);
     statement.execute();
+    statement.reset();
+    this.purgeCache();
     
   },
   fetchArray: function(statement) {
@@ -306,12 +312,19 @@ var smilefox_sqlite = {
     } 
     return rows;
   },
+  purgeCache: function() {
+    this.rows_cache = [];
+    this.cached = false;
+  },
   /* Select data from Database */
   select: function() {
     if (!this.db_connect) {this.load();}
+    if (this.cached) { return this.rows_cache; }
     var statement = this.db_connect.createStatement("SELECT * FROM smilefox ORDER BY id DESC");
     statement.execute();
     var rows = this.fetchArray(statement);
+    this.rows_cache = rows;
+    this.cached = true;
     statement.reset();
     return rows;
   },
@@ -343,6 +356,7 @@ var smilefox_sqlite = {
 
     statement.execute();
     statement.reset();
+    this.purgeCache();
 
     var content = {
     id: this.db_connect.lastInsertRowID,
@@ -350,7 +364,6 @@ var smilefox_sqlite = {
     status: 0
     };
     return content;
-    
   },
   updateStatus: function (id, stat) {
     try
@@ -362,6 +375,7 @@ var smilefox_sqlite = {
       stmt.bindInt32Parameter(2, id);
       stmt.execute();
       stmt.reset();
+      this.purgeCache();
     }
     catch(e)
     {
@@ -384,6 +398,7 @@ var smilefox_sqlite = {
     stmt.bindInt32Parameter(6, id);
     stmt.execute();
     stmt.reset();
+    this.purgeCache();
     
     info.status = 5;
     info.video_economy = (info.video_economy)?1:0;
@@ -398,6 +413,7 @@ var smilefox_sqlite = {
     stmt.bindInt32Parameter(2, id);
     stmt.execute();
     stmt.reset();
+    this.purgeCache();
     
     var content = {current_bytes: info.current_bytes, max_bytes: info.max_bytes};
     return content;
@@ -414,6 +430,7 @@ var smilefox_sqlite = {
     stmt.bindInt32Parameter(2, id);
     stmt.execute();
     stmt.reset();
+    this.purgeCache();
     
     var content = {status: 1, end_time: end_time};
     return content;
@@ -433,6 +450,7 @@ var smilefox_sqlite = {
     stmt.bindInt32Parameter(4, id);
     stmt.execute();
     stmt.reset();
+    this.purgeCache();
     
     var content = {status: stat, end_time: end_time, current_bytes: 0, max_bytes: 0};
     return content;
@@ -445,6 +463,7 @@ var smilefox_sqlite = {
     stmt.bindInt32Parameter(2, id);
     stmt.execute();
     stmt.reset();
+    this.purgeCache();
     
     var info = new Object();
     info.status = 4;
@@ -458,6 +477,7 @@ var smilefox_sqlite = {
       stmt.bindInt32Parameter(0, id);
       stmt.execute();
       stmt.reset();
+      this.purgeCache();
       return true;  
     }
     catch(e)

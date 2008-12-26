@@ -11,20 +11,20 @@
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
   </stringbundleset>
   <keyset id="smilefox-keyset">
-  <key id="select-all-key" modifiers="accel" key="A" oncommand="popup_command.selectAll();"/>
+  <key id="select-all-key" modifiers="accel" key="A" oncommand="smilefox_popup_command.selectAll();"/>
   </keyset>
 <vbox id="smilefox-main" flex="1">
   <toolbox>
     <toolbar id="download_toolbar">
       <toolbarbutton label="&window.title;" disabled="true"/>
       <toolbarbutton id="smilefox-toolbar-download" label="&download.label;" oncommand="nicofox.goDownload(gBrowser.selectedBrowser.contentDocument.location.href, true);" />
-      <toolbarbutton id="smilefox-toolbar-start" label="&start.label;" oncommand="start();" disabled="false"  />
+      <toolbarbutton id="smilefox-toolbar-start" label="&start.label;" oncommand="smilefox.start();" disabled="false"  />
       <!--<toolbarbutton id="pause" accesskey="p" label="Pause"/>-->
-      <toolbarbutton id="smilefox-toolbar-stop" label="&stop.label;" oncommand="stop();" disabled="true" />
-      <toolbarbutton id="smilefox-toolbar-option" label="&options.label;" oncommand="optionsWindow();" disabled="false" />
+      <toolbarbutton id="smilefox-toolbar-stop" label="&stop.label;" oncommand="smilefox.stop();" disabled="true" />
+      <toolbarbutton id="smilefox-toolbar-option" label="&options.label;" oncommand="smilefox.optionsWindow();" disabled="false" />
       <spacer flex="1" />
-      <textbox value="" emptytext="&search.label;" width="300" id="smilefox-search" type="timed" timeout="500" oncommand="doSearch();"/>
-      <toolbarbutton id="smilefox-toolbar-close" oncommand="toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
+      <textbox value="" emptytext="&search.label;" width="300" id="smilefox-search" type="timed" timeout="500" oncommand="smilefox.doSearch();"/>
+      <toolbarbutton id="smilefox-toolbar-close" oncommand="smilefox.toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
 
     </toolbar>
     
@@ -50,18 +50,18 @@
 </tree>
 
   <menupopup id="smilefox-popup">
-   <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="popup_command.cancel()" />
-   <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="popup_command.retry()" style="font-weight: bold;"  />
-   <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="popup_command.open()" style="font-weight: bold;" />
-   <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="popup_command.openExternal()" />
-<!--   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="popup_command.openSwfPlayer()" />-->
-   <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="popup_command.openFolder();" id="popup-open-folder"/>
+   <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="smilefox_popup_command.cancel()" />
+   <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="smilefox_popup_command.retry()" style="font-weight: bold;"  />
+   <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="smilefox_popup_command.open()" style="font-weight: bold;" />
+   <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="smilefox_popup_command.openExternal()" />
+<!--   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="smilefox_popup_command.openSwfPlayer()" />-->
+   <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="smilefox_popup_command.openFolder();" id="popup-open-folder"/>
    <menuseparator />
-   <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="popup_command.go();" />
-   <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="popup-copy" oncommand="popup_command.copy();" />
+   <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="smilefox_popup_command.go();" />
+   <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="popup-copy" oncommand="smilefox_popup_command.copy();" />
    <menuseparator />
-   <menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="popup-select-all" oncommand="popup_command.selectAll();" />
-   <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="popup-remove" oncommand="popup_command.remove();"/>
+   <menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="popup-select-all" oncommand="smilefox_popup_command.selectAll();" />
+   <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="popup-remove" oncommand="smilefox_popup_command.remove();"/>
   </menupopup>
 </vbox>
 </overlay>
