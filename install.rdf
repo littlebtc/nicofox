@@ -4,15 +4,11 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.3.3pre</em:version>
+    <em:version>0.3.1</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your watching experience.</em:description>
     <em:creator>Littlebtc</em:creator>
-    <em:contributor>Logo and Icon designed by FeAm in ptt.cc</em:contributor>
-    <em:contributor>Using some Greasemonkey source code, (http://www.greasespot.net/)</em:contributor>
-    <em:contributor>Using Greasemonkey compiler, by Anthony Lieuallen (http://arantius.com/)</em:contributor>
-    <em:contributor>Using IWinProcess component by dafi (http://dafizilla.wordpress.com/)</em:contributor>
-    <em:contributor>Using Silk Icons 1.3 by Mark James (http://www.famfamfam.com)</em:contributor>
-    <em:contributor>Using ObjectPool 1.1 by Michael Baczynski (http://lab.polygonal.de/)</em:contributor>
+    <em:contributor>Logo and Icon designed by FeAm in ptt.cc (CC-by-sa-3.0)</em:contributor>
+    <em:contributor>NicoFox contains some source codes by others that are licensed under various licenses. See http://code.google.com/p/nicofox/wiki/License for details.</em:contributor>
     <em:translator>alexsh</em:translator>
     <em:translator>imfafa</em:translator>
     <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
@@ -37,11 +33,7 @@
         <em:description>從NICONICO動畫中下載影片和評論，並改變你的NICO觀賞經驗！ </em:description>
         <em:creator>Littlebtc</em:creator>
         <em:contributor>Logo和Icon由ptt.cc的FeAm設計</em:contributor>
-        <em:contributor>使用了一些Greasemonkey的原始碼 (http://www.greasespot.net/)</em:contributor>
-        <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
-	<em:contributor>使用了dafi的IWinProcess component (http://dafizilla.wordpress.com/)</em:contributor>
-        <em:contributor>使用了Mark James的Silk Icons 1.3 (http://www.famfamfam.com)</em:contributor>
-        <em:contributor>使用了Michael Baczynski的ObjectPool 1.1 (http://lab.polygonal.de/)</em:contributor>
+        <em:contributor>NicoFox包含了許多由他人撰寫且以不同授權方式釋出的原始碼。詳情請參考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
@@ -54,11 +46,7 @@
         <em:description>从NICONICO动画中下载视频，并改变你的NICO观赏经验！ </em:description>
         <em:creator>Littlebtc</em:creator>
         <em:contributor>Logo和Icon由ptt.cc的FeAm设计</em:contributor>
-        <em:contributor>使用了一些Greasemonkey的源代码  (http://www.greasespot.net/)</em:contributor>
-        <em:contributor>使用了Anthony Lieuallen的Greasemonkey Compiler (http://arantius.com/)</em:contributor>
-	<em:contributor>使用了dafi的IWinProcess component (http://dafizilla.wordpress.com/)</em:contributor>
-        <em:contributor>使用了Mark James的Silk Icons 1.3 (http://www.famfamfam.com)</em:contributor>
-        <em:contributor>使用了Michael Baczynski的ObjectPool 1.1 (http://lab.polygonal.de/)</em:contributor>
+        <em:contributor>NicoFox包含了许多由他人撰写且以不同授权方式释出的源代码。详情请参考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
@@ -71,11 +59,7 @@
         <em:description>ニコニコ動画から動画とコメントを保存し、あなたのニコ体験を更に！</em:description>
         <em:creator>Littlebtc</em:creator>
         <em:contributor>ロゴ、アイコンはptt.ccのFeAmさんが提供してくれました。</em:contributor>
-        <em:contributor>Greasemonkeyのソースコードを参考していただきました。 (http://www.greasespot.net/)</em:contributor>
-        <em:contributor>Anthony Lieuallen様のGreasemonkey Compilerを使わせていただきました。 (http://arantius.com/)</em:contributor>
-	<em:contributor>dafi様のIWinProcess componentを使わせていただきました。 (http://dafizilla.wordpress.com/)</em:contributor>
-        <em:contributor>Mark James様のSilk Icons 1.3を使わせていただきました。 (http://www.famfamfam.com)</em:contributor>
-        <em:contributor>Michael Baczynski様のObjectPool 1.1を使わせていただきました。 (http://lab.polygonal.de/)</em:contributor>
+        <em:contributor>NicoFoxは、色々なライセンスでリリースされたソースコードを使わせていただいてます。詳しくはhttp://code.google.com/p/nicofox/wiki/License </em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
