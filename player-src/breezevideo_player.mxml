@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="goProcessing();" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.*;
+			import flash.display.StageDisplayState;
+			[Bindable]
+			public var video_file:String;
+			public var comment_file:String;
+			private var breeze_comment:Object;
+			private function goResize(event:ResizeEvent):void
+			{
+				if(Application.application.stage.displayState != StageDisplayState.FULL_SCREEN)
+				{
+					
+				container.scaleX = 1;
+				container.scaleY = 1;
+				black_container.width = 512;
+				black_container.height = 384;
+				container.x = 0;
+				return;				
+				} 
+				
+				var scale:Number = (Application.application.height - 75) / 384;
+				black_container.width = Application.application.width;
+				container.scaleX = scale;
+				container.scaleY = scale;
+				black_container.x = 0;
+				black_container.y = 0;
+				black_container.height = Application.application.height - 75;
+				//container.x = (black_container.width-container.width) /2 /scale;
+				
+			}				
+			private function goFullscreen(e:Event):void
+			{
+				Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+			}
+			private function goProcessing():void
+			{
+				
+				video_file = Application.application.parameters.videoFile;
+				comment_file = Application.application.parameters.commentFile;
+				breeze_comment = new BreezeCommentReader(Application.application);
+				breeze_comment.loadComment(comment_file);
+				
+
+				
+				bvideo.addEventListener(VideoEvent.PLAYHEAD_UPDATE, updateTime);
+				bvideo.addEventListener(VideoEvent.REWIND, videoReplay);
+				slider.addEventListener(SliderEvent.CHANGE, jumpTime);
+				//doggy.addEventListener(MouseEvent.CLICK, testScale);
+				pause.addEventListener(MouseEvent.CLICK, pauseVideo);
+				comment_switch.addEventListener(MouseEvent.CLICK, switchComment);
+				repeat_switch.addEventListener(MouseEvent.CLICK, switchRepeat);
+				fullscreen.addEventListener(MouseEvent.CLICK, goFullscreen);
+				
+				
+				Application.application.addEventListener('resize', goResize);
+				
+
+/*				var pt1:Point = new flash.geom.Point(0, 50);
+				pt1 = ue_container.localToGlobal(pt1);		
+						
+				if (doggytext.hitTestPoint(pt1.x+1, pt1.y+1, false))
+				{ time.text = 'true'+doggytext.height;} else {time.text='false';}*/ 
+			}
+			
+			private function switchComment(e:MouseEvent):void
+			{
+				comment_container.visible = !comment_container.visible;
+				if (comment_container.visible) comment_switch.label = '* コメ';
+				else comment_switch.label = 'コメ';
+
+			}
+			private function switchRepeat(e:MouseEvent):void
+			{
+				bvideo.autoRewind = !bvideo.autoRewind;
+				if (bvideo.autoRewind) repeat_switch.label = '* Re';
+				else repeat_switch.label = 'Re';
+			}
+
+			private function videoReplay( event:VideoEvent ):void
+			{
+				event.target.play();
+			}			
+
+			private function pauseVideo(e:MouseEvent):void
+			{	
+				if (bvideo.playing)
+				{			
+					bvideo.pause();
+					pause.label = ">";
+				}
+				else
+				{
+					bvideo.play();					
+					pause.label = "||";
+				}
+			}	
+			private function updateComment(e:Event):void
+			{
+				
+				var num:int = e.currentTarget.selectedValue;
+				comment_container.visible=false;
+				breeze_comment.cleanComment();
+				breeze_comment.loadComment(comment_file, num);
+				comment_container.visible=true;
+			}
+							
+			private function updateTime(e:VideoEvent):void
+			{
+				/* Some facts about Nico Nico Douga marqueeplayer:
+				 (in brief, but may be wrong) 
+				 # vpos => Playback time (10 ms = 1/100 sec)
+				 # naka => marquee, shita => bottom, ue => top
+				 # "naka" will be created in vpos-100, at center in vpos+100, disappeared in vpos+300
+				 # "shita" and "ue" will be created in vpos, disappered in vpos+300
+				 # When comments are too much to display, display randomly
+				   (but we shouldn't do this because there will be some "comment ASCII art") 
+				 */							
+				var vpos:Number = Math.floor(e.playheadTime * 100);
+				var Mins:Number = Math.floor(vpos / 100);						
+				var Hours:Number = Math.floor(Mins / 60);
+				Mins = Mins % 60;
+				var Hours_str:String;
+				var Mins_str:String;
+				if (Hours < 10) Hours_str = '0'+ Hours;
+				else Hours_str = ''+ Hours;
+				if (Mins < 10) Mins_str = '0'+ Mins;
+				else Mins_str = ''+ Mins;
+				
+				time.text = ''+Hours_str+':'+Mins_str;
+				
+				var total:Number = Math.floor(e.target.totalTime);						
+				Hours = Math.floor(total / 60);
+				Mins = total % 60;
+				if (Hours < 10) Hours_str = '0'+ Hours;
+				else Hours_str = ''+ Hours;
+				if (Mins < 10) Mins_str = '0'+ Mins;
+				else Mins_str = ''+ Mins;
+				
+				total_time.text = '/ '+Hours_str+':'+Mins_str;  
+				breeze_comment.prepareComment(vpos);
+			}
+			
+			private function jumpTime(e:SliderEvent):void
+			{
+				bvideo.playheadTime = e.value;		
+			}			
+			
+		]]>
+	</mx:Script>
+	    
+    <mx:VBox>
+    	<!-- We set playbackUpdateInterval as 10, because the "vpos" of comment XML is in 10 milliseconds -->   
+		<mx:Canvas id="black_container" width="100%" height="384" backgroundColor="black">
+        <mx:Canvas id="container" width="512" height="384" horizontalCenter="0">
+		
+		<mx:VideoDisplay width="512" height="384" volume="{volslider.value}" source="{video_file}" autoPlay="true" id="bvideo" playheadUpdateInterval="30" x="0" y="0" autoRewind="false"/>
+		
+        <mx:Canvas id="comment_container" x="0" y="0" width="512" height="384"  visible="true" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+        </mx:Canvas>
+        </mx:Canvas>
+        </mx:Canvas>
+        <mx:VBox id="container2" height="50" width="100%">
+        <mx:HBox>        	
+        <mx:Button id="pause" label="||"/>
+		<mx:HSlider id="slider" tickInterval="2" value="{bvideo.playheadTime}"  maximum="{bvideo.totalTime}" />
+		<mx:Text id="time" />
+		<mx:Text id="total_time" />
+		<mx:Button id="fullscreen" label="[↗]"/>
+		<mx:Button id="comment_switch" label="* コメ"/>
+		<mx:Button id="repeat_switch" label="Re"/>
+		</mx:HBox>
+		<mx:HBox> 
+		<mx:RadioButtonGroup id="comment_number" itemClick="updateComment(event);" selectedValue="0"/>
+        <mx:RadioButton groupName="comment_number" id="comment_100" value="100" 
+            label="100" width="50" />
+        <mx:RadioButton groupName="comment_number" id="comment_250" value="250" 
+            label="250" width="50" />
+        <mx:RadioButton groupName="comment_number" id="comment_500" value="500" 
+            label="500" width="50" />
+        <mx:RadioButton groupName="comment_number" id="comment_1000" value="1000" 
+            label="1000" width="60" />
+        <mx:RadioButton groupName="comment_number" id="comment_all" value="0" 
+            label="All" width="50" />
+		<mx:Label text="Vol" />
+		<mx:HSlider id="volslider" tickInterval="0.05" value="0.75" width="100"  maximum="1"/>
+       
+   		<!--<mx:TextArea id="textArea" width="300" height="50" text="" />-->
+		</mx:HBox>	
+		</mx:VBox>
+
+    </mx:VBox>
+
+
+ 
+</mx:Application>
