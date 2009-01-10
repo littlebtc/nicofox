@@ -3,29 +3,29 @@ Components.utils.import("resource://nicofox/download_manager.js");
 Components.utils.import("resource://nicofox/common.js");
 Components.utils.import("resource://nicofox/urlparser_nico.js");
 
+if (!nicofox) {var nicofox = {};}
+if (!nicofox.ui) {nicofox.ui = {};}
 /* Download count refresh listener */
-var icon_listener = 
+nicofox.ui.icon_listener = 
 {
   add: function(id, content) {
-    refreshIcon();
+    nicofox.ui.refreshIcon();
   },
   remove: function(id) {
-    refreshIcon();
+    nicofox.ui.refreshIcon();
   },
   update: function(id, content) {
-    refreshIcon();
+    nicofox.ui.refreshIcon();
   },
   stop: function() {
-    refreshIcon();
+    nicofox.ui.refreshIcon();
   },
   rebuild: function() {
   }
-}
+};
+  nicofox.ui.bar_opened = false;
 
-var nicofox = {
-  bar_opened: false,
-
-  nicofox_page_listener:
+  nicofox.ui.page_listener = 
   {
     QueryInterface: function(aIID)
     {
@@ -40,11 +40,11 @@ var nicofox = {
      /* FIXME: Dirty */
      if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)) {
        document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
-       nicofox.openBar(true);
+       nicofox.ui.openBar(true);
      } else {
        document.getElementById('smilefox-toolbar-download').setAttribute('disabled', true);
        if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\//)) {
-         nicofox.openBar(true);
+         nicofox.ui.openBar(true);
        }
      }
      return 0;
@@ -54,9 +54,9 @@ var nicofox = {
     onStatusChange: function() {return 0;},
     onSecurityChange: function() {return 0;},
     onLinkIconAvailable: function() {return 0;}
-  },
+  };
 
-   onLoad: function() {
+   nicofox.ui.onLoad = function() {
 //   this.nico_dl_observer = new nicofox_download_observer();
     /* initialization code */
     this.initialized = true;
@@ -71,25 +71,22 @@ var nicofox = {
     this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                   .getService(Ci.nsIPromptService);
 
-    gBrowser.addProgressListener(this.nicofox_page_listener,
+    gBrowser.addProgressListener(this.page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
-   nicofox_download_listener.addListener(icon_listener);
-   nicofox_download_manager.go();
-  },
-  onUnload: function() {
-    gBrowser.removeProgressListener(this.nicofox_page_listener,
+   nicofox.download_listener.addListener(nicofox.ui.icon_listener);
+   nicofox.download_manager.go();
+  };
+  nicofox.ui.onUnload = function() {
+    gBrowser.removeProgressListener(this.page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
-    nicofox_download_listener.removeListener(icon_listener);
-  },
+    nicofox.download_listener.removeListener(nicofox.icon_listener);
+  };
   
-  onMenuItemCommand: function(e) {
-	nicofox.openBar(false);
-  },
-  onPageLoad: function(aEvent) {
-
-  },
-    openBar: function(auto_triggered)
+  nicofox.ui.onMenuItemCommand = function(e) {
+	nicofox.ui.openBar(false);
+  };
+  nicofox.ui.openBar = function(auto_triggered)
     {
       /* Auto triggered and not dismissed */
       if (auto_triggered
@@ -104,8 +101,8 @@ var nicofox = {
         document.getElementById('smilefox-space').collapsed = false;
 	this.bar_opened = true;
       }
-    },
-    goDownload: function(url, dont_confirm) 
+    };
+    nicofox.ui.goDownload = function(url, dont_confirm) 
 	{
 		/* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
 		var value = this.prefs.getComplexValue("save_path",
@@ -129,11 +126,11 @@ var nicofox = {
 		nicofox_icon.label = this.strings.getString('processing');
 
 		urlparser = new nicoFoxUrlParser();
-		urlparser.return_to = hitchFunction(nicofox, 'confirmDownload', url, dont_confirm);
+		urlparser.return_to = nicofox.hitch(nicofox, 'confirmDownload', url, dont_confirm);
 		urlparser.goParse(url);
-	},
+	};
 
-	goDownloadFromVideoPage: function(Video, url)
+	nicofox.ui.goDownloadFromVideoPage =  function(Video, url)
 	{
 		/* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
 		var value = this.prefs.getComplexValue("save_path",
@@ -151,7 +148,7 @@ var nicofox = {
 		}
 		this.confirmDownload(Video, url, true);
 	},
-    openOptions: function() {
+    nicofox.ui.openOptions = function() {
       /* instantApply needs dialog = no */
       /* Copied from chrome://mozapps/content/extensions/extensions.js in Firefox */
       var features;
@@ -167,7 +164,7 @@ var nicofox = {
       pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
       pref_window.focus();
     },
-	confirmDownload: function(Video, url, dont_confirm)
+	nicofox.ui.confirmDownload = function(Video, url, dont_confirm)
 		{
 
 		refreshIcon();
@@ -217,41 +214,40 @@ var nicofox = {
 		else
 		{
 		}*/
-		nicofox_download_manager.add(Video, url);
-		nicofox.openBar(false);
+		nicofox.download_manager.add(Video, url);
+		nicofox.ui.openBar(false);
 		/*dlmanager.focus();*/
 
-	},
-	collapseBar: function()
+	};
+	nicofox.ui.collapseBar = function()
 	{
 		document.getElementById('nicofox-splitter').collapsed = !document.getElementById('nicofox-splitter').collapsed;
 		document.getElementById('smilefox-space').collapsed = !document.getElementById('smilefox-space').collapsed;
-	},
-	matchWatchUrl: function(url)
+	};
+	nicofox.ui.matchWatchUrl = function(url)
 	{
 		return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/);
-	},
+	};
 
-	matchWatchCommentUrl: function(url)
+	nicofox.ui.matchWatchCommentUrl = function(url)
 	{
 		return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/);
-	},
+	};
 
-	matchWatchVideoUrl: function(url)
+	nicofox.ui.matchWatchVideoUrl =  function(url)
 	{
 		return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/);
-	},
+	};
 
-};
-function refreshIcon() {
+nicofox.ui.refreshIcon = function() {
   var nicofox_icon = document.getElementById('nicofox-icon');
-  var download_count = nicofox_download_manager.getDownloadCount();
-  var waiting_count = nicofox_download_manager.getWaitingCount();
+  var download_count = nicofox.download_manager.getDownloadCount();
+  var waiting_count = nicofox.download_manager.getWaitingCount();
   if (download_count > 0) {
     nicofox_icon.setAttribute ('label', download_count + '/' + (download_count + waiting_count));
   } else {
     nicofox_icon.setAttribute ('label', '');
   }
-}
-window.addEventListener("load", function(e) { nicofox.onLoad(e); }, false);
-window.addEventListener("unload", function(e) { nicofox.onUnload(e); }, false);
+};
+window.addEventListener("load", function(e) { nicofox.ui.onLoad(e); }, false);
+window.addEventListener("unload", function(e) { nicofox.ui.onUnload(e); }, false);

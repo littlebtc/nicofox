@@ -1,15 +1,14 @@
-var EXPORTED_SYMBOLS = ['nicoFoxUrlParser'];
+var EXPORTED_SYMBOLS = ['nicofox'];
 Components.utils.import('resource://nicofox/common.js');
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
+if(!nicofox) { var nicofox = {}; }
+if(!nicofox.parser) { nicofox.parser = {}; }
 
-function nicoFoxUrlParser()
-{
+nicofox.parser.nico = function () { }
 
-}
-
-nicoFoxUrlParser.prototype = {
+nicofox.parser.nico.prototype = {
   login_trial: false,
   url: '',
   /* Received the AJAX request from the video page */

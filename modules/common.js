@@ -1,10 +1,11 @@
-var EXPORTED_SYMBOLS = ['hitchFunction', 'goAjax', 'openInNewTab', 'displayNicoFoxMsg', 'nicoLogin'];
+var EXPORTED_SYMBOLS = ['nicofox'];
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
-function goAjax(url, type, funcok, funcerr, post_data)
-{
+if (!nicofox) { var nicofox = {}; }
+
+nicofox.goAjax = function(url, type, funcok, funcerr, post_data) {
   var http_request;
 
   http_request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
@@ -40,11 +41,11 @@ function goAjax(url, type, funcok, funcerr, post_data)
   /* For safety? */
   data = '';
   post_data = {};
-}
+};
 
 /* AJAX work will require some dirty way to call function
    The idea is from GM_hitch @ Greasemoneky and it is almost the same ||| */
-function hitchFunction(object, name) {
+nicofox.hitch = function(object, name) {
   if(!object || !object[name]) { return function(){}; }
   var args = Array.prototype.slice.call(arguments, 2);
 
@@ -58,38 +59,34 @@ function hitchFunction(object, name) {
     object[name].apply(object, args_inner);
   }
   return dirty_function;
-}
+};
+
 /* Open a link in the new tab */
-function openInNewTab(url)
-{
-        var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
-                 .getService(Ci.nsIWindowMediator);
-        var mainWindow = wm.getMostRecentWindow("navigator:browser");
+nicofox.openInNewTab = function(url) {
+  var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
+          .getService(Ci.nsIWindowMediator);
+  var mainWindow = wm.getMostRecentWindow("navigator:browser");
+  
+  /* If we cannot found browser, create one */
+ if (!mainWindow) {
+   window.open();
+   mainWindow = wm.getMostRecentWindow("navigator:browser");
+   mainWindow.getBrowser().selectedBrowser.contentDocument.location.href=url;
+ } else {
+   mainWindow.getBrowser().addTab(url);
+ }
+};
 
-        /* If we cannot found browser, create one */
-        if (!mainWindow)
-        {
-                window.open();
-                mainWindow = wm.getMostRecentWindow("navigator:browser");
-                mainWindow.getBrowser().selectedBrowser.contentDocument.location.href=url;
-        }
-        else
-        {
-                mainWindow.getBrowser().addTab(url);
-        }
-
-}
-
-function displayNicoFoxMsg(msg) {
+nicofox.msg = function(msg) {
   var console_service = Components.classes["@mozilla.org/consoleservice;1"]
                                   .getService(Components.interfaces.nsIConsoleService);
   console_service.logStringMessage(msg);
 
-}
+};
 
 /* Autologin, asking info from Password Manager 
    FIXME: Why not build a standalone password system? */
-function nicoLogin(funcok, funcerr) {
+nicofox.nicoLogin = function(funcok, funcerr) {
   var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                         .getService(Components.interfaces.nsIPrefService);
   prefs = prefs.getBranch("extensions.nicofox.");
@@ -127,4 +124,4 @@ function nicoLogin(funcok, funcerr) {
   login = {};
   logins = {};
   post_data = {};
-}
+};

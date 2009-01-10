@@ -1,7 +1,7 @@
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
-var EXPORTED_SYMBOLS = ['smileFoxDownloader'];
+var EXPORTED_SYMBOLS = ['nicofox'];
 
 var prefs = Components.classes["@mozilla.org/preferences-service;1"].
                     getService(Components.interfaces.nsIPrefService);
@@ -77,7 +77,7 @@ multipleDownloadsHelper.prototype = {
       onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
         if (aStateFlags & 16) /* STATE_STOP = 16 */ {
 	  this.callback();
-	  hitchFunction(_this, 'completeDownload')();
+	  nicofox.hitch(_this, 'completeDownload')();
         }
       },
       onProgressChange: function (aWebProgress, aRequest,
@@ -114,9 +114,11 @@ multipleDownloadsHelper.prototype = {
    });
   }
 }
-
-function smileFoxDownloader() { }
-smileFoxDownloader.prototype = {
+if (!nicofox) { var nicofox = {}; }
+if (!nicofox.download) { nicofox.download = {}; }
+if (!nicofox.download.helper) { nicofox.download.helper = {}; }
+nicofox.download.helper.nico = function() { };
+nicofox.download.helper.nico.prototype = {
   download_comment: false,
   canceled: false,
   ms_lock: false,
@@ -129,7 +131,7 @@ smileFoxDownloader.prototype = {
     this.comment_id = comment_id;
 
     /* Operator friendly? 403 Workaround? */
-    goAjax('http://www.nicovideo.jp/watch/'+comment_id, 'GET', hitchFunction(this, 'goParse') , hitchFunction(this, 'failParse'));
+    nicofox.goAjax('http://www.nicovideo.jp/watch/'+comment_id, 'GET', nicofox.hitch(this, 'goParse') , nicofox.hitch(this, 'failParse'));
   },
  
   goParse: function(req) {
@@ -142,7 +144,7 @@ smileFoxDownloader.prototype = {
     {
       /* Try autologin */
       if (!this.login_trial && prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
-        nicoLogin(hitchFunction(this, 'retry'), hitchFunction(this, 'failParse'));
+        nicofox.nicoLogin(nicofox.hitch(this, 'retry'), nicofox.hitch(this, 'failParse'));
 	this.login_trial = true;
         return;
       }
@@ -157,12 +159,12 @@ smileFoxDownloader.prototype = {
       this.uploader_comment = true;
     }
 
-    goAjax('http://www.nicovideo.jp/api/getflv?v='+this.comment_id, 'GET', hitchFunction(this, 'parseGetFlv') , hitchFunction(this, 'failParse'));
+    nicofox.goAjax('http://www.nicovideo.jp/api/getflv?v='+this.comment_id, 'GET', nicofox.hitch(this, 'parseGetFlv') , nicofox.hitch(this, 'failParse'));
   },
 
   retry: function(req) {
     /* Retry after autologin */
-    goAjax('http://www.nicovideo.jp/watch/'+this.comment_id, 'GET', hitchFunction(this, 'goParse') , hitchFunction(this, 'failParse'));
+    nicofox.goAjax('http://www.nicovideo.jp/watch/'+this.comment_id, 'GET', nicofox.hitch(this, 'goParse') , nicofox.hitch(this, 'failParse'));
   },
   parseGetFlv: function(req) {
     /* Don't waste time */
@@ -182,8 +184,8 @@ smileFoxDownloader.prototype = {
 
     /* :( for channel videos */
     if (params.needs_key) {
-      goAjax('http://www.nicovideo.jp/api/getthreadkey?thread='+this.comment_id+'&ts='+new Date().getTime(),  'GET',
-      hitchFunction(this, 'parseThreadKey', params) , hitchFunction(this, 'failParse')); 
+      nicofox.goAjax('http://www.nicovideo.jp/api/getthreadkey?thread='+this.comment_id+'&ts='+new Date().getTime(),  'GET',
+      nicofox.hitch(this, 'parseThreadKey', params) , nicofox.hitch(this, 'failParse')); 
     } else {
       this.goDownload(params);
     }
@@ -360,7 +362,7 @@ smileFoxDownloader.prototype = {
     };
 
     listener.downloaderCallback = this.callback;
-    listener.stopCallback = hitchFunction(this, 'getComments', params);
+    listener.stopCallback = nicofox.hitch(this, 'getComments', params);
     this.persist.progressListener = listener;
     this.persist.saveURI(movie_uri, null, ref_uri, null, null, this.movie_file);
 
@@ -390,8 +392,8 @@ smileFoxDownloader.prototype = {
       '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>';
     }
     this.download_helper = new multipleDownloadsHelper();
-    this.download_helper.doneCallback = hitchFunction(this, 'callback', 'completed', {});
-    this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, hitchFunction(this, 'processNicoComment', params));
+    this.download_helper.doneCallback = nicofox.hitch(this, 'callback', 'completed', {});
+    this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, nicofox.hitch(this, 'processNicoComment', params));
     if(this.uploader_comment) {
       this.download_helper.addDownload(params.ms, null , owner_post_header, this.ms_file2, true, function() {});
     }

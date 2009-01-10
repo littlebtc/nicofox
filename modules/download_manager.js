@@ -1,8 +1,9 @@
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
-var EXPORTED_SYMBOLS = ['nicofox_download_listener', 'nicofox_download_manager', 'nicofox_download_observer'];
-Components.utils.import('resource://nicofox/smilefox_downloader.js');
+var EXPORTED_SYMBOLS = ['nicofox'];
+if (!nicofox) { var nicofox = {}; }
+Components.utils.import('resource://nicofox/download_helper_nico.js');
 Components.utils.import('resource://nicofox/common.js');
 
 var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
@@ -43,7 +44,7 @@ var prefs_observer =
 };
 
 /* Make a observer to check the private mode (for Fx 3.1b2+) and the quitting of the browser */
-var nicofox_download_observer = {
+nicofox.download_observer = {
   quit_confirmed: false,
   observe: function(subject, topic, data) {
 
@@ -98,12 +99,12 @@ var nicofox_download_observer = {
   }
 }
 prefs_observer.register();
-nicofox_download_observer.register();
+nicofox.download_observer.register();
 
 var download_listeners = [];
 
 /* A download listener for all application that need to know the download status */
-var nicofox_download_listener = 
+nicofox.download_listener = 
 {
   addListener: function(listener) {
     download_listeners.push(listener);
@@ -486,10 +487,10 @@ var smilefox_sqlite = {
   },
 }
 
-/* Export Symbol: nicofox_download_manager
+/* 
    Providing communication between download manager interface and core
 */
-var nicofox_download_manager = 
+nicofox.download_manager = 
 {
    getDownloads: function() {
   rows = smilefox_sqlite.select();
@@ -731,7 +732,7 @@ var download_runner =
             break;
           }
         }
-        this.query[k].downloader = new smileFoxDownloader();
+        this.query[k].downloader = new nicofox.download.helper.nico();
         this.query[k].downloader.callback = hitchFunction(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
         /* FIXME: Check the filename scheme! */
         var file_title = prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
@@ -817,7 +818,7 @@ var nicofox_timer = {
       download_runner.economy_switch = false;
       download_runner.timer.cancel();
       download_runner.timer = null;
-      nicofox_download_manager.go();
+      nicofox.download_manager.go();
     } 
     else
     {

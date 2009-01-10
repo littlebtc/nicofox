@@ -88,7 +88,7 @@ injectScript: function(script, url, unsafeContentWin) {
 	
 	// Nicomonkey dirty hacks
 	sandbox.NM_getString = nicomonkey_gmCompiler.hitch(this, 'getString');
-	sandbox.NM_goDownload = nicomonkey_gmCompiler.hitch(nicofox, 'goDownloadFromVideoPage');
+	sandbox.NM_goDownload = nicomonkey_gmCompiler.hitch(nicofox.ui, 'goDownloadFromVideoPage');
 	sandbox.NM_bookmark = nicomonkey_gmCompiler.hitch(this, 'bookmark');
 	sandbox.NM_tag = nicomonkey_gmCompiler.hitch(this, 'tag');
 
