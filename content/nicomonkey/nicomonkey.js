@@ -12,7 +12,7 @@
 /*
 	var NM_getString = function(str) { return str; };
 */
-
+var start_time = new Date().getTime();
 var comment_naka_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAIlJREFUOE+9lF0OwCAIg9nNPBo3d0PDpviTEbqZEHn6UtLCQUT5KvgTKLrgwDL5UmVKKTNzKekdE62hAtMnfRgaAM7HDwJHKADYQ0HAByrutqao629/k47qfqvypjsak44K/USpVevMpc1wH36QWeNGAcDzNQ2Cf9x9TQT8Sjmu0t79AKgF4y//CV9HbAYNfLwgAAAAAElFTkSuQmCC';
 var comment_ue_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAERJREFUOE9jZGBg+A/EVAf/Gf4rUg9DHUk9A0GOG4KGQpxMTUxVw5DClLquBCdRanp71KWQbD8aplQPAqobOBpRNEinAC1++Owoo4AmAAAAAElFTkSuQmCC';
 var comment_shita_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAEBJREFUOE9jZGBg+A/EVAcgQ6mNqW4g2OfUduWooaNhSoNkNZpOqZ+saBWm/xX/M1ALQ8tn6hkIctgQNJTKsQ8AQAj47EvrtdgAAAAASUVORK5CYII=';
@@ -177,24 +177,24 @@ function start()
 		if(GM_getValue('toolbar'))
 		{
 			/* Use Div to do something wrong */
-			var niconicofox_inject = document.createElement('div'); niconicofox_inject.id = 'niconicofox_inject';
-			niconicofox_inject.style.display = 'none';
+		/*	var niconicofox_inject = document.createElement('div'); niconicofox_inject.id = 'niconicofox_inject';
+			niconicofox_inject.style.display = 'none';*
 
 			/* innerHTML is truly dirty but useful! */
-			niconicofox_inject.innerHTML = '<input id="inject_video_v" /><input id="inject_video_id" /><input id="inject_video_isDeleted" /><input id="inject_video_isMymemory" />';
+/*			niconicofox_inject.innerHTML = '<input id="inject_video_v" /><input id="inject_video_id" /><input id="inject_video_isDeleted" /><input id="inject_video_isMymemory" />';*/
 
 			/* Put the container of injection */
-			var watchfooter= document.getElementById('WATCHFOOTER');
-			watchfooter.appendChild(niconicofox_inject);
+/*			var watchfooter= document.getElementById('WATCHFOOTER');
+			watchfooter.appendChild(niconicofox_inject);*/
 
 			/* Use location hack to get the Video object, which contains what we want! */
-			var inject_js_str  = 
+/*			var inject_js_str  = 
 			'document.getElementById("inject_video_v").value = Video.v;'+
 			'document.getElementById("inject_video_id").value = Video.id;'+
 			'document.getElementById("inject_video_isDeleted").value = Video.isDeleted;'+
 			'document.getElementById("inject_video_isMymemory").value = Video.isMymemory;';
 
-			location.href='javascript: void(eval(\''+inject_js_str.replace(/\'/g,'\\\'')+'\'));';
+			location.href='javascript: void(eval(\''+inject_js_str.replace(/\'/g,'\\\'')+'\'));';*/
 
 			prepare_inject(0);
 		}
@@ -203,34 +203,39 @@ function start()
 
 function prepare_inject(timer)
 {
-	if (!document.getElementById('inject_video_v').value)
-	{
-		if (timer==10)
-		{
-			alert('Inject time out! The script may be broken.');
-			return;
-		}
-		timer = timer + 1;
-		window.setTimeout(prepare_inject, 1, timer);
-	}
-	else
-	{
-		start_inject();
-	}
-
+	window.setTimeout(start_inject, 10);
 }
 
 function start_inject()
 {
-
-	var Video = 
+	var Video = {};
+	/* Try to make unsafe safer */
+	if ((typeof unsafeWindow.Video) != 'object') { return; }
+	for (var key in unsafeWindow.Video) {
+	  var value = unsafeWindow.Video[key];
+	  if ((typeof value) == 'object') {
+            Video[key] = [];
+	    if (!value.length && (typeof value.length) != 'number') { return; }
+            for (var i = 0; i < value.length; i++) {
+	      if ((typeof value[i]) != 'string') { return; }
+              Video[key].push(value[i]);
+	    }
+          }
+	  else if ((typeof value) != 'string' && (typeof value) != 'number' && (typeof value) != 'boolean') {
+	    return;
+	  } else {
+  	    Video[key] = unsafeWindow.Video[key];
+	  }
+	}
+	var Video = unsafeWindow.Video;
+/*	var Video = 
 	{
 		title: document.getElementsByTagName('h1')[0].getElementsByTagName('a')[0].textContent.replace(/\&\#039\;/g, '\''),	    
 		v: document.getElementById('inject_video_v').value,
 		id: document.getElementById('inject_video_id').value,
 		isDeleted: false,
 		isMymemory: false,
-	}
+	}*/
 	
 	/* XXX it should not be here, but it is used to reduce the render times */
 	var community_nodes = $$('.//a[@class="community"]');
@@ -255,7 +260,7 @@ function start_inject()
 	}
 
 
-	if (document.getElementById('inject_video_isDeleted').value=='true') { Video.isDeleted = true; }
+/*	if (document.getElementById('inject_video_isDeleted').value=='true') { Video.isDeleted = true; }
 	if (document.getElementById('inject_video_isMymemory').value=='true') { Video.isMymemory = true; }
 
 	if (Video.isDeleted)
@@ -265,7 +270,7 @@ function start_inject()
 			window.setTimeout(killPlayer, 20);
 		}	
 		return;
-	}
+	}*/
 
 	var niconicofarm = "\r\n";
 	/* check if Video.v is a pure integer... (mymemory / community / other countries ver.), (for hatena::diary and niconicofarm) */
@@ -317,6 +322,8 @@ function start_inject()
         WATCHHEADER = document.getElementById('WATCHHEADER');
         WATCHHEADER.appendChild(video_utilities);
 
+	var end_time = new Date().getTime();
+	GM_log((end_time-start_time)+'ms => Toolbar');
 
 }
 
@@ -339,14 +346,8 @@ function addCommentHelper()
 	/* The comment helper */
 	comment_helper = document.createElement('div');
 	comment_helper.id = 'comment_helper';
-	
-	comment_helper_form = document.createElement('form');
-	comment_helper_form.name = 'comment_helper_form';
 
-	comment_helper_content = document.createElement('p');
-	comment_helper_content.id = 'comment_helper_content';
-
-	comment_helper_content.innerHTML = 
+	comment_helper.innerHTML = 
 	'<a href="#" class="ch_link" id="comment_helper_naka"><img src="'+comment_naka_uri+'" class="fox-ch-selected" /></a>'+
 	'<a href="#" class="ch_link" id="comment_helper_ue"><img src="'+comment_ue_uri+'" /></a>'+
 	'<a href="#" class="ch_link" id="comment_helper_shita"><img src="'+comment_shita_uri+'" /></a>'+
@@ -374,12 +375,11 @@ function addCommentHelper()
 	'</span>'+
 	'<textarea rows="1" value="" onchange="$(\'flvplayer\').SetVariable(\'inputArea.ChatInput1.text\', this.value);" onkeyup="this.onchange();"></textarea>';
 
-	comment_helper_form.appendChild(comment_helper_content);
-	comment_helper.appendChild(comment_helper_form);
+
 	watch_footer = document.getElementById('WATCHFOOTER');
 	watch_footer.insertBefore(comment_helper, watch_footer.firstChild);
 
-	helper_links = comment_helper_content.getElementsByTagName('a')
+	helper_links = comment_helper.getElementsByTagName('a')
 	for (i = 0; i < helper_links.length; i++)	
 	{
 		helper_links[i].addEventListener('click', commentHelperSelect, false);
@@ -387,6 +387,9 @@ function addCommentHelper()
 
 	js = 'if (User.isPremium) {$(\'comment_helper_premium\').show() }'; 
 	location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
+
+	var end_time = new Date().getTime();
+	GM_log((end_time-start_time)+'ms => Comment Helper');
 }
 
 var ch_position = 'naka';

@@ -82,7 +82,7 @@ injectScript: function(script, url, unsafeContentWin) {
 	);
 	//unsupported
 	sandbox.GM_registerMenuCommand=function(){};
-	sandbox.GM_log=function(){};
+	sandbox.GM_log=function(str){Components.utils.reportError(str)};
 	sandbox.GM_getResourceURL=function(){};
 	sandbox.GM_getResourceText=function(){};
 	
@@ -227,7 +227,7 @@ onUnLoad: function() {
 
 /* Dirty Hack for NicoFox */
 getString: function(str) {
-	return nicofox.monkeyStrings.getString(str);
+	return nicofox.ui.monkeyStrings.getString(str);
 },
 
 /* Add bookmark (Firefox 3+ only) */

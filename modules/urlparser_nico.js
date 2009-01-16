@@ -23,7 +23,7 @@ nicofox.parser.nico.prototype = {
                     getService(Components.interfaces.nsIPrefService);
       prefs = prefs.getBranch("extensions.nicofox.");
       if (!this.login_trial && prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
-        nicoLogin(hitchFunction(this, 'retry'), hitchFunction(this, 'failLogin'));
+        nicoLogin(nicofox.hitch(this, 'retry'), nicofox.hitch(this, 'failLogin'));
 	this.login_trial = true;
         return;
       }
@@ -86,7 +86,7 @@ nicofox.parser.nico.prototype = {
 		}
 
 		/* Download the watch page (something like my memory / Taiwan ver. should use this) */
-		goAjax(url, 'GET', hitchFunction(this, 'parseVideoPage'), hitchFunction(this, 'failDownload'));
+		nicofox.goAjax(url, 'GET', nicofox.hitch(this, 'parseVideoPage'), nicofox.hitch(this, 'failDownload'));
 
 		return true;
 	},

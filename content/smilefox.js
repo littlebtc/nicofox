@@ -532,7 +532,7 @@ nicofox.manager.popup_command =
     clipboard_helper.copyString(nicofox.manager.rows[this.recent_row].url);  
   },
   selectAll: function() {
-    document.getElementById('smilefox-tree').view.selection.rangedSelect(0, this.rows.length, true);
+    document.getElementById('smilefox-tree').view.selection.rangedSelect(0, nicofox.manager.rows.length, true);
     document.getElementById('smilefox-tree').focus();
   },
   remove: function() {

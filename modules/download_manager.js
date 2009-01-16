@@ -733,7 +733,7 @@ var download_runner =
           }
         }
         this.query[k].downloader = new nicofox.download.helper.nico();
-        this.query[k].downloader.callback = hitchFunction(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
+        this.query[k].downloader.callback = nicofox.hitch(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
         /* FIXME: Check the filename scheme! */
         var file_title = prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
         file_title = file_title.replace(/\%TITLE\%/, fixReservedCharacters(downloads[i].video_title));
