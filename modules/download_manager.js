@@ -7,25 +7,10 @@ Components.utils.import('resource://nicofox/download_helper_nico.js');
 Components.utils.import('resource://nicofox/common.js');
 
 var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
-var strings = 
-{
-  bundle: null, 
-  init: function() {
-   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicofox.properties');
-  }, 
-  getString: function(str) {
-    if (this.bundle === null) this.init();
-    return this.bundle.GetStringFromName(str);
-  }
-
-}
 var unloading = false;
 
-var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-                    getService(Components.interfaces.nsIPrefService);
-prefs = prefs.getBranch("extensions.nicofox.");
-
 /* Watch download max modification */
+var prefs = nicofox.prefs; /* FIXME: Is there another way? */
 prefs.QueryInterface(Ci.nsIPrefBranch2);
 
 var prefs_observer = 
@@ -54,7 +39,7 @@ nicofox.download_observer = {
                     .getService(Ci.nsIPromptService);
       if (download_count > 0)
       {
-        if (!prompts.confirm(null, strings.getString('closeSmileFoxTitle'), strings.getString('closeSmileFoxMsg'))){
+        if (!prompts.confirm(null, nicofox.strings.getString('closeSmileFoxTitle'), nicofox.strings.getString('closeSmileFoxMsg'))){
             subject.QueryInterface(Ci.nsISupportsPRBool);
             subject.data = true;
             return;
@@ -212,7 +197,7 @@ var smilefox_sqlite = {
       } catch (e) {
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
-        prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorBackup'));
+        prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorBackup'));
 	return;
       }
       /* BOOM! */
@@ -670,7 +655,7 @@ var download_runner =
               this.downloader.fail();
                   var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                            .getService(Ci.nsIPromptService);
-              prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
+              prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorIncomplete'));
               return;
             }
             smilefox_sqlite.updateBytes(id, {current_bytes: this.downloader.current_bytes, max_bytes: this.downloader.max_bytes});
@@ -684,7 +669,7 @@ var download_runner =
             this.downloader.fail();
             var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                          .getService(Ci.nsIPromptService);
-            prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorIncomplete'));
+            prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorIncomplete'));
             break;
 
             case 'completed':
@@ -833,17 +818,17 @@ function allDone() {
   var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]
                        .getService(Components.interfaces.nsIAlertsService);
   alerts_service.showAlertNotification("chrome://nicofox/skin/logo.png", 
-                                    strings.getString('alertCompleteTitle'), strings.getString('alertCompleteText'), 
+                                    nicofox.strings.getString('alertCompleteTitle'), nicofox.strings.getString('alertCompleteText'), 
                                     false, "", null);
 
 }
 
 /* Fix common reserved characters in filesystems by converting to full-width */
 function fixReservedCharacters(title) {
-  title = title.replace(/\//g, '／');
-  title = title.replace(/\\/g, '＼');
-  title = title.replace(/\?/g, '？');
-  title = title.replace(/\%/g, '％');
+  title = title.replace(/\//g, "\uFF0F");
+  title = title.replace(/\\/g, "\uFF3C");
+  title = title.replace(/\?/g, "\uFF1F");
+  title = title.replace(/\%/g, "\uFF05");
   title = title.replace(/\*/g, '＊');
   title = title.replace(/\:/g, '：');
   title = title.replace(/\|/g, '｜');

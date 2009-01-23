@@ -9,21 +9,15 @@ if (!nicofox) {var nicofox = {};}
 nicofox.manager = {
   prefs: null,
   prompts: null,
-  strings: null,
   listener: null,
   rows: [],
   treeview_assigned: false,
   load: function() {
     this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                    .getService(Ci.nsIPromptService);
-    /* Load strings */
-    this.strings = document.getElementById('nicofox-strings');
-    this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                           .getService(Components.interfaces.nsIPrefService);
-    this.prefs = this.prefs.getBranch("extensions.nicofox.");
     
     nicofox.manager.rows = nicofox.download_manager.getDownloads();
-    this.assignTreeView();
+    nicofox.manager.assignTreeView();
 
     /* For XULRunner 1.9.1+, use type="search" */
     var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
@@ -40,11 +34,11 @@ nicofox.manager = {
     document.getElementById('smilefox-tree').focus();
 
     /* Drag & Drop */
-    document.getElementById('smilefox-tree').addEventListener('dragover', this.dragOver, true);
-    document.getElementById('smilefox-tree').addEventListener('dragdrop', this.dragDrop, true);
+    document.getElementById('smilefox-tree').addEventListener('dragover', nicofox.manager.dragOver, true);
+    document.getElementById('smilefox-tree').addEventListener('dragdrop', nicofox.manager.dragDrop, true);
 
     /* Download listener */
-    this.listener = 
+    nicofox.manager.listener = 
     {
        add: function(id, content) {
          if ((typeof content) != 'object') return false;
@@ -88,7 +82,7 @@ nicofox.manager = {
          nicofox.manager.doSearch();
        }
      };
-    nicofox.download_listener.addListener(this.listener);
+    nicofox.download_listener.addListener(nicofox.manager.listener);
   },
   assignTreeView: function() {
     var tree_view = {
@@ -110,8 +104,8 @@ nicofox.manager = {
 
         case 'tree-economy':
         if (nicofox.manager.rows[row].status == 1 || nicofox.manager.rows[row].status >= 6) {
-          if (nicofox.manager.rows[row].video_economy == 1) return  nicofox.manager.strings.getString('economyYes');
-          else return nicofox.manager.strings.getString('economyNo');
+          if (nicofox.manager.rows[row].video_economy == 1) return  nicofox.strings.getString('economyYes');
+          else return nicofox.strings.getString('economyNo');
         }
         return;  
 
@@ -119,22 +113,22 @@ nicofox.manager = {
         switch (nicofox.manager.rows[row].status)
         {
           case 0:
-          return nicofox.manager.strings.getString('progressWaiting');
+          return nicofox.strings.getString('progressWaiting');
           case 1:
-          return nicofox.manager.strings.getString('progressCompleted');
+          return nicofox.strings.getString('progressCompleted');
           case 2:
-          return nicofox.manager.strings.getString('progressCanceled');
+          return nicofox.strings.getString('progressCanceled');
           case 3:
-          return nicofox.manager.strings.getString('progressFailed');
+          return nicofox.strings.getString('progressFailed');
           case 4:
-          return nicofox.manager.strings.getString('progressScheduled');
+          return nicofox.strings.getString('progressScheduled');
            
           case 5:
-          return nicofox.manager.strings.getString('progressLoading');
+          return nicofox.strings.getString('progressLoading');
           case 6:
-          return nicofox.manager.strings.getString('progressCommentDownloading');
+          return nicofox.strings.getString('progressCommentDownloading');
           case 7:
-          return nicofox.manager.strings.getString('progressVideoDownloading');
+          return nicofox.strings.getString('progressVideoDownloading');
           default:
           return 'Buggy!';
         }
@@ -336,7 +330,7 @@ nicofox.manager = {
   stop: function()
   {
     /* If downloading, confirm */
-    if (!this.prompts.confirm(null, nicofox.manager.strings.getString('stopDownloadTitle'), nicofox.manager.strings.getString('stopDownloadMsg')))
+    if (!this.prompts.confirm(null, nicofox.strings.getString('stopDownloadTitle'), nicofox.strings.getString('stopDownloadMsg')))
     { return; }
     nicofox.download_manager.cancelAll();
   },
@@ -365,10 +359,12 @@ nicofox.manager = {
   },
 
   unload: function() {
-    nicofox.download_listener.removeListener(this.listener);
+    nicofox.download_listener.removeListener(nicofox.manager.listener);
+    window.removeEventListener("load", nicofox.manager.load, false);
+    window.removeEventListener("unload", nicofox.manager.unload, false);
     document.getElementById('smilefox-tree').removeEventListener('contextmenu', nicofox.manager.popup_command.activate, false);
-    document.getElementById('smilefox-tree').removeEventListener('dragover', this.dragOver, true);
-    document.getElementById('smilefox-tree').removeEventListener('dragdrop', this.dragDrop, true);
+    document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox.manager.dragOver, true);
+    document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox.manager.dragDrop, true);
   },
 
   doSearch: function() {
@@ -453,13 +449,13 @@ nicofox.manager.popup_command =
         
     var external_process = false;
     /*  flv/mp4/swf detection and custom player */
-    if (nicofox.manager.prefs.getBoolPref("external_video_player") && nicofox.manager.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
+    if (nicofox.prefs.getBoolPref("external_video_player") && nicofox.manager.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
       external_process = true;
-      var external_path = nicofox.manager.prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
+      var external_path = nicofox.prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
     }
-    else if (nicofox.manager.prefs.getBoolPref("external_swf_player") && nicofox.manager.rows[this.recent_row].video_file.match(/(swf)$/)) {
+    else if (nicofox.prefs.getBoolPref("external_swf_player") && nicofox.manager.rows[this.recent_row].video_file.match(/(swf)$/)) {
       external_process = true;
-      var external_path = nicofox.manager.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
+      var external_path = nicofox.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
     }
     if (external_process) {
       var os_string = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
@@ -522,7 +518,7 @@ nicofox.manager.popup_command =
   go: function() {
     if (this.recent_row < 0) { return; }
     if (!nicofox.manager.rows[this.recent_row].url) { return; }
-    openInNewTab(nicofox.manager.rows[this.recent_row].url);
+    nicofox.openInTab(nicofox.manager.rows[this.recent_row].url);
   },
   copy: function() {
     if (this.recent_row < 0) { return; }
@@ -625,7 +621,6 @@ nicofox.manager.popup_command =
   }
 };
 
-
-window.addEventListener("load", function(e) { nicofox.manager.load(); }, false);
-window.addEventListener("unload", function(e) { nicofox.manager.unload(); }, false);
+window.addEventListener("load", nicofox.manager.load, false);
+window.addEventListener("unload", nicofox.manager.unload, false);
 

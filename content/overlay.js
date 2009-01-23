@@ -55,24 +55,21 @@ nicofox.ui = {
   onLoad: function() {
 //   this.nico_dl_observer = new nicofox_download_observer();
    /* initialization code */
-   this.initialized = true;
-   this.strings = document.getElementById("nicofox-strings");
-   this.monkeyStrings = document.getElementById("nicomonkey-strings");
-   this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                          .getService(Components.interfaces.nsIPrefService);
-   this.prefs = this.prefs.getBranch("extensions.nicofox.");
+   nicofox.ui.initialized = true;
 
    /* Prepapre prompt service */
-   this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-                  .getService(Ci.nsIPromptService);
+   nicofox.ui.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                       .getService(Ci.nsIPromptService);
 
-   gBrowser.addProgressListener(this.page_listener,
+   gBrowser.addProgressListener(nicofox.ui.page_listener,
    Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
    nicofox.download_listener.addListener(nicofox.ui.icon_listener);
    nicofox.download_manager.go();
   },
   onUnload: function() {
+    window.removeEventListener("load", nicofox.ui.onLoad, false);
+    window.removeEventListener("unload", nicofox.ui.onUnload, false);
     gBrowser.removeProgressListener(this.page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
     nicofox.download_listener.removeListener(nicofox.icon_listener);
@@ -83,7 +80,7 @@ nicofox.ui = {
   openBar: function(auto_triggered) {
     /* Auto triggered and not dismissed */
     if (auto_triggered
-    && this.prefs.getBoolPref("bar_autoopen")
+    && nicofox.prefs.getBoolPref("bar_autoopen")
     && ! this.bar_opened)
     {
       document.getElementById('nicofox-splitter').collapsed = false;
@@ -97,13 +94,13 @@ nicofox.ui = {
   },
   goDownload: function(url, dont_confirm) {
     /* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
-    var value = this.prefs.getComplexValue("save_path", Ci.nsISupportsString).data;
+    var value = nicofox.prefs.getComplexValue("save_path", Ci.nsISupportsString).data;
     if (!value)
     {
       var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-      file_picker.init(window, this.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
+      file_picker.init(window, nicofox.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
       if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
-        this.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
+        nicofox.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
       } else {
         return;
       }
@@ -113,7 +110,7 @@ nicofox.ui = {
     url = url.split("?")[0];    
 
     var nicofox_icon = document.getElementById('nicofox-icon');
-    nicofox_icon.label = this.strings.getString('processing');
+    nicofox_icon.label = nicofox.strings.getString('processing');
 
     urlparser = new nicofox.parser.nico();
     urlparser.return_to = nicofox.hitch(nicofox.ui, 'confirmDownload', url, dont_confirm);
@@ -121,12 +118,12 @@ nicofox.ui = {
   },
   goDownloadFromVideoPage: function(Video, url) {
     /* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
-    var value = this.prefs.getComplexValue("save_path",Ci.nsISupportsString).data;
+    var value = nicofox.prefs.getComplexValue("save_path",Ci.nsISupportsString).data;
     if (!value) {
       var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-      file_picker.init(window, this.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
+      file_picker.init(window, nicofox.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
       if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
-        this.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
+        nicofox.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
       } else {
         return;
       }
@@ -153,20 +150,20 @@ nicofox.ui = {
     nicofox.ui.refreshIcon();
     /* Download failed */
     if(Video == false) {
-      this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorParseFailed'));
+      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorParseFailed'));
       return;
     }
     if (Video.isDeleted) {
-      this.prompts.alert(null, this.strings.getString('errorTitle'), this.strings.getString('errorDeleted'));
+      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorDeleted'));
       return;
     }
 
-    if(this.prefs.getBoolPref('confirm_before_download') && !dont_confirm) {
+    if(nicofox.prefs.getBoolPref('confirm_before_download') && !dont_confirm) {
       /* Call the download confirm dialog */
       var params = {url: url, Video: Video, out: null};       
 
       /* Easter Egg is here! */
-      if (this.prefs.getBoolPref('tsundere')) {
+      if (nicofox.prefs.getBoolPref('tsundere')) {
         window.openDialog("chrome://nicofox/content/tsundere_confirm.xul", "",
             "centerscreen,modal", params).focus();
       } else {
@@ -225,5 +222,5 @@ nicofox.ui = {
     }
   },
 };
-window.addEventListener("load", function(e) { nicofox.ui.onLoad(e); }, false);
-window.addEventListener("unload", function(e) { nicofox.ui.onUnload(e); }, false);
+window.addEventListener("load", nicofox.ui.onLoad, false);
+window.addEventListener("unload", nicofox.ui.onUnload, false);

@@ -5,6 +5,11 @@ var Ci = Components.interfaces;
 
 if (!nicofox) { var nicofox = {}; }
 
+/* Load prefs */
+nicofox.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                          .getService(Components.interfaces.nsIPrefService);
+nicofox.prefs = nicofox.prefs.getBranch("extensions.nicofox.");
+
 nicofox.goAjax = function(url, type, funcok, funcerr, post_data) {
   var http_request;
 
@@ -62,7 +67,7 @@ nicofox.hitch = function(object, name) {
 };
 
 /* Open a link in the new tab */
-nicofox.openInNewTab = function(url) {
+nicofox.openInTab = function(url) {
   var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
           .getService(Ci.nsIWindowMediator);
   var mainWindow = wm.getMostRecentWindow("navigator:browser");
@@ -87,11 +92,7 @@ nicofox.msg = function(msg) {
 /* Autologin, asking info from Password Manager 
    FIXME: Why not build a standalone password system? */
 nicofox.nicoLogin = function(funcok, funcerr) {
-  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                        .getService(Components.interfaces.nsIPrefService);
-  prefs = prefs.getBranch("extensions.nicofox.");
-
-  var username = prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data;
+  var username = nicofox.prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data;
   var password = '';
 
   var login_manager = Cc["@mozilla.org/login-manager;1"]
@@ -125,3 +126,39 @@ nicofox.nicoLogin = function(funcok, funcerr) {
   logins = {};
   post_data = {};
 };
+
+/* Strings using JavaScript+XPCOM way, more stable? */
+nicofox.strings = {
+  bundle: null, 
+  init: function() {
+   var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
+   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicofox.properties');
+  }, 
+  getString: function(str) {
+    if (this.bundle === null) this.init();
+    return this.bundle.GetStringFromName(str);
+  },
+  getFormattedString: function (key, arr) {
+    if (typeof (arr) != 'array') {return '';}
+    if (this.bundle === null) this.init();
+    return this.bundle.formatStringFromName(key, arr, arr.length);
+  }
+};
+
+nicofox.monkey_strings = {
+  bundle: null, 
+  init: function() {
+   var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
+   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicomonkey.properties');
+  }, 
+  getString: function(str) {
+    if (this.bundle === null) this.init();
+    return this.bundle.GetStringFromName(str);
+  },
+  getFormattedString: function (key, arr) {
+    if (typeof (arr) != 'array') {return '';}
+    if (this.bundle === null) this.init();
+    return this.bundle.formatStringFromName(key, arr, arr.length);
+  }
+};
+

@@ -19,10 +19,7 @@ nicofox.parser.nico.prototype = {
     reg_array = html.match(/<script type\=\"text\/javascript\">\s+<!--\s+var Video = \{([\s\S]*)\}\;\s+-->\s+<\/script>/);
     if(!reg_array) {
       /* Try autologin */
-      var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-                    getService(Components.interfaces.nsIPrefService);
-      prefs = prefs.getBranch("extensions.nicofox.");
-      if (!this.login_trial && prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
+      if (!this.login_trial && nicofox.prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
         nicoLogin(nicofox.hitch(this, 'retry'), nicofox.hitch(this, 'failLogin'));
 	this.login_trial = true;
         return;

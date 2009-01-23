@@ -3,23 +3,6 @@ var Cc = Components.classes;
 var Ci = Components.interfaces;
 var EXPORTED_SYMBOLS = ['nicofox'];
 
-var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-                    getService(Components.interfaces.nsIPrefService);
-	prefs = prefs.getBranch("extensions.nicofox.");
-
-var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
-var strings = 
-{
-  bundle: null, 
-  init: function() {
-   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicofox.properties');
-  }, 
-  getString: function(str) {
-    if (this.bundle === null) this.init();
-    return this.bundle.GetStringFromName(str);
-  }
-
-}
 Components.utils.import('resource://nicofox/common.js');
 
 var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
@@ -126,7 +109,7 @@ nicofox.download.helper.nico.prototype = {
   uploader_comment: false,
   download_helper: null,
   init: function(comment_id) {
-    this.download_comment = prefs.getBoolPref('download_comment');
+    this.download_comment = nicofox.prefs.getBoolPref('download_comment');
     /* Save it to the object */
     this.comment_id = comment_id;
 
@@ -143,19 +126,19 @@ nicofox.download.helper.nico.prototype = {
     if(!reg_array)
     {
       /* Try autologin */
-      if (!this.login_trial && prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
+      if (!this.login_trial && nicofox.prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
         nicofox.nicoLogin(nicofox.hitch(this, 'retry'), nicofox.hitch(this, 'failParse'));
 	this.login_trial = true;
         return;
       }
-      prompts.alert(null, strings.getString('errorTitle'), strings.getString('errorParseFailed'));
+      prompts.alert(null, nicofox.strings.getString('errorTitle'), strings.getString('errorParseFailed'));
       this.callback('fail',{});
       return;
     }
     /* Is there any uploader's comment? */
     this.uploder_comment = false;	
     if (html.match(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/)
-    && prefs.getBoolPref('uploader_comment')) {
+    && nicofox.prefs.getBoolPref('uploader_comment')) {
       this.uploader_comment = true;
     }
 
@@ -213,7 +196,7 @@ nicofox.download.helper.nico.prototype = {
       displayNicoFoxMsg('NicoFox: This is in economy!');
       this.economy = true; 
 
-      if (prefs.getIntPref('economy') == 1) {
+      if (nicofox.prefs.getIntPref('economy') == 1) {
         this.callback('economy_break',{});
         return;
       }	
@@ -239,55 +222,55 @@ nicofox.download.helper.nico.prototype = {
    
     if (this.download_comment) {
       /* Prepare target file */
-      this.ms_file = prefs.getComplexValue("save_path", Ci.nsILocalFile);
+      this.ms_file = nicofox.prefs.getComplexValue("save_path", Ci.nsILocalFile);
       this.ms_file.append(this.file_title + '.xml');
       
       if(this.ms_file.exists()) {
         /* FIXME: there should have some other way to fix the conflict */
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                      .getService(Ci.nsIPromptService);
-        prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
+        prompts.alert(null, nicofox.strings.getString('errorTitle'), 'The XML comment file exists.');
         this.callback('fail2',{});
         return;
       }	
     }
     /* Prepare target file */
     if (this.uploader_comment) {
-      this.ms_file2 = prefs.getComplexValue("save_path", Ci.nsILocalFile);
+      this.ms_file2 = nicofox.prefs.getComplexValue("save_path", Ci.nsILocalFile);
       this.ms_file2.append(this.file_title + '[Owner].xml');
     
       if(this.ms_file2.exists()) {
         /* FIXME: there should have some other way to fix the conflict */
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                      .getService(Ci.nsIPromptService);
-        prompts.alert(null, strings.getString('errorTitle'), 'The XML comment file exists.');
+        prompts.alert(null, nicofox.strings.getString('errorTitle'), 'The XML comment file exists.');
         this.callback('fail2',{});
         return;
       }	
     }
     
     /* Make a file to prepare */
-    this.movie_prepare_file = prefs.getComplexValue("save_path", Ci.nsILocalFile);
+    this.movie_prepare_file = nicofox.prefs.getComplexValue("save_path", Ci.nsILocalFile);
     this.movie_prepare_file.append(this.file_title+'.'+this.type);
     if(this.movie_prepare_file.exists())
     {
       /* FIXME: there should have some other way to fix the conflict */
       var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Ci.nsIPromptService);
-      prompts.alert(null, strings.getString('errorTitle'), 'The video file exists.');
+      prompts.alert(null, nicofox.strings.getString('errorTitle'), 'The video file exists.');
       this.callback('fail2',{});
       return;
     }
 
     /* Part file is what we will truly store the video download */
-    this.movie_file = prefs.getComplexValue("save_path", Ci.nsILocalFile);
+    this.movie_file = nicofox.prefs.getComplexValue("save_path", Ci.nsILocalFile);
     this.movie_file.append(this.file_title+'.'+this.type+'.part');
     if(this.movie_file.exists())
     {
       /* FIXME: there should have some other way to fix the conflict */
       var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                    .getService(Ci.nsIPromptService);
-      prompts.alert(null, strings.getString('errorTitle'), 'The temp video file exists.');
+      prompts.alert(null, nicofox.strings.getString('errorTitle'), 'The temp video file exists.');
       this.callback('fail2',{});
       return;
     }
@@ -326,7 +309,7 @@ nicofox.download.helper.nico.prototype = {
 
     var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
                  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
-    if (prefs.getBoolPref('video_bypass_cache')) {
+    if (nicofox.prefs.getBoolPref('video_bypass_cache')) {
       flags = flags | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE; 
     }
     this.persist.persistFlags = flags; 
@@ -451,8 +434,8 @@ nicofox.download.helper.nico.prototype = {
   processNicoComment: function(params)
   {
     if (this.cancelled) { return; }
-    var boon_comment = prefs.getBoolPref('boon_comment');
-    var replace_filters = prefs.getBoolPref('replace_filters'); 
+    var boon_comment = nicofox.prefs.getBoolPref('boon_comment');
+    var replace_filters = nicofox.prefs.getBoolPref('replace_filters'); 
     if (!boon_comment && !replace_filters) { return; }
 
     if (replace_filters && params.ng_up) {

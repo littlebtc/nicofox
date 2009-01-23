@@ -3,6 +3,7 @@ function onLoad()
 	url = window.arguments[0].url;
 	Video = window.arguments[0].Video;
 	notice = document.getElementById('notice');
+	/* TODO: Why Not using nicofox.strings? */
 	strings = document.getElementById('nicofox-strings');
 
 	if (Video.isMymemory)

@@ -1,4 +1,7 @@
-function nicomonkey_PrefManager() {
+if (!nicofox) {var nicofox = {};}
+if (!nicofox.monkey) { nicofox.monkey = {};}
+
+nicofox.monkey.prefs = function() {
 	var startPoint="extensions.nicofox.nicomonkey.";
 
 	var pref=Components.classes["@mozilla.org/preferences-service;1"].
