@@ -20,7 +20,7 @@ nicofox.parser.nico.prototype = {
     if(!reg_array) {
       /* Try autologin */
       if (!this.login_trial && nicofox.prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
-        nicoLogin(nicofox.hitch(this, 'retry'), nicofox.hitch(this, 'failLogin'));
+        nicofox.nicoLogin(nicofox.hitch(this, 'retry'), nicofox.hitch(this, 'failLogin'));
 	this.login_trial = true;
         return;
       }

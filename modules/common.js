@@ -119,7 +119,7 @@ nicofox.nicoLogin = function(funcok, funcerr) {
   post_data[login.passwordField] = login.password;
 
   /* We don't need a XMLHttpRequest to be resent to init, so ... */
-  goAjax('https://secure.nicovideo.jp/secure/login?site=niconico', 'POST', funcok, funcerr, post_data) ;
+  nicofox.goAjax('https://secure.nicovideo.jp/secure/login?site=niconico', 'POST', funcok, funcerr, post_data) ;
 
   /* Recycle instantly for security */
   login = {};
