@@ -3,21 +3,21 @@ Components.utils.import("resource://nicofox/download_manager.js");
 Components.utils.import("resource://nicofox/common.js");
 Components.utils.import("resource://nicofox/urlparser_nico.js");
 
-if (!nicofox) {var nicofox = {};}
+if (!nicofox_ui) {var nicofox_ui = {};}
 /* Download count refresh listener */
-nicofox.ui = {
+nicofox_ui.overlay = {
   icon_listener: { 
     add: function(id, content) {
-      nicofox.ui.refreshIcon();
+      nicofox_ui.overlay.refreshIcon();
     },
     remove: function(id) {
-      nicofox.ui.refreshIcon();
+      nicofox_ui.overlay.refreshIcon();
     },
     update: function(id, content) {
-      nicofox.ui.refreshIcon();
+      nicofox_ui.overlay.refreshIcon();
     },
     stop: function() {
-      nicofox.ui.refreshIcon();
+      nicofox_ui.overlay.refreshIcon();
     },
     rebuild: function() {
     }
@@ -37,11 +37,11 @@ nicofox.ui = {
      /* FIXME: Dirty */
      if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)) {
        document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
-       nicofox.ui.openBar(true);
+       nicofox_ui.overlay.openBar(true);
      } else {
        document.getElementById('smilefox-toolbar-download').setAttribute('disabled', true);
        if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\//)) {
-         nicofox.ui.openBar(true);
+         nicofox_ui.overlay.openBar(true);
        }
      }
      return 0;
@@ -55,27 +55,27 @@ nicofox.ui = {
   onLoad: function() {
 //   this.nico_dl_observer = new nicofox_download_observer();
    /* initialization code */
-   nicofox.ui.initialized = true;
+   nicofox_ui.overlay.initialized = true;
 
    /* Prepapre prompt service */
-   nicofox.ui.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+   nicofox_ui.overlay.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                        .getService(Ci.nsIPromptService);
 
-   gBrowser.addProgressListener(nicofox.ui.page_listener,
+   gBrowser.addProgressListener(nicofox_ui.overlay.page_listener,
    Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
-   nicofox.download_listener.addListener(nicofox.ui.icon_listener);
+   nicofox.download_listener.addListener(nicofox_ui.overlay.icon_listener);
    nicofox.download_manager.go();
   },
   onUnload: function() {
-    window.removeEventListener("load", nicofox.ui.onLoad, false);
-    window.removeEventListener("unload", nicofox.ui.onUnload, false);
-    gBrowser.removeProgressListener(this.page_listener,
+    window.removeEventListener("load", nicofox_ui.overlay.onLoad, false);
+    window.removeEventListener("unload", nicofox_ui.overlay.onUnload, false);
+    gBrowser.removeProgressListener(nicofox_ui.overlay.page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
-    nicofox.download_listener.removeListener(nicofox.icon_listener);
+    nicofox.download_listener.removeListener(nicofox_ui.overlay.icon_listener);
   },
   onMenuItemCommand: function(e) {
-  nicofox.ui.openBar(false);
+  nicofox_ui.overlay.openBar(false);
   },
   openBar: function(auto_triggered) {
     /* Auto triggered and not dismissed */
@@ -113,7 +113,7 @@ nicofox.ui = {
     nicofox_icon.label = nicofox.strings.getString('processing');
 
     urlparser = new nicofox.parser.nico();
-    urlparser.return_to = nicofox.hitch(nicofox.ui, 'confirmDownload', url, dont_confirm);
+    urlparser.return_to = nicofox.hitch(nicofox_ui.overlay, 'confirmDownload', url, dont_confirm);
     urlparser.goParse(url);
   },
   goDownloadFromVideoPage: function(Video, url) {
@@ -147,7 +147,7 @@ nicofox.ui = {
       pref_window.focus();
   },
   confirmDownload: function(Video, url, dont_confirm) {
-    nicofox.ui.refreshIcon();
+    nicofox_ui.overlay.refreshIcon();
     /* Download failed */
     if(Video == false) {
       this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorParseFailed'));
@@ -187,7 +187,7 @@ nicofox.ui = {
     {
     }*/
     nicofox.download_manager.add(Video, url);
-    nicofox.ui.openBar(false);
+    nicofox_ui.overlay.openBar(false);
     /*dlmanager.focus();*/
 
   },
@@ -222,5 +222,5 @@ nicofox.ui = {
     }
   },
 };
-window.addEventListener("load", nicofox.ui.onLoad, false);
-window.addEventListener("unload", nicofox.ui.onUnload, false);
+window.addEventListener("load", nicofox_ui.overlay.onLoad, false);
+window.addEventListener("unload", nicofox_ui.overlay.onUnload, false);

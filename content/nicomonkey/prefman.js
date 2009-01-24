@@ -1,7 +1,7 @@
-if (!nicofox) {var nicofox = {};}
-if (!nicofox.monkey) { nicofox.monkey = {};}
+if (!nicofox_ui) {var nicofox_ui = {};}
+if (!nicofox_ui.monkey) { nicofox_ui.monkey = {};}
 
-nicofox.monkey.prefs = function() {
+nicofox_ui.monkey.prefs = function() {
 	var startPoint="extensions.nicofox.nicomonkey.";
 
 	var pref=Components.classes["@mozilla.org/preferences-service;1"].

@@ -193,7 +193,6 @@ nicofox.download.helper.nico.prototype = {
   goDownload: function(params) {
     /* Distinguish Economy mode */
     if (params.url.match(/low$/)) {
-      displayNicoFoxMsg('NicoFox: This is in economy!');
       this.economy = true; 
 
       if (nicofox.prefs.getIntPref('economy') == 1) {
@@ -204,7 +203,6 @@ nicofox.download.helper.nico.prototype = {
       this.economy = false;
       /* It has been a economy but now it's not! */
       if (this.has_economy) {
-        displayNicoFoxMsg('NicoFox: Economy mode seems to be off!');
         this.callback('economy_off',{});
       }
     }

@@ -5,19 +5,19 @@ var Ci = Components.interfaces;
 Components.utils.import('resource://nicofox/common.js');
 Components.utils.import('resource://nicofox/download_manager.js');
 
-if (!nicofox) {var nicofox = {};}
-nicofox.manager = {
+if (!nicofox_ui) {var nicofox_ui = {};}
+nicofox_ui.manager = {
   prefs: null,
   prompts: null,
   listener: null,
   rows: [],
   treeview_assigned: false,
   load: function() {
-    this.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-                   .getService(Ci.nsIPromptService);
+    nicofox_ui.manager.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                      .getService(Ci.nsIPromptService);
     
-    nicofox.manager.rows = nicofox.download_manager.getDownloads();
-    nicofox.manager.assignTreeView();
+    nicofox_ui.manager.rows = nicofox.download_manager.getDownloads();
+    nicofox_ui.manager.assignTreeView();
 
     /* For XULRunner 1.9.1+, use type="search" */
     var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
@@ -30,65 +30,65 @@ nicofox.manager = {
       document.getElementById('smilefox-toolbar-start').disabled = true;
       document.getElementById('smilefox-toolbar-stop').disabled = true;
     }
-    document.getElementById('smilefox-tree').addEventListener('contextmenu', nicofox.hitch(nicofox.manager.popup_command, 'activate'), false);
+    document.getElementById('smilefox-tree').addEventListener('contextmenu', nicofox.hitch(nicofox_ui.manager.popup_command, 'activate'), false);
     document.getElementById('smilefox-tree').focus();
 
     /* Drag & Drop */
-    document.getElementById('smilefox-tree').addEventListener('dragover', nicofox.manager.dragOver, true);
-    document.getElementById('smilefox-tree').addEventListener('dragdrop', nicofox.manager.dragDrop, true);
+    document.getElementById('smilefox-tree').addEventListener('dragover', nicofox_ui.manager.dragOver, true);
+    document.getElementById('smilefox-tree').addEventListener('dragdrop', nicofox_ui.manager.dragDrop, true);
 
     /* Download listener */
-    nicofox.manager.listener = 
+    nicofox_ui.manager.listener = 
     {
        add: function(id, content) {
          if ((typeof content) != 'object') return false;
          
          content.id = id;
-         nicofox.manager.rows.unshift(content);
-         nicofox.manager.updateTreeCount(0, 1);
+         nicofox_ui.manager.rows.unshift(content);
+         nicofox_ui.manager.updateTreeCount(0, 1);
          var keyword = document.getElementById('smilefox-search').value;
          if (keyword) {
-           nicofox.manager.doSearch();
+           nicofox_ui.manager.doSearch();
          } else {
            document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
          }
        },
        remove: function(id) {
-         nicofox.manager.rows = nicofox.manager.rows.filter(function(element, index, array) {
+         nicofox_ui.manager.rows = nicofox_ui.manager.rows.filter(function(element, index, array) {
            if (element.id == id) {
-             nicofox.manager.updateTreeCount(index, -1);
+             nicofox_ui.manager.updateTreeCount(index, -1);
            } else {
              return true;
            }
          });
        },
        update: function(id, content) {
-         nicofox.manager.rows.forEach(function(element, index, array) {
+         nicofox_ui.manager.rows.forEach(function(element, index, array) {
            if (element.id == id) {
              for (key in content) {
                array[index][key] = content[key];
              }
-             nicofox.manager.updateTreeRow(index);
-             nicofox.manager.updateRowSpeed(index);
+             nicofox_ui.manager.updateTreeRow(index);
+             nicofox_ui.manager.updateRowSpeed(index);
            }
          });
-         nicofox.manager.updateToolbar();
+         nicofox_ui.manager.updateToolbar();
        },
        stop: function() {
-         nicofox.manager.updateToolbar();
+         nicofox_ui.manager.updateToolbar();
        },
        rebuild: function() {
          document.getElementById('smilefox-search').value = '';
-         nicofox.manager.doSearch();
+         nicofox_ui.manager.doSearch();
        }
      };
-    nicofox.download_listener.addListener(nicofox.manager.listener);
+    nicofox.download_listener.addListener(nicofox_ui.manager.listener);
   },
   assignTreeView: function() {
     var tree_view = {
       treeBox: null,
       selection: null,
-      get rowCount()  {return nicofox.manager.rows.length;},
+      get rowCount()  {return nicofox_ui.manager.rows.length;},
       getCellText : function(row,column){
 
       switch(column.id)
@@ -97,20 +97,20 @@ nicofox.manager = {
         return;
 
         case 'tree-title':
-        return nicofox.manager.rows[row].video_title;
+        return nicofox_ui.manager.rows[row].video_title;
 
         case 'tree-comment':
-        return nicofox.manager.rows[row].comment_type;
+        return nicofox_ui.manager.rows[row].comment_type;
 
         case 'tree-economy':
-        if (nicofox.manager.rows[row].status == 1 || nicofox.manager.rows[row].status >= 6) {
-          if (nicofox.manager.rows[row].video_economy == 1) return  nicofox.strings.getString('economyYes');
+        if (nicofox_ui.manager.rows[row].status == 1 || nicofox_ui.manager.rows[row].status >= 6) {
+          if (nicofox_ui.manager.rows[row].video_economy == 1) return  nicofox.strings.getString('economyYes');
           else return nicofox.strings.getString('economyNo');
         }
         return;  
 
         case 'tree-status':
-        switch (nicofox.manager.rows[row].status)
+        switch (nicofox_ui.manager.rows[row].status)
         {
           case 0:
           return nicofox.strings.getString('progressWaiting');
@@ -134,15 +134,15 @@ nicofox.manager = {
         }
         break;
         case 'tree-size':
-        if (nicofox.manager.rows[row].status == 1) {
-          return (Math.floor(nicofox.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
-        } else if(nicofox.manager.rows[row].status == 7) {
-          return (Math.floor(nicofox.manager.rows[row].current_bytes / 1024 / 1024 * 10) / 10) + 'MB/'+(Math.floor(nicofox.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
+        if (nicofox_ui.manager.rows[row].status == 1) {
+          return (Math.floor(nicofox_ui.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
+        } else if(nicofox_ui.manager.rows[row].status == 7) {
+          return (Math.floor(nicofox_ui.manager.rows[row].current_bytes / 1024 / 1024 * 10) / 10) + 'MB/'+(Math.floor(nicofox_ui.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
         }
         return;  
 
         case 'tree-speed':
-        if (nicofox.manager.rows[row].status == 7 && nicofox.manager.rows[row].speed) return nicofox.manager.rows[row].speed+'KB/s';
+        if (nicofox_ui.manager.rows[row].status == 7 && nicofox_ui.manager.rows[row].speed) return nicofox_ui.manager.rows[row].speed+'KB/s';
         else return;
         break;
   
@@ -151,12 +151,12 @@ nicofox.manager = {
         }
       },
       getCellValue : function(row,column){
-        if (column.id == "tree-progress" &&( nicofox.manager.rows[row].status == 5 || nicofox.manager.rows[row].status == 6)) return 20;
-        else if (column.id == "tree-progress"){progress = Math.floor(nicofox.manager.rows[row].current_bytes / nicofox.manager.rows[row].max_bytes * 100); return progress; }
+        if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 20;
+        else if (column.id == "tree-progress"){progress = Math.floor(nicofox_ui.manager.rows[row].current_bytes / nicofox_ui.manager.rows[row].max_bytes * 100); return progress; }
         else return;
       },
       getProgressMode : function(row,column){
-        if (column.id == "tree-progress" &&( nicofox.manager.rows[row].status == 5 || nicofox.manager.rows[row].status == 6)) return 2; 
+        if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 2; 
         else if (column.id == "tree-progress") return 1; 
         else return;
       },
@@ -237,7 +237,7 @@ nicofox.manager = {
     }
     /* XXX: Dirty way (why check URLs here)? */
     if (urls[0].match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/) && gBrowser) {
-      nicofox.ui.goDownload(urls[0]);
+      nicofox_ui.overlay.goDownload(urls[0]);
     }
   },
 
@@ -359,20 +359,20 @@ nicofox.manager = {
   },
 
   unload: function() {
-    nicofox.download_listener.removeListener(nicofox.manager.listener);
-    window.removeEventListener("load", nicofox.manager.load, false);
-    window.removeEventListener("unload", nicofox.manager.unload, false);
-    document.getElementById('smilefox-tree').removeEventListener('contextmenu', nicofox.manager.popup_command.activate, false);
-    document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox.manager.dragOver, true);
-    document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox.manager.dragDrop, true);
+    nicofox.download_listener.removeListener(nicofox_ui.manager.listener);
+    window.removeEventListener("load", nicofox_ui.manager.load, false);
+    window.removeEventListener("unload", nicofox_ui.manager.unload, false);
+    document.getElementById('smilefox-tree').removeEventListener('contextmenu', nicofox_ui.manager.popup_command.activate, false);
+    document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox_ui.manager.dragOver, true);
+    document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox_ui.manager.dragDrop, true);
   },
 
   doSearch: function() {
     var keyword = document.getElementById('smilefox-search').value;
     
-    this.updateTreeCount(0, -nicofox.manager.rows.length);
+    this.updateTreeCount(0, -nicofox_ui.manager.rows.length);
     this.rows = nicofox.download_manager.getDownloads();
-    this.updateTreeCount(0, nicofox.manager.rows.length);
+    this.updateTreeCount(0, nicofox_ui.manager.rows.length);
 
     if (keyword) {
       keyword = keyword.replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]]/g, '\\$1');
@@ -389,7 +389,7 @@ nicofox.manager = {
       if (result) {
         return true;
       } else {
-        nicofox.manager.updateTreeCount(index, -1);
+        nicofox_ui.manager.updateTreeCount(index, -1);
       }
     });
     }
@@ -400,60 +400,60 @@ nicofox.manager = {
 
 
 
-nicofox.manager.popup_command = 
+nicofox_ui.manager.popup_command = 
 {
   recent_row: -1,
   multiple_select: true, 
     cancel: function() {
       if (this.recent_row < 0) { return; }  
-      nicofox.download_manager.cancel(nicofox.manager.rows[this.recent_row].id);
+      nicofox.download_manager.cancel(nicofox_ui.manager.rows[this.recent_row].id);
     },
     retry: function() {
       if (this.recent_row < 0) { return; }  
-      nicofox.download_manager.retry(nicofox.manager.rows[this.recent_row].id);
+      nicofox.download_manager.retry(nicofox_ui.manager.rows[this.recent_row].id);
     },
     open: function() {
       if (this.recent_row < 0) { return; }
-      if (!nicofox.manager.rows[this.recent_row].video_file) { return; }
-      if (!nicofox.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4)$/)) { return; }
+      if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
+      if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4)$/)) { return; }
   
       var file = Cc["@mozilla.org/file/local;1"]
                  .createInstance(Ci.nsILocalFile);
-      file.initWithPath(nicofox.manager.rows[this.recent_row].video_file);
+      file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
       if (!file.exists()) { return false; }
       var video_uri = Cc["@mozilla.org/network/io-service;1"]
                      .getService(Ci.nsIIOService).newFileURI(file);
       var video_uri_spec = video_uri.spec;
       var comment_uri_spec = '';
     
-      if (nicofox.manager.rows[this.recent_row].comment_file) {
+      if (nicofox_ui.manager.rows[this.recent_row].comment_file) {
       var file = Cc["@mozilla.org/file/local;1"]
                  .createInstance(Ci.nsILocalFile);
-      file.initWithPath(nicofox.manager.rows[this.recent_row].comment_file);
+      file.initWithPath(nicofox_ui.manager.rows[this.recent_row].comment_file);
       if (!file.exists()) { return false; }
       var comment_uri = Cc["@mozilla.org/network/io-service;1"]
                   .getService(Ci.nsIIOService).newFileURI(file);
       comment_uri_spec = comment_uri.spec; 
     }
       
-    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox.manager.rows[this.recent_row].video_title});  
+    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
   }, 
   openExternal: function() {
     if (this.recent_row < 0) { return; }
-    if (!nicofox.manager.rows[this.recent_row].video_file) { return; }
+    if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
         
     var file = Cc["@mozilla.org/file/local;1"]
                  .createInstance(Ci.nsILocalFile);
-    file.initWithPath(nicofox.manager.rows[this.recent_row].video_file);
+    file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
     if (!file.exists()) { return false; }
         
     var external_process = false;
     /*  flv/mp4/swf detection and custom player */
-    if (nicofox.prefs.getBoolPref("external_video_player") && nicofox.manager.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
+    if (nicofox.prefs.getBoolPref("external_video_player") && nicofox_ui.manager.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
       external_process = true;
       var external_path = nicofox.prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
     }
-    else if (nicofox.prefs.getBoolPref("external_swf_player") && nicofox.manager.rows[this.recent_row].video_file.match(/(swf)$/)) {
+    else if (nicofox.prefs.getBoolPref("external_swf_player") && nicofox_ui.manager.rows[this.recent_row].video_file.match(/(swf)$/)) {
       external_process = true;
       var external_path = nicofox.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
     }
@@ -497,10 +497,10 @@ nicofox.manager.popup_command =
   },
   openFolder: function() {
     if (this.recent_row < 0) { return; }
-    if (!nicofox.manager.rows[this.recent_row].video_file) { return; }
+    if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
     var file = Cc["@mozilla.org/file/local;1"]
                .createInstance(Ci.nsILocalFile);
-    file.initWithPath(nicofox.manager.rows[this.recent_row].video_file);
+    file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
     if (!file.exists()) { return false; }
     try {
       file.reveal();
@@ -517,18 +517,18 @@ nicofox.manager.popup_command =
   },
   go: function() {
     if (this.recent_row < 0) { return; }
-    if (!nicofox.manager.rows[this.recent_row].url) { return; }
-    nicofox.openInTab(nicofox.manager.rows[this.recent_row].url);
+    if (!nicofox_ui.manager.rows[this.recent_row].url) { return; }
+    nicofox.openInTab(nicofox_ui.manager.rows[this.recent_row].url);
   },
   copy: function() {
     if (this.recent_row < 0) { return; }
-    if (!nicofox.manager.rows[this.recent_row].url) { return; }  
+    if (!nicofox_ui.manager.rows[this.recent_row].url) { return; }  
     var clipboard_helper = Cc["@mozilla.org/widget/clipboardhelper;1"]  
                           .getService(Ci.nsIClipboardHelper);  
-    clipboard_helper.copyString(nicofox.manager.rows[this.recent_row].url);  
+    clipboard_helper.copyString(nicofox_ui.manager.rows[this.recent_row].url);  
   },
   selectAll: function() {
-    document.getElementById('smilefox-tree').view.selection.rangedSelect(0, nicofox.manager.rows.length, true);
+    document.getElementById('smilefox-tree').view.selection.rangedSelect(0, nicofox_ui.manager.rows.length, true);
     document.getElementById('smilefox-tree').focus();
   },
   remove: function() {
@@ -541,8 +541,8 @@ nicofox.manager.popup_command =
       tree.view.selection.getRangeAt(i, start, end);
       for (var j = start.value; j <= end.value; j++) {
         /* when it is failed, completed, canceled or waiting, we can remove it */
-        if(nicofox.manager.rows[j].status <= 4) {
-          removing_ids.push(nicofox.manager.rows[j].id);
+        if(nicofox_ui.manager.rows[j].status <= 4) {
+          removing_ids.push(nicofox_ui.manager.rows[j].id);
         }
       }
     }
@@ -574,9 +574,9 @@ nicofox.manager.popup_command =
       }
     }
     document.getElementById('smilefox-popup').style.display='-moz-popup';
-    selected_row = nicofox.manager.rows[this.recent_row];
+    selected_row = nicofox_ui.manager.rows[this.recent_row];
     
-    if(nicofox.manager.rows[this.recent_row].status == 0) {
+    if(nicofox_ui.manager.rows[this.recent_row].status == 0) {
       /* Waiting */
       document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'none';
@@ -584,13 +584,13 @@ nicofox.manager.popup_command =
       document.getElementById('popup-open-external').style.display = 'none';
       document.getElementById('popup-open-folder').style.display = 'none';
       document.getElementById('popup-remove').style.display = 'block';
-    } else if(nicofox.manager.rows[this.recent_row].status == 1) {
+    } else if(nicofox_ui.manager.rows[this.recent_row].status == 1) {
       /* Completed */
       document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'none';
       document.getElementById('popup-open').style.display = 'block';
       /* NicoFox player do not support SWF currently */
-      if (nicofox.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { document.getElementById('popup-open').style.display ='none';
+      if (nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { document.getElementById('popup-open').style.display ='none';
         //document.getElementById('popup-open-swf-player').style.display ='block';
       } else {
         document.getElementById('popup-open').style.display ='block';
@@ -599,7 +599,7 @@ nicofox.manager.popup_command =
       document.getElementById('popup-open-external').style.display = 'block';
       document.getElementById('popup-open-folder').style.display = 'block';
       document.getElementById('popup-remove').style.display = 'block';
-    } else if(nicofox.manager.rows[this.recent_row].status > 4) {
+    } else if(nicofox_ui.manager.rows[this.recent_row].status > 4) {
       /* When downloading */
       document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'block';
@@ -621,6 +621,6 @@ nicofox.manager.popup_command =
   }
 };
 
-window.addEventListener("load", nicofox.manager.load, false);
-window.addEventListener("unload", nicofox.manager.unload, false);
+window.addEventListener("load", nicofox_ui.manager.load, false);
+window.addEventListener("unload", nicofox_ui.manager.unload, false);
 

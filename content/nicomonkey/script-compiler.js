@@ -1,9 +1,9 @@
 Components.utils.import('resource://nicofox/common.js');
 
-if (!nicofox) {var nicofox = {};}
-if (!nicofox.monkey) { nicofox.monkey = {};}
+if (!nicofox_ui) {var nicofox_ui = {};}
+if (!nicofox_ui.monkey) { nicofox_ui.monkey = {};}
 
-nicofox.monkey.compiler = {
+nicofox_ui.monkey.compiler = {
 
 // getUrlContents adapted from Greasemonkey Compiler
 // http://www.letitblog.com/code/python/greasemonkey.py.txt
@@ -48,14 +48,14 @@ contentLoad: function(e) {
   var href=new XPCNativeWrapper(unsafeLoc, "href").href;
 
   if (
-    nicofox.monkey.compiler.isGreasemonkeyable(href)
+    nicofox_ui.monkey.compiler.isGreasemonkeyable(href)
     && ( /http:\/\/www\.nicovideo\.jp\/.*/.test(href) || /http:\/\/tw\.nicovideo\.jp\/.*/.test(href) || /http:\/\/de\.nicovideo\.jp\/.*/.test(href) || /http:\/\/es\.nicovideo\.jp\/.*/.test(href) || /http:\/\/ch\.nicovideo\.jp\/.*/.test(href) )
     && true
   ) {
-    var script=nicofox.monkey.compiler.getUrlContents(
+    var script=nicofox_ui.monkey.compiler.getUrlContents(
       'chrome://nicofox/content/nicomonkey/nicomonkey.js'
     );
-    nicofox.monkey.compiler.injectScript(script, href, unsafeWin);
+    nicofox_ui.monkey.compiler.injectScript(script, href, unsafeWin);
   }
 },
 
@@ -65,8 +65,8 @@ injectScript: function(script, url, unsafeContentWin) {
 
   sandbox=new Components.utils.Sandbox(safeWin);
 
-  var storage=new nicofox.monkey.script_storage();
-  xmlhttpRequester=new nicofox.monkey.ajax(
+  var storage=new nicofox_ui.monkey.script_storage();
+  xmlhttpRequester=new nicofox_ui.monkey.ajax(
     unsafeContentWin, window//appSvc.hiddenDOMWindow
   );
 
@@ -78,11 +78,11 @@ injectScript: function(script, url, unsafeContentWin) {
   sandbox.XPathResult=Components.interfaces.nsIDOMXPathResult;
 
   // add our own APIs
-  sandbox.GM_addStyle=function(css) { nicofox.monkey.compiler.addStyle(sandbox.document, css) };
-  sandbox.GM_setValue=nicofox.monkey.compiler.hitch(storage, "setValue");
-  sandbox.GM_getValue=nicofox.monkey.compiler.hitch(storage, "getValue");
-  sandbox.GM_openInTab=nicofox.monkey.compiler.hitch(this, "openInTab", unsafeContentWin);
-  sandbox.GM_xmlhttpRequest=nicofox.monkey.compiler.hitch(
+  sandbox.GM_addStyle=function(css) { nicofox_ui.monkey.compiler.addStyle(sandbox.document, css) };
+  sandbox.GM_setValue=nicofox_ui.monkey.compiler.hitch(storage, "setValue");
+  sandbox.GM_getValue=nicofox_ui.monkey.compiler.hitch(storage, "getValue");
+  sandbox.GM_openInTab=nicofox_ui.monkey.compiler.hitch(this, "openInTab", unsafeContentWin);
+  sandbox.GM_xmlhttpRequest=nicofox_ui.monkey.compiler.hitch(
     xmlhttpRequester, "contentStartRequest"
   );
   //unsupported
@@ -92,10 +92,10 @@ injectScript: function(script, url, unsafeContentWin) {
   sandbox.GM_getResourceText=function(){};
   
   // Nicomonkey dirty hacks
-  sandbox.NM_getString = nicofox.monkey.compiler.hitch(storage, 'getString');
-  sandbox.NM_goDownload = nicofox.monkey.compiler.hitch(storage, 'goDownload');
-  sandbox.NM_bookmark = nicofox.monkey.compiler.hitch(storage, 'bookmark');
-  sandbox.NM_tag = nicofox.monkey.compiler.hitch(storage, 'tag');
+  sandbox.NM_getString = nicofox_ui.monkey.compiler.hitch(storage, 'getString');
+  sandbox.NM_goDownload = nicofox_ui.monkey.compiler.hitch(storage, 'goDownload');
+  sandbox.NM_bookmark = nicofox_ui.monkey.compiler.hitch(storage, 'bookmark');
+  sandbox.NM_tag = nicofox_ui.monkey.compiler.hitch(storage, 'tag');
 
   sandbox.__proto__=sandbox.window;
 
@@ -185,7 +185,7 @@ hitch: function(obj, meth) {
   var staticArgs = Array.prototype.splice.call(arguments, 2, arguments.length);
 
   return function() {
-    if (nicofox.monkey.compiler.apiLeakCheck(hitchCaller)) {
+    if (nicofox_ui.monkey.compiler.apiLeakCheck(hitchCaller)) {
       return;
     }
     
@@ -218,40 +218,40 @@ onLoad: function() {
   var appcontent=window.document.getElementById("appcontent");
   if (appcontent && !appcontent.greased_nicomonkey_gmCompiler) {
     appcontent.greased_nicomonkey_gmCompiler=true;
-    appcontent.addEventListener("DOMContentLoaded", nicofox.monkey.compiler.contentLoad, false);
+    appcontent.addEventListener("DOMContentLoaded", nicofox_ui.monkey.compiler.contentLoad, false);
   }
 },
 
 onUnLoad: function() {
   //remove now unnecessary listeners
-  window.removeEventListener('load', nicofox.monkey.compiler.onLoad, false);
-  window.removeEventListener('unload', nicofox.monkey.compiler.onUnLoad, false);
+  window.removeEventListener('load', nicofox_ui.monkey.compiler.onLoad, false);
+  window.removeEventListener('unload', nicofox_ui.monkey.compiler.onUnLoad, false);
   window.document.getElementById("appcontent")
-    .removeEventListener("DOMContentLoaded", nicofox.monkey.compiler.contentLoad, false);
+    .removeEventListener("DOMContentLoaded", nicofox_ui.monkey.compiler.contentLoad, false);
 },
 
-}; //object nicofox.monkey.compiler
+}; //object nicofox_ui.monkey.compiler
 
 
-nicofox.monkey.script_storage = function() {
-  this.prefMan=new nicofox.monkey.prefs();
+nicofox_ui.monkey.script_storage = function() {
+  this.prefMan=new nicofox_ui.monkey.prefs();
 }
-nicofox.monkey.script_storage.prototype.setValue = function(name, val) {
+nicofox_ui.monkey.script_storage.prototype.setValue = function(name, val) {
   this.prefMan.setValue(name, val);
 }
-nicofox.monkey.script_storage.prototype.getValue = function(name, defVal) {
+nicofox_ui.monkey.script_storage.prototype.getValue = function(name, defVal) {
   return this.prefMan.getValue(name, defVal);
 }
 /* NicoMonkey Only API */
-nicofox.monkey.script_storage.prototype.goDownload = function(Video, url) {
-  nicofox.ui.goDownloadFromVideoPage(Video, url);
+nicofox_ui.monkey.script_storage.prototype.goDownload = function(Video, url) {
+  nicofox_ui.overlay.goDownloadFromVideoPage(Video, url);
 }
-nicofox.monkey.script_storage.prototype.getString = function(str) {
+nicofox_ui.monkey.script_storage.prototype.getString = function(str) {
   return nicofox.monkey_strings.getString(str);
 }
 
 /* Add bookmark (Firefox 3+ only) */
-nicofox.monkey.script_storage.prototype.bookmark = function() {
+nicofox_ui.monkey.script_storage.prototype.bookmark = function() {
   var bookmark_serv = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                       .getService(Components.interfaces.nsINavBookmarksService);
 
@@ -266,7 +266,7 @@ nicofox.monkey.script_storage.prototype.bookmark = function() {
   }
 }
 /* Add tag to places */
-nicofox.monkey.script_storage.prototype.tag = function(str) {
+nicofox_ui.monkey.script_storage.prototype.tag = function(str) {
   if (typeof str != 'string') { return; }
   var bookmark_serv = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                       .getService(Components.interfaces.nsINavBookmarksService);
@@ -288,5 +288,5 @@ nicofox.monkey.script_storage.prototype.tag = function(str) {
 
 }
 
-window.addEventListener('load', nicofox.monkey.compiler.onLoad, false);
-window.addEventListener('unload', nicofox.monkey.compiler.onUnLoad, false);
+window.addEventListener('load', nicofox_ui.monkey.compiler.onLoad, false);
+window.addEventListener('unload', nicofox_ui.monkey.compiler.onUnLoad, false);
