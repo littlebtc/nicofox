@@ -619,7 +619,7 @@ var download_runner =
 	    if (!download_runner.timer) {
               download_runner.timer = Cc["@mozilla.org/timer;1"]
                                       .createInstance(Ci.nsITimer);
-              download_runner.timer.initWithCallback( nicofox_timer, 300000, Ci.nsITimer.TYPE_REPEATING_SLACK);
+              download_runner.timer.initWithCallback( nicofox_timer, 600000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 	    }
             download_runner.prepare();
             break;
@@ -799,7 +799,6 @@ var nicofox_timer = {
 
     /* Economy mode is fired when 19-2 in Japan time (UTC+9) => 10-17 in UTC time */
     if (now.getUTCHours() >= 17 || now.getUTCHours() < 10) {
-      displayNicoFoxMsg('NicoFox Timer: Economy mode seems to be off by your system time!');
       download_runner.economy_switch = false;
       download_runner.timer.cancel();
       download_runner.timer = null;
@@ -829,13 +828,13 @@ function fixReservedCharacters(title) {
   title = title.replace(/\\/g, "\uFF3C");
   title = title.replace(/\?/g, "\uFF1F");
   title = title.replace(/\%/g, "\uFF05");
-  title = title.replace(/\*/g, '＊');
-  title = title.replace(/\:/g, '：');
-  title = title.replace(/\|/g, '｜');
-  title = title.replace(/\"/g, '”');
-  title = title.replace(/\</g, '＜');
-  title = title.replace(/\>/g, '＞');
-  title = title.replace(/\+/g, '＋');
+  title = title.replace(/\*/g, "\uFF0A");
+  title = title.replace(/\:/g, "\uFF1A");
+  title = title.replace(/\|/g, "\uFF5C");
+  title = title.replace(/\"/g, "\uFF02");
+  title = title.replace(/\</g, "\uFF1C");
+  title = title.replace(/\>/g, "\uFF1E");
+  title = title.replace(/\+/g, "\uFF0B");
   /* Windows FAT specified... */
   //title = title.replace(/\[/g, '〔');
   //title = title.replace(/\]/g, '〕');
