@@ -135,10 +135,16 @@ function start()
 		download_link.title = NM_getString('download');
 		download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
+		var h1 = null;
 		/* Fetching Nico Nico's video title */
-		var h1 = document.getElementsByTagName('h1')[0];
+		if(window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/watch\//)) {
+		  /* Taiwan (new) has another <h1> */
+		  h1 = document.getElementsByTagName('h1')[1];
+		} else {
+		  h1 = document.getElementsByTagName('h1')[0];
+		}
 		/* inject the video download link */
-		if (h1.hasChildNodes())
+		if (h1 && h1.hasChildNodes())
 		{
 			h1.appendChild(download_link);
 		}
@@ -388,10 +394,16 @@ document.addEventListener('DOMAttrModified', function(event)
 }
 function pushLinks(mainpage)
 {
+	var videos = null;
 	/* Fetching the video links */
 	if (mainpage == true)
 	{
 		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
+	}
+	/* Taiwan version ranking doesn't follow the original css rule */
+	else if (window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/ranking\//)) 
+	{
+		videos = $$('.//a [starts-with(@href,"http://tw.nicovideo.jp/watch/")]');
 	}
 	else
 	{
