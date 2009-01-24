@@ -10,7 +10,7 @@ http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 Some part of the extension is not done by Littlebtc, below is a list of them with their licenses:
 
-    * Logo and Icon designed by FeAm? in ptt.cc (CC-by-sa-3.0)
+    * Logo and Icon designed by FeAm in ptt.cc (CC-by-sa-3.0)
     * Source code from Greasemonkey (MIT License)
     * Greasemonkey compiler by Anthony Lieuallen (GPLv2)
     * IWinProcess component by dafi (GPLv2)
@@ -21,6 +21,7 @@ Some part of the extension is not done by Littlebtc, below is a list of them wit
 
 Check http://code.google.com/p/nicofox/wiki/License for details.
 
+-------------------------------------------------------------------------------------------------
 GNU GENERAL PUBLIC LICENSE
 
 Version 2, June 1991
