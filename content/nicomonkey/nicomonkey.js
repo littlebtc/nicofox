@@ -318,9 +318,9 @@ function addCommentHelper()
 	'</span>'+
 	'<textarea rows="1" value="" onchange="$(\'flvplayer\').SetVariable(\'inputArea.ChatInput1.text\', this.value);" onkeyup="this.onchange();"></textarea>';
 
-
-	watch_footer = document.getElementById('WATCHFOOTER');
-	watch_footer.insertBefore(comment_helper, watch_footer.firstChild);
+	/* Inserted in WATCHFOOTER is the right way, but broken in Taiwan (new); So I do a bad workaround. */
+	var flvplayer_container = document.getElementById('flvplayer_container')
+	flvplayer_container.parentNode.insertBefore(comment_helper ,flvplayer_container.nextSibling);
 
 	helper_links = comment_helper.getElementsByTagName('a')
 	for (i = 0; i < helper_links.length; i++)	
