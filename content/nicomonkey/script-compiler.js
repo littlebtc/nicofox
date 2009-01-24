@@ -87,7 +87,7 @@ injectScript: function(script, url, unsafeContentWin) {
   );
   //unsupported
   sandbox.GM_registerMenuCommand=function(){};
-  sandbox.GM_log=function(str){Components.utils.reportError(str)};
+  sandbox.GM_log=function(){};
   sandbox.GM_getResourceURL=function(){};
   sandbox.GM_getResourceText=function(){};
   
