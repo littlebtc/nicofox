@@ -11,7 +11,11 @@ list-style-image: url("chrome://nicofox/skin/stop.png");
 }
 #smilefox-toolbar-download
 {
-list-style-image: url("chrome://nicofox/skin/film_go.png");
+list-style-image: url("chrome://nicofox/skin/film_save.png");
+}
+#smilefox-toolbar-open
+{
+list-style-image: url("chrome://nicofox/skin/folder_page_white.png");
 }
 #smilefox-toolbar-option
 {

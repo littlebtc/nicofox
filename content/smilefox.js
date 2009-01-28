@@ -200,7 +200,6 @@ nicofox_ui.manager = {
   
   },
   dragDrop: function () {
-
     var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
                        .getService(Ci.nsIDragService);
     var drag_session = drag_service.getCurrentSession();
@@ -395,9 +394,32 @@ nicofox_ui.manager = {
     }
     this.updateTree();
   },
+  openFileToPlayer: function() {
+    var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    file_picker.init(window, 'Choose Video File to Play', null);
+    file_picker.appendFilter('Supported Type', '*.flv; *.mp4');
+    if (file_picker.show() == Ci.nsIFilePicker.returnOK)
+    {
+      /* XXX: Find a better way to make a function */
+      var file = file_picker.file;
+      var video_uri = Cc["@mozilla.org/network/io-service;1"]
+                     .getService(Ci.nsIIOService).newFileURI(file);
+      var video_uri_spec = video_uri.spec;
+      var comment_uri_spec = '';
 
+      var comment_file_path = file.path.replace(/(flv|mp4)$/, 'xml');
+      var comment_file = Cc["@mozilla.org/file/local;1"]
+                        .createInstance(Ci.nsILocalFile);
+      comment_file.initWithPath(comment_file_path);
+      if (comment_file.exists()) {
+        var comment_uri = Cc["@mozilla.org/network/io-service;1"]
+                    .getService(Ci.nsIIOService).newFileURI(comment_file);
+        comment_uri_spec = comment_uri.spec; 
+      }    
+    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: file.leafName});  
+    }
+  }	
 };
-
 
 
 nicofox_ui.manager.popup_command = 

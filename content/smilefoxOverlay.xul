@@ -24,13 +24,31 @@
       <toolbarbutton id="smilefox-toolbar-option" label="&options.label;" oncommand="nicofox_ui.manager.optionsWindow();" disabled="false" />
       <spacer flex="1" />
       <textbox value="" emptytext="&search.label;" width="300" id="smilefox-search" type="timed" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
+      <toolbarbutton id="smilefox-toolbar-open" oncommand="nicofox_ui.manager.openFileToPlayer();" disabled="false"  class="toolbarbutton-iconic" />
       <toolbarbutton id="smilefox-toolbar-close" oncommand="nicofox_ui.manager.toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
 
     </toolbar>
     
   </toolbox>
-
-<tree id="smilefox-tree" flex="1" context="smilefox-popup">
+<hbox flex="1">
+<tree id="dir-tree" flex="1" seltype="single" hidecolumnpicker="true">
+  <treecols>
+    <treecol flex="1" primary="true" hideheader="true" />
+  </treecols>
+  <treechildren>
+   <treeitem>  
+      <treerow>  
+        <treecell label="Downloads" src="chrome://nicofox/skin/logo_16.png"/>
+      </treerow>  
+    </treeitem>  
+    <treeitem>  
+      <treerow>  
+        <treecell label="Stored Folder" src="chrome://nicofox/skin/folder_go.png"/>
+      </treerow>  
+    </treeitem>
+    </treechildren>
+</tree>
+<tree id="smilefox-tree" flex="8" context="smilefox-popup">
   <treecols>
     <treecol label="&tree.videoTitle;" id="tree-title" flex="5"/>
     <splitter class="tree-splitter"/>
@@ -48,7 +66,7 @@
   </treecols>
   <treechildren id="smilefox-treechildren"/>
 </tree>
-
+</hbox>
   <menupopup id="smilefox-popup">
    <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="nicofox_ui.manager.popup_command.cancel()" />
    <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="nicofox_ui.manager.popup_command.retry()" style="font-weight: bold;"  />
