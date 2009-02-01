@@ -17,15 +17,21 @@
     <em:iconURL>chrome://nicofox/skin/logo.png</em:iconURL>
     <em:targetApplication>
       <Description>
-        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox / Iceweasel ... -->
         <em:minVersion>3.0</em:minVersion>
         <em:maxVersion>3.1b3pre</em:maxVersion>
       </Description>
       <Description>
-        <em:id>songbird@songbirdnest.com</em:id>
+        <em:id>songbird@songbirdnest.com</em:id> <!-- Songbird -->
         <em:minVersion>1.0</em:minVersion>
         <em:maxVersion>1.1.0a</em:maxVersion>
       </Description>
+      <Description>
+        <em:id>{a463f10c-3994-11da-9945-000d60ca027b}</em:id> <!-- Flock -->
+        <em:minVersion>2.0</em:minVersion>
+        <em:maxVersion>2.0.*</em:maxVersion>
+      </Description>
+
     </em:targetApplication>
     <em:localized>
       <Description>
