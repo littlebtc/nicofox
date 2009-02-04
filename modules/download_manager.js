@@ -748,6 +748,17 @@ var download_runner =
     if (download_count == 0) {
       if (!this.is_stopped && (this.download_triggered - this.download_canceled) > 0) {
         allDone();
+      } else if (download_runner.economy_switch) {
+        /* Economy is on, so something is not downloaded */
+        if (prefs.getBoolPref('economy_notice')) {
+          var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                        .getService(Ci.nsIPromptService);
+          var check = {value: false};
+          prompts.alertCheck(null, nicofox.strings.getString('errorTitle'), 'On Nico Nico Douga, the economy mode (low quality mode) is on, so some downloads will be preserved. It will be scheduled now and downloaded after the mode is off.', 'Do not notify me again' , check);
+	  if (check.value) {
+            prefs.setBoolPref('economy_notice', false);
+	  }
+	}
       }
       this.download_triggered = 0;
       this.download_canceled = 0;

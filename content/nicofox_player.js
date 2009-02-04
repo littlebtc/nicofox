@@ -23,8 +23,8 @@ function load()
   browser.setAttribute("id", "sample-browser");
   browser.setAttribute("name", "sample-browser");
   browser.setAttribute("type", "content-primary");
-  browser.setAttribute("width", "520");
-  browser.setAttribute("height", "500");
+  browser.setAttribute("width", "512");
+  browser.setAttribute("height", "454");
   document.documentElement.appendChild(browser);
   // set restrictions as needed
   browser.webNavigation.allowAuth = true;
@@ -42,5 +42,6 @@ obj.setAttribute('video_file', window.arguments[0].video);
 obj.setAttribute('comment_file', window.arguments[0].comment);
 }, false, true);
 
-
 }
+
+

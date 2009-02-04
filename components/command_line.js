@@ -54,7 +54,7 @@ function openPlayer(aFile) {
      comment_uri_spec = comment_uri.spec; 
   }    
   
-  openDialog(null, 'chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: aFile.leafName});  
+  openDialog(null, 'chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=454, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: aFile.leafName});  
 }	 
  
 function openDialog(parentWindow, url, windowName, features)

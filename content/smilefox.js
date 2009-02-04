@@ -416,7 +416,7 @@ nicofox_ui.manager = {
                     .getService(Ci.nsIIOService).newFileURI(comment_file);
         comment_uri_spec = comment_uri.spec; 
       }    
-    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: file.leafName});  
+    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=454, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: file.leafName});  
     }
   }	
 };
@@ -458,7 +458,7 @@ nicofox_ui.manager.popup_command =
       comment_uri_spec = comment_uri.spec; 
     }
       
-    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=520,height=470, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
+    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=454, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
   }, 
   openExternal: function() {
     if (this.recent_row < 0) { return; }
@@ -600,6 +600,7 @@ nicofox_ui.manager.popup_command =
     
     if(nicofox_ui.manager.rows[this.recent_row].status == 0) {
       /* Waiting */
+      document.getElementById('popup-missing').style.display = 'none';
       document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'none';
       document.getElementById('popup-open').style.display = 'none';
@@ -608,21 +609,38 @@ nicofox_ui.manager.popup_command =
       document.getElementById('popup-remove').style.display = 'block';
     } else if(nicofox_ui.manager.rows[this.recent_row].status == 1) {
       /* Completed */
+      document.getElementById('popup-missing').style.display = 'none';
       document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'none';
-      document.getElementById('popup-open').style.display = 'block';
-      /* NicoFox player do not support SWF currently */
-      if (nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { document.getElementById('popup-open').style.display ='none';
-        //document.getElementById('popup-open-swf-player').style.display ='block';
+      
+      var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+      file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
+
+      if (file.exists()) {
+        /* If we cannot find the file, do not show the following things */
+        document.getElementById('popup-open').style.display = 'block';
+        /* NicoFox player do not support SWF currently */
+        if (nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { document.getElementById('popup-open').style.display ='none';
+          //document.getElementById('popup-open-swf-player').style.display ='block';
+        } else {
+          document.getElementById('popup-open').style.display ='block';
+          //document.getElementById('popup-open-swf-player').style.display ='none';
+        }
+        document.getElementById('popup-open-external').style.display = 'block';
+        document.getElementById('popup-open-folder').style.display = 'block';
       } else {
-        document.getElementById('popup-open').style.display ='block';
+        document.getElementById('popup-missing').style.display = 'block';
+        document.getElementById('popup-retry').style.display = 'block';
+        /* Give some way to retry download! */
+        document.getElementById('popup-open').style.display = 'none';
         //document.getElementById('popup-open-swf-player').style.display ='none';
+        document.getElementById('popup-open-external').style.display = 'none';
+        document.getElementById('popup-open-folder').style.display = 'none';
       }
-      document.getElementById('popup-open-external').style.display = 'block';
-      document.getElementById('popup-open-folder').style.display = 'block';
       document.getElementById('popup-remove').style.display = 'block';
     } else if(nicofox_ui.manager.rows[this.recent_row].status > 4) {
       /* When downloading */
+      document.getElementById('popup-missing').style.display = 'none';
       document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'block';
       document.getElementById('popup-open').style.display = 'none';
@@ -632,6 +650,7 @@ nicofox_ui.manager.popup_command =
       document.getElementById('popup-remove').style.display = 'none';
     } else {
       /* Failed/canceled */ 
+      document.getElementById('popup-missing').style.display = 'none';
       document.getElementById('popup-retry').style.display = 'block';
       document.getElementById('popup-cancel').style.display = 'none';
       document.getElementById('popup-open').style.display = 'none';

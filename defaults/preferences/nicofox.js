@@ -6,6 +6,7 @@ pref("extensions.nicofox.download_comment", true);
 pref("extensions.nicofox.download_thumbnail", false);
 pref("extensions.nicofox.boon_comment", true);
 pref("extensions.nicofox.nicowa_blocker", false);
+
 // New in 0.3
 pref("extensions.nicofox.first_run_0.3", true);
 pref("extensions.nicofox.bar_autoopen", false);
@@ -21,6 +22,9 @@ pref("extensions.nicofox.external_video_player", false);
 pref("extensions.nicofox.external_video_player_path", '');
 pref("extensions.nicofox.external_swf_player", false);
 pref("extensions.nicofox.external_swf_player_path", '');
+
+// New in 0.3.3
+pref("extensions.nicofox.economy_notice", true);
 
 // NicoMonkey
 pref("extensions.nicofox.nicomonkey.enable", true);

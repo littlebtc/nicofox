@@ -68,6 +68,7 @@
 </tree>
 </hbox>
   <menupopup id="smilefox-popup">
+   <menuitem label="File missing!" accesskey="" id="popup-missing" disabled="true" />
    <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="nicofox_ui.manager.popup_command.cancel()" />
    <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="nicofox_ui.manager.popup_command.retry()" style="font-weight: bold;"  />
    <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="nicofox_ui.manager.popup_command.open()" style="font-weight: bold;" />
