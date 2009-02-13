@@ -17,7 +17,7 @@ if ("createEvent" in document) {
   element.dispatchEvent(evt);
   var video_file = element.getAttribute('video_file');
   var comment_file = element.getAttribute('comment_file');
-  swfobject.embedSWF('breezevideo_player.swf', "myContent", "512", "424", "9.0.0", "expressInstall.swf", {
+  swfobject.embedSWF('breezevideo_player.swf', "myContent", window.innerWidth, window.innerHeight, "9.0.0", "expressInstall.swf", {
     videoFile: encodeURI(video_file),
     /* Without encodeURI works in IE but not Firefox */
     commentFile: encodeURI(comment_file),
