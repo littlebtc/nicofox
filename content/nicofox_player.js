@@ -23,8 +23,6 @@ function load()
   browser.setAttribute("id", "sample-browser");
   browser.setAttribute("name", "sample-browser");
   browser.setAttribute("type", "content-primary");
-  browser.setAttribute("width", "512");
-  browser.setAttribute("height", "424");
   browser.setAttribute("flex", "1");
   document.getElementById("player-box").appendChild(browser);
   // set restrictions as needed
