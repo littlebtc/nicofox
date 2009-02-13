@@ -24,8 +24,9 @@ function load()
   browser.setAttribute("name", "sample-browser");
   browser.setAttribute("type", "content-primary");
   browser.setAttribute("width", "512");
-  browser.setAttribute("height", "454");
-  document.documentElement.appendChild(browser);
+  browser.setAttribute("height", "424");
+  browser.setAttribute("flex", "1");
+  document.getElementById("player-box").appendChild(browser);
   // set restrictions as needed
   browser.webNavigation.allowAuth = true;
   browser.webNavigation.allowImages = true;
@@ -43,5 +44,4 @@ obj.setAttribute('comment_file', window.arguments[0].comment);
 }, false, true);
 
 }
-
 
