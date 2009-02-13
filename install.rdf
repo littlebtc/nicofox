@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
- xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+ xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+ xmlns:songbird="http://www.songbirdnest.com/2007/addon-metadata-rdf#"
+>
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
@@ -76,4 +78,20 @@
       </Description>
      </em:localized>
   </Description>
+  <songbird:displayPanes>
+    <Description>
+        <songbird:displayPane>
+            <Description>
+                <songbird:contentUrl>chrome://nicofox/content/smilefoxOverlay.xul</songbird:contentUrl>
+                <songbird:contentTitle>NicoFox</songbird:contentTitle>
+                <songbird:contentIcon>chrome://nicofox/skin/logo_16.png</songbird:contentIcon>
+                <songbird:defaultWidth>350</songbird:defaultWidth>
+                <songbird:defaultHeight>400</songbird:defaultHeight>
+                <songbird:suggestedContentGroups>contentpane</songbird:suggestedContentGroups>
+                <songbird:showOnInstall>true</songbird:showOnInstall>
+            </Description>
+        </songbird:displayPane>
+    </Description>
+  </songbird:displayPanes>
+
 </RDF>
