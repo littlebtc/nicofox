@@ -4,7 +4,7 @@
 <!DOCTYPE window SYSTEM "chrome://nicofox/locale/smilefox.dtd">
 <window id="nicofox-player" title="NicoFox Player" 
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml" onload="load();" onresize="resize();" style="margin: 0; padding:0;">
+        xmlns:html="http://www.w3.org/1999/xhtml" onload="load();" style="margin: 0; padding:0;">
 <vbox id="player-box" flex="1"></vbox>
 <script type="application/x-javascript" src="chrome://nicofox/content/nicofox_player.js" />
 </window>	
