@@ -102,14 +102,12 @@ nicofox.download_listener =
 /* A function to call all of the listeners */
 function triggerDownloadListeners(listener_event, id, content)
 {
-var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-                .getService(Ci.nsIPromptService);
   var i;
   if ((typeof listener_event) != 'string') {return false;}
   for (i = 0; i < download_listeners.length; i++)
   { 
     if ((typeof download_listeners[i][listener_event]) == 'function')
-    { download_listeners[i][listener_event].call(null, id, content); }
+    { download_listeners[i][listener_event].call(download_listeners[i], id, content); }
   }
 }
 
@@ -325,6 +323,11 @@ var smilefox_sqlite = {
     return rows[0];
   },
   add: function (Video, url) {
+    /* Change parasitestage url
+       XXX: Dirty */
+//    if (url.indexOf('http://www.parasitestage.net/') == 0) {
+//       url = url.replace(/^http:\/\/www\./, 'http://');
+//    }
     var statement = this.db_connect.createStatement("INSERT INTO smilefox (url, video_id, comment_id, comment_type, video_title, add_time, status, in_private) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)");
     statement.bindUTF8StringParameter(0, url);
     statement.bindUTF8StringParameter(1, Video.id);
@@ -478,8 +481,8 @@ var smilefox_sqlite = {
 nicofox.download_manager = 
 {
    getDownloads: function() {
-  rows = smilefox_sqlite.select();
-  return rows;
+     rows = smilefox_sqlite.select();
+     return rows.concat();
    },
 
    searchDownloads: function(keywords) {
@@ -538,7 +541,8 @@ var download_runner =
   download_triggered: 0,
   download_canceled: 0,
   timer: null,
-  economy_switch: false,
+  economy_invoked: false, /* For economy mode notification */
+  economy_switch: false, /* For cheking current mode */
   query: new Array(),
   initialize: function()
   {
@@ -565,7 +569,7 @@ var download_runner =
     { this.initialize(); }
     if (unloading || this.is_stopped)
     { return; }
-    var economy_test = false;
+    download_runner.economy_invoked = false;
     /* Re-select so we can purge our content */
     downloads = smilefox_sqlite.select();
     i = downloads.length - 1;
@@ -614,6 +618,7 @@ var download_runner =
             triggerDownloadListeners('update', id, info);
 	    download_runner.download_canceled++;  
 	    download_runner.economy_switch = true;
+	    download_runner.economy_invoked = true;
 
             /* Run the economy timer */
 	    if (!download_runner.timer) {
@@ -717,14 +722,27 @@ var download_runner =
             break;
           }
         }
-        this.query[k].downloader = new nicofox.download.helper.nico();
+
+	if (downloads[i].url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\//)) {
+          /* It is nicovideo */
+          this.query[k].downloader = new nicofox.download.helper.nico();
+	  if (downloads[i].video_economy) {
+            this.query[k].downloader.has_economy = true;
+	  } else {
+	    this.query[k].downloader.has_economy = false;
+	  }
+//        } else if (downloads[i].url.match(/^http:\/\/parasitestage\.net\//)) {
+//          this.query[k].downloader = new nicofox.download.helper.parasite();
+        }
+
+
         this.query[k].downloader.callback = nicofox.hitch(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
         /* FIXME: Check the filename scheme! */
         var file_title = prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
         file_title = file_title.replace(/\%TITLE\%/, fixReservedCharacters(downloads[i].video_title));
         file_title = file_title.replace(/\%ID\%/, fixReservedCharacters(downloads[i].video_id));
                     /* Add comment filename */
-        if (downloads[i].comment_type != 'www')
+        if (downloads[i].comment_type != 'www' && downloads[i].comment_type)
         {
           file_title = file_title.replace(/\%COMMENT\%/, fixReservedCharacters('['+downloads[i].comment_type+']'));
         }
@@ -733,11 +751,6 @@ var download_runner =
           file_title = file_title.replace(/\%COMMENT\%/, '');
         }
 
-	if (downloads[i].video_economy) {
-	  this.query[k].downloader.has_economy = true;
-	} else {
-	  this.query[k].downloader.has_economy = false;
-	}
         this.query[k].downloader.file_title = file_title;
         this.query[k].downloader.comment_type = downloads[i].comment_type;
         this.query[k].downloader.init(downloads[i].comment_id);
@@ -748,7 +761,8 @@ var download_runner =
     if (download_count == 0) {
       if (!this.is_stopped && (this.download_triggered - this.download_canceled) > 0) {
         allDone();
-      } else if (download_runner.economy_switch) {
+      }
+      if (download_runner.economy_invoked) {
         /* Economy is on, so something is not downloaded */
         if (prefs.getBoolPref('economy_notice')) {
           var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
