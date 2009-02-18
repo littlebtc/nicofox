@@ -1,56 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="goProcessing();" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+<mx:Application
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:breezevideo="idv.littlebtc.*" 
+	creationComplete="goProcessing();" 
+	paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" 
+	layout="absolute" verticalScrollPolicy="off" horizontalScrollPolicy="off"
+	>
+    <mx:XMLList id="comment_numbers">
+        <node value="-1" label="All" type="radio" groupName="cn"/>        
+        <node value="100" label="100" type="radio" groupName="cn"/>
+        <node value="250" label="250" type="radio" groupName="cn"/>
+        <node value="500" label="500" type="radio" groupName="cn"/>
+        <node value="1000" label="1000" type="radio" groupName="cn"/>        
+    </mx:XMLList>
 	<mx:Script>
 		<![CDATA[
 			import mx.events.*;
 			import flash.display.StageDisplayState;
+			import idv.littlebtc.*;
+			import flash.ui.*;
+			
+			public var hide_timeout_activated:Boolean;
+			public var mouse_timeout_activated:Boolean;
+			public var hide_timeout:Number;
+			public var mouse_timeout:Number;
+			[Embed(source="fullscreen.png")]
+			public var screen_img_full:Class;
+			[Embed(source="no_fullscreen.png")]
+			public var screen_img_win:Class;
+			
+			
+			[Embed(source="comment.png")]
+			public var comment_img_yes:Class;
+			[Embed(source="no_comment.png")]
+			public var comment_img_no:Class;
+			
+			[Embed(source="repeat.png")]
+			public var repeat_img_yes:Class;
+			[Embed(source="no_repeat.png")]
+			public var repeat_img_no:Class;
+
+			[Embed(source="volume.png")]
 			[Bindable]
+			public var volume_img:Class;
+			
+			
+			[Embed(source="fullscreen.png")]
+			[Bindable]
+			public var screen_img:Class;			
+			
+			[Embed(source="comment.png")]
+			[Bindable]
+			public var comment_img:Class;
+			[Embed(source="no_repeat.png")]
+			[Bindable]
+			public var repeat_img:Class;
+			
+			[Bindable]
+						
 			public var video_file:String;
-			public var comment_file:String;
+			public var comment_file:String;			
 			private var breeze_comment:Object;
-			private function goResize(event:ResizeEvent):void
+		
+
+			private function goResize(e:ResizeEvent):void
 			{
+
+				slider.width = 	Application.application.width - 400;
+				var scale:Number;
+				container2.y = Application.application.height - container2.height;				
 				if(Application.application.stage.displayState != StageDisplayState.FULL_SCREEN)
 				{
 					
-				container.scaleX = 1;
-				container.scaleY = 1;
-				black_container.width = 512;
-				black_container.height = 384;
-				container.x = 0;
-				return;				
-				} 
+					screen_img = screen_img_full;
+					/* Change from fullscreen to normal */
+					if (hide_timeout_activated) {
+						clearTimeout(hide_timeout);
+						hide_timeout_activated = false;
+						container2.visible = true;
+					}				
+					if (mouse_timeout_activated) {					
+						clearTimeout(mouse_timeout);
+						mouse_timeout_activated = false;
+					}
+					Mouse.show();
+					big_container.removeEventListener(MouseEvent.MOUSE_MOVE, checkMouse);
+					container2.removeEventListener(MouseEvent.MOUSE_OVER, checkMouse);
+										
+					
+					black_container.width = 512;
+					black_container.height = 384;
+					// Let the Navigation back!
+					container2.visible = true;
+					scale = Math.min(((Application.application.height - container2.height) / 384), (Application.application.width / 512));
+					black_container.height = Application.application.height - container2.height;
+		
+				} else {
+					screen_img = screen_img_win;
+					scale = Math.min((Application.application.height / 384), (Application.application.width / 512));
+					black_container.height = Application.application.height;
+
+					big_container.y = 0;
 				
-				var scale:Number = (Application.application.height - 75) / 384;
+				}
+				
+				comment_container.scaleX = scale;
+				comment_container.scaleY = scale;
 				black_container.width = Application.application.width;
-				container.scaleX = scale;
-				container.scaleY = scale;
+				
+				
+				bvideo.width = 512 * scale;
+				bvideo.height = 384 * scale;
+				
 				black_container.x = 0;
 				black_container.y = 0;
-				black_container.height = Application.application.height - 75;
-				//container.x = (black_container.width-container.width) /2 /scale;
+											
 				
 			}				
 			private function goFullscreen(e:Event):void
 			{
-				Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+				if (Application.application.stage.displayState == StageDisplayState.FULL_SCREEN)
+				{
+					Application.application.stage.displayState = StageDisplayState.NORMAL;
+					
+				} else {
+					Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+					big_container.addEventListener(MouseEvent.MOUSE_MOVE, checkMouse);
+					container2.addEventListener(MouseEvent.MOUSE_OVER, checkMouse);
+					
+				
+					hide_timeout = setTimeout(hideNav, 1500);
+					hide_timeout_activated = true;
+					mouse_timeout = setTimeout(hideMouse, 1500);
+					mouse_timeout_activated = true;	
+				}
 			}
+			
+			private function checkMouse(e:MouseEvent):void 
+			{	
+				/* Pointer hide */			
+				Mouse.show();
+				if (!mouse_timeout_activated) {
+					mouse_timeout = setTimeout(hideMouse, 1500);
+					mouse_timeout_activated = true;						
+				} else {
+					clearTimeout(mouse_timeout);
+					mouse_timeout_activated = false;	
+				}				
+				/* Bar hide */
+				if (e.stageY >= Application.application.height - 40) {
+					if (hide_timeout_activated) {
+						clearTimeout(hide_timeout);
+						hide_timeout_activated = false;
+					}
+					container2.visible = true;				
+					// Reset the navigation timeout
+				} else {
+					if (!hide_timeout_activated) {
+						hide_timeout = setTimeout(hideNav, 1500);
+						hide_timeout_activated = true;						
+					}
+				}
+			}
+			private function hideNav():void
+			{
+				if (container2.visible == true) {
+					container2.visible = false;
+					Mouse.hide();					
+				}		
+
+			}
+			private function hideMouse():void
+			{
+					Mouse.hide();
+					clearTimeout(mouse_timeout);
+					mouse_timeout_activated = false;	
+			}
+			
+			
 			private function goProcessing():void
 			{
+				container2.y = Application.application.height - container2.height;
+				slider.width = 	Application.application.width - 400;
+				var scale:Number;
+				
+				screen_img = screen_img_full;
+					
+				black_container.width = 512;
+				black_container.height = 384;
+				
+				scale = Math.min(((Application.application.height - container2.height) / 384), (Application.application.width / 512));
+				black_container.height = Application.application.height - container2.height;										
+				black_container.width = Application.application.width;
+				
+				comment_container.scaleX = scale;
+				comment_container.scaleY = scale;
+				black_container.width = Application.application.width;
+				
+				
+				bvideo.width = 512 * scale;
+				bvideo.height = 384 * scale;
+				
+				black_container.x = 0;
+				black_container.y = 0;
 				
 				video_file = Application.application.parameters.videoFile;
 				comment_file = Application.application.parameters.commentFile;
-				breeze_comment = new BreezeCommentReader(Application.application);
+				
+				breeze_comment = new BreezeCommentReader(Application.application);				
 				breeze_comment.loadComment(comment_file);
 				
-
-				
+								
 				bvideo.addEventListener(VideoEvent.PLAYHEAD_UPDATE, updateTime);
 				bvideo.addEventListener(VideoEvent.REWIND, videoReplay);
+				bvideo.addEventListener(VideoEvent.STATE_CHANGE, updatePlaybackStatus);				
+				
 				slider.addEventListener(SliderEvent.CHANGE, jumpTime);
 				//doggy.addEventListener(MouseEvent.CLICK, testScale);
 				pause.addEventListener(MouseEvent.CLICK, pauseVideo);
 				comment_switch.addEventListener(MouseEvent.CLICK, switchComment);
+				comment_switch.addEventListener(MenuEvent.ITEM_CLICK, updateComment);
 				repeat_switch.addEventListener(MouseEvent.CLICK, switchRepeat);
 				fullscreen.addEventListener(MouseEvent.CLICK, goFullscreen);
 				
@@ -68,20 +237,23 @@
 			private function switchComment(e:MouseEvent):void
 			{
 				comment_container.visible = !comment_container.visible;
-				if (comment_container.visible) comment_switch.label = '* コメ';
-				else comment_switch.label = 'コメ';
-
+				if (comment_container.visible) comment_img = comment_img_yes; 
+				else {
+					comment_img = comment_img_no;					
+				}
+				
 			}
 			private function switchRepeat(e:MouseEvent):void
 			{
 				bvideo.autoRewind = !bvideo.autoRewind;
-				if (bvideo.autoRewind) repeat_switch.label = '* Re';
-				else repeat_switch.label = 'Re';
+				if (bvideo.autoRewind) repeat_img = repeat_img_yes;
+				else repeat_img = repeat_img_no;
 			}
 
 			private function videoReplay( event:VideoEvent ):void
 			{
 				event.target.play();
+				updatePlaybackStatus(null);
 			}			
 
 			private function pauseVideo(e:MouseEvent):void
@@ -89,23 +261,34 @@
 				if (bvideo.playing)
 				{			
 					bvideo.pause();
-					pause.label = ">";
 				}
 				else
 				{
 					bvideo.play();					
+				}
+				updatePlaybackStatus(null);
+			}	
+			private function updatePlaybackStatus(e:VideoEvent):void
+			{
+				if (bvideo.playing)
+				{			
 					pause.label = "||";
 				}
-			}	
-			private function updateComment(e:Event):void
-			{
+				else
+				{					
+					pause.label = ">";
+				}
 				
-				var num:int = e.currentTarget.selectedValue;
-				comment_container.visible=false;
+			}
+			private function updateComment(e:MenuEvent):void
+			{				
+				var num:int = e.item.@value;
+				
 				breeze_comment.cleanComment();
 				breeze_comment.loadComment(comment_file, num);
-				comment_container.visible=true;
+								
 			}
+			
 							
 			private function updateTime(e:VideoEvent):void
 			{
@@ -118,6 +301,7 @@
 				 # When comments are too much to display, display randomly
 				   (but we shouldn't do this because there will be some "comment ASCII art") 
 				 */							
+				
 				var vpos:Number = Math.floor(e.playheadTime * 100);
 				var Mins:Number = Math.floor(vpos / 100);						
 				var Hours:Number = Math.floor(Mins / 60);
@@ -139,8 +323,11 @@
 				if (Mins < 10) Mins_str = '0'+ Mins;
 				else Mins_str = ''+ Mins;
 				
-				total_time.text = '/ '+Hours_str+':'+Mins_str;  
-				breeze_comment.prepareComment(vpos);
+				time.text += ' / '+Hours_str+':'+Mins_str;
+				
+				if (breeze_comment.hasComment) {  
+					breeze_comment.prepareComment(vpos);
+				}
 			}
 			
 			private function jumpTime(e:SliderEvent):void
@@ -150,49 +337,33 @@
 			
 		]]>
 	</mx:Script>
-	    
-    <mx:VBox>
-    	<!-- We set playbackUpdateInterval as 10, because the "vpos" of comment XML is in 10 milliseconds -->   
-		<mx:Canvas id="black_container" width="100%" height="384" backgroundColor="black">
-        <mx:Canvas id="container" width="512" height="384" horizontalCenter="0">
-		
-		<mx:VideoDisplay width="512" height="384" volume="{volslider.value}" source="{video_file}" autoPlay="true" id="bvideo" playheadUpdateInterval="30" x="0" y="0" autoRewind="false"/>
-		
-        <mx:Canvas id="comment_container" x="0" y="0" width="512" height="384"  visible="true" verticalScrollPolicy="off" horizontalScrollPolicy="off">
-        </mx:Canvas>
-        </mx:Canvas>
-        </mx:Canvas>
-        <mx:VBox id="container2" height="50" width="100%">
-        <mx:HBox>        	
-        <mx:Button id="pause" label="||"/>
-		<mx:HSlider id="slider" tickInterval="2" value="{bvideo.playheadTime}"  maximum="{bvideo.totalTime}" />
-		<mx:Text id="time" />
-		<mx:Text id="total_time" />
-		<mx:Button id="fullscreen" label="[↗]"/>
-		<mx:Button id="comment_switch" label="* コメ"/>
-		<mx:Button id="repeat_switch" label="Re"/>
-		</mx:HBox>
-		<mx:HBox> 
-		<mx:RadioButtonGroup id="comment_number" itemClick="updateComment(event);" selectedValue="0"/>
-        <mx:RadioButton groupName="comment_number" id="comment_100" value="100" 
-            label="100" width="50" />
-        <mx:RadioButton groupName="comment_number" id="comment_250" value="250" 
-            label="250" width="50" />
-        <mx:RadioButton groupName="comment_number" id="comment_500" value="500" 
-            label="500" width="50" />
-        <mx:RadioButton groupName="comment_number" id="comment_1000" value="1000" 
-            label="1000" width="60" />
-        <mx:RadioButton groupName="comment_number" id="comment_all" value="0" 
-            label="All" width="50" />
-		<mx:Label text="Vol" />
-		<mx:HSlider id="volslider" tickInterval="0.05" value="0.75" width="100"  maximum="1"/>
-       
-   		<!--<mx:TextArea id="textArea" width="300" height="50" text="" />-->
-		</mx:HBox>	
-		</mx:VBox>
 
+	<!-- We set playbackUpdateInterval as 20, because the "vpos" of comment XML is in 10 milliseconds -->
+	
+    <mx:VBox id="big_container" width="100%" x="0" y="0" visible="true">    	   
+		<mx:Canvas id="black_container" width="100%" height="384" backgroundColor="black">	
+	    <breezevideo:BreezeVideo width="512" height="384" volume="{volslider.value}" source="{video_file}" autoPlay="true" id="bvideo" playheadUpdateInterval="30" x="0" y="0" autoRewind="false"  horizontalCenter="0" verticalCenter="0" />
+        <mx:Canvas id="comment_container" x="0" y="0" width="512" height="384"  visible="true" verticalScrollPolicy="off" horizontalScrollPolicy="off"  horizontalCenter="0" verticalCenter="0">
+                
+        </mx:Canvas>
+        </mx:Canvas>
+                
     </mx:VBox>
-
-
+	    
+    
+    <mx:VBox id="container2" height="40" width="100%" backgroundAlpha="0.5" backgroundColor="#EEEEEE" paddingTop="10" paddingLeft="10" paddingRight="10">        
+        <mx:HBox horizontalGap="3">        	
+        <mx:Button id="pause" label="||"/>
+		<mx:HSlider id="slider" tickInterval="5" value="{bvideo.playheadTime}"  maximum="{bvideo.totalTime}" />
+		<mx:Text id="time" />
+		
+		<mx:Button id="repeat_switch" icon="{repeat_img}" width="25"/>							
+		<mx:PopUpMenuButton labelField="@label" id="comment_switch" icon="{comment_img}" dataProvider="{comment_numbers}"/>		
+		<mx:Image source="{volume_img}" width="20" />
+		<mx:HSlider id="volslider" showTrackHighlight="true" tickInterval="0.1" value="0.75" width="55"  maximum="1"/>
+		<mx:Button id="fullscreen" icon="{screen_img}" width="25"/>
+		
+		</mx:HBox>
+		</mx:VBox>
  
 </mx:Application>
