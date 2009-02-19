@@ -20,13 +20,17 @@ var Nicowatcher = {
 		if (contentType == Components.interfaces.nsIContentPolicy.TYPE_DOCUMENT)
 		{
 			url = contentLocation.spec;
-			if (url.match(/^http:\/\/(www|tw|de|es).nicovideo.jp\/(watch|mylist)\/[0-9a-zA-Z]+\?smilefox\=get$/))
+			/* XXX: Why not intergrate with nicofox.parser in modules/urlparser.js ? */
+			if (url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/(watch|mylist)\/[0-9a-zA-Z]+\?smilefox\=get$/)
+			//|| url.match(/^http:\/\/tw\.keytalks\.com\/watch\/?\?.*\&smilefox\=get$/)
+			//|| url.match(/^http:\/\/(www\.)?parasitestage\.net\/Page\/MediaView\.aspx\?ID\=[0-9]+\&smilefox\=get$/)
+			)
 			{
 			
 			var winWat = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
 		    .getService(Components.interfaces.nsIWindowWatcher);
 
-			if (winWat.activeWindow && winWat.activeWindow.nicofox) {
+			if (winWat.activeWindow && winWat.activeWindow.nicofox_ui && winWat.activeWindow.nicofox_ui.overlay) {
 			  /* We have no setTimeout(), so... */
 			  var timer_event = { notify: function () {winWat.activeWindow.nicofox_ui.overlay.goDownload(url);} }
 			  var timer = Components.classes["@mozilla.org/timer;1"]
