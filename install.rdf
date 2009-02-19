@@ -4,8 +4,8 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.3.3a</em:version>
-    <em:description>Download videos with its comments from Nico Nico Douga or ParasiteStage, which may change your video watching experience!</em:description>
+    <em:version>0.3.5a</em:version>
+    <em:description>Download videos with its comments from Nico Nico Douga and change your video watching experience!</em:description>
     <em:creator>Littlebtc</em:creator>
     <em:contributor>Logo and Icon designed by FeAm in ptt.cc (CC-by-sa-3.0)</em:contributor>
     <em:contributor>NicoFox contains some source codes by others that are licensed under various licenses.</em:contributor>
@@ -40,7 +40,7 @@
       <Description>
         <em:locale>zh-TW</em:locale>
         <em:name>NicoFox</em:name>
-        <em:description>從NICONICO動畫或ParasiteStage中下載影片和評論，並改變你的NICO觀賞經驗！ </em:description>
+        <em:description>從NICONICO動畫中下載影片和評論，並改變你的NICO觀賞經驗！ </em:description>
         <em:creator>Littlebtc</em:creator>
         <em:contributor>Logo和Icon由ptt.cc的FeAm設計 (CC-by-sa-3.0)</em:contributor>
         <em:contributor>NicoFox包含了許多由他人撰寫且以不同授權方式釋出的原始碼。</em:contributor>
