@@ -223,7 +223,7 @@ function start_inject()
 
 	if (Video.v.match(/[A-Za-z]/))
 	{
-		niconicofarm = '<li><a href="http://nico.xii.jp/comment/?url='+Video.id+'" target="_blank" title="'+NM_getString('toolsNicoNicoFarm')+'"<img src="'+comments_uri+'">'+"\r\n"; // Use Nico Nico Farm (supported pages only)
+		niconicofarm = '<li><a href="http://nico.xii.jp/comment/?url='+Video.id+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsNicoNicoFarm')+'"<img src="'+comments_uri+'">'+"\r\n"; // Use Nico Nico Farm (supported pages only)
 	}
 
 	document.getElementById('fox-dl-this1').addEventListener('click', function(e)
@@ -257,8 +257,9 @@ function start_inject()
                 '<li><a href="http://tw.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoTw')+'"><img src="'+tw_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://es.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoEs')+'"><img src="'+es_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://de.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoDe')+'"><img src="'+de_uri+'" /></a></li>'+"\r\n"+
-                '<li><a href="'+sound_website+'" target="_blank" title="'+NM_getString('toolsSoundConverter')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
-               '<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('toolsNicoChart')+'"><img src="'+chart_uri+'" /></a></li>'+"\r\n";
+		'<li>External Website</li>'+"\r\n"+
+                '<li><a href="'+sound_website+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsSoundConverter')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
+               '<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsNicoChart')+'"><img src="'+chart_uri+'" /></a></li>'+"\r\n";
 
         html = html + niconicofarm; /* Niconico farm is general comment only */
         html = html + '</ul></li>'+"\r\n"+
@@ -268,6 +269,24 @@ function start_inject()
         WATCHHEADER = document.getElementById('WATCHHEADER');
         WATCHHEADER.appendChild(video_utilities);
 
+	/* 3rd party notice */
+ 	var external_links = document.getElementsByClassName('nicofox_external');
+	for (var i = 0; i < external_links.length; i++)
+	{
+  		external_links[i].addEventListener('click', function(e)
+		{
+			/* We may click on <a> links or <img> */
+			var href = e.target.href;
+			if (!href) {
+				href = e.target.parentNode.href;
+			}
+			GM_openThirdPartyInTab(href);
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	
+		, true);
+	}
 }
 
 function videoUtilitiesTab(e)

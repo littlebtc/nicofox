@@ -49,13 +49,20 @@ contentLoad: function(e) {
 
   if (
     nicofox_ui.monkey.compiler.isGreasemonkeyable(href)
-    && ( /http:\/\/www\.nicovideo\.jp\/.*/.test(href) || /http:\/\/tw\.nicovideo\.jp\/.*/.test(href) || /http:\/\/de\.nicovideo\.jp\/.*/.test(href) || /http:\/\/es\.nicovideo\.jp\/.*/.test(href) || /http:\/\/ch\.nicovideo\.jp\/.*/.test(href) )
-    && true
+     && true
   ) {
-    var script=nicofox_ui.monkey.compiler.getUrlContents(
-      'chrome://nicofox/content/nicomonkey/nicomonkey.js'
-    );
-    nicofox_ui.monkey.compiler.injectScript(script, href, unsafeWin);
+      var script = '';
+      if ( /http:\/\/www\.nicovideo\.jp\/.*/.test(href) || /http:\/\/tw\.nicovideo\.jp\/.*/.test(href) || /http:\/\/de\.nicovideo\.jp\/.*/.test(href) || /http:\/\/es\.nicovideo\.jp\/.*/.test(href) || /http:\/\/ch\.nicovideo\.jp\/.*/.test(href) ) {
+        script=nicofox_ui.monkey.compiler.getUrlContents('chrome://nicofox/content/nicomonkey/nicomonkey.js');
+      }// else if (/^http:\/\/parasitestage\.net\/.*$/.test(href) || /^http:\/\/www\.parasitestage\.net\/.*$/.test(href)) {
+      //  script=nicofox_ui.monkey.compiler.getUrlContents('chrome://nicofox/content/nicomonkey/parasitemonkey.js');
+      //}
+      // else if (/http:\/\/tw\.keytalks\.com\/.*/.test(href)) {
+      //  script=nicofox_ui.monkey.compiler.getUrlContents('chrome://nicofox/content/nicomonkey/keytalksmonkey.js');
+      //}
+      if (script) {
+        nicofox_ui.monkey.compiler.injectScript(script, href, unsafeWin);
+      }	
   }
 },
 
@@ -82,6 +89,7 @@ injectScript: function(script, url, unsafeContentWin) {
   sandbox.GM_setValue=nicofox_ui.monkey.compiler.hitch(storage, "setValue");
   sandbox.GM_getValue=nicofox_ui.monkey.compiler.hitch(storage, "getValue");
   sandbox.GM_openInTab=nicofox_ui.monkey.compiler.hitch(this, "openInTab", unsafeContentWin);
+  sandbox.GM_openThirdPartyInTab=nicofox_ui.monkey.compiler.hitch(this, "openThirdPartyInTab", unsafeContentWin);
   sandbox.GM_xmlhttpRequest=nicofox_ui.monkey.compiler.hitch(
     xmlhttpRequester, "contentStartRequest"
   );
@@ -136,7 +144,7 @@ openInTab: function(unsafeContentWin, url) {
       break;
     }
   if (!isMyWindow) return;
- 
+
   var loadInBackground, sendReferrer, referrer = null;
   loadInBackground = tabBrowser.mPrefs.getBoolPref("browser.tabs.loadInBackground");
   sendReferrer = tabBrowser.mPrefs.getIntPref("network.http.sendRefererHeader");
@@ -147,7 +155,38 @@ openInTab: function(unsafeContentWin, url) {
    }
    tabBrowser.loadOneTab(url, referrer, null, null, loadInBackground);
  },
- 
+
+openThirdPartyInTab: function(unsafeContentWin, url) {
+  var tabBrowser = getBrowser(), browser, isMyWindow = false;
+  for (var i = 0; browser = tabBrowser.browsers[i]; i++)
+    if (browser.contentWindow == unsafeContentWin) {
+      isMyWindow = true;
+      break;
+    }
+  if (!isMyWindow) return;
+
+  /* Dirty fix: add a confirm window */
+  var storage=new nicofox_ui.monkey.script_storage();
+  if (storage.getValue('third_party_notice')) {
+    var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                  .getService(Ci.nsIPromptService);
+    var check = {value: false};
+    prompts.alertCheck(null, 'Notice: External Website', '您將會前往第三方的網站使用此工具，而這些網站非由NICONICO動畫營運者或NicoFox開發者所經營，亦和以上組織或個人沒有合作關係。NicoFox工具列為方便取向而增加此連結，但並不保證其可用性。'+"\n\n"+'（在此向提供這些外部服務的辛苦維護者致謝！）' , '當我連到外部工具時不再通知我' , check);
+    if (check.value) {
+      storage.setValue('third_party_notice', false);
+    }
+  }
+
+  /* Don't load in background */
+  sendReferrer = tabBrowser.mPrefs.getIntPref("network.http.sendRefererHeader");
+  if (sendReferrer) {
+    var ios = Components.classes["@mozilla.org/network/io-service;1"]
+              .getService(Components.interfaces.nsIIOService);
+    referrer = ios.newURI(content.document.location.href, null, null);
+   }
+   tabBrowser.loadOneTab(url, referrer, null, null, false);
+ },
+  
  hitch: function(obj, meth) {
   var unsafeTop = new XPCNativeWrapper(unsafeContentWin, "top").top;
 
