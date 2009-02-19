@@ -23,7 +23,7 @@ pref("extensions.nicofox.external_video_player_path", '');
 pref("extensions.nicofox.external_swf_player", false);
 pref("extensions.nicofox.external_swf_player_path", '');
 
-// New in 0.3.3
+// New in 0.3.5
 pref("extensions.nicofox.economy_notice", true);
 
 // NicoMonkey
@@ -31,6 +31,9 @@ pref("extensions.nicofox.nicomonkey.enable", true);
 pref("extensions.nicofox.nicomonkey.toolbar", true);
 pref("extensions.nicofox.nicomonkey.comment_helper", false);
 pref("extensions.nicofox.nicomonkey.player_killer", false);
+
+// New in 0.3.5
+pref("extensions.nicofox.nicomonkey.third_party_notice", true);
 
 // New in 0.3
 pref("extensions.nicofox.nicomonkey.sound_converter", 'http://nicosound.anyap.info/sound/%1');
