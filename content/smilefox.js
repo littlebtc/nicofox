@@ -37,53 +37,51 @@ nicofox_ui.manager = {
     document.getElementById('smilefox-tree').addEventListener('dragdrop', nicofox_ui.manager.dragDrop, true);
 
     /* Download listener */
-    var _manager = nicofox_ui.manager;
-    var listener = 
+    nicofox_ui.manager.listener = 
     {
-       manager: {},
        add: function(id, content) {
          if ((typeof content) != 'object') return false;
          
          content.id = id;
-         _manager.rows.unshift(content);
-         _manager.updateTreeCount(0, 1);
+         nicofox_ui.manager.rows.unshift(content);
+         nicofox_ui.manager.updateTreeCount(0, 1);
          var keyword = document.getElementById('smilefox-search').value;
          if (keyword) {
-           _manager.doSearch();
+           this,manager.doSearch();
          } else {
            document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
          }
        },
        remove: function(id) {
-         _manager.rows = _manager.rows.filter(function(element, index, array) {
+         nicofox_ui.manager.rows = nicofox_ui.manager.rows.filter(function(element, index, array) {
            if (element.id == id) {
-             _manager.updateTreeCount(index, -1);
+             nicofox_ui.manager.updateTreeCount(index, -1);
            } else {
              return true;
            }
          });
        },
        update: function(id, content) {
-         _manager.rows.forEach(function(element, index, array) {
+         nicofox_ui.manager.rows.forEach(function(element, index, array) {
            if (element.id == id) {
              for (key in content) {
                array[index][key] = content[key];
              }
-             _manager.updateTreeRow(index);
-             _manager.updateRowSpeed(index);
+             nicofox_ui.manager.updateTreeRow(index);
+             nicofox_ui.manager.updateRowSpeed(index);
            }
          });
-         _manager.updateToolbar();
+         nicofox_ui.manager.updateToolbar();
        },
        stop: function() {
-         _manager.updateToolbar();
+         nicofox_ui.manager.updateToolbar();
        },
        rebuild: function() {
          document.getElementById('smilefox-search').value = '';
-         _manager.doSearch();
+         nicofox_ui.manager.doSearch();
        }
      };
-    nicofox.download_listener.addListener(listener);
+    nicofox.download_listener.addListener(nicofox_ui.manager.listener);
   },
   assignTreeView: function() {
     var tree_view = {
@@ -417,7 +415,7 @@ nicofox_ui.manager = {
                     .getService(Ci.nsIIOService).newFileURI(comment_file);
         comment_uri_spec = comment_uri.spec; 
       }    
-    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: file.leafName});  
+    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: file.leafName});  
     }
   }	
 };
@@ -459,7 +457,7 @@ nicofox_ui.manager.popup_command =
       comment_uri_spec = comment_uri.spec; 
     }
       
-    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
+    window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
   }, 
   openExternal: function() {
     if (this.recent_row < 0) { return; }

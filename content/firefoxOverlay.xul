@@ -15,9 +15,9 @@
     <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
   </stringbundleset>
 
-  <menupopup id="menu_ToolsPopup">
-    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;"
-              oncommand="nicofox.onMenuItemCommand(event);" position="6"/>
+  <menupopup id="menu_viewPopup">
+    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;" type="checkbox" checked="false" autocheck="false"
+              oncommand="nicofox_ui.overlay.onMenuItemCommand(event);" position="2" />
   </menupopup>
 
  <statusbar id="status-bar">

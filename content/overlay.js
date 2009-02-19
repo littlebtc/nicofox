@@ -1,7 +1,7 @@
 
 Components.utils.import("resource://nicofox/download_manager.js");
 Components.utils.import("resource://nicofox/common.js");
-Components.utils.import("resource://nicofox/urlparser_nico.js");
+Components.utils.import("resource://nicofox/urlparser.js");
 
 if (!nicofox_ui) {var nicofox_ui = {};}
 /* Download count refresh listener */
@@ -75,7 +75,7 @@ nicofox_ui.overlay = {
     nicofox.download_listener.removeListener(nicofox_ui.overlay.icon_listener);
   },
   onMenuItemCommand: function(e) {
-  nicofox_ui.overlay.openBar(false);
+    nicofox_ui.overlay.collapseBar();
   },
   openBar: function(auto_triggered) {
     /* Auto triggered and not dismissed */
@@ -85,10 +85,12 @@ nicofox_ui.overlay = {
     {
       document.getElementById('nicofox-splitter').collapsed = false;
       document.getElementById('smilefox-space').collapsed = false;
+      document.getElementById('smilefox-entry').setAttribute('checked', 'true');
       this.bar_opened = true;
     } else if (!auto_triggered) {
       document.getElementById('nicofox-splitter').collapsed = false;
       document.getElementById('smilefox-space').collapsed = false;
+      document.getElementById('smilefox-entry').setAttribute('checked', 'true');
       this.bar_opened = true;
     }
   },
@@ -106,16 +108,17 @@ nicofox_ui.overlay = {
       }
     }
 
-    /* Get the nicovideo page URL */
-    url = url.split("?")[0];    
+    /* Get the URLs we really want */
+    url = url.replace(/[\?\&]smilefox\=get$/, '');  
 
     var nicofox_icon = document.getElementById('nicofox-icon');
     nicofox_icon.label = nicofox.strings.getString('processing');
 
-    urlparser = new nicofox.parser.nico();
+    urlparser = new nicofox.parser();
     urlparser.return_to = nicofox.hitch(nicofox_ui.overlay, 'confirmDownload', url, dont_confirm);
     urlparser.goParse(url);
   },
+  /* Nicovideo only: Nicomonkey -> DL check */
   goDownloadFromVideoPage: function(Video, url) {
     /* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
     var value = nicofox.prefs.getComplexValue("save_path",Ci.nsISupportsString).data;
@@ -195,6 +198,11 @@ nicofox_ui.overlay = {
   {
     document.getElementById('nicofox-splitter').collapsed = !document.getElementById('nicofox-splitter').collapsed;
     document.getElementById('smilefox-space').collapsed = !document.getElementById('smilefox-space').collapsed;
+    if (document.getElementById('smilefox-space').collapsed) {
+      document.getElementById('smilefox-entry').removeAttribute('checked');
+    } else {
+      document.getElementById('smilefox-entry').setAttribute('checked', 'true');
+    }
   },
   matchWatchUrl: function(url)
   {
