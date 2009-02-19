@@ -9,7 +9,7 @@ package idv.littlebtc
 		private var time:Number;
 		private var comment_type:String;
 		private const comment_max:int = 50;
-
+	 
 		//private var comment_pool:Array;
 		
 		public function BreezeCommentSprite(new_type:String)
@@ -28,10 +28,10 @@ package idv.littlebtc
 			  var tf:BreezeTextField = new BreezeTextField(new_type);
 			  tf.visible = false;			  
 			  this.addChild(tf);
-			}
-			
+			}			
 
 		}
+		
 		public function addComment(info:Object):DisplayObject
 		{
 			var use_object:DisplayObject;
@@ -149,13 +149,20 @@ package idv.littlebtc
 			/* Return a DisplayObject so it can be recycled */
 			return use_object;
 		}
-		public function updateNakaPosition(object:DisplayObject):void {
-			//var field:BreezeTextField = object as BreezeTextField;			
-			//field.x = 512 + (512 + field.width)*(field.vpos-100-this.time) / 400;					
-		
+		public function updateNakaPosition():void {
+			var object:DisplayObject;
+			var i:int;
+			for (i = 0; i < this.numChildren; i++) {
+				object = this.getChildAt(i);
+				var field:BreezeTextField = object as BreezeTextField;			
+				field.x = 512 + (512 + field.width)*(field.vpos-100-this.time) / 400;
+				object = null;
+			}
+			
 		}
 		public function updateTime(time:Number):void {
 			this.time = time;			
+			updateNakaPosition();
 		}
 		public function recycleField(object:DisplayObject):void {
 			/* Put it at last, then release it */	

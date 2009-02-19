@@ -266,7 +266,7 @@ package idv.littlebtc
 					}
 					else
                     {
-                          comment.object.x = 512+(512+comment.object.width)*(comment.vpos-100-time) / 400;
+                          //comment.object.x = 512+(512+comment.object.width)*(comment.vpos-100-time) / 400;
     					          
                     }
 
