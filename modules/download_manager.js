@@ -3,7 +3,7 @@ var Ci = Components.interfaces;
 
 var EXPORTED_SYMBOLS = ['nicofox'];
 if (!nicofox) { var nicofox = {}; }
-Components.utils.import('resource://nicofox/download_helper_nico.js');
+Components.utils.import('resource://nicofox/download_helper.js');
 Components.utils.import('resource://nicofox/common.js');
 
 var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
@@ -324,10 +324,11 @@ var smilefox_sqlite = {
   },
   add: function (Video, url) {
     /* Change parasitestage url
-       XXX: Dirty */
-//    if (url.indexOf('http://www.parasitestage.net/') == 0) {
-//       url = url.replace(/^http:\/\/www\./, 'http://');
-//    }
+       XXX: Dirty
+       Commented out until we actully support parasitestage */
+    /* if (url.indexOf('http://www.parasitestage.net/') == 0) {
+       url = url.replace(/^http:\/\/www\./, 'http://');
+    } */
     var statement = this.db_connect.createStatement("INSERT INTO smilefox (url, video_id, comment_id, comment_type, video_title, add_time, status, in_private) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)");
     statement.bindUTF8StringParameter(0, url);
     statement.bindUTF8StringParameter(1, Video.id);
@@ -337,6 +338,7 @@ var smilefox_sqlite = {
 //    statement.bindUTF8StringParameter(5, Video.description);
     /* XXX: Space-separated for all websites? */
 //    statement.bindUTF8StringParameter(6, Video.tags.join(' '));
+
     var now_date = new Date();
     var add_time = now_date.getTime();
     statement.bindInt32Parameter(5, add_time);
@@ -569,7 +571,6 @@ var download_runner =
     { this.initialize(); }
     if (unloading || this.is_stopped)
     { return; }
-    download_runner.economy_invoked = false;
     /* Re-select so we can purge our content */
     downloads = smilefox_sqlite.select();
     i = downloads.length - 1;
@@ -773,6 +774,7 @@ var download_runner =
             prefs.setBoolPref('economy_notice', false);
 	  }
 	}
+        download_runner.economy_invoked = false;
       }
       this.download_triggered = 0;
       this.download_canceled = 0;
