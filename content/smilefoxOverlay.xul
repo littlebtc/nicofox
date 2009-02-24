@@ -78,6 +78,7 @@
    <menuseparator />
    <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="nicofox_ui.manager.popup_command.go();" />
    <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="popup-copy" oncommand="nicofox_ui.manager.popup_command.copy();" />
+   <menuitem accesskey="O" id="popup-copy-cell" oncommand="nicofox_ui.manager.popup_command.copyCell();" />
    <menuseparator />
    <menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="popup-select-all" oncommand="nicofox_ui.manager.popup_command.selectAll();" />
    <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="popup-remove" oncommand="nicofox_ui.manager.popup_command.remove();"/>

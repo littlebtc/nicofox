@@ -10,13 +10,12 @@ nicofox_ui.manager = {
   prefs: null,
   prompts: null,
   rows: [],
-  treeview_assigned: false,
   load: function() {
     nicofox_ui.manager.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
     
     nicofox_ui.manager.rows = nicofox.download_manager.getDownloads();
-    nicofox_ui.manager.assignTreeView();
+    nicofox_ui.manager.download_tree.assignTreeView();
 
     /* For XULRunner 1.9.1+, use type="search" */
     var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
@@ -33,8 +32,8 @@ nicofox_ui.manager = {
     document.getElementById('smilefox-tree').focus();
 
     /* Drag & Drop */
-    document.getElementById('smilefox-tree').addEventListener('dragover', nicofox_ui.manager.dragOver, true);
-    document.getElementById('smilefox-tree').addEventListener('dragdrop', nicofox_ui.manager.dragDrop, true);
+    document.getElementById('smilefox-tree').addEventListener('dragover', nicofox_ui.manager.download_tree.dragOver, true);
+    document.getElementById('smilefox-tree').addEventListener('dragdrop', nicofox_ui.manager.download_tree.dragDrop, true);
 
     /* Download listener */
     nicofox_ui.manager.listener = 
@@ -83,162 +82,6 @@ nicofox_ui.manager = {
      };
     nicofox.download_listener.addListener(nicofox_ui.manager.listener);
   },
-  assignTreeView: function() {
-    var tree_view = {
-      treeBox: null,
-      selection: null,
-      get rowCount()  {return nicofox_ui.manager.rows.length;},
-      getCellText : function(row,column){
-
-      switch(column.id)
-      {
-        case 'progress':
-        return;
-
-        case 'tree-title':
-        return nicofox_ui.manager.rows[row].video_title;
-
-        case 'tree-comment':
-        return nicofox_ui.manager.rows[row].comment_type;
-
-        case 'tree-economy':
-        if (nicofox_ui.manager.rows[row].status == 1 || nicofox_ui.manager.rows[row].status >= 6) {
-          if (nicofox_ui.manager.rows[row].video_economy == 1) return  nicofox.strings.getString('economyYes');
-          else return nicofox.strings.getString('economyNo');
-        }
-        return;  
-
-        case 'tree-status':
-        switch (nicofox_ui.manager.rows[row].status)
-        {
-          case 0:
-          return nicofox.strings.getString('progressWaiting');
-          case 1:
-          return nicofox.strings.getString('progressCompleted');
-          case 2:
-          return nicofox.strings.getString('progressCanceled');
-          case 3:
-          return nicofox.strings.getString('progressFailed');
-          case 4:
-          return nicofox.strings.getString('progressScheduled');
-           
-          case 5:
-          return nicofox.strings.getString('progressLoading');
-          case 6:
-          return nicofox.strings.getString('progressCommentDownloading');
-          case 7:
-          return nicofox.strings.getString('progressVideoDownloading');
-          default:
-          return 'Buggy!';
-        }
-        break;
-        case 'tree-size':
-        if (nicofox_ui.manager.rows[row].status == 1) {
-          return (Math.floor(nicofox_ui.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
-        } else if(nicofox_ui.manager.rows[row].status == 7) {
-          return (Math.floor(nicofox_ui.manager.rows[row].current_bytes / 1024 / 1024 * 10) / 10) + 'MB/'+(Math.floor(nicofox_ui.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
-        }
-        return;  
-
-        case 'tree-speed':
-        if (nicofox_ui.manager.rows[row].status == 7 && nicofox_ui.manager.rows[row].speed) return nicofox_ui.manager.rows[row].speed+'KB/s';
-        else return;
-        break;
-  
-        default:
-        return;
-        }
-      },
-      getCellValue : function(row,column){
-        if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 20;
-        else if (column.id == "tree-progress"){progress = Math.floor(nicofox_ui.manager.rows[row].current_bytes / nicofox_ui.manager.rows[row].max_bytes * 100); return progress; }
-        else return;
-      },
-      getProgressMode : function(row,column){
-        if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 2; 
-        else if (column.id == "tree-progress") return 1; 
-        else return;
-      },
-      setTree: function(treeBox){ this.treeBox = treeBox; },
-      isContainer: function(row){ return false; },
-      isSeparator: function(row){ return false; },
-      isSorted: function(){ return false; },
-      canDrop: function(index, orientation) {
-        var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
-                          .getService(Ci.nsIDragService);
-        var drag_session = drag_service.getCurrentSession();
-  
-        var supported = drag_session.isDataFlavorSupported("text/x-moz-url");
-  
-        if (supported && gBrowser) {
-          return true;
-        }
-      },
-      drop: function(index, orientation) {
-        return;
-      },
-      getParentIndex: function(index){ return -1; },
-      getLevel: function(row){ return 0; },
-      getImageSrc: function(row,col){ return null; },
-      getRowProperties: function(row,props){},
-      getCellProperties: function(row,col,props){},
-      getColumnProperties: function(colid,col,props){},
-    };
-    document.getElementById('smilefox-tree').view = tree_view;
-    this.treeview_assigned = true;
-  },
-  dragOver: function () {
-    var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
-                      .getService(Ci.nsIDragService);
-    var drag_session = drag_service.getCurrentSession();
-    var supported = drag_session.isDataFlavorSupported("text/x-moz-url");
-
-    if (supported && gBrowser) {
-      drag_session.canDrop = true;
-    }
-  
-  },
-  dragDrop: function () {
-    var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
-                       .getService(Ci.nsIDragService);
-    var drag_session = drag_service.getCurrentSession();
-     /* Drag & drop is OK only in browser */
-    if (drag_session.sourceNode == null) {
-      return;
-    }
-    /* Transfer data */
-    var trans = Cc["@mozilla.org/widget/transferable;1"]
-               .createInstance(Ci.nsITransferable);
-    trans.addDataFlavor("text/x-moz-url");
-    var urls = [];
-    for (var i = 0; i < drag_session.numDropItems; i++) {
-      var url = null;
-      drag_session.getData(trans, i);
-      var flavor = {}, data = {}, length = {};
-      trans.getAnyTransferData(flavor, data, length);
-      if (data) {
-        try {
-          var str = data.value.QueryInterface(Ci.nsISupportsString);
-        } catch(ex) {
-          alert(ex);
-        }
-        if (str) {
-          url = str.data.split("\n")[0];
-        }
-      }
-      if (url) {
-      /* Replace some common redirect */
-        url = url.replace(/^http:\/\/ime\.nu\/(.*)$/, 'http://$1');
-        url = url.replace(/^http:\/\/www\.flog\.jp\/w\.php\/(.*)$/, '$1');
-        urls.push(url);
-      }  
-    }
-    /* XXX: Dirty way (why check URLs here)? */
-    if (urls[0].match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/) && gBrowser) {
-      nicofox_ui.overlay.goDownload(urls[0]);
-    }
-  },
-
 
   updateRowSpeed: function(num) {
     /* Initialize */
@@ -361,8 +204,8 @@ nicofox_ui.manager = {
     window.removeEventListener("load", nicofox_ui.manager.load, false);
     window.removeEventListener("unload", nicofox_ui.manager.unload, false);
     document.getElementById('smilefox-tree').removeEventListener('contextmenu', nicofox_ui.manager.popup_command.activate, false);
-    document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox_ui.manager.dragOver, true);
-    document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox_ui.manager.dragDrop, true);
+    document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox_ui.manager.download_tree.dragOver, true);
+    document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox_ui.manager.download_tree.dragDrop, true);
   },
 
   doSearch: function() {
@@ -419,11 +262,172 @@ nicofox_ui.manager = {
     }
   }	
 };
+nicofox_ui.manager.download_tree = {
+  tree_view: null,
 
+  assignTreeView: function() {
+    this.tree_view = {
+      treeBox: null,
+      selection: null,
+      get rowCount()  {return nicofox_ui.manager.rows.length;},
+      getCellText : function(row,column){
+
+      switch(column.id)
+      {
+        case 'progress':
+        return;
+
+        case 'tree-title':
+        return nicofox_ui.manager.rows[row].video_title;
+
+        case 'tree-comment':
+        return nicofox_ui.manager.rows[row].comment_type;
+
+        case 'tree-economy':
+        if (nicofox_ui.manager.rows[row].status == 1 || nicofox_ui.manager.rows[row].status >= 6) {
+          if (nicofox_ui.manager.rows[row].video_economy == 1) return  nicofox.strings.getString('economyYes');
+          else return nicofox.strings.getString('economyNo');
+        }
+        return;  
+
+        case 'tree-status':
+        switch (nicofox_ui.manager.rows[row].status)
+        {
+          case 0:
+          return nicofox.strings.getString('progressWaiting');
+          case 1:
+          return nicofox.strings.getString('progressCompleted');
+          case 2:
+          return nicofox.strings.getString('progressCanceled');
+          case 3:
+          return nicofox.strings.getString('progressFailed');
+          case 4:
+          return nicofox.strings.getString('progressScheduled');
+           
+          case 5:
+          return nicofox.strings.getString('progressLoading');
+          case 6:
+          return nicofox.strings.getString('progressCommentDownloading');
+          case 7:
+          return nicofox.strings.getString('progressVideoDownloading');
+          default:
+          return 'Buggy!';
+        }
+        break;
+        case 'tree-size':
+        if (nicofox_ui.manager.rows[row].status == 1) {
+          return (Math.floor(nicofox_ui.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
+        } else if(nicofox_ui.manager.rows[row].status == 7) {
+          return (Math.floor(nicofox_ui.manager.rows[row].current_bytes / 1024 / 1024 * 10) / 10) + 'MB/'+(Math.floor(nicofox_ui.manager.rows[row].max_bytes / 1024 / 1024 * 10) / 10)+'MB';
+        }
+        return;  
+
+        case 'tree-speed':
+        if (nicofox_ui.manager.rows[row].status == 7 && nicofox_ui.manager.rows[row].speed) return nicofox_ui.manager.rows[row].speed+'KB/s';
+        else return;
+        break;
+  
+        default:
+        return;
+        }
+      },
+      getCellValue : function(row,column){
+        if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 20;
+        else if (column.id == "tree-progress"){progress = Math.floor(nicofox_ui.manager.rows[row].current_bytes / nicofox_ui.manager.rows[row].max_bytes * 100); return progress; }
+        else return;
+      },
+      getProgressMode : function(row,column){
+        if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 2; 
+        else if (column.id == "tree-progress") return 1; 
+        else return;
+      },
+      setTree: function(treeBox){ this.treeBox = treeBox; },
+      isContainer: function(row){ return false; },
+      isSeparator: function(row){ return false; },
+      isSorted: function(){ return false; },
+      canDrop: function(index, orientation) {
+        var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
+                          .getService(Ci.nsIDragService);
+        var drag_session = drag_service.getCurrentSession();
+  
+        var supported = drag_session.isDataFlavorSupported("text/x-moz-url");
+  
+        if (supported && gBrowser) {
+          return true;
+        }
+      },
+      drop: function(index, orientation) {
+        return;
+      },
+      getParentIndex: function(index){ return -1; },
+      getLevel: function(row){ return 0; },
+      getImageSrc: function(row,col){ return null; },
+      getRowProperties: function(row,props){},
+      getCellProperties: function(row,col,props){},
+      getColumnProperties: function(colid,col,props){},
+    };
+    document.getElementById('smilefox-tree').view = this.tree_view;
+  },
+  dragOver: function () {
+    var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
+                      .getService(Ci.nsIDragService);
+    var drag_session = drag_service.getCurrentSession();
+    var supported = drag_session.isDataFlavorSupported("text/x-moz-url");
+
+    if (supported && gBrowser) {
+      drag_session.canDrop = true;
+    }
+  
+  },
+  dragDrop: function () {
+    var drag_service = Cc["@mozilla.org/widget/dragservice;1"]
+                       .getService(Ci.nsIDragService);
+    var drag_session = drag_service.getCurrentSession();
+     /* Drag & drop is OK only in browser */
+    if (drag_session.sourceNode == null) {
+      return;
+    }
+    /* Transfer data */
+    var trans = Cc["@mozilla.org/widget/transferable;1"]
+               .createInstance(Ci.nsITransferable);
+    trans.addDataFlavor("text/x-moz-url");
+    var urls = [];
+    for (var i = 0; i < drag_session.numDropItems; i++) {
+      var url = null;
+      drag_session.getData(trans, i);
+      var flavor = {}, data = {}, length = {};
+      trans.getAnyTransferData(flavor, data, length);
+      if (data) {
+        try {
+          var str = data.value.QueryInterface(Ci.nsISupportsString);
+        } catch(ex) {
+          alert(ex);
+        }
+        if (str) {
+          url = str.data.split("\n")[0];
+        }
+      }
+      if (url) {
+      /* Replace some common redirect */
+        url = url.replace(/^http:\/\/ime\.nu\/(.*)$/, 'http://$1');
+        url = url.replace(/^http:\/\/www\.flog\.jp\/w\.php\/(.*)$/, '$1');
+        urls.push(url);
+      }  
+    }
+    /* XXX: Dirty way (why check URLs here)? */
+    if (urls[0].match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/) && gBrowser) {
+      nicofox_ui.overlay.goDownload(urls[0]);
+    }
+  },
+
+
+}
 
 nicofox_ui.manager.popup_command = 
 {
   recent_row: -1,
+  recent_col: -1,
+  cell_text: null,
   multiple_select: true, 
     cancel: function() {
       if (this.recent_row < 0) { return; }  
@@ -548,6 +552,13 @@ nicofox_ui.manager.popup_command =
                           .getService(Ci.nsIClipboardHelper);  
     clipboard_helper.copyString(nicofox_ui.manager.rows[this.recent_row].url);  
   },
+  copyCell: function() {
+    if (this.recent_row < 0) { return; }
+    if (!this.cell_text) { return; }
+    var clipboard_helper = Cc["@mozilla.org/widget/clipboardhelper;1"]  
+                          .getService(Ci.nsIClipboardHelper);  
+    clipboard_helper.copyString(this.cell_text);
+  },
   selectAll: function() {
     document.getElementById('smilefox-tree').view.selection.rangedSelect(0, nicofox_ui.manager.rows.length, true);
     document.getElementById('smilefox-tree').focus();
@@ -578,6 +589,7 @@ nicofox_ui.manager.popup_command =
     var row = { }, col = { }, child = { };
     tree.treeBoxObject.getCellAt(e.clientX, e.clientY, row, col, child);
     this.recent_row = row.value;
+    this.recent_col = col.value;
 
     if(this.recent_row == -1) {
       /* Out of the range, but something is still selected */
@@ -596,7 +608,21 @@ nicofox_ui.manager.popup_command =
     }
     document.getElementById('smilefox-popup').style.display='-moz-popup';
     selected_row = nicofox_ui.manager.rows[this.recent_row];
-    
+   
+    /* Fix copy cell info */
+    /* Technique from nsContextMenu.js */
+    this.cell_text = tree.view.getCellText(this.recent_row, this.recent_col);
+    var cell_text = this.cell_text;
+    if (cell_text && cell_text.length > 15) {
+      cell_text = cell_text.substr(0, 15) + "\u2026";
+    }
+    if (cell_text) {
+      document.getElementById('popup-copy-cell').label = 'Copy \''+ cell_text +'\'';
+      document.getElementById('popup-copy-cell').style.display = 'block';
+    } else {
+      document.getElementById('popup-copy-cell').style.display = 'none';
+    }
+ 
     if(nicofox_ui.manager.rows[this.recent_row].status == 0) {
       /* Waiting */
       document.getElementById('popup-missing').style.display = 'none';
