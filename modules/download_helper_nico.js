@@ -358,7 +358,7 @@ nicofox.download.helper.nico.prototype = {
       var filter_replaces = [];
       for (var i = 0; i < ng_ups.length; i++) {
         var array = ng_ups[i].split('=');
-	var target = decodeURIComponent(array[0]).replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]\=]/g, '\\$1');
+	var target = decodeURIComponent(array[0]).replace(/([\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]])/g, '\\$1');
 	var match = new RegExp(target, 'g'); // Case-sensitive
 	filter_strings.push(decodeURIComponent(array[0]));
         filter_matches.push(match);

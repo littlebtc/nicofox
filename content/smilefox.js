@@ -373,7 +373,8 @@ nicofox_ui.manager = {
     this.updateTreeCount(0, nicofox_ui.manager.rows.length);
 
     if (keyword) {
-      keyword = keyword.replace(/[\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]\=]/g, '\\$1');
+      keyword = keyword.replace(/([\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]])/g, '\\$1');
+      alert(keyword);
       var keywords = keyword.replace(/\s(.*)\s/, '$1').split(/\s/);
       for (var i = 0; i < keywords.length; i++) {
         keywords[i] = new RegExp(keywords[i], 'ig');
