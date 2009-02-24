@@ -1,0 +1,35 @@
+<!ENTITY window.title "Gestionnaire de téléchargement  NicoFox">
+<!ENTITY download.label "Télécharger">
+<!ENTITY download.accesskey "T">
+<!ENTITY start.label "Démarrer">
+<!ENTITY start.accesskey "S">
+<!ENTITY stop.label "Arrêter">
+<!ENTITY stop.accesskey "P">
+<!ENTITY options.label "Options">
+<!ENTITY options.accesskey "O">
+<!ENTITY search.label "Rechercher">
+<!ENTITY tree.videoTitle "Titre de la vidéo">
+<!ENTITY tree.comment "Commentaire">
+<!ENTITY tree.economy "Économie">
+<!ENTITY tree.progress "Avancement">
+<!ENTITY tree.status "État">
+<!ENTITY tree.size "Taille">
+<!ENTITY tree.speed "Vitesse">
+<!ENTITY popup.cancel.label "Annuler">
+<!ENTITY popup.cancel.accesskey "C">
+<!ENTITY popup.retry.label "Réessayer">
+<!ENTITY popup.retry.accesskey "R">
+<!ENTITY popup.open.label "Lire">
+<!ENTITY popup.open.accesskey "P">
+<!ENTITY popup.openExternal.label "Lire dans un lecteur externe">
+<!ENTITY popup.openExternal.accesskey "E">
+<!ENTITY popup.openFolder.label "Ouvrir le dossier contenant la vidéo">
+<!ENTITY popup.openFolder.accesskey "F">
+<!ENTITY popup.go.label "Se rendre sur la page de la vidéo">
+<!ENTITY popup.go.accesskey "G">
+<!ENTITY popup.copy.label "Copier l&apos;URL de la page de la vidéo">
+<!ENTITY popup.copy.accesskey "C">
+<!ENTITY popup.selectAll.label "Tout sélectionner">
+<!ENTITY popup.selectAll.accesskey "A">
+<!ENTITY popup.remove.label "Supprimer de la liste">
+<!ENTITY popup.remove.accesskey "R">
