@@ -197,13 +197,13 @@ function start_inject()
 	}
 	
 	/* XXX it should not be here, but it is used to reduce the render times */
-	var community_nodes = $$('.//a[@class="community"]');
+	var community_nodes = $$('.//img[@class="comm_img_S"]');
 
 	if (community_nodes.length > 0) {
 		/* XXX: Why Community name? */
-		var community_test = community_nodes[0].href.match(/^http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)$/i);	
+		var community_test = community_nodes[0].src.match(/^http\:\/\/icon\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)\.jpg\?[0-9]+$/i);	
 		Video.comment_type = community_test[2];
-		Video.community_name = community_nodes[0].textContent;
+		//Video.community_name = community_nodes[0].textContent;
 	}
 	else if (Video.isMymemory)
 	{
