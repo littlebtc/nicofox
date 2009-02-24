@@ -20,16 +20,16 @@ function load()
 	}
   document.title = window.arguments[0].title + ' - NicoFox Player';
   browser = document.createElement("browser");
-  browser.setAttribute("id", "sample-browser");
-  browser.setAttribute("name", "sample-browser");
+  browser.setAttribute("id", "nicofox-player-browser");
+  browser.setAttribute("name", "nicofox-player-browser");
   browser.setAttribute("type", "content-primary");
   browser.setAttribute("flex", "1");
   document.getElementById("player-box").appendChild(browser);
   // set restrictions as needed
-  browser.webNavigation.allowAuth = true;
-  browser.webNavigation.allowImages = true;
+  browser.webNavigation.allowAuth = false;
+  browser.webNavigation.allowImages = false;
   browser.webNavigation.allowJavascript = true;
-  browser.webNavigation.allowMetaRedirects = true;
+  browser.webNavigation.allowMetaRedirects = false;
   browser.webNavigation.allowPlugins = true;
   browser.webNavigation.allowSubframes = false;
 

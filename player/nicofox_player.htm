@@ -5,37 +5,35 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<script type="text/javascript" src="swfobject.js"></script>
 		<script type="text/javascript">
+function load() {
+  if ("createEvent" in document) {
+    var element = document.createElement("NicoFoxEvent");
+    document.documentElement.appendChild(element);
 
-if ("createEvent" in document) {
-  var element = document.createElement("NicoFoxEvent");
-  element.setAttribute("attribute1", "foobar");
-  element.setAttribute("attribute2", "hello world");
-  document.documentElement.appendChild(element);
-
-  var evt = document.createEvent("Events");
-  evt.initEvent("NicoFoxEvent", true, false);
-  element.dispatchEvent(evt);
-  var video_file = element.getAttribute('video_file');
-  var comment_file = element.getAttribute('comment_file');
-  swfobject.embedSWF('breezevideo_player.swf', "myContent", window.innerWidth, window.innerHeight, "9.0.0", "expressInstall.swf", {
-    videoFile: encodeURI(video_file),
-    /* Without encodeURI works in IE but not Firefox */
-    commentFile: encodeURI(comment_file),
-  }, {allowFullScreen: 'true'});
+    var evt = document.createEvent("Events");
+    evt.initEvent("NicoFoxEvent", true, false);
+    element.dispatchEvent(evt);
+    var video_file = element.getAttribute('video_file');
+    var comment_file = element.getAttribute('comment_file');
+    swfobject.embedSWF('breezevideo_player.swf', "player_container", window.innerWidth, window.innerHeight, "9.0.115.0", "expressInstall.swf", {
+      videoFile: encodeURI(video_file),
+      commentFile: encodeURI(comment_file),
+    }, {allowFullScreen: 'true'});
+  }
 }
-
 function resizeSwf() {
-  var player = document.getElementById('myContent');
+  var player = document.getElementById('player_container');
   player.setAttribute('width', window.innerWidth);
   player.setAttribute('height', window.innerHeight);
 }
-		</script>
-	</head>
-	<body style="margin:0; padding: 0; overflow: hidden;" onresize="resizeSwf();">
-		<div id="myContent">
-			<h1>Alternative content</h1>
-			<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>
-		</div>
-	</body>
+</script>
+</head>
+<body style="margin:0; padding: 0; overflow: hidden;" onload="load();" onresize="resizeSwf();">
+<div id="player_container">
+<h1>Fail to call NicoFox Player</h1>
+<p>NicoFox Player requires Flash Player newer than 9.0.115.0.</p>
+<p>If you are using NoScript, please add <code>file://</code> to your NoScript blacklist to use NicoFox Player.
+</div>
+</body>
 </html>
 
