@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
+<?xul-overlay href="chrome://nicofox/content/smilefoxOverlay.xul" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://nicofox/locale/nicofox.dtd">
+
+<overlay id="nicofox-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/xmlhttprequester.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/prefman.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/script-compiler.js" />
+
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
+    <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
+  </stringbundleset>
+
+  <menupopup id="view_toolbars_popup">
+    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;" type="checkbox" checked="false" autocheck="false"
+              oncommand="nicofox_ui.overlay.onMenuItemCommand(event);" position="7" />
+  </menupopup>
+
+ <statusbar id="status-bar">
+   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic-text" src="chrome://nicofox/skin/logo_16.png" label="" oncommand="nicofox_ui.overlay.collapseBar();"/>
+
+ </statusbar>
+ <vbox id="appcontent">
+ <splitter id="nicofox-splitter" collapsed="true" />
+  <vbox id="smilefox-space" persist="height" height="100" collapsed="true">
+  <vbox id="smilefox-main">
+  </vbox>
+  </vbox>
+ </vbox>
+</overlay>
