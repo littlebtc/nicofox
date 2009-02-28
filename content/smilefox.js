@@ -127,10 +127,9 @@ nicofox_ui.manager = {
   },
   toolbarClose: function()
   {
-    if(gBrowser)
+    if(gBrowser && nicofox_ui && nicofox_ui.overlay)
     {
-      document.getElementById('nicofox-splitter').collapsed = !document.getElementById('nicofox-splitter').collapsed;
-      document.getElementById('smilefox-space').collapsed = !document.getElementById('smilefox-space').collapsed;
+      nicofox_ui.overlay.collapseBar();
     }
     else {
       window.close();
@@ -239,6 +238,7 @@ nicofox_ui.manager = {
   openFileToPlayer: function() {
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
     file_picker.init(window, 'Choose Video File to Play', null);
+    file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     file_picker.appendFilter('Supported Type', '*.flv; *.mp4');
     if (file_picker.show() == Ci.nsIFilePicker.returnOK)
     {
@@ -365,6 +365,7 @@ nicofox_ui.manager.download_tree = {
       getRowProperties: function(row,props){},
       getCellProperties: function(row,col,props){},
       getColumnProperties: function(colid,col,props){},
+      cycleHeader: function(col){},
     };
     document.getElementById('smilefox-tree').view = this.tree_view;
   },
@@ -459,7 +460,7 @@ nicofox_ui.manager.popup_command =
       var comment_uri = Cc["@mozilla.org/network/io-service;1"]
                   .getService(Ci.nsIIOService).newFileURI(file);
       comment_uri_spec = comment_uri.spec; 
-    }
+      }
       
     window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
   }, 
@@ -540,6 +541,80 @@ nicofox_ui.manager.popup_command =
       protocol_service.loadUrl(uri);
     }
   },
+  moveFolder: function() {
+    if (this.recent_row < 0) { return; }
+    if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
+    if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4)$/)) { return; }
+ 
+    /* Initialize and check files */ 
+    var video_file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+    video_file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
+    if (!video_file.exists()) { return false; }
+  
+    var comment_exists = false;
+    if (nicofox_ui.manager.rows[this.recent_row].comment_file) {
+      var comment_file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+      comment_file.initWithPath(nicofox_ui.manager.rows[this.recent_row].comment_file);
+      comment_exists = comment_file.exists();
+    }
+
+    var uploader_comment_exists = false;
+    var uploader_comment_file_path = nicofox_ui.manager.rows[this.recent_row].comment_file.replace(/\.xml$/, '[Owner].xml');
+    if (uploader_comment_file_path) {
+      var uploader_comment_file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+      uploader_comment_file.initWithPath(uploader_comment_file_path);
+      uploader_comment_exists = uploader_comment_file.exists();
+    }
+
+    /* Show file picker */
+    var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    file_picker.init(window, 'Select a Folder', Ci.nsIFilePicker.modeGetFolder);
+    file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
+    if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
+      var move_to = file_picker.file;
+    } else {
+      return;
+    }
+    
+    /* Check video file */
+    var video_file_check = move_to.clone();
+    video_file_check.append(video_file.leafName);
+    if (video_file_check.exists()) {
+      nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move1');
+      return;
+    }
+
+    /* Check comment files */
+    if (comment_exists) {
+      var comment_file_check = move_to.clone();
+      comment_file_check.append(comment_file.leafName);
+      if (comment_file_check.exists()) {
+        nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move2');
+        return;
+      }
+    }
+    if (uploader_comment_exists) {
+      var uploader_comment_file_check = move_to.clone();
+      uploader_comment_file_check.append(uploader_comment_file.leafName);
+      if (uploader_comment_file_check.exists()) {
+        nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move3');
+        return;
+      }
+    }
+
+    /* Let's move */
+    try {
+      video_file.moveTo(move_to ,''); 
+      if (comment_exists) comment_file.moveTo(move_to ,''); 
+      if (uploader_comment_exists) uploader_comment_file.moveTo(move_to ,''); 
+    } catch(e) {
+      nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move!');
+    }
+    /* Change the database */
+    var comment_file_path = '';
+    if (comment_exists) { comment_file_path = comment_file.path; }
+    nicofox.download_manager.moveFile(nicofox_ui.manager.rows[this.recent_row].id, video_file.path, comment_file_path);
+  },
   go: function() {
     if (this.recent_row < 0) { return; }
     if (!nicofox_ui.manager.rows[this.recent_row].url) { return; }
@@ -608,7 +683,15 @@ nicofox_ui.manager.popup_command =
     }
     document.getElementById('smilefox-popup').style.display='-moz-popup';
     selected_row = nicofox_ui.manager.rows[this.recent_row];
-   
+  
+    /* Initialize */
+    var menuitems = document.getElementById('smilefox-popup').getElementsByTagName('menuitem');
+    for (var i = 0; i < menuitems.length; i++) {
+      menuitems[i].style.display = 'none';
+    }
+    document.getElementById('popup-go').style.display = 'block';
+    document.getElementById('popup-copy').style.display = 'block';
+
     /* Fix copy cell info */
     /* Technique from nsContextMenu.js */
     this.cell_text = tree.view.getCellText(this.recent_row, this.recent_col);
@@ -620,24 +703,13 @@ nicofox_ui.manager.popup_command =
       document.getElementById('popup-copy-cell').label = 'Copy \''+ cell_text +'\'';
       document.getElementById('popup-copy-cell').style.display = 'block';
     } else {
-      document.getElementById('popup-copy-cell').style.display = 'none';
     }
  
     if(nicofox_ui.manager.rows[this.recent_row].status == 0) {
       /* Waiting */
-      document.getElementById('popup-missing').style.display = 'none';
-      document.getElementById('popup-retry').style.display = 'none';
-      document.getElementById('popup-cancel').style.display = 'none';
-      document.getElementById('popup-open').style.display = 'none';
-      document.getElementById('popup-open-external').style.display = 'none';
-      document.getElementById('popup-open-folder').style.display = 'none';
       document.getElementById('popup-remove').style.display = 'block';
     } else if(nicofox_ui.manager.rows[this.recent_row].status == 1) {
       /* Completed */
-      document.getElementById('popup-missing').style.display = 'none';
-      document.getElementById('popup-retry').style.display = 'none';
-      document.getElementById('popup-cancel').style.display = 'none';
-      
       var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
       file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
 
@@ -645,43 +717,24 @@ nicofox_ui.manager.popup_command =
         /* If we cannot find the file, do not show the following things */
         document.getElementById('popup-open').style.display = 'block';
         /* NicoFox player do not support SWF currently */
-        if (nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { document.getElementById('popup-open').style.display ='none';
-          //document.getElementById('popup-open-swf-player').style.display ='block';
-        } else {
+        if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { 
           document.getElementById('popup-open').style.display ='block';
-          //document.getElementById('popup-open-swf-player').style.display ='none';
         }
         document.getElementById('popup-open-external').style.display = 'block';
         document.getElementById('popup-open-folder').style.display = 'block';
+        document.getElementById('popup-move-folder').style.display = 'block';
       } else {
+        /* Give some way to retry download! */
         document.getElementById('popup-missing').style.display = 'block';
         document.getElementById('popup-retry').style.display = 'block';
-        /* Give some way to retry download! */
-        document.getElementById('popup-open').style.display = 'none';
-        //document.getElementById('popup-open-swf-player').style.display ='none';
-        document.getElementById('popup-open-external').style.display = 'none';
-        document.getElementById('popup-open-folder').style.display = 'none';
       }
       document.getElementById('popup-remove').style.display = 'block';
     } else if(nicofox_ui.manager.rows[this.recent_row].status > 4) {
       /* When downloading */
-      document.getElementById('popup-missing').style.display = 'none';
-      document.getElementById('popup-retry').style.display = 'none';
       document.getElementById('popup-cancel').style.display = 'block';
-      document.getElementById('popup-open').style.display = 'none';
-      //document.getElementById('popup-open-swf-player').style.display ='none';
-      document.getElementById('popup-open-external').style.display = 'none';
-      document.getElementById('popup-open-folder').style.display = 'none';
-      document.getElementById('popup-remove').style.display = 'none';
     } else {
       /* Failed/canceled */ 
-      document.getElementById('popup-missing').style.display = 'none';
       document.getElementById('popup-retry').style.display = 'block';
-      document.getElementById('popup-cancel').style.display = 'none';
-      document.getElementById('popup-open').style.display = 'none';
-      //document.getElementById('popup-open-swf-player').style.display ='none';
-      document.getElementById('popup-open-external').style.display = 'none';
-      document.getElementById('popup-open-folder').style.display = 'none';
       document.getElementById('popup-remove').style.display = 'block';
     }
   }

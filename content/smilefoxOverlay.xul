@@ -30,24 +30,6 @@
     </toolbar>
     
   </toolbox>
-<hbox flex="1">
-<tree id="dir-tree" flex="1" seltype="single" hidecolumnpicker="true">
-  <treecols>
-    <treecol flex="1" primary="true" hideheader="true" />
-  </treecols>
-  <treechildren>
-   <treeitem>  
-      <treerow>  
-        <treecell label="Downloads" src="chrome://nicofox/skin/logo_16.png"/>
-      </treerow>  
-    </treeitem>  
-    <treeitem>  
-      <treerow>  
-        <treecell label="Stored Folder" src="chrome://nicofox/skin/folder_go.png"/>
-      </treerow>  
-    </treeitem>
-    </treechildren>
-</tree>
 <tree id="smilefox-tree" flex="8" context="smilefox-popup">
   <treecols>
     <treecol label="&tree.videoTitle;" id="tree-title" flex="5"/>
@@ -66,7 +48,6 @@
   </treecols>
   <treechildren id="smilefox-treechildren"/>
 </tree>
-</hbox>
   <menupopup id="smilefox-popup">
    <menuitem label="File missing!" accesskey="" id="popup-missing" disabled="true" />
    <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="nicofox_ui.manager.popup_command.cancel()" />
@@ -75,6 +56,7 @@
    <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="nicofox_ui.manager.popup_command.openExternal()" />
 <!--   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="nicofox_ui.manager.popup_command.openSwfPlayer()" />-->
    <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.openFolder();" id="popup-open-folder"/>
+   <menuitem label="Move files to folder..."  accesskey="M" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="popup-move-folder"/>
    <menuseparator />
    <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="nicofox_ui.manager.popup_command.go();" />
    <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="popup-copy" oncommand="nicofox_ui.manager.popup_command.copy();" />

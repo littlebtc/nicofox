@@ -395,7 +395,17 @@ var smilefox_sqlite = {
     info.video_economy = (info.video_economy)?1:0;
     return info;
   },
-
+  updatePath: function(id, info) {
+    if(!id || isNaN(id)) { return false; }
+    var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `video_file` = ?1 , `comment_file` = ?2 WHERE `id` = ?3");
+    stmt.bindUTF8StringParameter(0, info.video_file);
+    stmt.bindUTF8StringParameter(1, info.comment_file);
+    stmt.bindInt32Parameter(2, id);
+    stmt.execute();
+    stmt.reset();
+    this.purgeCache();
+    return info;
+  },
   updateBytes: function(id, info) {
     if(!id || isNaN(id)) { return false; }
     var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `current_bytes` = ?1, `max_bytes` = ?2 WHERE `id` = ?3");
@@ -514,6 +524,11 @@ nicofox.download_manager =
       triggerDownloadListeners('remove', id, {});
   }  
    },
+   moveFile: function(id, video_file, comment_file) {
+     var info = smilefox_sqlite.updatePath(id, {video_file: video_file, comment_file: comment_file});
+     triggerDownloadListeners('update', id, info);
+   },
+
    cancel: function(id)
    {
      download_runner.cancel(id);
