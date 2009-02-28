@@ -528,7 +528,6 @@ nicofox.download_manager =
      var info = smilefox_sqlite.updatePath(id, {video_file: video_file, comment_file: comment_file});
      triggerDownloadListeners('update', id, info);
    },
-
    cancel: function(id)
    {
      download_runner.cancel(id);
