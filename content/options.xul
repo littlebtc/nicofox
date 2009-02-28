@@ -9,8 +9,8 @@
   <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();" image="chrome://nicofox/skin/nicofox_content.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel1.js" />
     <preferences>
-      <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool"/>
-      <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool"/>
+      <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool" onchange="nicomonkeySwitch();" />
+      <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool" onchange="toolbarSwitch();" />
       <preference id="pref-nicomonkey.comment_helper" name="extensions.nicofox.nicomonkey.comment_helper" type="bool"/>
       <preference id="pref-nicomonkey.player_killer" name="extensions.nicofox.nicomonkey.player_killer" type="bool"/>
       <preference id="pref-nicomonkey.sound_converter" name="extensions.nicofox.nicomonkey.sound_converter" type="string"/>
@@ -19,10 +19,10 @@
       <preference id="pref-nicowa_blocker" name="extensions.nicofox.nicowa_blocker" type="bool"/>
     </preferences>
     <checkbox id="nicowa_blocker" preference="pref-nicowa_blocker" label="&nicowa_blocker.label;" accesskey="&nicowa_blocker.accesskey;" />
-    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;" oncommand="nicomonkeySwitch();" />
+    <checkbox id="nicomonkey.enable" preference="pref-nicomonkey.enable" label="&nicomonkey.enable.label;" accesskey="&nicomonkey.enable.accesskey;"/>
     <groupbox align="start" id="nicomonkey-groupbox">
      <caption label="&nicomonkey.options;"/>
-     <checkbox id="nicomonkey.toolbar" preference="pref-nicomonkey.toolbar" label="&nicomonkey.toolbar.label;" accesskey="&nicomonkey.toolbar.accesskey;" oncommand="toolbarSwitch();" />
+     <checkbox id="nicomonkey.toolbar" preference="pref-nicomonkey.toolbar" label="&nicomonkey.toolbar.label;" accesskey="&nicomonkey.toolbar.accesskey;"/>
      <hbox class="indent">
      <label value="&nicomonkey.sound_converter.label;" accesskey="&nicomonkey.sound_converter.accesskey;" control="nicomonkey.sound_converter"/>
       <menulist id="nicomonkey.sound_converter" preference="pref-nicomonkey.sound_converter" >
@@ -137,9 +137,9 @@
   <prefpane id="pane3" label="&video_player;" onpaneload="updatePanel3();" image="chrome://nicofox/skin/nicofox_player.png">
   <script type="application/x-javascript" src="chrome://nicofox/content/options-panel3.js" />
     <preferences>
-      <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" />
+      <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" onchange="updateVideoPlayer();"/>
       <preference id="pref-external_video_player_path" name="extensions.nicofox.external_video_player_path" type="file" />
-      <preference id="pref-external_swf_player" name="extensions.nicofox.external_swf_player" type="bool" />
+      <preference id="pref-external_swf_player" name="extensions.nicofox.external_swf_player" type="bool" onchange="updateSwfPlayer();"/>
       <preference id="pref-external_swf_player_path" name="extensions.nicofox.external_swf_player_path" type="file" />
     </preferences>
      <groupbox>

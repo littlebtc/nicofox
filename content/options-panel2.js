@@ -4,38 +4,41 @@ var Ci = Components.interfaces;
 
 function updatePanel2()
 {
-	var save_path = document.getElementById("pref-save_path").value;
-	if (save_path)
-	{
-		var save_path_element = document.getElementById("save_path");
-		save_path_element.file = save_path;
-		save_path_element.label = save_path.leafName;
-	}
+  var save_path = document.getElementById("pref-save_path").value;
+  if (save_path)
+  {
+    var save_path_element = document.getElementById("save_path");
+    save_path_element.file = save_path;
+    save_path_element.label = save_path.leafName;
+  }
 
-	/* Update the username for menulist */
-	if (document.getElementById('pref-autologin_username').value)
-	{
-		document.getElementById('autologin_username').appendItem(document.getElementById('pref-autologin_username').value, document.getElementById('pref-autologin_username').value, null);
-		document.getElementById('autologin_username').selectedIndex = 0 ;
-	}
-	else
-	{
-		document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
-		document.getElementById('autologin_username').selectedIndex = 0 ;
+  /* Update the username for menulist */
+  if (document.getElementById('pref-autologin_username').value)
+  {
+    document.getElementById('autologin_username').appendItem(document.getElementById('pref-autologin_username').value, document.getElementById('pref-autologin_username').value, null);
+    document.getElementById('autologin_username').selectedIndex = 0 ;
+  }
+  else
+  {
+    document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
+    document.getElementById('autologin_username').selectedIndex = 0 ;
                 document.getElementById('autologin_remove').hidden = true;
-	}
+  }
 
 }
 function selectDir(title)
 {
-	var file_picker = Cc["@mozilla.org/filepicker;1"]
-	                  .createInstance(Ci.nsIFilePicker);
-	file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
-	if (file_picker.show() == Ci.nsIFilePicker.returnOK)
-	{
-		document.getElementById("pref-save_path").value = file_picker.file;
-	updatePanel2();
-	}
+  var file_picker = Cc["@mozilla.org/filepicker;1"]
+                    .createInstance(Ci.nsIFilePicker);
+  file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
+  /* Set saved path to default */
+  file_picker.displayDirectory = document.getElementById("pref-save_path").value;
+
+  if (file_picker.show() == Ci.nsIFilePicker.returnOK)
+  {
+    document.getElementById("pref-save_path").value = file_picker.file;
+  updatePanel2();
+  }
 }
 
 
@@ -53,7 +56,7 @@ function readUsernames()
      document.getElementById('autologin_username').selectedIndex = 0;
      for (var i = 0; i < logins.length; i++)
      {
-	document.getElementById('autologin_username').appendItem(logins[i].username, logins[i].username, null);
+  document.getElementById('autologin_username').appendItem(logins[i].username, logins[i].username, null);
         /* Select the username in preferences */
         if (document.getElementById('pref-autologin_username').value == logins[i].username)
           document.getElementById('autologin_username').selectedIndex = i+1;

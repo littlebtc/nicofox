@@ -216,7 +216,7 @@ nicofox_ui.manager = {
 
     if (keyword) {
       keyword = keyword.replace(/([\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]])/g, '\\$1');
-      var keywords = keyword.replace(/\s(.*)\s/, '$1').split(/\s/);
+      var keywords = keyword.replace(/^\s(.*)\s$/, '$1').split(/\s/);
       for (var i = 0; i < keywords.length; i++) {
         keywords[i] = new RegExp(keywords[i], 'ig');
       }
@@ -238,7 +238,9 @@ nicofox_ui.manager = {
   openFileToPlayer: function() {
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
     file_picker.init(window, 'Choose Video File to Play', null);
-    file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
+    if (nicofox.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
+      file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
+    }
     file_picker.appendFilter('Supported Type', '*.flv; *.mp4');
     if (file_picker.show() == Ci.nsIFilePicker.returnOK)
     {
@@ -569,7 +571,7 @@ nicofox_ui.manager.popup_command =
     /* Show file picker */
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
     file_picker.init(window, 'Select a Folder', Ci.nsIFilePicker.modeGetFolder);
-    file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
+    file_picker.displayDirectory = video_file.parent;
     if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
       var move_to = file_picker.file;
     } else {
