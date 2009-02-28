@@ -61,6 +61,15 @@ nicofox_ui.overlay = {
    nicofox_ui.overlay.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                        .getService(Ci.nsIPromptService);
 
+   /* Cancel some function for non-firefox */
+   var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]
+                    .getService(Ci.nsIXULAppInfo);  
+   if (xulapp_info.ID != '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}') {
+     nicofox.prefs.setBoolPref('extensions.nicofox.nicomonkey.supertag', false);
+     nicofox.prefs.setBoolPref('extensions.nicofox.nicomonkey.superlist', false);
+   }
+
+   /* Listen pages */
    gBrowser.addProgressListener(nicofox_ui.overlay.page_listener,
    Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
