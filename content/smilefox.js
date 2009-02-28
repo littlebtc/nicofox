@@ -28,7 +28,7 @@ nicofox_ui.manager = {
       document.getElementById('smilefox-toolbar-start').disabled = true;
       document.getElementById('smilefox-toolbar-stop').disabled = true;
     }
-    document.getElementById('smilefox-tree').addEventListener('contextmenu', nicofox.hitch(nicofox_ui.manager.popup_command, 'activate'), false);
+    document.getElementById('smilefox-popup').addEventListener('popupshowing', nicofox_ui.manager.popup_command.activate, false);
     document.getElementById('smilefox-tree').focus();
 
     /* Drag & Drop */
@@ -202,7 +202,7 @@ nicofox_ui.manager = {
     nicofox.download_listener.removeListener(nicofox_ui.manager.listener);
     window.removeEventListener("load", nicofox_ui.manager.load, false);
     window.removeEventListener("unload", nicofox_ui.manager.unload, false);
-    document.getElementById('smilefox-tree').removeEventListener('contextmenu', nicofox_ui.manager.popup_command.activate, false);
+    document.getElementById('smilefox-popup').removeEventListener('popupshowing', nicofox_ui.manager.popup_command.activate, false);
     document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox_ui.manager.download_tree.dragOver, true);
     document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox_ui.manager.download_tree.dragDrop, true);
   },
@@ -667,13 +667,17 @@ nicofox_ui.manager.popup_command =
     tree.treeBoxObject.getCellAt(e.clientX, e.clientY, row, col, child);
     this.recent_row = row.value;
     this.recent_col = col.value;
-
+    /* Column out of range */
+    if (!this.recent_col) {
+      e.preventDefault();
+      return;
+    }
     if(this.recent_row == -1) {
       /* Out of the range, but something is still selected */
       this.recent_row = tree.currentIndex;
       if (this.recent_row == -1) {
         /* Nothing selected */
-        document.getElementById('smilefox-popup').style.display='none';
+        e.preventDefault();
         return;
      }
     } else {
@@ -683,7 +687,6 @@ nicofox_ui.manager.popup_command =
         this.multiple_select = false;
       }
     }
-    document.getElementById('smilefox-popup').style.display='-moz-popup';
     selected_row = nicofox_ui.manager.rows[this.recent_row];
   
     /* Initialize */

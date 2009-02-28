@@ -170,6 +170,23 @@ nicofox_ui.overlay = {
       return;
     }
 
+    /* Test the file title */
+    /* FIXME: This should not be here? */
+    var file_title = nicofox.prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
+    file_title = file_title.replace(/\%TITLE\%/, nicofox.fixReservedCharacters(Video.title));
+    file_title = file_title.replace(/\%ID\%/, nicofox.fixReservedCharacters(Video.id));
+    /* Add comment filename */
+    if (Video.comment_type != 'www' && Video.comment_type) {
+      file_title = file_title.replace(/\%COMMENT\%/, nicofox.fixReservedCharacters('['+Video.comment_type+']'));
+    } else {
+      file_title = file_title.replace(/\%COMMENT\%/, '');
+    }
+    var save_path = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
+    if (!this.checkFile(save_path, file_title)) {
+      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), 'You are trying to download the video that you have downloaded.');
+      return;
+    }
+
     if(nicofox.prefs.getBoolPref('confirm_before_download') && !dont_confirm) {
       /* Call the download confirm dialog */
       var params = {url: url, Video: Video, out: null};       
@@ -227,7 +244,23 @@ nicofox_ui.overlay = {
   {
     return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/);
   },
-
+  checkFile: function(path, filename) {
+    if (
+    this.isFileExists(path, filename + '.flv')
+    || this.isFileExists(path, filename + '.mp4')
+    || this.isFileExists(path, filename + '.xml')
+    || this.isFileExists(path, filename + '[Owner].xml')
+    ) {
+      return false;
+    }
+    return true;
+  },
+  isFileExists: function(path, filename) {
+    var file = path.clone();
+    file.append(filename);
+    var exists = file.exists();
+    return exists;
+  },
   refreshIcon: function() {
     var nicofox_icon = document.getElementById('nicofox-icon');
     var download_count = nicofox.download_manager.getDownloadCount();
