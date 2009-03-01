@@ -161,4 +161,21 @@ nicofox.monkey_strings = {
     return this.bundle.formatStringFromName(key, arr, arr.length);
   }
 };
-
+/* Fix common reserved characters in filesystems by converting to full-width */
+nicofox.fixReservedCharacters = function(title) {
+  title = title.replace(/\//g, "\uFF0F");
+  title = title.replace(/\\/g, "\uFF3C");
+  title = title.replace(/\?/g, "\uFF1F");
+  title = title.replace(/\%/g, "\uFF05");
+  title = title.replace(/\*/g, "\uFF0A");
+  title = title.replace(/\:/g, "\uFF1A");
+  title = title.replace(/\|/g, "\uFF5C");
+  title = title.replace(/\"/g, "\uFF02");
+  title = title.replace(/\</g, "\uFF1C");
+  title = title.replace(/\>/g, "\uFF1E");
+  title = title.replace(/\+/g, "\uFF0B");
+  /* Windows FAT specified... */
+  //title = title.replace(/\[/g, '〔');
+  //title = title.replace(/\]/g, '〕');
+  return title;
+}

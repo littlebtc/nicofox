@@ -28,7 +28,8 @@ nicofox_ui.manager = {
       document.getElementById('smilefox-toolbar-start').disabled = true;
       document.getElementById('smilefox-toolbar-stop').disabled = true;
     }
-    document.getElementById('smilefox-popup').addEventListener('popupshowing', nicofox_ui.manager.popup_command.activate, false);
+    document.getElementById('smilefox-popup').addEventListener('popupshowing', function(e) {
+    nicofox_ui.manager.popup_command.activate.call(nicofox_ui.manager.popup_command, e)}, false);
     document.getElementById('smilefox-tree').focus();
 
     /* Drag & Drop */
@@ -202,7 +203,8 @@ nicofox_ui.manager = {
     nicofox.download_listener.removeListener(nicofox_ui.manager.listener);
     window.removeEventListener("load", nicofox_ui.manager.load, false);
     window.removeEventListener("unload", nicofox_ui.manager.unload, false);
-    document.getElementById('smilefox-popup').removeEventListener('popupshowing', nicofox_ui.manager.popup_command.activate, false);
+    document.getElementById('smilefox-popup').removeEventListener('popupshowing', function(e) {
+    nicofox_ui.manager.popup_command.activate.call(nicofox_ui.manager.popup_command, e)}, false);
     document.getElementById('smilefox-tree').removeEventListener('dragover', nicofox_ui.manager.download_tree.dragOver, true);
     document.getElementById('smilefox-tree').removeEventListener('dragdrop', nicofox_ui.manager.download_tree.dragDrop, true);
   },

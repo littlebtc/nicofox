@@ -754,12 +754,12 @@ var download_runner =
         this.query[k].downloader.callback = nicofox.hitch(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
         /* FIXME: Check the filename scheme! */
         var file_title = prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
-        file_title = file_title.replace(/\%TITLE\%/, fixReservedCharacters(downloads[i].video_title));
-        file_title = file_title.replace(/\%ID\%/, fixReservedCharacters(downloads[i].video_id));
+        file_title = file_title.replace(/\%TITLE\%/, nicofox.fixReservedCharacters(downloads[i].video_title));
+        file_title = file_title.replace(/\%ID\%/, nicofox.fixReservedCharacters(downloads[i].video_id));
                     /* Add comment filename */
         if (downloads[i].comment_type != 'www' && downloads[i].comment_type)
         {
-          file_title = file_title.replace(/\%COMMENT\%/, fixReservedCharacters('['+downloads[i].comment_type+']'));
+          file_title = file_title.replace(/\%COMMENT\%/, nicofox.fixReservedCharacters('['+downloads[i].comment_type+']'));
         }
         else
         {
@@ -863,22 +863,5 @@ function allDone() {
 
 }
 
-/* Fix common reserved characters in filesystems by converting to full-width */
-function fixReservedCharacters(title) {
-  title = title.replace(/\//g, "\uFF0F");
-  title = title.replace(/\\/g, "\uFF3C");
-  title = title.replace(/\?/g, "\uFF1F");
-  title = title.replace(/\%/g, "\uFF05");
-  title = title.replace(/\*/g, "\uFF0A");
-  title = title.replace(/\:/g, "\uFF1A");
-  title = title.replace(/\|/g, "\uFF5C");
-  title = title.replace(/\"/g, "\uFF02");
-  title = title.replace(/\</g, "\uFF1C");
-  title = title.replace(/\>/g, "\uFF1E");
-  title = title.replace(/\+/g, "\uFF0B");
-  /* Windows FAT specified... */
-  //title = title.replace(/\[/g, '〔');
-  //title = title.replace(/\]/g, '〕');
-  return title;
-}
+
 
