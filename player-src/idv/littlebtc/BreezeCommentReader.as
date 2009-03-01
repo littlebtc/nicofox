@@ -246,7 +246,8 @@ package idv.littlebtc
 				if (comment.pos == 'shita'  && comment.vpos <= time && comment.vpos+300 >= time )
 				{
 					if(!comment.object)
-					{												
+					{
+									
 						comment.object = shita_sprite.addComment(comment);
 						num++;						
 					}														
@@ -293,6 +294,7 @@ package idv.littlebtc
 			}
 			//myapp.textArea.text = '?'+check_head+'/'+check_tail + "\n"+ myapp.textArea.text;
 		}
+		
 		public function cleanComment():void
 		{
 			var comment:Object;
