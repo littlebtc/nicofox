@@ -61,7 +61,7 @@
 			public var video_file:String;
 			public var comment_file:String;			
 			private var breeze_comment:Object;
-		
+			public var time_previous:Number;
 
 			private function goResize(e:ResizeEvent):void
 			{
@@ -301,6 +301,14 @@
 				 # When comments are too much to display, display randomly
 				   (but we shouldn't do this because there will be some "comment ASCII art") 
 				 */							
+				
+				/* Check fps and supress something */
+				var time_now:Number = new Date().getTime();
+				if (time_now - this.time_previous >= 100) {
+					this.time_previous = time_now;
+					return;
+				}
+				this.time_previous = time_now;
 				
 				var vpos:Number = Math.floor(e.playheadTime * 100);
 				var Mins:Number = Math.floor(vpos / 100);						

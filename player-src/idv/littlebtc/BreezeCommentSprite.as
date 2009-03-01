@@ -9,7 +9,7 @@ package idv.littlebtc
 		private var time:Number;
 		private var comment_type:String;
 		private const comment_max:int = 50;
-	 
+			 
 		//private var comment_pool:Array;
 		
 		public function BreezeCommentSprite(new_type:String)
@@ -29,7 +29,9 @@ package idv.littlebtc
 			  tf.visible = false;			  
 			  this.addChild(tf);
 			}			
-
+			if (new_type == 'naka') {
+			  setInterval(this.updateNakaPosition, 20);
+			}
 		}
 		
 		public function addComment(info:Object):DisplayObject
@@ -150,6 +152,7 @@ package idv.littlebtc
 			return use_object;
 		}
 		public function updateNakaPosition():void {
+
 			var object:DisplayObject;
 			var i:int;
 			for (i = 0; i < this.numChildren; i++) {

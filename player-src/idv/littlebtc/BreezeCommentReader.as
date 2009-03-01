@@ -239,21 +239,24 @@ package idv.littlebtc
 			var lineMetrics:TextLineMetrics ;
 			var scale:Number;
 			var matrix:Matrix;
+			var num:int = 0;
 			for each(comment in comment_list)
 			{	
-				
+				if (num > 3) return;
 				if (comment.pos == 'shita'  && comment.vpos <= time && comment.vpos+300 >= time )
 				{
 					if(!comment.object)
 					{												
-						comment.object = shita_sprite.addComment(comment);						
+						comment.object = shita_sprite.addComment(comment);
+						num++;						
 					}														
 				}
 				else if(comment.pos == 'ue'  && comment.vpos <= time && comment.vpos+300 >= time )
 				{
 					if(!comment.object)
 					{												
-						comment.object = ue_sprite.addComment(comment);						
+						comment.object = ue_sprite.addComment(comment);
+						num++;						
 					}
 
 				}
@@ -262,7 +265,8 @@ package idv.littlebtc
 				{
 					if(!comment.object)
 					{												
-						comment.object = naka_sprite.addComment(comment);						
+						comment.object = naka_sprite.addComment(comment);
+						num++;						
 					}
 					else
                     {
