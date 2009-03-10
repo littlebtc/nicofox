@@ -237,13 +237,13 @@ nicofox_ui.manager = {
     }
     this.updateTree();
   },
-  openFileToPlayer: function() {
+  openFileInPlayer: function() {
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    file_picker.init(window, 'Choose Video File to Play', null);
+    file_picker.init(window, nicofox.strings.getString('chooseVideoFile'), null);
     if (nicofox.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
       file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     }
-    file_picker.appendFilter('Supported Type', '*.flv; *.mp4');
+    file_picker.appendFilter(nicofox.strings.getString('supportedType'), '*.flv; *.mp4');
     if (file_picker.show() == Ci.nsIFilePicker.returnOK)
     {
       /* XXX: Find a better way to make a function */
@@ -572,19 +572,25 @@ nicofox_ui.manager.popup_command =
 
     /* Show file picker */
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    file_picker.init(window, 'Select a Folder', Ci.nsIFilePicker.modeGetFolder);
+    file_picker.init(window, nicofox.strings.getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
     file_picker.displayDirectory = video_file.parent;
     if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
       var move_to = file_picker.file;
     } else {
       return;
     }
-    
+   
+    /* No same desination */
+    if (move_to.equals(video_file.parent)) {
+      nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMovePath'));
+      return;
+    }
+ 
     /* Check video file */
     var video_file_check = move_to.clone();
     video_file_check.append(video_file.leafName);
     if (video_file_check.exists()) {
-      nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move1');
+      nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
       return;
     }
 
@@ -593,7 +599,7 @@ nicofox_ui.manager.popup_command =
       var comment_file_check = move_to.clone();
       comment_file_check.append(comment_file.leafName);
       if (comment_file_check.exists()) {
-        nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move2');
+        nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
         return;
       }
     }
@@ -601,7 +607,7 @@ nicofox_ui.manager.popup_command =
       var uploader_comment_file_check = move_to.clone();
       uploader_comment_file_check.append(uploader_comment_file.leafName);
       if (uploader_comment_file_check.exists()) {
-        nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move3');
+        nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
         return;
       }
     }
@@ -612,7 +618,7 @@ nicofox_ui.manager.popup_command =
       if (comment_exists) comment_file.moveTo(move_to ,''); 
       if (uploader_comment_exists) uploader_comment_file.moveTo(move_to ,''); 
     } catch(e) {
-      nicofox_ui.manager.prompts.alert(null, 'Error', 'Cannot move!');
+      nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
     }
     /* Change the database */
     var comment_file_path = '';
@@ -707,7 +713,7 @@ nicofox_ui.manager.popup_command =
       cell_text = cell_text.substr(0, 15) + "\u2026";
     }
     if (cell_text) {
-      document.getElementById('popup-copy-cell').label = 'Copy \''+ cell_text +'\'';
+      document.getElementById('popup-copy-cell').label = nicofox.strings.getFormattedString('copyCell', [ cell_text ]);
       document.getElementById('popup-copy-cell').style.display = 'block';
     } else {
     }

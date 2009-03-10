@@ -62,11 +62,9 @@ nicofox_ui.overlay = {
                        .getService(Ci.nsIPromptService);
 
    /* Cancel some function for non-firefox */
-   var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]
-                    .getService(Ci.nsIXULAppInfo);  
-   if (xulapp_info.ID != '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}') {
-     nicofox.prefs.setBoolPref('extensions.nicofox.nicomonkey.supertag', false);
-     nicofox.prefs.setBoolPref('extensions.nicofox.nicomonkey.superlist', false);
+   if (!Ci.nsINavBookmarksService) {
+     nicofox.prefs.setBoolPref('nicomonkey.supertag', false);
+     nicofox.prefs.setBoolPref('nicomonkey.superlist', false);
    }
 
    /* Listen pages */
@@ -183,7 +181,7 @@ nicofox_ui.overlay = {
     }
     var save_path = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     if (!this.checkFile(save_path, file_title)) {
-      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), 'You are trying to download the video that you have downloaded.');
+      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorFileExisted'));
       return;
     }
 

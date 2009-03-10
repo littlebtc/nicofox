@@ -37,6 +37,13 @@ function $$(xpath,root) {
 
 function start()
 {
+	/* Check if we've logged in */
+        var logged_in = false;
+	if (unsafeWindow.User) {
+		if (unsafeWindow.User.id) {
+			if (typeof unsafeWindow.User.id == 'number') { logged_in = true; }
+		}
+	}
 	if (document.getElementById('flvplayer_container') && document.getElementById('deleted_message_default') && GM_getValue('player_killer')) /* Video is deleted for copyright issue */
 	{
 		killPlayer();
@@ -49,36 +56,18 @@ function start()
 		GM_addStyle('#video_utilities ul {list-style-type: none; margin:0; padding: 0; margin-left: 3px;} #video_utilities ul li {display: inline; font-size: 12px; font-weight: bold;}');		
 		GM_addStyle('#video_utilities img {vertical-align: middle;}');
 		GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
-	window.setTimeout(pushLinks, 10);
-	if (document.getElementById('category_recent'))
-	{
-		window.setTimeout(listenMainPage, 10);
-	}
 
+	if (logged_in) {
+		window.setTimeout(pushLinks, 10);
+		if (document.getElementById('category_recent'))
+		{
+			window.setTimeout(listenMainPage, 10);
+		}
+	}
 	var link_alternate = $$('.//link [@rel="alternate"]');
-	/* Not logged in? Add a hatena video link :D */
-	if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
-	  && link_alternate.length > 0) /* Logged in */
-	{
-	  var vm = link_alternate[0].href.match(/^http:\/\/m\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/);
-	  if (vm) {
-  	    var v = vm[1];
-	    var download_link = document.createElement('a');
-	    download_link.className = 'fox-dl-link';
-	    download_link.title = NM_getString('relatedHatena');
-	    download_link.innerHTML = '<img src="'+hatena_uri+'" />';
-	    download_link.href = 'http://d.hatena.ne.jp/video/niconico/'+v;
 
-	    /* Fetching Nico Nico's video title */
-	    var h2 = document.getElementsByTagName('h2')[0];
-	    /* inject the video download link */
-	    if (h2.hasChildNodes()) {
-	      h2.appendChild(download_link);
-	    }
-	  } 
-	}
 	/* Player-related hack, need the 'watch' address and the flv player */
-	else if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
+	if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
 	  && document.getElementById('flvplayer_container') /* Logged in */
 	  )
 	{
@@ -128,45 +117,46 @@ function start()
 		  }	
 		}
 
-		/* Use img to reduce the DOM use */
-		var download_link = document.createElement('a');
-		download_link.className = 'fox-dl-link';
-		download_link.id = 'fox-dl-this1';
-		download_link.title = NM_getString('download');
-		download_link.innerHTML = '<img src="'+dl_uri+'" />';
+		if (logged_in) {
+			/* Use img to reduce the DOM use */
+			var download_link = document.createElement('a');
+			download_link.className = 'fox-dl-link';
+			download_link.id = 'fox-dl-this1';
+			download_link.title = NM_getString('download');
+			download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
-		var h1 = null;
-		/* Fetching Nico Nico's video title */
-		if(window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/watch\//)) {
-		  /* Taiwan (new) has another <h1> */
-		  h1 = document.getElementsByTagName('h1')[1];
-		} else {
-		  h1 = document.getElementsByTagName('h1')[0];
-		}
-		/* inject the video download link */
-		if (h1 && h1.hasChildNodes())
-		{
-			h1.appendChild(download_link);
-		}
-
-		/* Use img to reduce the DOM use */
-		var download_link = document.createElement('a');
-		download_link.className = 'fox-dl-link';
-		download_link.id = 'fox-dl-this2';
-		download_link.title = NM_getString('download');
-		download_link.innerHTML = '<img src="'+dl_uri+'" />';
-
-		/* Find for non-expanded mode */
-		var des1 = document.getElementById('des_1');
-		if (des1 && des1.hasChildNodes())
-		{
-			var headera = des1.getElementsByTagName('a')[1];
-			if (headera)
+			var h1 = null;
+			/* Fetching Nico Nico's video title */
+			if(window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/watch\//)) {
+			  /* Taiwan (new) has another <h1> */
+			  h1 = document.getElementsByTagName('h1')[1];
+			} else {
+			  h1 = document.getElementsByTagName('h1')[0];
+			}
+			/* inject the video download link */
+			if (h1 && h1.hasChildNodes())
 			{
-				headera.parentNode.insertBefore(download_link, headera.nextSibling);
+				h1.appendChild(download_link);
+			}
+
+			/* Use img to reduce the DOM use */
+			var download_link = document.createElement('a');
+			download_link.className = 'fox-dl-link';
+			download_link.id = 'fox-dl-this2';
+			download_link.title = NM_getString('download');
+			download_link.innerHTML = '<img src="'+dl_uri+'" />';
+
+			/* Find for non-expanded mode */
+			var des1 = document.getElementById('des_1');
+			if (des1 && des1.hasChildNodes())
+			{
+				var headera = des1.getElementsByTagName('a')[1];
+				if (headera)
+				{
+					headera.parentNode.insertBefore(download_link, headera.nextSibling);
+				}
 			}
 		}
-
 		if(GM_getValue('toolbar'))
 		{
 			window.setTimeout(start_inject, 10);
@@ -257,7 +247,7 @@ function start_inject()
                 '<li><a href="http://tw.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoTw')+'"><img src="'+tw_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://es.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoEs')+'"><img src="'+es_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://de.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoDe')+'"><img src="'+de_uri+'" /></a></li>'+"\r\n"+
-		'<li>External Website</li>'+"\r\n"+
+		'<li>'+NM_getString('tools')+'</li>'+"\r\n"+
                 '<li><a href="'+sound_website+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsSoundConverter')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
                '<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsNicoChart')+'"><img src="'+chart_uri+'" /></a></li>'+"\r\n";
 

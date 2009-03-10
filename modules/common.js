@@ -139,8 +139,7 @@ nicofox.strings = {
     return this.bundle.GetStringFromName(str);
   },
   getFormattedString: function (key, arr) {
-    if (typeof (arr) != 'array') {return '';}
-    if (this.bundle === null) this.init();
+    if (toString.call(arr) === "[object Array]") {return '';} // Technology from jQuery
     return this.bundle.formatStringFromName(key, arr, arr.length);
   }
 };
@@ -156,7 +155,7 @@ nicofox.monkey_strings = {
     return this.bundle.GetStringFromName(str);
   },
   getFormattedString: function (key, arr) {
-    if (typeof (arr) != 'array') {return '';}
+    if (toString.call(arr) === "[object Array]") {return '';} // Technology from jQuery
     if (this.bundle === null) this.init();
     return this.bundle.formatStringFromName(key, arr, arr.length);
   }

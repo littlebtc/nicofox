@@ -8,6 +8,8 @@
 <!ENTITY options.label "Options">
 <!ENTITY options.accesskey "O">
 <!ENTITY search.label "Search">
+<!ENTITY openPlayer.tooltiptext "Open Video File in Player">
+<!ENTITY close.tooltiptext "Dismiss the manager">
 <!ENTITY tree.videoTitle "Video Title">
 <!ENTITY tree.comment "Comment">
 <!ENTITY tree.economy "Economy">
@@ -15,6 +17,7 @@
 <!ENTITY tree.status "Status">
 <!ENTITY tree.size "Size">
 <!ENTITY tree.speed "Speed">
+<!ENTITY popup.missing.label "File missing!">
 <!ENTITY popup.cancel.label "Cancel">
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "Retry">
@@ -25,10 +28,13 @@
 <!ENTITY popup.openExternal.accesskey "E">
 <!ENTITY popup.openFolder.label "Open Containing Folder">
 <!ENTITY popup.openFolder.accesskey "F">
+<!ENTITY popup.moveFolder.label "Move files to folder...">
+<!ENTITY popup.moveFolder.accesskey "M">
 <!ENTITY popup.go.label "Go to Video Page">
 <!ENTITY popup.go.accesskey "G">
 <!ENTITY popup.copy.label "Copy Video Page URL">
 <!ENTITY popup.copy.accesskey "C">
+<!ENTITY popup.copyCell.accesskey "o">
 <!ENTITY popup.selectAll.label "Select All">
 <!ENTITY popup.selectAll.accesskey "A">
 <!ENTITY popup.remove.label "Remove from List">

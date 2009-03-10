@@ -497,12 +497,6 @@ nicofox.download_manager =
      return rows.concat();
    },
 
-   searchDownloads: function(keywords) {
-     if (typeof keywords != 'Array') return new Array();
-  rows = smilefox_sqlite.search(keywords);
-  return rows;
-   },
-
    getDownloadCount: function() {
      return download_count;
 
@@ -783,7 +777,7 @@ var download_runner =
           var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                         .getService(Ci.nsIPromptService);
           var check = {value: false};
-          prompts.alertCheck(null, nicofox.strings.getString('errorTitle'), 'On Nico Nico Douga, the economy mode (low quality mode) is on, so some downloads will be preserved. It will be scheduled now and downloaded after the mode is off.', 'Do not notify me again' , check);
+          prompts.alertCheck(null, nicofox.strings.getString('economyNoticeTitle'), nicofox.strings.getString('economyNoticeMessage'), nicofox.strings.getString('economyNoticeNeverAsk') , check);
 	  if (check.value) {
             prefs.setBoolPref('economy_notice', false);
 	  }

@@ -24,8 +24,8 @@
       <toolbarbutton id="smilefox-toolbar-option" label="&options.label;" oncommand="nicofox_ui.manager.optionsWindow();" disabled="false" />
       <spacer flex="1" />
       <textbox value="" emptytext="&search.label;" width="300" id="smilefox-search" type="timed" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
-      <toolbarbutton id="smilefox-toolbar-open" oncommand="nicofox_ui.manager.openFileToPlayer();" disabled="false"  class="toolbarbutton-iconic" />
-      <toolbarbutton id="smilefox-toolbar-close" oncommand="nicofox_ui.manager.toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
+      <toolbarbutton id="smilefox-toolbar-open" tooltiptext="&openPlayer.tooltiptext;" oncommand="nicofox_ui.manager.openFileInPlayer();" disabled="false"  class="toolbarbutton-iconic" />
+      <toolbarbutton id="smilefox-toolbar-close" tooltiptext="&close.tooltiptext;" oncommand="nicofox_ui.manager.toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
 
     </toolbar>
     
@@ -49,18 +49,18 @@
   <treechildren id="smilefox-treechildren"/>
 </tree>
   <menupopup id="smilefox-popup">
-   <menuitem label="File missing!" accesskey="" id="popup-missing" disabled="true" />
+   <menuitem label="&popup.missing.label;" accesskey="" id="popup-missing" disabled="true" />
    <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="popup-cancel" oncommand="nicofox_ui.manager.popup_command.cancel()" />
    <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="nicofox_ui.manager.popup_command.retry()" style="font-weight: bold;"  />
    <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="nicofox_ui.manager.popup_command.open()" style="font-weight: bold;" />
    <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="nicofox_ui.manager.popup_command.openExternal()" />
 <!--   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="nicofox_ui.manager.popup_command.openSwfPlayer()" />-->
    <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.openFolder();" id="popup-open-folder"/>
-   <menuitem label="Move files to folder..."  accesskey="M" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="popup-move-folder"/>
+   <menuitem label="&popup.moveFolder.label;"  accesskey="&popup.moveFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="popup-move-folder"/>
    <menuseparator />
    <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="popup-go" oncommand="nicofox_ui.manager.popup_command.go();" />
    <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="popup-copy" oncommand="nicofox_ui.manager.popup_command.copy();" />
-   <menuitem accesskey="O" id="popup-copy-cell" oncommand="nicofox_ui.manager.popup_command.copyCell();" />
+   <menuitem accesskey="&popup.copyCell.accesskey;" id="popup-copy-cell" oncommand="nicofox_ui.manager.popup_command.copyCell();" />
    <menuseparator />
    <menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="popup-select-all" oncommand="nicofox_ui.manager.popup_command.selectAll();" />
    <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="popup-remove" oncommand="nicofox_ui.manager.popup_command.remove();"/>

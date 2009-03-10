@@ -2,7 +2,12 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
 <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
-<!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
+<!DOCTYPE prefwindow [
+<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
+%brandDTD;
+<!ENTITY % prefDTD SYSTEM "chrome://nicofox/locale/prefwindow.dtd" >
+%prefDTD;
+]>
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
  title="&prefwindow.title;" width="600" style="height: 45em;">

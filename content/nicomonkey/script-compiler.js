@@ -171,7 +171,7 @@ openThirdPartyInTab: function(unsafeContentWin, url) {
     var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                   .getService(Ci.nsIPromptService);
     var check = {value: false};
-    prompts.alertCheck(null, 'Notice: External Website', '您將會前往第三方的網站使用此工具，而這些網站非由NICONICO動畫營運者或NicoFox開發者所經營，亦和以上組織或個人沒有合作關係。NicoFox工具列為方便取向而增加此連結，但並不保證其可用性。'+"\n\n"+'（在此向提供這些外部服務的辛苦維護者致謝！）' , '當我連到外部工具時不再通知我' , check);
+    prompts.alertCheck(null, storage.getString('thirdPartyTitle'), storage.getString('thirdPartyMessage') , storage.getString('thirdPartyNeverAsk') , check);
     if (check.value) {
       storage.setValue('third_party_notice', false);
     }
