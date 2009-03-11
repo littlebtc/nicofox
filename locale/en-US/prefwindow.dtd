@@ -14,7 +14,7 @@
 <!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "Hide Player for deleted videos">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "Display &quot;Add this tag to &brandShortName; bookmark&quot; buttons">
+<!ENTITY nicomonkey.supertag.label "Display &quot;Add this tag to bookmark&quot; buttons">
 <!ENTITY nicomonkey.supertag.accesskey "G">
 <!ENTITY nicomonkey.superlist.label "When Adding Video to Mylist, Add the Video Page URL to &brandShortName; Bookmark">
 <!ENTITY nicomonkey.superlist.accesskey "M">

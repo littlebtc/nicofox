@@ -14,9 +14,9 @@
 <!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "隱藏被刪除影片的播放器">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "顯示「加入此標籤到Firefox書籤」按鈕">
+<!ENTITY nicomonkey.supertag.label "顯示「加入此標籤到書籤」按鈕">
 <!ENTITY nicomonkey.supertag.accesskey "G">
-<!ENTITY nicomonkey.superlist.label "當加入影片到我的清單時，將影片網址加入到Firefox書籤">
+<!ENTITY nicomonkey.superlist.label "當加入影片到我的清單時，將影片網址加入到 &brandShortName; 書籤">
 <!ENTITY nicomonkey.superlist.accesskey "M">
 <!ENTITY downloader "下載管理員">
 <!ENTITY downloader.options "下載選項">
