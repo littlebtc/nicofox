@@ -45,7 +45,7 @@ nicofox.download.helper.nico.prototype = {
 	this.login_trial = true;
         return;
       }
-      prompts.alert(null, nicofox.strings.getString('errorTitle'), strings.getString('errorParseFailed'));
+      prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorParseFailed'));
       this.callback('fail',{});
       return;
     }
