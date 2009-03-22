@@ -16,7 +16,7 @@
 <!ENTITY nicomonkey.player_killer.accesskey "H">
 <!ENTITY nicomonkey.supertag.label "「ブックマークにこのタグを追加」ボタンを追加する">
 <!ENTITY nicomonkey.supertag.accesskey "G">
-<!ENTITY nicomonkey.superlist.label "マイリストに追加するとき、Firefoxのブックマークにも追加する">
+<!ENTITY nicomonkey.superlist.label "マイリストに追加するとき、ブックマークにも追加する">
 <!ENTITY nicomonkey.superlist.accesskey "M">
 <!ENTITY downloader "ダウンロードマネージャー">
 <!ENTITY downloader.options "ダウンロードオプション">
