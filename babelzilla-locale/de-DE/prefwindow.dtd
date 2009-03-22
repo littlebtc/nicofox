@@ -1,0 +1,62 @@
+<!ENTITY prefwindow.title "NicoFox Einstellungen">
+<!ENTITY pane1.title "NicoFox Einstellungen">
+<!ENTITY nicowa_blocker.label "Blocke Nicowa (Stündliche Benachrichtigungen, Nachrichten, ..., mit Ausnahme von Benutzer Nicowa)">
+<!ENTITY nicowa_blocker.accesskey "W">
+<!ENTITY nicomonkey "Seiteninhalt">
+<!ENTITY nicomonkey.enable.label "Fügt Seiten NicoFox-Funktionen hinzu">
+<!ENTITY nicomonkey.enable.accesskey "F">
+<!ENTITY nicomonkey.options "Funktionen anpassen">
+<!ENTITY nicomonkey.toolbar.label "Symbolleiste hinzufügen">
+<!ENTITY nicomonkey.toolbar.accesskey "Y">
+<!ENTITY nicomonkey.sound_converter.label "Bevorzugte Sound-Konverter-Website:">
+<!ENTITY nicomonkey.sound_converter.accesskey "S">
+<!ENTITY nicomonkey.comment_helper.label "Eingabehilfe für Kommentare">
+<!ENTITY nicomonkey.comment_helper.accesskey "K">
+<!ENTITY nicomonkey.player_killer.label "Player bei gelöschten Videos ausblenden">
+<!ENTITY nicomonkey.player_killer.accesskey "A">
+<!ENTITY nicomonkey.supertag.label "&quot;Tag den Lesezeichen hinzufügen&quot;-Schaltfläche anzeigen">
+<!ENTITY nicomonkey.supertag.accesskey "G">
+<!ENTITY nicomonkey.superlist.label "When Adding Video to Mylist, Add the Video Page URL to Bookmark">
+<!ENTITY nicomonkey.superlist.accesskey "M">
+<!ENTITY downloader "Download-Manager">
+<!ENTITY downloader.options "Download-Einstellungen">
+<!ENTITY downloader.confirm_before_download.label "Display confirm dialog before download (except watching video)">
+<!ENTITY downloader.confirm_before_download.accesskey "D">
+<!ENTITY downloader.bar_autoopen.label "Open Download Manager Automatically when I am in Supported Websites">
+<!ENTITY downloader.bar_autoopen.accesskey "A">
+<!ENTITY downloader.save_path.label "Videos speichern in">
+<!ENTITY downloader.save_path.accesskey "S">
+<!ENTITY downloader.save_path.browse.label "Durchsuchen...">
+<!ENTITY downloader.save_path.browse.accesskey "D">
+<!ENTITY downloader.filename_scheme.label "Dateinamen-Schema:">
+<!ENTITY downloader.filename_scheme.accesskey "N">
+<!ENTITY downloader.also_download "Ebenfalls herunterladen:">
+<!ENTITY downloader.download_comment.label "Kommentare">
+<!ENTITY downloader.download_comment.accesskey "K">
+<!ENTITY downloader.download_max.label "Maxium videos to download simultaneously:">
+<!ENTITY downloader.download_max.accesskey "M">
+<!ENTITY downloader.video_bypass_cache.label "Cache beim Download von Videodateien umgehen">
+<!ENTITY downloader.video_bypass_cache.accesskey "P">
+<!ENTITY downloader.nico_only "Nico Nico Douga-spezifische Funktionen">
+<!ENTITY downloader.economy.label "Bei aktiviertem Energiesparmodus (Videomodus mit niedriger Auflösung):">
+<!ENTITY downloader.economy.accesskey "E">
+<!ENTITY downloader.economy.1 "Videos mit niedriger Auflösung trotzdem herunterladen">
+<!ENTITY downloader.economy.2 "Schedule and Process Video Download after the Economy Mode is Off">
+<!ENTITY downloader.uploader_comment.label "Uploader-Kommentare herunterladen">
+<!ENTITY downloader.uploader_comment.accesskey "U">
+<!ENTITY downloader.replace_filters.label "Kommentar-Filter ersetzen">
+<!ENTITY downloader.replace_filters.accesskey "F">
+<!ENTITY downloader.boon_comment.label "Kommentar-Dateien für den BOON-Player kompatibel machen">
+<!ENTITY downloader.boon_comment.accesskey "B">
+<!ENTITY downloader.autologin_username.label "Automatischer Login, mit der Email-Adresse des Passwort-Managers:">
+<!ENTITY downloader.autologin_username.accesskey "L">
+<!ENTITY video_player "Video-Player">
+<!ENTITY video_player.external "Anpassung für externen Player">
+<!ENTITY video_player.external_video_player.label "Use Custom Extenral Player for FLV/MP4 Videos:">
+<!ENTITY video_player.external_video_player.accesskey "F">
+<!ENTITY video_player.external_video_player_path.browse.label "Durchsuchen...">
+<!ENTITY video_player.external_video_player_path.browse.accesskey "D">
+<!ENTITY video_player.external_swf_player.label "Eigenen externen Player für SWF-Videos verwenden">
+<!ENTITY video_player.external_swf_player.accesskey "S">
+<!ENTITY video_player.external_swf_player_path.browse.label "Durchsuchen...">
+<!ENTITY video_player.external_swf_player_path.browse.accesskey "R">

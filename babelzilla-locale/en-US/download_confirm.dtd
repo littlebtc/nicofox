@@ -1,0 +1,6 @@
+<!ENTITY window.title "NicoFox Download">
+<!ENTITY msg "Are you sure to download this video and its comment?">
+<!ENTITY dontAsk.label "Do not ask me again">
+<!ENTITY dontAsk.accesskey "N">
+<!ENTITY download "Download">
+<!ENTITY cancel "Cancel">

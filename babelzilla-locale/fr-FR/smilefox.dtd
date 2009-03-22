@@ -1,4 +1,4 @@
-<!ENTITY window.title "Gestionnaire de téléchargement  NicoFox">
+<!ENTITY window.title "Téléchargeur NicoFox">
 <!ENTITY download.label "Télécharger">
 <!ENTITY download.accesskey "T">
 <!ENTITY start.label "Démarrer">
@@ -8,6 +8,8 @@
 <!ENTITY options.label "Options">
 <!ENTITY options.accesskey "O">
 <!ENTITY search.label "Rechercher">
+<!ENTITY openPlayer.tooltiptext "Ouvrir le fichier vidéo dans le lecteur">
+<!ENTITY close.tooltiptext "Ne pas utiliser le gestionnaire">
 <!ENTITY tree.videoTitle "Titre de la vidéo">
 <!ENTITY tree.comment "Commentaire">
 <!ENTITY tree.economy "Économie">
@@ -15,6 +17,7 @@
 <!ENTITY tree.status "État">
 <!ENTITY tree.size "Taille">
 <!ENTITY tree.speed "Vitesse">
+<!ENTITY popup.missing.label "Fichier manquant !">
 <!ENTITY popup.cancel.label "Annuler">
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "Réessayer">
@@ -25,10 +28,13 @@
 <!ENTITY popup.openExternal.accesskey "E">
 <!ENTITY popup.openFolder.label "Ouvrir le dossier contenant la vidéo">
 <!ENTITY popup.openFolder.accesskey "F">
+<!ENTITY popup.moveFolder.label "Déplacer les fichiers vers un dossier…">
+<!ENTITY popup.moveFolder.accesskey "D">
 <!ENTITY popup.go.label "Se rendre sur la page de la vidéo">
 <!ENTITY popup.go.accesskey "G">
 <!ENTITY popup.copy.label "Copier l&apos;URL de la page de la vidéo">
 <!ENTITY popup.copy.accesskey "C">
+<!ENTITY popup.copyCell.accesskey "o">
 <!ENTITY popup.selectAll.label "Tout sélectionner">
 <!ENTITY popup.selectAll.accesskey "A">
 <!ENTITY popup.remove.label "Supprimer de la liste">
