@@ -704,6 +704,7 @@ nicofox_ui.manager.popup_command =
     }
     document.getElementById('popup-go').style.display = 'block';
     document.getElementById('popup-copy').style.display = 'block';
+    document.getElementById('popup-select-all').style.display = 'block';
 
     /* Fix copy cell info */
     /* Technique from nsContextMenu.js */
