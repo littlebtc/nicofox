@@ -14,7 +14,7 @@
 <!ENTITY nicomonkey.comment_helper.accesskey "C">
 <!ENTITY nicomonkey.player_killer.label "隐藏被删除视频的播放器">
 <!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "显示「加入此标签至Firefox书签」按钮">
+<!ENTITY nicomonkey.supertag.label "显示「加入此标签至书签」按钮">
 <!ENTITY nicomonkey.supertag.accesskey "G">
 <!ENTITY nicomonkey.superlist.label "当加入视频至我的清单时，将视频网址加入至Firefox书签">
 <!ENTITY nicomonkey.superlist.accesskey "M">
