@@ -658,7 +658,7 @@ nicofox_ui.manager.popup_command =
       tree.view.selection.getRangeAt(i, start, end);
       for (var j = start.value; j <= end.value; j++) {
         /* when it is failed, completed, canceled or waiting, we can remove it */
-        if(nicofox_ui.manager.rows[j].status <= 4) {
+        if(nicofox_ui.manager.rows[j] && nicofox_ui.manager.rows[j].status <= 4) {
           removing_ids.push(nicofox_ui.manager.rows[j].id);
         }
       }
