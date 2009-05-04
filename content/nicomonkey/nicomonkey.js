@@ -55,7 +55,6 @@ function start()
 		GM_addStyle('.fox-tag-link {vertical-align: middle; padding-right: 0.1em; cursor: pointer;}');
 		GM_addStyle('#video_utilities ul {list-style-type: none; margin:0; padding: 0; margin-left: 3px;} #video_utilities ul li {display: inline; font-size: 12px; font-weight: bold;}');		
 		GM_addStyle('#video_utilities img {vertical-align: middle;}');
-		GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
 
 	if (logged_in) {
 		window.setTimeout(pushLinks, 10);
@@ -71,9 +70,12 @@ function start()
 	  && document.getElementById('flvplayer_container') /* Logged in */
 	  )
 	{
-		/* Add comment helper */
+		/* Add comment helper, if the player is old player */
 		if(GM_getValue('comment_helper'))
 		{
+			if (document.getElementById('flvplayer')
+			&& (document.getElementById('flvplayer').src.indexOf('new') == -1)
+			)
 			window.setTimeout(addCommentHelper, 10);
 		}
 
@@ -295,6 +297,9 @@ function videoUtilitiesTab(e)
 
 function addCommentHelper()
 {
+	/* Add CSS */
+	GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
+
 	/* The comment helper */
 	comment_helper = document.createElement('div');
 	comment_helper.id = 'comment_helper';
