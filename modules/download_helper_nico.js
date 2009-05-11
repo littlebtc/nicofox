@@ -122,8 +122,11 @@ nicofox.download.helper.nico.prototype = {
     }
     
     /* Distinguish what type of video we will download */
-    if (params.url.match(/smile\?s\=/)) /* SWF from Nico Nico Movie Maker */
-    { this.type = 'swf'; }
+    if (params.url.match(/smile\?s\=/)) {
+      /* XXX: Since new player is launched, it seems that Nico Nico Douga is forced AS2 SWF to be like AS3 SWF. Do we need a option? */
+      this.type = 'swf'; 
+      params.url += 'as3';
+    }
     else if (params.url.match(/smile\?m\=/)) /* H.264 mp4 */
     { this.type = 'mp4'; }
     else /* maybe FLV */
