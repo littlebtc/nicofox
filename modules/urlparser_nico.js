@@ -38,7 +38,7 @@ nicofox.parser.nico.prototype = {
   {  
     html = req.responseText;
     /* fetch v and id parameter in javascript array 'Video'. The regex is dirty but can be easily understood! */
-    reg_array = html.match(/<script type\=\"text\/javascript\">\s+<!--\s+var Video = \{([\s\S]*)\}\;\s+-->\s+<\/script>/);
+    reg_array = html.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*)\}\;\s+(-->)?\s?<\/script>/);
     if(!reg_array) {
       /* Try autologin */
       if (!this.login_trial && nicofox.prefs.getComplexValue('autologin_username', Ci.nsISupportsString).data) {
@@ -51,7 +51,7 @@ nicofox.parser.nico.prototype = {
 
     /* Use sandbox for security */
     var s = Components.utils.Sandbox("about:blank");                         
-    Components.utils.evalInSandbox('var Video = {'+reg_array[1]+'}', s);
+    Components.utils.evalInSandbox('var Video = {'+reg_array[2]+'}', s);
     if (typeof s.Video != "object") {
       this.return_to(false); return;
     }

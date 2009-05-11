@@ -36,7 +36,7 @@ nicofox.download.helper.nico.prototype = {
     if (this.canceled) { return; }
 
     html = req.responseText;
-    reg_array = html.match(/<script type\=\"text\/javascript\">\s+<!--\s+var Video = \{([\s\S]*)\}\;\s+-->\s+<\/script>/);
+    reg_array = html.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*)\}\;\s+(-->)?\s?<\/script>/);
     if(!reg_array)
     {
       /* Try autologin */
