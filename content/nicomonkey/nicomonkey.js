@@ -86,7 +86,7 @@ function start()
     /* Tag helper, aka "Supertag" */
     if (GM_getValue('supertag'))
     {
-      tags = $$('.//a [@rel="tag"]', document.getElementById('video_tags'))
+      var tags = $$('.//a [@rel="tag"]', document.getElementById('video_tags'))
       for (var i = 0; i < tags.length; i++) {
         var tag = tags[i];
 
@@ -239,9 +239,9 @@ function start_inject()
   sound_website = sound_website.replace('%1', Video.id);
 
   /* Inject Video Utilities */
-  video_utilities = document.createElement('div');
+  var video_utilities = document.createElement('div');
   video_utilities.id = 'video_utilities';
-  html =  '<ul id="video_utilities_list">'+"\r\n"+
+  var html =  '<ul id="video_utilities_list">'+"\r\n"+
     '<li>'+NM_getString('toolbarTitle')+'</li>'+"\r\n"+
                 '<li><a href="http://d.hatena.ne.jp/video/niconico/'+Video.v+'" target="_blank" title="'+NM_getString('relatedHatena')+'"><img src='+hatena_uri+' /></a></li>'+"\r\n"+
                 '<li><a href="http://www.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoWww')+'"><img src="'+jp_uri+'" /></a></li>'+"\r\n"+
@@ -257,7 +257,7 @@ function start_inject()
                 '</ul>';
 
         video_utilities.innerHTML = html;
-        WATCHHEADER = document.getElementById('WATCHHEADER');
+        var WATCHHEADER = document.getElementById('WATCHHEADER');
         WATCHHEADER.appendChild(video_utilities);
 
   /* 3rd party notice */
@@ -282,7 +282,7 @@ function start_inject()
 
 function videoUtilitiesTab(e)
 {
-  tab_num = (e.target.id.match(/sw([0-9])$/)[1]);
+  var tab_num = (e.target.id.match(/sw([0-9])$/)[1]);
   if (!tab_num || isNaN(tab_num)) { return; }
   for (var i = 1; i <= 3; i++)
   {
@@ -300,7 +300,7 @@ function addCommentHelper()
   GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
 
   /* The comment helper */
-  comment_helper = document.createElement('div');
+  var comment_helper = document.createElement('div');
   comment_helper.id = 'comment_helper';
 
   comment_helper.innerHTML = 
@@ -335,7 +335,7 @@ function addCommentHelper()
   var flvplayer_container = document.getElementById('flvplayer_container')
   flvplayer_container.parentNode.insertBefore(comment_helper ,flvplayer_container.nextSibling);
 
-  helper_links = comment_helper.getElementsByTagName('a')
+  var helper_links = comment_helper.getElementsByTagName('a')
   for (var i = 0; i < helper_links.length; i++)  
   {
     helper_links[i].addEventListener('click', commentHelperSelect, false);
@@ -355,12 +355,12 @@ var ch_colors = ['white', 'red', 'pink', 'orange', 'yellow', 'green', 'cyan', 'b
 
 function commentHelperSelect(e)
 {
-  id = e.target.id;
+  var id = e.target.id;
   /* When click on img, the id will be empty */
   if (!id) { id = e.target.parentNode.id; }
   if (!id) { return; }
   
-  sel = id.match(/comment\_helper\_(.*)$/);
+  var sel = id.match(/comment\_helper\_(.*)$/);
   if(!sel) { return; }
   sel = sel[1];
   if (ch_positions.indexOf(sel) != -1)
@@ -385,13 +385,13 @@ function commentHelperSelect(e)
     ch_color = sel;
   }
 
-  mail_inputs = [];
+  var mail_inputs = [];
   if (ch_positions.indexOf(ch_position) != 0) mail_inputs.push(ch_position);
   if (ch_sizes.indexOf(ch_size) != 0) mail_inputs.push(ch_size);
   if (ch_colors.indexOf(ch_color) != 0) mail_inputs.push(ch_color);
 
-  mail_input = mail_inputs.join(' ');
-  js = '$(\'flvplayer\').SetVariable(\'inputArea.MailInput.text\',\''+mail_input+'\');'; 
+  var mail_input = mail_inputs.join(' ');
+  var js = '$(\'flvplayer\').SetVariable(\'inputArea.MailInput.text\',\''+mail_input+'\');'; 
   location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
   e.stopPropagation();
   e.preventDefault();
@@ -432,7 +432,7 @@ function pushLinks(mainpage)
     if (href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)/* || href.match(/^http:\/\/(tw|www)\.nicovideo\.jp\/mylist\/[0-9]+$/)*/)
     {
       /* If it is, we will add a "download" link, to help Smilefox work :) */
-      download_link = document.createElement('a');
+      var download_link = document.createElement('a');
       download_link.className = 'fox-dl-link';
       download_link.href = href+'?smilefox=get';
       download_link.innerHTML = '<img src="'+dl_uri+'" style="vertical-align: middle;">';
@@ -448,7 +448,7 @@ function killPlayer()
     flvplayer.parentNode.removeChild(flvplayer);
     var flvplayer_container = document.getElementById('flvplayer_container')
 
-    player_deleted = document.createElement('div');
+    var player_deleted = document.createElement('div');
     player_deleted.innerHTML = '<a href="'+window.location.href+'" id="regenerate_player">'+NM_getString('playerKillerMsg')+'</a>';
     flvplayer_container.appendChild(player_deleted);
 
