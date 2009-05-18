@@ -37,218 +37,218 @@ function $$(xpath,root) {
 
 function start()
 {
-	/* Check if we've logged in */
+  /* Check if we've logged in */
         var logged_in = false;
-	if (unsafeWindow.User) {
-		if (unsafeWindow.User.id) {
-			if (typeof unsafeWindow.User.id == 'number') { logged_in = true; }
-		}
-	}
-	if (document.getElementById('flvplayer_container') && document.getElementById('deleted_message_default') && GM_getValue('player_killer')) /* Video is deleted for copyright issue */
-	{
-		killPlayer();
-	}
+  if (unsafeWindow.User) {
+    if (unsafeWindow.User.id) {
+      if (typeof unsafeWindow.User.id == 'number') { logged_in = true; }
+    }
+  }
+  if (document.getElementById('flvplayer_container') && document.getElementById('deleted_message_default') && GM_getValue('player_killer')) /* Video is deleted for copyright issue */
+  {
+    killPlayer();
+  }
 
-	/* Inject CSS */
-		GM_addStyle('#regenerate_player { background: #BBBBBB; border: 1px solid #CCCCCC; color: white; display: block; width: 100%; height: 540px; text-align: center; line-height: 540px; font-size: 200%; text-decoration: none; } #regenerate_player:hover {background: #999999;}'
-		);
-		GM_addStyle('.fox-tag-link {vertical-align: middle; padding-right: 0.1em; cursor: pointer;}');
-		GM_addStyle('#video_utilities ul {list-style-type: none; margin:0; padding: 0; margin-left: 3px;} #video_utilities ul li {display: inline; font-size: 12px; font-weight: bold;}');		
-		GM_addStyle('#video_utilities img {vertical-align: middle;}');
+  /* Inject CSS */
+    GM_addStyle('#regenerate_player { background: #BBBBBB; border: 1px solid #CCCCCC; color: white; display: block; width: 100%; height: 540px; text-align: center; line-height: 540px; font-size: 200%; text-decoration: none; } #regenerate_player:hover {background: #999999;}'
+    );
+    GM_addStyle('.fox-tag-link {vertical-align: middle; padding-right: 0.1em; cursor: pointer;}');
+    GM_addStyle('#video_utilities ul {list-style-type: none; margin:0; padding: 0; margin-left: 3px;} #video_utilities ul li {display: inline; font-size: 12px; font-weight: bold;}');    
+    GM_addStyle('#video_utilities img {vertical-align: middle;}');
 
-	if (logged_in) {
-		window.setTimeout(pushLinks, 10);
-		if (document.getElementById('category_recent'))
-		{
-			window.setTimeout(listenMainPage, 10);
-		}
-	}
-	var link_alternate = $$('.//link [@rel="alternate"]');
+  if (logged_in) {
+    window.setTimeout(pushLinks, 10);
+    if (document.getElementById('category_recent'))
+    {
+      window.setTimeout(listenMainPage, 10);
+    }
+  }
+  var link_alternate = $$('.//link [@rel="alternate"]');
 
-	/* Player-related hack, need the 'watch' address and the flv player */
-	if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
-	  && document.getElementById('flvplayer_container') /* Logged in */
-	  )
-	{
-		/* Add comment helper, if the player is old player */
-		if(GM_getValue('comment_helper'))
-		{
-			if (document.getElementById('flvplayer')
-			&& (document.getElementById('flvplayer').src.indexOf('new') == -1)
-			)
-			window.setTimeout(addCommentHelper, 10);
-		}
+  /* Player-related hack, need the 'watch' address and the flv player */
+  if(window.location.href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\//) /* URL is right */
+    && document.getElementById('flvplayer_container') /* Logged in */
+    )
+  {
+    /* Add comment helper, if the player is old player */
+    if(GM_getValue('comment_helper'))
+    {
+      if (document.getElementById('flvplayer')
+      && (document.getElementById('flvplayer').src.indexOf('new') == -1)
+      )
+      window.setTimeout(addCommentHelper, 10);
+    }
 
-		/* Bookmark helper, aka "Superlist" */
-		if (document.getElementById('mylist_add_submit') && GM_getValue('superlist'))
-		{ document.getElementById('mylist_add_submit').addEventListener('click', function(e){NM_bookmark();}, true); }
+    /* Bookmark helper, aka "Superlist" */
+    if (document.getElementById('mylist_add_submit') && GM_getValue('superlist'))
+    { document.getElementById('mylist_add_submit').addEventListener('click', function(e){NM_bookmark();}, true); }
 
-		/* Tag helper, aka "Supertag" */
-		if (GM_getValue('supertag'))
-		{
-		  tags = $$('.//a [@rel="tag"]', document.getElementById('video_tags'))
-		  for (i=0; i < tags.length; i++) {
-		    var tag = tags[i];
+    /* Tag helper, aka "Supertag" */
+    if (GM_getValue('supertag'))
+    {
+      tags = $$('.//a [@rel="tag"]', document.getElementById('video_tags'))
+      for (var i = 0; i < tags.length; i++) {
+        var tag = tags[i];
 
-		    var tag_helper = document.createElement('img');
-		    tag_helper.className = 'fox-tag-link';
-		    tag_helper.src=tag_add_uri;
-		    tag_helper.title = NM_getString('addTag');
-		    tag_helper.alt = '';
-		    tag_helper.id = "tag_helper_"+i;
+        var tag_helper = document.createElement('img');
+        tag_helper.className = 'fox-tag-link';
+        tag_helper.src=tag_add_uri;
+        tag_helper.title = NM_getString('addTag');
+        tag_helper.alt = '';
+        tag_helper.id = "tag_helper_"+i;
 
-		    tag_helper.addEventListener('click', function(e) {
-		      if (!e.target) {return;}
-		      NM_tag(e.target.parentNode.getElementsByTagName('a')[0].textContent);
-		      e.stopPropagation();
-		      e.preventDefault();
-		    }
-		    , true);
-		    if (tag.parentNode.tagName.match(/nobr/i)) {
-		      /* Japan version, use <nobr> */
-  		      tag.parentNode.appendChild(tag_helper);
-		    } else { 
-		      /* Non-japan version, append <nobr> */ 
-		      var nobr = document.createElement('nobr');
-		      var tag_list = tag.parentNode;
-		      tag_list.insertBefore(nobr, tag.nextSibling);
-		      tag_list.removeChild(tag);
-		      nobr.appendChild(tag);
-		      nobr.appendChild(tag_helper);
-		    }
-		  }	
-		}
+        tag_helper.addEventListener('click', function(e) {
+          if (!e.target) {return;}
+          NM_tag(e.target.parentNode.getElementsByTagName('a')[0].textContent);
+          e.stopPropagation();
+          e.preventDefault();
+        }
+        , true);
+        if (tag.parentNode.tagName.match(/nobr/i)) {
+          /* Japan version, use <nobr> */
+            tag.parentNode.appendChild(tag_helper);
+        } else { 
+          /* Non-japan version, append <nobr> */ 
+          var nobr = document.createElement('nobr');
+          var tag_list = tag.parentNode;
+          tag_list.insertBefore(nobr, tag.nextSibling);
+          tag_list.removeChild(tag);
+          nobr.appendChild(tag);
+          nobr.appendChild(tag_helper);
+        }
+      }  
+    }
 
-		if (logged_in) {
-			/* Use img to reduce the DOM use */
-			var download_link = document.createElement('a');
-			download_link.className = 'fox-dl-link';
-			download_link.id = 'fox-dl-this1';
-			download_link.title = NM_getString('download');
-			download_link.innerHTML = '<img src="'+dl_uri+'" />';
+    if (logged_in) {
+      /* Use img to reduce the DOM use */
+      var download_link = document.createElement('a');
+      download_link.className = 'fox-dl-link';
+      download_link.id = 'fox-dl-this1';
+      download_link.title = NM_getString('download');
+      download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
-			var h1 = null;
-			/* Fetching Nico Nico's video title */
-			if(window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/watch\//)) {
-			  /* Taiwan (new) has another <h1> */
-			  h1 = document.getElementsByTagName('h1')[1];
-			} else {
-			  h1 = document.getElementsByTagName('h1')[0];
-			}
-			/* inject the video download link */
-			if (h1 && h1.hasChildNodes())
-			{
-				h1.appendChild(download_link);
-			}
+      var h1 = null;
+      /* Fetching Nico Nico's video title */
+      if(window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/watch\//)) {
+        /* Taiwan (new) has another <h1> */
+        h1 = document.getElementsByTagName('h1')[1];
+      } else {
+        h1 = document.getElementsByTagName('h1')[0];
+      }
+      /* inject the video download link */
+      if (h1 && h1.hasChildNodes())
+      {
+        h1.appendChild(download_link);
+      }
 
-			/* Use img to reduce the DOM use */
-			var download_link = document.createElement('a');
-			download_link.className = 'fox-dl-link';
-			download_link.id = 'fox-dl-this2';
-			download_link.title = NM_getString('download');
-			download_link.innerHTML = '<img src="'+dl_uri+'" />';
+      /* Use img to reduce the DOM use */
+      var download_link = document.createElement('a');
+      download_link.className = 'fox-dl-link';
+      download_link.id = 'fox-dl-this2';
+      download_link.title = NM_getString('download');
+      download_link.innerHTML = '<img src="'+dl_uri+'" />';
 
-			/* Find for non-expanded mode */
-			var des1 = document.getElementById('des_1');
-			if (des1 && des1.hasChildNodes())
-			{
-				var headera = des1.getElementsByTagName('a')[1];
-				if (headera)
-				{
-					headera.parentNode.insertBefore(download_link, headera.nextSibling);
-				}
-			}
-		}
-		if(GM_getValue('toolbar'))
-		{
-			window.setTimeout(start_inject, 10);
-		}
-	}
+      /* Find for non-expanded mode */
+      var des1 = document.getElementById('des_1');
+      if (des1 && des1.hasChildNodes())
+      {
+        var headera = des1.getElementsByTagName('a')[1];
+        if (headera)
+        {
+          headera.parentNode.insertBefore(download_link, headera.nextSibling);
+        }
+      }
+    }
+    if(GM_getValue('toolbar'))
+    {
+      window.setTimeout(start_inject, 10);
+    }
+  }
 }
 
 function start_inject()
 {
-	var Video = {};
-	/* Try to make unsafeWindow safer */
-	if ((typeof unsafeWindow.Video) != 'object') { return; }
-	for (var key in unsafeWindow.Video) {
-	  var value = unsafeWindow.Video[key];
-	  if ((typeof value) == 'object') {
+  var Video = {};
+  /* Try to make unsafeWindow safer */
+  if ((typeof unsafeWindow.Video) != 'object') { return; }
+  for (var key in unsafeWindow.Video) {
+    var value = unsafeWindow.Video[key];
+    if ((typeof value) == 'object') {
             Video[key] = [];
-	    if (!value.length && (typeof value.length) != 'number') { return; }
+      if (!value.length && (typeof value.length) != 'number') { return; }
             for (var i = 0; i < value.length; i++) {
-	      if ((typeof value[i]) != 'string') { return; }
+        if ((typeof value[i]) != 'string') { return; }
               Video[key].push(value[i]);
-	    }
+      }
           }
-	  else if ((typeof value) != 'string' && (typeof value) != 'number' && (typeof value) != 'boolean') {
-	    return;
-	  } else {
-  	    Video[key] = unsafeWindow.Video[key];
-	  }
-	}
-	
-	/* XXX it should not be here, but it is used to reduce the render times */
-	/* Fetch the community name by the link node (fixed in 0.3.6) */
-	var community_nodes = $$('.//a[starts-with(@href, "http://ch.nicovideo.jp/community") or starts-with(@href, "http://ch.nicovideo.jp/channel") ]');
+    else if ((typeof value) != 'string' && (typeof value) != 'number' && (typeof value) != 'boolean') {
+      return;
+    } else {
+        Video[key] = unsafeWindow.Video[key];
+    }
+  }
+  
+  /* XXX it should not be here, but it is used to reduce the render times */
+  /* Fetch the community name by the link node (fixed in 0.3.6) */
+  var community_nodes = $$('.//a[starts-with(@href, "http://ch.nicovideo.jp/community") or starts-with(@href, "http://ch.nicovideo.jp/channel") ]');
 
-	if (community_nodes.length > 0) {
-		var community_test = community_nodes[0].href.match(/^http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)$/i);	
-		Video.comment_type = community_test[2];
-	}
-	else if (Video.isMymemory)
-	{
-		Video.comment_type = 'mymemory' + Video.v;
-	}
-	else if (window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[0-9]+/))
-	{
-		Video.comment_type = 'comment' + Video.v;
-	}
-	else
-	{
-		Video.comment_type = window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{2}[0-9]+/)[1] ;
-	}
+  if (community_nodes.length > 0) {
+    var community_test = community_nodes[0].href.match(/^http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)$/i);  
+    Video.comment_type = community_test[2];
+  }
+  else if (Video.isMymemory)
+  {
+    Video.comment_type = 'mymemory' + Video.v;
+  }
+  else if (window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[0-9]+/))
+  {
+    Video.comment_type = 'comment' + Video.v;
+  }
+  else
+  {
+    Video.comment_type = window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{2}[0-9]+/)[1] ;
+  }
 
-	var niconicofarm = "\r\n";
-	/* check if Video.v is a pure integer... (mymemory / community / other countries ver.), (for hatena::diary and niconicofarm) */
+  var niconicofarm = "\r\n";
+  /* check if Video.v is a pure integer... (mymemory / community / other countries ver.), (for hatena::diary and niconicofarm) */
 
-	if (Video.v.match(/[A-Za-z]/))
-	{
-		niconicofarm = '<li><a href="http://nico.xii.jp/comment/?url='+Video.id+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsNicoNicoFarm')+'"<img src="'+comments_uri+'">'+"\r\n"; // Use Nico Nico Farm (supported pages only)
-	}
+  if (Video.v.match(/[A-Za-z]/))
+  {
+    niconicofarm = '<li><a href="http://nico.xii.jp/comment/?url='+Video.id+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsNicoNicoFarm')+'"<img src="'+comments_uri+'">'+"\r\n"; // Use Nico Nico Farm (supported pages only)
+  }
 
-	document.getElementById('fox-dl-this1').addEventListener('click', function(e)
-	{
-		NM_goDownload(Video, window.location.href);
-		e.stopPropagation();
-		e.preventDefault();
+  document.getElementById('fox-dl-this1').addEventListener('click', function(e)
+  {
+    NM_goDownload(Video, window.location.href);
+    e.stopPropagation();
+    e.preventDefault();
 
-	}
-	, true);
-	if (document.getElementById('fox-dl-this2')) 
- 	document.getElementById('fox-dl-this2').addEventListener('click', function(e)
-	{
-		NM_goDownload(Video, window.location.href);
-		e.stopPropagation();
-		e.preventDefault();
+  }
+  , true);
+  if (document.getElementById('fox-dl-this2')) 
+   document.getElementById('fox-dl-this2').addEventListener('click', function(e)
+  {
+    NM_goDownload(Video, window.location.href);
+    e.stopPropagation();
+    e.preventDefault();
 
-	}
-	, true);
-	/* Add sound website */
-	var sound_website = GM_getValue('sound_converter');
-	sound_website = sound_website.replace('%1', Video.id);
+  }
+  , true);
+  /* Add sound website */
+  var sound_website = GM_getValue('sound_converter');
+  sound_website = sound_website.replace('%1', Video.id);
 
-	/* Inject Video Utilities */
-	video_utilities = document.createElement('div');
-	video_utilities.id = 'video_utilities';
-	html =  '<ul id="video_utilities_list">'+"\r\n"+
-		'<li>'+NM_getString('toolbarTitle')+'</li>'+"\r\n"+
+  /* Inject Video Utilities */
+  video_utilities = document.createElement('div');
+  video_utilities.id = 'video_utilities';
+  html =  '<ul id="video_utilities_list">'+"\r\n"+
+    '<li>'+NM_getString('toolbarTitle')+'</li>'+"\r\n"+
                 '<li><a href="http://d.hatena.ne.jp/video/niconico/'+Video.v+'" target="_blank" title="'+NM_getString('relatedHatena')+'"><img src='+hatena_uri+' /></a></li>'+"\r\n"+
                 '<li><a href="http://www.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoWww')+'"><img src="'+jp_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://tw.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoTw')+'"><img src="'+tw_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://es.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoEs')+'"><img src="'+es_uri+'" /></a></li>'+"\r\n"+
                 '<li><a href="http://de.nicovideo.jp/watch/'+Video.id+'" target="_blank" title="'+NM_getString('relatedNicoDe')+'"><img src="'+de_uri+'" /></a></li>'+"\r\n"+
-		'<li>'+NM_getString('tools')+'</li>'+"\r\n"+
+    '<li>'+NM_getString('tools')+'</li>'+"\r\n"+
                 '<li><a href="'+sound_website+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsSoundConverter')+'"><img src="'+music_uri+'" /></a></li>'+"\r\n"+
                '<li><a href="http://www.nicochart.jp/watch/'+Video.id+'" class="nicofox_external" target="_blank" title="'+NM_getString('toolsNicoChart')+'"><img src="'+chart_uri+'" /></a></li>'+"\r\n";
 
@@ -260,89 +260,89 @@ function start_inject()
         WATCHHEADER = document.getElementById('WATCHHEADER');
         WATCHHEADER.appendChild(video_utilities);
 
-	/* 3rd party notice */
- 	var external_links = document.getElementsByClassName('nicofox_external');
-	for (var i = 0; i < external_links.length; i++)
-	{
-  		external_links[i].addEventListener('click', function(e)
-		{
-			/* We may click on <a> links or <img> */
-			var href = e.target.href;
-			if (!href) {
-				href = e.target.parentNode.href;
-			}
-			GM_openThirdPartyInTab(href);
-			e.stopPropagation();
-			e.preventDefault();
-		}
-	
-		, true);
-	}
+  /* 3rd party notice */
+   var external_links = document.getElementsByClassName('nicofox_external');
+  for (var i = 0; i < external_links.length; i++)
+  {
+      external_links[i].addEventListener('click', function(e)
+    {
+      /* We may click on <a> links or <img> */
+      var href = e.target.href;
+      if (!href) {
+        href = e.target.parentNode.href;
+      }
+      GM_openThirdPartyInTab(href);
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  
+    , true);
+  }
 }
 
 function videoUtilitiesTab(e)
 {
-	tab_num = (e.target.id.match(/sw([0-9])$/)[1]);
-	if (!tab_num || isNaN(tab_num)) { return; }
-	for (i = 1; i <= 3; i++)
-	{
-		document.getElementById('video_utilities_tab'+i).style.display = 'none';
-		document.getElementById('video_utilities_sw'+i).className = 'fox-sw-link';
-	}
-	document.getElementById('video_utilities_tab'+tab_num).style.display = 'block';
-	document.getElementById('video_utilities_sw'+tab_num).className = 'fox-sw-link-selected';
-	return false;
+  tab_num = (e.target.id.match(/sw([0-9])$/)[1]);
+  if (!tab_num || isNaN(tab_num)) { return; }
+  for (var i = 1; i <= 3; i++)
+  {
+    document.getElementById('video_utilities_tab'+i).style.display = 'none';
+    document.getElementById('video_utilities_sw'+i).className = 'fox-sw-link';
+  }
+  document.getElementById('video_utilities_tab'+tab_num).style.display = 'block';
+  document.getElementById('video_utilities_sw'+tab_num).className = 'fox-sw-link-selected';
+  return false;
 }
 
 function addCommentHelper()
 {
-	/* Add CSS */
-	GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
+  /* Add CSS */
+  GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
 
-	/* The comment helper */
-	comment_helper = document.createElement('div');
-	comment_helper.id = 'comment_helper';
+  /* The comment helper */
+  comment_helper = document.createElement('div');
+  comment_helper.id = 'comment_helper';
 
-	comment_helper.innerHTML = 
-	'<a href="#" class="ch_link" id="comment_helper_naka"><img src="'+comment_naka_uri+'" class="fox-ch-selected" /></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_ue"><img src="'+comment_ue_uri+'" /></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_shita"><img src="'+comment_shita_uri+'" /></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_big"><img src="'+comment_big_uri+'" /></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_medium"><img src="'+comment_medium_uri+'"  class="fox-ch-selected"/></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_small"><img src="'+comment_small_uri+'" /></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_white"><img src="'+transparent_uri+'"  class="fox-ch-selected" style="background: #FFFFFF;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_red"><img src="'+transparent_uri+'" style="background: #FF0000;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_pink"><img src="'+transparent_uri+'" style="background: #FF8080;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_orange"><img src="'+transparent_uri+'" style="background: #FFCC00;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_yellow"><img src="'+transparent_uri+'" style="background: #FFFF00;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_green"><img src="'+transparent_uri+'" style="background: #00FF00;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_cyan"><img src="'+transparent_uri+'" style="background: #00FFFF;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_blue"><img src="'+transparent_uri+'" style="background: #0000FF;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_purple"><img src="'+transparent_uri+'" style="background: #C000FF;"></a>'+
-	'<span id="comment_helper_premium" style="display: none;">'+
-	'<a href="#" class="ch_link" id="comment_helper_white2"><img src="'+transparent_uri+'" style="background: #CCCC99;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_red2"><img src="'+transparent_uri+'" style="background: #CC0033;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_orange2"><img src="'+transparent_uri+'" style="background: #FF6600;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_yellow2"><img src="'+transparent_uri+'" style="background: #999900;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_green2"><img src="'+transparent_uri+'" style="background: #00CC66;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_blue2"><img src="'+transparent_uri+'" style="background: #33FFFC;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_purple2"><img src="'+transparent_uri+'" style="background: #6633CC;"></a>'+
-	'<a href="#" class="ch_link" id="comment_helper_black"><img src="'+transparent_uri+'" style="background: #000000;"></a>'+
-	'</span>'+
-	'<textarea rows="1" value="" onchange="$(\'flvplayer\').SetVariable(\'inputArea.ChatInput1.text\', this.value);" onkeyup="this.onchange();"></textarea>';
+  comment_helper.innerHTML = 
+  '<a href="#" class="ch_link" id="comment_helper_naka"><img src="'+comment_naka_uri+'" class="fox-ch-selected" /></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_ue"><img src="'+comment_ue_uri+'" /></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_shita"><img src="'+comment_shita_uri+'" /></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_big"><img src="'+comment_big_uri+'" /></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_medium"><img src="'+comment_medium_uri+'"  class="fox-ch-selected"/></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_small"><img src="'+comment_small_uri+'" /></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_white"><img src="'+transparent_uri+'"  class="fox-ch-selected" style="background: #FFFFFF;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_red"><img src="'+transparent_uri+'" style="background: #FF0000;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_pink"><img src="'+transparent_uri+'" style="background: #FF8080;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_orange"><img src="'+transparent_uri+'" style="background: #FFCC00;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_yellow"><img src="'+transparent_uri+'" style="background: #FFFF00;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_green"><img src="'+transparent_uri+'" style="background: #00FF00;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_cyan"><img src="'+transparent_uri+'" style="background: #00FFFF;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_blue"><img src="'+transparent_uri+'" style="background: #0000FF;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_purple"><img src="'+transparent_uri+'" style="background: #C000FF;"></a>'+
+  '<span id="comment_helper_premium" style="display: none;">'+
+  '<a href="#" class="ch_link" id="comment_helper_white2"><img src="'+transparent_uri+'" style="background: #CCCC99;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_red2"><img src="'+transparent_uri+'" style="background: #CC0033;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_orange2"><img src="'+transparent_uri+'" style="background: #FF6600;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_yellow2"><img src="'+transparent_uri+'" style="background: #999900;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_green2"><img src="'+transparent_uri+'" style="background: #00CC66;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_blue2"><img src="'+transparent_uri+'" style="background: #33FFFC;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_purple2"><img src="'+transparent_uri+'" style="background: #6633CC;"></a>'+
+  '<a href="#" class="ch_link" id="comment_helper_black"><img src="'+transparent_uri+'" style="background: #000000;"></a>'+
+  '</span>'+
+  '<textarea rows="1" value="" onchange="$(\'flvplayer\').SetVariable(\'inputArea.ChatInput1.text\', this.value);" onkeyup="this.onchange();"></textarea>';
 
-	/* Inserted in WATCHFOOTER is the right way, but broken in Taiwan (new); So I do a bad workaround. */
-	var flvplayer_container = document.getElementById('flvplayer_container')
-	flvplayer_container.parentNode.insertBefore(comment_helper ,flvplayer_container.nextSibling);
+  /* Inserted in WATCHFOOTER is the right way, but broken in Taiwan (new); So I do a bad workaround. */
+  var flvplayer_container = document.getElementById('flvplayer_container')
+  flvplayer_container.parentNode.insertBefore(comment_helper ,flvplayer_container.nextSibling);
 
-	helper_links = comment_helper.getElementsByTagName('a')
-	for (i = 0; i < helper_links.length; i++)	
-	{
-		helper_links[i].addEventListener('click', commentHelperSelect, false);
-	}
+  helper_links = comment_helper.getElementsByTagName('a')
+  for (var i = 0; i < helper_links.length; i++)  
+  {
+    helper_links[i].addEventListener('click', commentHelperSelect, false);
+  }
 
-	js = 'if (User.isPremium) {$(\'comment_helper_premium\').show() }'; 
-	location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
+  js = 'if (User.isPremium) {$(\'comment_helper_premium\').show() }'; 
+  location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
 }
 
 var ch_position = 'naka';
@@ -355,113 +355,113 @@ var ch_colors = ['white', 'red', 'pink', 'orange', 'yellow', 'green', 'cyan', 'b
 
 function commentHelperSelect(e)
 {
-	id = e.target.id;
-	/* When click on img, the id will be empty */
-	if (!id) { id = e.target.parentNode.id; }
-	if (!id) { return; }
-	
-	sel = id.match(/comment\_helper\_(.*)$/);
-	if(!sel) { return; }
-	sel = sel[1];
-	if (ch_positions.indexOf(sel) != -1)
-	{	
-		document.getElementById('comment_helper_'+ch_position).getElementsByTagName('img')[0].className = '';
-		document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
-		
-		ch_position = sel;
-	}
-	if (ch_sizes.indexOf(sel) != -1)
-	{
-		document.getElementById('comment_helper_'+ch_size).getElementsByTagName('img')[0].className = '';
-		document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
+  id = e.target.id;
+  /* When click on img, the id will be empty */
+  if (!id) { id = e.target.parentNode.id; }
+  if (!id) { return; }
+  
+  sel = id.match(/comment\_helper\_(.*)$/);
+  if(!sel) { return; }
+  sel = sel[1];
+  if (ch_positions.indexOf(sel) != -1)
+  {  
+    document.getElementById('comment_helper_'+ch_position).getElementsByTagName('img')[0].className = '';
+    document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
+    
+    ch_position = sel;
+  }
+  if (ch_sizes.indexOf(sel) != -1)
+  {
+    document.getElementById('comment_helper_'+ch_size).getElementsByTagName('img')[0].className = '';
+    document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
 
-		ch_size = sel;
-	}
-	if (ch_colors.indexOf(sel) != -1)
-	{
-		document.getElementById('comment_helper_'+ch_color).getElementsByTagName('img')[0].className = '';
-		document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
+    ch_size = sel;
+  }
+  if (ch_colors.indexOf(sel) != -1)
+  {
+    document.getElementById('comment_helper_'+ch_color).getElementsByTagName('img')[0].className = '';
+    document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
 
-		ch_color = sel;
-	}
+    ch_color = sel;
+  }
 
-	mail_inputs = [];
-	if (ch_positions.indexOf(ch_position) != 0) mail_inputs.push(ch_position);
-	if (ch_sizes.indexOf(ch_size) != 0) mail_inputs.push(ch_size);
-	if (ch_colors.indexOf(ch_color) != 0) mail_inputs.push(ch_color);
+  mail_inputs = [];
+  if (ch_positions.indexOf(ch_position) != 0) mail_inputs.push(ch_position);
+  if (ch_sizes.indexOf(ch_size) != 0) mail_inputs.push(ch_size);
+  if (ch_colors.indexOf(ch_color) != 0) mail_inputs.push(ch_color);
 
-	mail_input = mail_inputs.join(' ');
-	js = '$(\'flvplayer\').SetVariable(\'inputArea.MailInput.text\',\''+mail_input+'\');'; 
-	location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
-	e.stopPropagation();
-	e.preventDefault();
+  mail_input = mail_inputs.join(' ');
+  js = '$(\'flvplayer\').SetVariable(\'inputArea.MailInput.text\',\''+mail_input+'\');'; 
+  location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
+  e.stopPropagation();
+  e.preventDefault();
 }
 
 function listenMainPage()
 {
 document.addEventListener('DOMAttrModified', function(event)
-	{
-		if(event.target.id == 'tag_modeA' || event.target.id == 'tag_modeB') { pushLinks(true); }
-	}
+  {
+    if(event.target.id == 'tag_modeA' || event.target.id == 'tag_modeB') { pushLinks(true); }
+  }
 , false);
 }
 function pushLinks(mainpage)
 {
-	var videos = null;
-	/* Fetching the video links */
-	if (mainpage == true)
-	{
-		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
-	}
-	/* Taiwan version ranking doesn't follow the original css rule */
-	else if (window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/ranking\//)) 
-	{
-		videos = $$('.//a [starts-with(@href,"http://tw.nicovideo.jp/watch/")]');
-	}
-	else
-	{
-		videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*)]');
-	}
-	/* Run every link to check what we like */
-	for (i = 0; i < videos.length; i++)
-	{
-		video = videos[i];
-		href = video.href;
+  var videos = null;
+  /* Fetching the video links */
+  if (mainpage == true)
+  {
+    videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
+  }
+  /* Taiwan version ranking doesn't follow the original css rule */
+  else if (window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/ranking\//)) 
+  {
+    videos = $$('.//a [starts-with(@href,"http://tw.nicovideo.jp/watch/")]');
+  }
+  else
+  {
+    videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*)]');
+  }
+  /* Run every link to check what we like */
+  for (var i = 0; i < videos.length; i++)
+  {
+    var video = videos[i];
+    var href = video.href;
 
-		/* Is it truly a "watch" or "mylist" links? */
-		if (href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)/* || href.match(/^http:\/\/(tw|www)\.nicovideo\.jp\/mylist\/[0-9]+$/)*/)
-		{
-			/* If it is, we will add a "download" link, to help Smilefox work :) */
-			download_link = document.createElement('a');
-			download_link.className = 'fox-dl-link';
-			download_link.href = href+'?smilefox=get';
-			download_link.innerHTML = '<img src="'+dl_uri+'" style="vertical-align: middle;">';
+    /* Is it truly a "watch" or "mylist" links? */
+    if (href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)/* || href.match(/^http:\/\/(tw|www)\.nicovideo\.jp\/mylist\/[0-9]+$/)*/)
+    {
+      /* If it is, we will add a "download" link, to help Smilefox work :) */
+      download_link = document.createElement('a');
+      download_link.className = 'fox-dl-link';
+      download_link.href = href+'?smilefox=get';
+      download_link.innerHTML = '<img src="'+dl_uri+'" style="vertical-align: middle;">';
 
-			video.parentNode.insertBefore(download_link, video.nextSibling);
-		}
-	}
+      video.parentNode.insertBefore(download_link, video.nextSibling);
+    }
+  }
 }
 //category_recent
 function killPlayer()
 {
-		var flvplayer = document.getElementById('flvplayer');
-		flvplayer.parentNode.removeChild(flvplayer);
-		var flvplayer_container = document.getElementById('flvplayer_container')
+    var flvplayer = document.getElementById('flvplayer');
+    flvplayer.parentNode.removeChild(flvplayer);
+    var flvplayer_container = document.getElementById('flvplayer_container')
 
-		player_deleted = document.createElement('div');
-		player_deleted.innerHTML = '<a href="'+window.location.href+'" id="regenerate_player">'+NM_getString('playerKillerMsg')+'</a>';
-		flvplayer_container.appendChild(player_deleted);
+    player_deleted = document.createElement('div');
+    player_deleted.innerHTML = '<a href="'+window.location.href+'" id="regenerate_player">'+NM_getString('playerKillerMsg')+'</a>';
+    flvplayer_container.appendChild(player_deleted);
 
-		document.getElementById('regenerate_player').addEventListener('click', function(e)
-		{
-			document.getElementById('flvplayer_container').removeChild(player_deleted);
-			document.getElementById('flvplayer_container').appendChild(flvplayer);
-			e.stopPropagation();
-			e.preventDefault();
-			return false;
-		}
-		, true
-		);
+    document.getElementById('regenerate_player').addEventListener('click', function(e)
+    {
+      document.getElementById('flvplayer_container').removeChild(player_deleted);
+      document.getElementById('flvplayer_container').appendChild(flvplayer);
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
+    }
+    , true
+    );
 }
 
 if (GM_getValue('enable'))
