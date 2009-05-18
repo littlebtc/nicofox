@@ -162,9 +162,10 @@ package idv.littlebtc
 				{
 					comment.pos = 'naka';					
 				}
-								
+						
+				// Color match 1: color name; Color match 2: HTML hex code
 				var color_pattern:RegExp = 
-				/(white|red|pink|orange|yellow|green|cyan|blue|purple|niconicowhite|white2|truered|red2|passionorange|orange2|madyellow|yellow2|elementalgreen|green2|marineblue|blue2|nobleviolet|purple2|black)/;
+				/(white|red|pink|orange|yellow|green|cyan|blue|purple|niconicowhite|white2|truered|red2|passionorange|orange2|madyellow|yellow2|elementalgreen|green2|marineblue|blue2|nobleviolet|purple2|black|\#[0-9a-f]{6})/;
 				var color_match:Array = mail.match(color_pattern);
 				if (color_match)
 				{

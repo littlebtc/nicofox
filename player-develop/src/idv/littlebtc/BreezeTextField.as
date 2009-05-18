@@ -130,11 +130,18 @@ package idv.littlebtc
 				}
 			/*}*/
 			var format:TextFormat = defaultTextFormat;
+			
+			// Suport #xxxxxx HTML color code
+			if (color.match(/^\#[0-9a-f]{6}/)) {
+				color_num = Number(color.replace(/^\#/, '0x'));
+			}
+			
 			if (color_num == 0x000000) {
 				this.filters = [nico_bevel_black];
 			} else {
 				this.filters = [nico_bevel];
 			}
+			
 			format.size = size_int;							
 			format.color = color_num;
 			this.setTextFormat(format);			
