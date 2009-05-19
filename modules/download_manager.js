@@ -353,6 +353,7 @@ var smilefox_sqlite = {
     var content = {
     id: this.db_connect.lastInsertRowID,
     url: url, video_id: Video.id, comment_id: Video.v, comment_type: Video.comment_type, video_title: Video.title, add_time: add_time,
+    start_time: 0, current_bytes: 0, max_bytes: 0,
     status: 0
     };
     return content;
@@ -793,7 +794,7 @@ var download_runner =
   },
   cancel: function(id)
   {
-    for (i = 0; i < this.query.length; i++)
+    for (var i = 0; i < this.query.length; i++)
     {
       if (this.query[i].id == id && this.query[i].downloader)
       {
@@ -803,7 +804,7 @@ var download_runner =
   },
   cancelAll: function()
   {
-    for (i = 0; i < this.query.length; i++)
+    for (var i = 0; i < this.query.length; i++)
     {
       if (this.query[i].downloader)
       {
