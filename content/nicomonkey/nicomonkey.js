@@ -341,7 +341,7 @@ function addCommentHelper()
     helper_links[i].addEventListener('click', commentHelperSelect, false);
   }
 
-  js = 'if (User.isPremium) {$(\'comment_helper_premium\').show() }'; 
+  var js = 'if (User.isPremium) {$(\'comment_helper_premium\').show() }'; 
   location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
 }
 
