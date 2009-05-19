@@ -137,6 +137,11 @@ package idv.littlebtc
 			
 			for each (item in comment_xml.child('chat'))
 			{
+				/* Filter out deleted commment */
+				if (item.@deleted == 1) {
+					continue;
+				}
+				
 				/* Process the comment list */
 				var comment:Object =
 				{
