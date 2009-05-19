@@ -56,7 +56,14 @@ nicofox.download.helper.nico.prototype = {
       this.uploader_comment = true;
     }
 
-    nicofox.goAjax('http://www.nicovideo.jp/api/getflv?v='+this.comment_id, 'GET', nicofox.hitch(this, 'parseGetFlv') , nicofox.hitch(this, 'failParse'));
+    /* Prepare request URL */
+    var request_url = 'http://www.nicovideo.jp/api/getflv?v='+this.comment_id;
+    /* XXX: Workaround for NMM vidoes, request as3=1 */
+    if (typeof this.video_id == 'string' && this.video_id.indexOf('nm') == 0) {
+      request_url += '&as3=1';
+    }
+    /* Go request */
+    nicofox.goAjax(request_url, 'GET', nicofox.hitch(this, 'parseGetFlv') , nicofox.hitch(this, 'failParse'));
   },
 
   retry: function(req) {
@@ -123,9 +130,7 @@ nicofox.download.helper.nico.prototype = {
     
     /* Distinguish what type of video we will download */
     if (params.url.match(/smile\?s\=/)) {
-      /* XXX: Since new player is launched, it seems that Nico Nico Douga is forced AS2 SWF to be like AS3 SWF. Do we need a option? */
       this.type = 'swf'; 
-      params.url += 'as3';
     }
     else if (params.url.match(/smile\?m\=/)) /* H.264 mp4 */
     { this.type = 'mp4'; }

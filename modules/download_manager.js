@@ -762,6 +762,9 @@ var download_runner =
           file_title = file_title.replace(/\%COMMENT\%/, '');
         }
 
+        /* XXX: Workaround for NMM videos */
+        this.query[k].downloader.video_id = downloads[i].video_id;
+
         this.query[k].downloader.file_title = file_title;
         this.query[k].downloader.comment_type = downloads[i].comment_type;
         this.query[k].downloader.init(downloads[i].comment_id);
