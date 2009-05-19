@@ -13,11 +13,19 @@ var uri = Cc["@mozilla.org/network/io-service;1"]
 var player_src = uri.spec;
 function load()
 {
-	/* Find the path */
-	if(!window.arguments || !window.arguments[0])
-	{
-		return;
-	}
+  /* Find the path */
+  if(!window.arguments || !window.arguments[0])
+  {
+    return;
+  }
+  // Set Event
+  document.addEventListener("NicoFoxEvent", function(e) {
+    var obj = e.target;
+    obj.setAttribute('video_file', window.arguments[0].video);
+    obj.setAttribute('comment_file', window.arguments[0].comment);
+  }, false, true);
+
+
   document.title = window.arguments[0].title + ' - NicoFox Player';
   var browser = document.createElement("browser");
   browser.setAttribute("id", "nicofox-player-browser");
@@ -33,13 +41,7 @@ function load()
   browser.webNavigation.allowPlugins = true;
   browser.webNavigation.allowSubframes = false;
 
-// load a page
-browser.contentDocument.location.href = player_src;
-document.addEventListener("NicoFoxEvent", function(e) {
-var obj = e.target;
-obj.setAttribute('video_file', window.arguments[0].video);
-obj.setAttribute('comment_file', window.arguments[0].comment);
-}, false, true);
-
+  // load a page
+  browser.contentDocument.location.href = player_src;
 }
 
