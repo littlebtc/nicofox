@@ -726,9 +726,8 @@ nicofox_ui.manager.popup_command =
       var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
       file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
 
+      /* If we cannot find the file, do not show the following things */
       if (file.exists()) {
-        /* If we cannot find the file, do not show the following things */
-        document.getElementById('popup-open').style.display = 'block';
         /* NicoFox player do not support SWF currently */
         if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { 
           document.getElementById('popup-open').style.display ='block';
