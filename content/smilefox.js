@@ -654,7 +654,7 @@ nicofox_ui.manager.popup_command =
     var end = new Object();
     var count = 0;
     var removing_ids = [];
-    for (i = 0; i < tree.view.selection.getRangeCount(); i++) {
+    for (var i = 0; i < tree.view.selection.getRangeCount(); i++) {
       tree.view.selection.getRangeAt(i, start, end);
       for (var j = start.value; j <= end.value; j++) {
         /* when it is failed, completed, canceled or waiting, we can remove it */
@@ -663,7 +663,7 @@ nicofox_ui.manager.popup_command =
         }
       }
     }
-    for(i = 0; i < removing_ids.length; i++) {
+    for (var i = 0; i < removing_ids.length; i++) {
       nicofox.download_manager.remove(removing_ids[i]);  
     }
   },
