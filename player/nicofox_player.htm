@@ -17,7 +17,7 @@ function load() {
     var comment_file = element.getAttribute('comment_file');
     swfobject.embedSWF('breezevideo_player.swf', "player_container", window.innerWidth, window.innerHeight, "9.0.115.0", "expressInstall.swf", {
       videoFile: encodeURI(video_file),
-      commentFile: encodeURI(comment_file),
+      commentFile: encodeURI(comment_file)
     }, {allowFullScreen: 'true'});
   }
 }
