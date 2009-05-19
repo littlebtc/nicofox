@@ -581,8 +581,8 @@ var download_runner =
     if (unloading || this.is_stopped)
     { return; }
     /* Re-select so we can purge our content */
-    downloads = smilefox_sqlite.select();
-    i = downloads.length - 1;
+    var downloads = smilefox_sqlite.select();
+    var i = downloads.length - 1;
     waiting_count = 0;
     while (i >= 0)
     {
