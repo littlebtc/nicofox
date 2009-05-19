@@ -190,7 +190,7 @@ nicofox_ui.manager = {
       features = "chrome,titlebar,toolbar,centerscreen,modal";
     }
             
-    pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
+    var pref_window = window.openDialog('chrome://nicofox/content/options.xul', '', features);
     pref_window.focus();
   },
 
@@ -337,7 +337,7 @@ nicofox_ui.manager.download_tree = {
       },
       getCellValue : function(row,column){
         if (column.id == "tree-progress" &&( nicofox_ui.manager.rows[row].status == 5 || nicofox_ui.manager.rows[row].status == 6)) return 20;
-        else if (column.id == "tree-progress"){progress = Math.floor(nicofox_ui.manager.rows[row].current_bytes / nicofox_ui.manager.rows[row].max_bytes * 100); return progress; }
+        else if (column.id == "tree-progress"){ return Math.floor(nicofox_ui.manager.rows[row].current_bytes / nicofox_ui.manager.rows[row].max_bytes * 100); }
         else return;
       },
       getProgressMode : function(row,column){
@@ -695,7 +695,6 @@ nicofox_ui.manager.popup_command =
         this.multiple_select = false;
       }
     }
-    selected_row = nicofox_ui.manager.rows[this.recent_row];
   
     /* Initialize */
     var menuitems = document.getElementById('smilefox-popup').getElementsByTagName('menuitem');

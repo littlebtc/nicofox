@@ -19,7 +19,7 @@ function load()
 		return;
 	}
   document.title = window.arguments[0].title + ' - NicoFox Player';
-  browser = document.createElement("browser");
+  var browser = document.createElement("browser");
   browser.setAttribute("id", "nicofox-player-browser");
   browser.setAttribute("name", "nicofox-player-browser");
   browser.setAttribute("type", "content-primary");

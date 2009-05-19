@@ -262,9 +262,10 @@ var smilefox_sqlite = {
     while (statement.executeStep())
     {
       rows[i] = new Object();
-      for (j = 0; j < statement.columnCount; j++)
+      for (var j = 0; j < statement.columnCount; j++)
       {
-        name = statement.getColumnName(j);
+        var name = statement.getColumnName(j);
+        var value = null;
         switch(statement.getTypeOfIndex(j))
         {
           case 0: // VALUE_TYPE_NULL
@@ -493,7 +494,7 @@ var smilefox_sqlite = {
 nicofox.download_manager = 
 {
    getDownloads: function() {
-     rows = smilefox_sqlite.select();
+     var rows = smilefox_sqlite.select();
      return rows.concat();
    },
 
@@ -559,9 +560,9 @@ var download_runner =
     
   if (this.ready)
   { return false; }
-  downloads = smilefox_sqlite.select();
+  var downloads = smilefox_sqlite.select();
   /* If there is something remained unexpected status, we will let it fail */
-  for (i=0; i< downloads.length; i++) {
+  for (var i = 0; i < downloads.length; i++) {
   if (downloads[i].status > 4)
       {
         smilefox_sqlite.updateStatus(downloads[i].id, 3); 
