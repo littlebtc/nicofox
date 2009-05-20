@@ -91,8 +91,8 @@ nicofox_ui.manager = {
       return;
     }
     /* Update */
-    now = new Date();
-    now_time = now.getTime();
+    var now = new Date();
+    var now_time = now.getTime();
     var speed = Math.round((this.rows[num].current_bytes) / (now_time - this.rows[num].start_time) / 0.1024) / 10;
     this.rows[num].speed = speed;
   },
