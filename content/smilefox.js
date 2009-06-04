@@ -47,7 +47,7 @@ nicofox_ui.manager = {
          nicofox_ui.manager.updateTreeCount(0, 1);
          var keyword = document.getElementById('smilefox-search').value;
          if (keyword) {
-           this,manager.doSearch();
+           nicofox_ui.manager.doSearch();
          } else {
            document.getElementById('smilefox-tree').boxObject.scrollToRow(0);
          }
