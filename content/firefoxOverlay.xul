@@ -21,7 +21,7 @@
   </menupopup>
 
  <statusbar id="status-bar">
-   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic-text" src="chrome://nicofox/skin/logo_16.png" label="" oncommand="nicofox_ui.overlay.collapseBar();"/>
+   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png" label="" oncommand="nicofox_ui.overlay.collapseBar();"/>
 
  </statusbar>
  <vbox id="appcontent">

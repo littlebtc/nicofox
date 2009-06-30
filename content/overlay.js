@@ -119,7 +119,8 @@ nicofox_ui.overlay = {
     url = url.replace(/[\?\&]smilefox\=get$/, '');  
 
     var nicofox_icon = document.getElementById('nicofox-icon');
-    nicofox_icon.label = nicofox.strings.getString('processing');
+    nicofox_icon.setAttribute('label', nicofox.strings.getString('processing'));
+    nicofox_icon.className = 'statusbarpanel-iconic-text';
 
     urlparser = new nicofox.parser();
     urlparser.return_to = nicofox.hitch(nicofox_ui.overlay, 'confirmDownload', url, dont_confirm);
@@ -265,8 +266,10 @@ nicofox_ui.overlay = {
     var waiting_count = nicofox.download_manager.getWaitingCount();
     if (download_count > 0) {
       nicofox_icon.setAttribute ('label', download_count + '/' + (download_count + waiting_count));
+      nicofox_icon.className = 'statusbarpanel-iconic-text';
     } else {
       nicofox_icon.setAttribute ('label', '');
+      nicofox_icon.className = 'statusbarpanel-iconic';
     }
   },
 };
