@@ -52,7 +52,7 @@
 <!ENTITY downloader.autologin_username.accesskey "L">
 <!ENTITY video_player "Video Player">
 <!ENTITY video_player.external "External Player Customization">
-<!ENTITY video_player.external_video_player.label "Use Custom Extenral Player for FLV/MP4 Videos:">
+<!ENTITY video_player.external_video_player.label "Use Custom External Player for FLV/MP4 Videos:">
 <!ENTITY video_player.external_video_player.accesskey "F">
 <!ENTITY video_player.external_video_player_path.browse.label "Browse...">
 <!ENTITY video_player.external_video_player_path.browse.accesskey "B">
