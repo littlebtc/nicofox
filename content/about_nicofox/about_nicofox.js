@@ -1,6 +1,8 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
+Components.import
+
 var aboutNicoFox = {
 
   /* URI Helper */
@@ -14,6 +16,14 @@ var aboutNicoFox = {
   bookmarkSvc: null,
   /* Prepare for nsITaggingService */
   taggingSvc: null,
+
+  /* Determine what type (directory) to show */
+  type: 'recently-bookmarked',
+  /* Select terms to find */
+  terms: '',
+  /* Choose an tag to show */
+  tagId: -1,
+
   /* When loaded, load bookmark items and tags */
   load: function() {
     /* Load services first */
@@ -21,28 +31,53 @@ var aboutNicoFox = {
     aboutNicoFox.bookmarkSvc = Cc["@mozilla.org/browser/nav-bookmarks-service;1"].getService(Ci.nsINavBookmarksService);
     aboutNicoFox.taggingSvc = Cc["@mozilla.org/browser/tagging-service;1"].getService(Ci.nsITaggingService);
 
+    document.getElementById('keyword').addEventListener('command', function(e) {
+      aboutNicoFox.terms = this.value;
+      aboutNicoFox.loadBookmarks();
+      e.stopPropagation();
+      e.preventDefault();
+
+    }, false);
+
     aboutNicoFox.testUserscript();
     aboutNicoFox.loadBookmarks();
     aboutNicoFox.loadTags();
   },
   /* Load bookmarks from places database, using some specific parameters */
-  /* FIXME: We need some parameter for bookmark loading */
   loadBookmarks: function() {
+    var itemBlock = document.getElementById('item-list');
+    /* Clean old result */
+    while (itemBlock.firstChild) 
+    {
+      itemBlock.removeChild(itemBlock.firstChild);
+    };
+    
+
+    // Access to the private DB Connection: BEWARE!
+    var db = aboutNicoFox.historySvc.QueryInterface(Ci.nsPIPlacesDatabase).DBConnection;
+
     /* Set options 
        XXX: Need parameters to set how to sort */
     var options = aboutNicoFox.historySvc.getNewQueryOptions();
     options.queryType = Ci.nsINavHistoryQueryOptions.QUERY_TYPE_BOOKMARKS;
+    if (aboutNicoFox.tagId >= 0) {
+      options.resultType = Ci.nsINavHistoryQueryOptions.RESULTS_AS_TAG_CONTENTS;
+    }
     
     /* Set queries to http://www.nicovideo.jp/watch/
        XXX: How to set multiple websites? */
     var query = aboutNicoFox.historySvc.getNewQuery();
     query.uri = aboutNicoFox.makeURI('http://www.nicovideo.jp/watch/');
+    query.searchTerms = aboutNicoFox.terms;
     query.uriIsPrefix = true;
+    if (aboutNicoFox.tagId >= 0) {
+      query.setFolders([aboutNicoFox.tagId], 1);
+    }
 
     /* Execute the query */
     var result = this.historySvc.executeQuery(query, options);
     var container = result.root;
-
+    var count = 0;
     /* Read results */
     container.containerOpen = true;
     for (var i = 0; i < container.childCount; i ++) {
@@ -90,15 +125,28 @@ var aboutNicoFox = {
       block.appendChild(thumb);
       block.appendChild(innerBlock);
 
-      document.getElementById('result').appendChild(block);
-	
+      itemBlock.appendChild(block);
+      count++;	
     }
     /* Done, Close container */
     container.containerOpen = false;
-
+    /* No result message */
+    if (count == 0) {
+      var noResult = document.createElement('p');
+      noResult.textContent = '找不到結果。';
+      noResult.className = 'no-result';
+      itemBlock.appendChild(noResult);
+    }
   },
   loadTags: function() {
-    // Access to the private DB Connection: BEWARE!
+    /* Make a "Clear Tag Result" event */
+    document.getElementById('tag-all').addEventListener('click', function(e) {
+      aboutNicoFox.selectTag(-1);
+      e.stopPropagation();
+      e.preventDefault();
+    } , false);
+
+    /* Access to the private DB Connection: BEWARE! */
     var db = aboutNicoFox.historySvc.QueryInterface(Ci.nsPIPlacesDatabase).DBConnection;
     
     /*
@@ -130,12 +178,17 @@ var aboutNicoFox = {
         }
         for (var i = 0; i < tagLength; i++) {
           var tagItem = document.createElement('li');
-          var tagLink = document.createElement('a');
-          /* Calculate the size of the font */
-          tagLink.href = 'about:nicofox#' + tagIds[i] ; /* XXX */
-          tagLink.textContent = tagNames[i];
-          tagItem.appendChild(tagLink);
-          tagItem.appendChild(document.createTextNode(' ('+ tagCounts[i] +')'));
+          tagItem.id = 'tag-' + tagIds[i] ;
+          tagItem.className = 'tag-normal';
+          tagItem.textContent = tagNames[i] + ' (' + tagCounts[i] + ')';
+          
+          tagItem.addEventListener('click', (function(id) {
+            return function(e) {
+              aboutNicoFox.selectTag(id);
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          })(tagIds[i]) , false);
           tagList.appendChild(tagItem);
         }
       },
@@ -151,6 +204,21 @@ var aboutNicoFox = {
     });
 
 
+  },
+  /* Fire when using select an tag in interface */
+  selectTag: function(id) {
+    aboutNicoFox.tagId = id;
+    aboutNicoFox.loadBookmarks();
+    /* Clean and refresh the interface */
+    var actives = document.getElementsByClassName('tag-active');
+    for (var i = 0; i < actives.length; i++) {
+      actives[i].className = 'tag-normal';
+    }
+    if (id == -1) {
+      document.getElementById('tag-all').className = 'tag-active';
+    } else {
+      document.getElementById('tag-'+parseInt(id, 10)).className = 'tag-active';
+    }
   },
   /* Test if user is using additional mylist userscript: (under NYSL)
      http://castor.s26.xrea.com/products/greasemonkey/nicovideo_additional_mylist.html
@@ -174,7 +242,7 @@ var aboutNicoFox = {
         return;
       }
       var importBlock = document.getElementById('import');
-      importBlock.innerHTML = '我們發現您有使用過額外 Mylist 這個 Userscript，且有 ' + prefArray.length + ' 筆紀錄於其中。引入到書籤？';
+      importBlock.innerHTML = '我們發現您有使用過額外 Mylist 這個 Userscript，且有 ' + prefArray.length + ' 筆紀錄於其中。 <input type="button" value="引入到書籤（施工中）" disabled="disabled" />';
     }
   }
 };

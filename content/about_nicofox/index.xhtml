@@ -23,6 +23,7 @@
   <h2>儲存在 &brandShortName; 書籤中的影片連結</h2>
   <div id="import"></div>
   <div id="result">
+    <!--
     <div id="directory-list">
       <ul>
         <li><a href="about:nicofox#recently-bookmarked" class="directory-active"><img src="chrome://browser/skin/places/query.png" alt=""/> Recently Bookmarked</a></li>
@@ -30,14 +31,20 @@
       </ul>
       <div id="directory-other"></div>
     </div>
+    -->
+    <div id="item-list">
+    </div>
   </div>
   
   <div id="tag-result">
     <h3>Search</h3>
-    <xul:textbox type="search" emptytext="輸入關鍵字" />
+    <xul:textbox id="keyword" type="search" emptytext="輸入關鍵字" />
     <h3>Tags</h3>
-    <ul id="tag-list"></ul>
+    <p id="tag-all" class="tag-active">不分標籤</p>
+    <ul id="tag-list">
+    </ul>
   </div>
+
 </div>
 </body>
 </html>

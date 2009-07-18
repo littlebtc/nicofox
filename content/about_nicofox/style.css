@@ -59,6 +59,44 @@ body {
   width: 230px;
 }
 
+
+#tag-all {
+  padding: 2px 0 2px 18px;
+  background: url(chrome://browser/skin/places/bookmark.png);
+  background-position: -32px 0px;
+  background-repeat: no-repeat;
+  height: 16px;
+  cursor: pointer;
+}
+#tag-all:hover {
+  background-color: #CCCCCC;
+  color: #666666;
+}
+
+#tag-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.tag-active {
+  background-color: #666666 !important;
+  color: #FFFFFF !important;
+}
+#tag-list li {
+  padding: 2px 0 2px 20px;
+  background: url(chrome://browser/skin/places/tag.png);
+  background-position: 2px 2px;
+  background-repeat: no-repeat;
+  height: 16px;
+  cursor: pointer;
+}
+
+#tag-list li:hover {
+  background-color: #DDDDDD;
+  color: #666666;
+}
+
+
 .item {
   clear: both;
   padding: 5px 0;
