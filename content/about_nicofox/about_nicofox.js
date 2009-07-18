@@ -1,8 +1,6 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-Components.import
-
 var aboutNicoFox = {
 
   /* URI Helper */
