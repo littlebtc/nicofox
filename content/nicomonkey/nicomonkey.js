@@ -173,16 +173,22 @@ function start_inject()
   if ((typeof unsafeWindow.Video) != 'object') { return; }
   for (var key in unsafeWindow.Video) {
     var value = unsafeWindow.Video[key];
-    if ((typeof value) == 'object') {
-            Video[key] = [];
-      if (!value.length && (typeof value.length) != 'number') { return; }
-            for (var i = 0; i < value.length; i++) {
-        if ((typeof value[i]) != 'string') { return; }
-              Video[key].push(value[i]);
+    /* Video has null value */
+    if (value === null) {
+      Video[key] = null;
+    }
+    /* If it is an array ... */
+    if (Object.prototype.toString.call(unsafeWindow.Video) === '[object Array]') {
+      /* Check its contents */
+      Video[key] = [];
+      if (!value.length && (typeof value.length) != 'number') { continue; }
+      for (var i = 0; i < value.length; i++) {
+        if ((typeof value[i]) != 'string') { continue; }
+          Video[key].push(value[i]);
       }
-          }
+    }
     else if ((typeof value) != 'string' && (typeof value) != 'number' && (typeof value) != 'boolean') {
-      return;
+      continue;
     } else {
         Video[key] = unsafeWindow.Video[key];
     }
