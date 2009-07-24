@@ -23,6 +23,13 @@
         <em:maxVersion>3.6a1pre</em:maxVersion>
       </Description>
     </em:targetApplication>
+    <em:targetApplication>
+      <Description>
+        <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id> <!-- SeaMonkey -->
+        <em:minVersion>2.0a2</em:minVersion>
+        <em:maxVersion>2.0b2pre</em:maxVersion>
+      </Description>
+    </em:targetApplication>
 
     <em:localized>
       <Description>
