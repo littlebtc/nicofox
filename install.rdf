@@ -10,8 +10,8 @@
     <em:contributor>Logo and Icon designed by FeAm in ptt.cc (CC-by-sa-3.0)</em:contributor>
     <em:contributor>NicoFox contains some source codes by others that are licensed under various licenses.</em:contributor>
     <em:contributor>See http://code.google.com/p/nicofox/wiki/License for details.</em:contributor>
-    <em:translator>alexsh</em:translator>
-    <em:translator>imfafa</em:translator>
+    <em:translator>alexsh (ja)</em:translator>
+    <em:translator>imfafa (ja)</em:translator>
     <em:translator>hzhbest (zh-CN)</em:translator>
     <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
     <em:optionsURL>chrome://nicofox/content/options.xul</em:optionsURL>
@@ -48,8 +48,8 @@
         <em:contributor>Logo和Icon由ptt.cc的FeAm设计 (CC-by-sa-3.0)</em:contributor>
         <em:contributor>NicoFox包含了许多由他人撰写且以不同授权方式释出的源代码。</em:contributor>
         <em:contributor>详情请参考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
-	<em:translator>alexsh</em:translator>
-	<em:translator>imfafa</em:translator>
+	<em:translator>alexsh (ja)</em:translator>
+	<em:translator>imfafa (ja)</em:translator>
 	<em:translator>hzhbest (zh-CN)</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
       </Description>
@@ -63,8 +63,8 @@
         <em:contributor>ロゴ、アイコンはptt.ccのFeAmさんが提供してくれました。 (CC-by-sa-3.0)</em:contributor>
         <em:contributor>NicoFoxは、色々なライセンスでリリースされたソースコードを使わせていただいてます。</em:contributor>
         <em:contributor>詳しくはhttp://code.google.com/p/nicofox/wiki/License 。</em:contributor>
-	<em:translator>alexsh</em:translator>
-	<em:translator>imfafa</em:translator>
+	<em:translator>alexsh (ja)</em:translator>
+	<em:translator>imfafa (ja)</em:translator>
 	<em:translator>hzhbest (zh-CN)</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
       </Description>
