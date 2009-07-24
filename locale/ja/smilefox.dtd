@@ -21,9 +21,9 @@
 <!ENTITY popup.cancel.label "キャンセル">
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "再試行">
-<!ENTITY popup.retry.accesskey "R">
+<!ENTITY popup.retry.accesskey "T">
 <!ENTITY popup.open.label "NicoFox Playerで再生">
-<!ENTITY popup.open.accesskey "O">
+<!ENTITY popup.open.accesskey "P">
 <!ENTITY popup.openExternal.label "外部プレイヤーで再生">
 <!ENTITY popup.openExternal.accesskey "E">
 <!ENTITY popup.openFolder.label "動画保存フォルダを開く">
@@ -34,7 +34,7 @@
 <!ENTITY popup.go.accesskey "G">
 <!ENTITY popup.copy.label "動画の元ページのURLをコピー">
 <!ENTITY popup.copy.accesskey "C">
-<!ENTITY popup.copyCell.accesskey "o">
+<!ENTITY popup.copyCell.accesskey "O">
 <!ENTITY popup.selectAll.label "すべてを選択">
 <!ENTITY popup.selectAll.accesskey "A">
 <!ENTITY popup.remove.label "リストから削除">

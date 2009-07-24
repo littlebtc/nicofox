@@ -21,7 +21,7 @@
 <!ENTITY popup.cancel.label "取消">
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "重試">
-<!ENTITY popup.retry.accesskey "R">
+<!ENTITY popup.retry.accesskey "T">
 <!ENTITY popup.open.label "以 NicoFox Player 播放">
 <!ENTITY popup.open.accesskey "P">
 <!ENTITY popup.openExternal.label "在外部播放器播放">

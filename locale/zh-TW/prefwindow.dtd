@@ -1,9 +1,9 @@
 <!ENTITY prefwindow.title "NicoFox 選項">
 <!ENTITY pane1.title "NicoFox 選項">
-<!ENTITY nicowa_blocker.label "攔截NICO割（時報、情報局...等；用戶自訂NICO割除外）">
+<!ENTITY nicowa_blocker.label "攔截 NICO 割（時報、情報局...等；用戶自訂 NICO 割除外）">
 <!ENTITY nicowa_blocker.accesskey "W">
 <!ENTITY nicomonkey "頁面顯示">
-<!ENTITY nicomonkey.enable.label "在頁面中加入NicoFox新增的功能">
+<!ENTITY nicomonkey.enable.label "在頁面中加入 NicoFox 新增的功能">
 <!ENTITY nicomonkey.enable.accesskey "E">
 <!ENTITY nicomonkey.options "自定追加功能">
 <!ENTITY nicomonkey.toolbar.label "加上工具列">
@@ -37,7 +37,7 @@
 <!ENTITY downloader.download_max.accesskey "M">
 <!ENTITY downloader.video_bypass_cache.label "在下載影片時不使用快取">
 <!ENTITY downloader.video_bypass_cache.accesskey "P">
-<!ENTITY downloader.nico_only "NICONICO動畫特定功能">
+<!ENTITY downloader.nico_only "NICONICO 動畫特定功能">
 <!ENTITY downloader.economy.label "當遭遇經濟模式（低畫質模式）時段時:">
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "仍下載低畫質影片">
@@ -46,17 +46,17 @@
 <!ENTITY downloader.uploader_comment.accesskey "U">
 <!ENTITY downloader.replace_filters.label "取代評論中的變換字句 (Filter)">
 <!ENTITY downloader.replace_filters.accesskey "F">
-<!ENTITY downloader.boon_comment.label "讓評論檔案與BOON Player相容">
+<!ENTITY downloader.boon_comment.label "讓評論檔案與 BOON Player 相容">
 <!ENTITY downloader.boon_comment.accesskey "B">
 <!ENTITY downloader.autologin_username.label "使用密碼管理員中的以下電子郵件地址做自動登入:">
 <!ENTITY downloader.autologin_username.accesskey "L">
 <!ENTITY video_player "影片撥放器">
 <!ENTITY video_player.external "自訂外部播放器">
-<!ENTITY video_player.external_video_player.label "使用自訂的FLV/MP4影片撥放器:">
+<!ENTITY video_player.external_video_player.label "使用自訂的 FLV/MP4 影片撥放器:">
 <!ENTITY video_player.external_video_player.accesskey "F">
 <!ENTITY video_player.external_video_player_path.browse.label "瀏覽...">
 <!ENTITY video_player.external_video_player_path.browse.accesskey "B">
-<!ENTITY video_player.external_swf_player.label "使用自訂的SWF影片撥放器:">
+<!ENTITY video_player.external_swf_player.label "使用自訂的 SWF 影片撥放器:">
 <!ENTITY video_player.external_swf_player.accesskey "S">
 <!ENTITY video_player.external_swf_player_path.browse.label "瀏覽...">
 <!ENTITY video_player.external_swf_player_path.browse.accesskey "R">

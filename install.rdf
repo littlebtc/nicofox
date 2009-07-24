@@ -32,8 +32,9 @@
         <em:contributor>Logo和Icon由ptt.cc的FeAm設計 (CC-by-sa-3.0)</em:contributor>
         <em:contributor>NicoFox包含了許多由他人撰寫且以不同授權方式釋出的原始碼。</em:contributor>
         <em:contributor>詳情請參考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
-	<em:translator>alexsh</em:translator>
-	<em:translator>imfafa</em:translator>
+	<em:translator>alexsh (ja)</em:translator>
+	<em:translator>imfafa (ja)</em:translator>
+	<em:translator>hzhbest (zh-CN)</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
       </Description>
      </em:localized>

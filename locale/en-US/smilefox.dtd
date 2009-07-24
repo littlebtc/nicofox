@@ -21,7 +21,7 @@
 <!ENTITY popup.cancel.label "Cancel">
 <!ENTITY popup.cancel.accesskey "C">
 <!ENTITY popup.retry.label "Retry">
-<!ENTITY popup.retry.accesskey "R">
+<!ENTITY popup.retry.accesskey "T">
 <!ENTITY popup.open.label "Play in NicoFox Player">
 <!ENTITY popup.open.accesskey "P">
 <!ENTITY popup.openExternal.label "Play in External Player">
@@ -34,7 +34,7 @@
 <!ENTITY popup.go.accesskey "G">
 <!ENTITY popup.copy.label "Copy Video Page URL">
 <!ENTITY popup.copy.accesskey "C">
-<!ENTITY popup.copyCell.accesskey "o">
+<!ENTITY popup.copyCell.accesskey "O">
 <!ENTITY popup.selectAll.label "Select All">
 <!ENTITY popup.selectAll.accesskey "A">
 <!ENTITY popup.remove.label "Remove from List">
