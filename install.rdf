@@ -12,6 +12,7 @@
     <em:contributor>See http://code.google.com/p/nicofox/wiki/License for details.</em:contributor>
     <em:translator>alexsh</em:translator>
     <em:translator>imfafa</em:translator>
+    <em:translator>hzhbest (zh-CN)</em:translator>
     <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
     <em:optionsURL>chrome://nicofox/content/options.xul</em:optionsURL>
     <em:iconURL>chrome://nicofox/skin/logo.png</em:iconURL>
@@ -49,6 +50,7 @@
         <em:contributor>详情请参考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
+	<em:translator>hzhbest (zh-CN)</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
       </Description>
      </em:localized>
@@ -63,6 +65,7 @@
         <em:contributor>詳しくはhttp://code.google.com/p/nicofox/wiki/License 。</em:contributor>
 	<em:translator>alexsh</em:translator>
 	<em:translator>imfafa</em:translator>
+	<em:translator>hzhbest (zh-CN)</em:translator>
         <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
       </Description>
      </em:localized>
