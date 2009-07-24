@@ -1,12 +1,13 @@
 content	nicofox		content/
 locale	nicofox		en-US	locale/en-US/
-locale	nicofox		ja-JP	locale/ja-JP/
+locale	nicofox		ja	locale/ja/
 locale	nicofox		zh-CN	locale/zh-CN/
 locale	nicofox		zh-TW	locale/zh-TW/
 locale	nicofox		zh-HK	locale/zh-TW/
 skin	nicofox		classic/1.0	skin/
-overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay.xul
+overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxoverlay.xul
 overlay chrome://songbird/content/xul/mainScriptsOverlay.xul	chrome://nicofox/content/firefoxOverlay.xul
 overlay chrome://navigator/content/navigator.xul	chrome://nicofox/content/seamonkeyOverlay.xul
 
+overlay	chrome://browser/content/sanitize.xul	chrome://nicofox/content/sanitize_overlay.xul
 resource nicofox modules/
