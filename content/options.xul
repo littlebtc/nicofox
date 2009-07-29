@@ -12,7 +12,7 @@
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
  title="&prefwindow.title;" width="600" style="height: 45em;">
   <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();" image="chrome://nicofox/skin/nicofox_content.png">
-  <script type="application/x-javascript" src="chrome://nicofox/content/options-panel1.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/options_panel1.js" />
     <preferences>
       <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool" onchange="nicomonkeySwitch();" />
       <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool" onchange="toolbarSwitch();" />
@@ -45,7 +45,7 @@
     </groupbox>
   </prefpane>
   <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/nicofox_downloader.png">
-  <script type="application/x-javascript" src="chrome://nicofox/content/options-panel2.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/options_panel2.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
@@ -140,7 +140,7 @@
      </groupbox>
   </prefpane>
   <prefpane id="pane3" label="&video_player;" onpaneload="updatePanel3();" image="chrome://nicofox/skin/nicofox_player.png">
-  <script type="application/x-javascript" src="chrome://nicofox/content/options-panel3.js" />
+  <script type="application/x-javascript" src="chrome://nicofox/content/options_panel3.js" />
     <preferences>
       <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" onchange="updateVideoPlayer();"/>
       <preference id="pref-external_video_player_path" name="extensions.nicofox.external_video_player_path" type="file" />
