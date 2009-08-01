@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
-<?xul-overlay href="chrome://nicofox/content/smilefoxOverlay.xul" type="text/css"?>
+<?xul-overlay href="chrome://nicofox/content/smilefox_overlay.xul" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://nicofox/locale/nicofox.dtd">
 
 <overlay id="nicofox-overlay"
