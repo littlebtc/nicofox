@@ -5,8 +5,9 @@ locale	nicofox		zh-CN	locale/zh-CN/
 locale	nicofox		zh-TW	locale/zh-TW/
 locale	nicofox		zh-HK	locale/zh-TW/
 skin	nicofox		classic/1.0	skin/
-overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxoverlay.xul
-overlay chrome://navigator/content/navigator.xul	chrome://nicofox/content/seamonkeyOverlay.xul
+overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefox_overlay.xul
+overlay chrome://navigator/content/navigator.xul	chrome://nicofox/content/seamonkey_overlay.xul
 
-overlay	chrome://browser/content/sanitize.xul	chrome://nicofox/content/sanitize_overlay.xul
+# Under construction...
+# overlay	chrome://browser/content/sanitize.xul	chrome://nicofox/content/sanitize_overlay.xul
 resource nicofox modules/

@@ -30,7 +30,10 @@
     </toolbar>
     
   </toolbox>
-<tree id="smilefox-tree" flex="8" context="smilefox-popup">
+<tree id="smilefox-tree" flex="8" context="smilefox-popup"
+onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) alert('?');"
+onclick="if (event.detail == 2) alert('?');"
+>
   <treecols>
     <treecol label="&tree.videoTitle;" id="tree-title" flex="5"/>
     <splitter class="tree-splitter"/>
@@ -54,7 +57,7 @@
    <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="popup-retry" oncommand="nicofox_ui.manager.popup_command.retry()" style="font-weight: bold;"  />
    <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="popup-open" oncommand="nicofox_ui.manager.popup_command.open()" style="font-weight: bold;" />
    <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="popup-open-external" oncommand="nicofox_ui.manager.popup_command.openExternal()" />
-<!--   <menuitem label="Play SWF movie in browser" accesskey="S" id="popup-open-swf-player" oncommand="nicofox_ui.manager.popup_command.openSwfPlayer()" />-->
+   <menuitem label="Edit Comment" accesskey="E" id="popup-comment-edit" oncommand="nicofox_ui.manager.popup_command.commentEdit()" />
    <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.openFolder();" id="popup-open-folder"/>
    <menuitem label="&popup.moveFolder.label;"  accesskey="&popup.moveFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="popup-move-folder"/>
    <menuseparator />

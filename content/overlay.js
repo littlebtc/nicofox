@@ -1,11 +1,12 @@
-
 Components.utils.import("resource://nicofox/download_manager.js");
 Components.utils.import("resource://nicofox/common.js");
 Components.utils.import("resource://nicofox/urlparser.js");
 
 if (!nicofox_ui) {var nicofox_ui = {};}
-/* Download count refresh listener */
+
 nicofox_ui.overlay = {
+  /* Prepare for nsIPromptService */
+  promptSvc: null,
   icon_listener: { 
     add: function(id, content) {
       nicofox_ui.overlay.refreshIcon();
@@ -34,8 +35,8 @@ nicofox_ui.overlay = {
     },
     onLocationChange: function(aProgress, aRequest, aURI)
     {
-     /* FIXME: Dirty */
-     if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)) {
+     /* Test if we are in supported website and change the "Download" button */
+     if (aURI && nicofox.parser.prototype.supported_sites.nico.test(aURI.spec)) {
        document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
        nicofox_ui.overlay.openBar(true);
      } else {
@@ -57,9 +58,8 @@ nicofox_ui.overlay = {
    /* initialization code */
    nicofox_ui.overlay.initialized = true;
 
-   /* Prepapre prompt service */
-   nicofox_ui.overlay.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-                       .getService(Ci.nsIPromptService);
+   /* Load services */
+   nicofox_ui.overlay.promptSvc = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 
    /* Cancel some function for non-firefox */
    if (!Ci.nsINavBookmarksService) {
@@ -73,6 +73,7 @@ nicofox_ui.overlay = {
 
    nicofox.download_listener.addListener(nicofox_ui.overlay.icon_listener);
    nicofox.download_manager.go();
+
   },
   onUnload: function() {
     window.removeEventListener("load", nicofox_ui.overlay.onLoad, false);
@@ -161,11 +162,11 @@ nicofox_ui.overlay = {
     nicofox_ui.overlay.refreshIcon();
     /* Download failed */
     if(Video == false) {
-      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorParseFailed'));
+      this.promptSvc.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorParseFailed'));
       return;
     }
     if (Video.isDeleted) {
-      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorDeleted'));
+      this.promptSvc.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorDeleted'));
       return;
     }
 
@@ -182,7 +183,7 @@ nicofox_ui.overlay = {
     }
     var save_path = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     if (!this.checkFile(save_path, file_title)) {
-      this.prompts.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorFileExisted'));
+      this.promptSvc.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorFileExisted'));
       return;
     }
 
@@ -228,20 +229,6 @@ nicofox_ui.overlay = {
     } else {
       document.getElementById('smilefox-entry').setAttribute('checked', 'true');
     }
-  },
-  matchWatchUrl: function(url)
-  {
-    return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/);
-  },
-
-  matchWatchCommentUrl: function(url)
-  {
-    return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/);
-  },
-
-  matchWatchVideoUrl: function(url)
-  {
-    return url.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/);
   },
   checkFile: function(path, filename) {
     if (
