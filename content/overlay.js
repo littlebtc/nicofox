@@ -1,3 +1,4 @@
+Components.utils.reportError('overlay.js//'+new Date().getTime());
 Components.utils.import("resource://nicofox/download_manager.js");
 Components.utils.import("resource://nicofox/common.js");
 Components.utils.import("resource://nicofox/urlparser.js");
@@ -54,6 +55,7 @@ nicofox_ui.overlay = {
     onLinkIconAvailable: function() {return 0;}
   },
   onLoad: function() {
+   Components.utils.reportError('onLoad//'+new Date().getTime());
 //   this.nico_dl_observer = new nicofox_download_observer();
    /* initialization code */
    nicofox_ui.overlay.initialized = true;
@@ -262,3 +264,4 @@ nicofox_ui.overlay = {
 };
 window.addEventListener("load", nicofox_ui.overlay.onLoad, false);
 window.addEventListener("unload", nicofox_ui.overlay.onUnload, false);
+Components.utils.reportError('end of overlay.js//'+new Date().getTime());

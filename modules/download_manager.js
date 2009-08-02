@@ -1,3 +1,4 @@
+Components.utils.reportError('download_manager.js//'+new Date().getTime());
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
@@ -113,9 +114,13 @@ function triggerDownloadListeners(listener_event, id, content)
 
 
 var smilefox_sqlite = {
+  /* Cache the SQLite Result */
   rows_cache: [],
   cached: false,
+  /* Are we at private browsing mode? */
   in_private: false,
+  /* Record field names (will be convient for Async fetch) */
+  fields: ['id', 'url', 'video_id', 'comment_id', 'comment_type', 'video_title', 'description', 'tags', 'video_type', 'video_economy', 'video_file', 'comment_file', 'uploader_comment_file', 'thumbnail_file', 'current_bytes', 'max_bytes', 'start_time', 'end_time', 'add_time', 'info', 'status', 'in_private'],
   load: function() {
     /* Private Browsing checking */
     try {  
@@ -303,6 +308,7 @@ var smilefox_sqlite = {
   },
   /* Select data from Database */
   select: function() {
+    Components.utils.reportError('smilefox_sqlite.select//'+new Date().getTime());
     if (!this.db_connect) {this.load();}
     if (this.cached) { return this.rows_cache; }
     var statement = this.db_connect.createStatement("SELECT * FROM smilefox ORDER BY id DESC");
@@ -312,6 +318,42 @@ var smilefox_sqlite = {
     this.cached = true;
     statement.reset();
     return rows;
+  },
+  /* Use asynchronous queries, supported in 1.9.1+ */
+  selectAsync: function(callback) {
+    if (!this.db_connect) {this.load();}
+    if (this.cached) { return this.rows_cache; }
+    
+    /* Callback should be a function */
+    if (typeof callback != 'function') { return; }
+
+    /* Prepare cache */
+    this.rows_cache = new Array();
+    var statement = this.db_connect.createStatement("SELECT * FROM smilefox ORDER BY id DESC");
+    statement.executeAsync({
+      callback: callback,
+      /* Fetch the result */
+      handleResult: function(aResultSet) {
+        for (var row = aResultSet.getNextRow(); row ; row = aResultSet.getNextRow()) {
+	  var rowObj = new Object();
+          for (var i = 0; i < smilefox_sqlite.fields.length; i++) {
+            rowObj[smilefox_sqlite.fields[i]] = row.getResultByName(smilefox_sqlite.fields[i]); 
+          }
+          smilefox_sqlite.rows_cache.push(rowObj);
+        }
+      },
+      handleError: function() {
+        /* XXX: This should throw an exception or something like that */
+      },
+      handleCompletion: function(aReason) {  
+        if (aReason != Ci.mozIStorageStatementCallback.REASON_FINISHED) {
+          /* XXX: This should throw an exception or something like that */
+          return;
+        }
+        smilefox_sqlite.cached = true;
+        this.callback();
+      }  
+    });
   },
   selectId: function (id) {
     if (!this.db_connect) {this.load();}
@@ -497,8 +539,8 @@ nicofox.download_manager =
    getDownloads: function() {
      var rows = smilefox_sqlite.select();
      return rows.concat();
+     Components.utils.reportError('End of nicofox.download_manager.getDownloads//'+new Date().getTime());
    },
-
    getDownloadCount: function() {
      return download_count;
 
@@ -558,7 +600,6 @@ var download_runner =
   query: new Array(),
   initialize: function()
   {
-    
   if (this.ready)
   { return false; }
   var downloads = smilefox_sqlite.select();

@@ -1,3 +1,4 @@
+Components.utils.reportError('common.js//'+new Date().getTime());
 var EXPORTED_SYMBOLS = ['nicofox'];
 
 var Cc = Components.classes;
