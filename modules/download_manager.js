@@ -319,7 +319,9 @@ var smilefox_sqlite = {
     statement.reset();
     return rows;
   },
-  /* Use asynchronous queries, supported in 1.9.1+ */
+  /* Use asynchronous queries, supported in 1.9.1+ 
+     XXX: NOT DONE YET
+  */
   selectAsync: function(callback) {
     if (!this.db_connect) {this.load();}
     if (this.cached) { return this.rows_cache; }
