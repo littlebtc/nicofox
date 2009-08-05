@@ -228,7 +228,7 @@ package idv.littlebtc
 			} 
 			return false;
 		}
-		
+		private var skipCount:int = 0;
 		public function prepareComment(time:Number):void
 		{
 			naka_sprite.updateTime(time);
@@ -238,7 +238,15 @@ package idv.littlebtc
 				//textfield_pool.purge();
 			//}
 			if (myapp.comment_container.visible==false)
-			{return;}
+			{return; }
+			
+			if (skipCount < 3) {		
+				skipCount++;
+				return;
+			}
+			
+			skipCount = 0;				
+			
 			var i: int = 0, k:int=0;
 			var comment:Object, format:TextFormat;
 			//myapp.textArea.text='';
@@ -248,7 +256,7 @@ package idv.littlebtc
 			var num:int = 0;
 			for each(comment in comment_list)
 			{	
-				if (num > 3) return;
+				//if (num > 3) return;
 				if (comment.pos == 'shita'  && comment.vpos <= time && comment.vpos+300 >= time )
 				{
 					if(!comment.object)

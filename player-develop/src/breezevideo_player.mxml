@@ -16,6 +16,7 @@
 	<mx:Script>
 		<![CDATA[
 			import mx.events.*;
+			import flash.events.Event;
 			import flash.display.StageDisplayState;
 			import idv.littlebtc.*;
 			import flash.ui.*;
@@ -179,6 +180,8 @@
 			
 			private function goProcessing():void
 			{
+			
+				
 				container2.y = Application.application.height - container2.height;
 				slider.width = 	Application.application.width - 400;
 				var scale:Number;
@@ -204,15 +207,16 @@
 				black_container.y = 0;
 				
 				video_file = Application.application.parameters.videoFile;
+				bvideo.src = video_file;
 				comment_file = Application.application.parameters.commentFile;
 				
 				breeze_comment = new BreezeCommentReader(Application.application);				
 				breeze_comment.loadComment(comment_file);
 				
 								
-				bvideo.addEventListener(VideoEvent.PLAYHEAD_UPDATE, updateTime);
-				bvideo.addEventListener(VideoEvent.REWIND, videoReplay);
-				bvideo.addEventListener(VideoEvent.STATE_CHANGE, updatePlaybackStatus);				
+				bvideo.addEventListener('timeUpdate', updateTime);
+				//bvideo.addEventListener(VideoEvent.REWIND, videoReplay);
+				bvideo.addEventListener('ended', updatePlaybackStatus);				
 				
 				slider.addEventListener(SliderEvent.CHANGE, jumpTime);
 				//doggy.addEventListener(MouseEvent.CLICK, testScale);
@@ -244,8 +248,8 @@
 			}
 			private function switchRepeat(e:MouseEvent):void
 			{
-				bvideo.autoRewind = !bvideo.autoRewind;
-				if (bvideo.autoRewind) repeat_img = repeat_img_yes;
+				bvideo.loop = !bvideo.loop;
+				if (bvideo.loop) repeat_img = repeat_img_yes;
 				else repeat_img = repeat_img_no;
 			}
 
@@ -267,7 +271,7 @@
 				}
 				updatePlaybackStatus(null);
 			}	
-			private function updatePlaybackStatus(e:VideoEvent):void
+			private function updatePlaybackStatus(e:Event):void
 			{
 				if (bvideo.playing)
 				{			
@@ -289,7 +293,7 @@
 			}
 			
 							
-			private function updateTime(e:VideoEvent):void
+			private function updateTime(e:Event):void
 			{
 				/* Some facts about Nico Nico Douga marqueeplayer:
 				 (in brief, but may be wrong) 
@@ -301,7 +305,7 @@
 				   (but we shouldn't do this because there will be some "comment ASCII art") 
 				 */							
 				
-				var vpos:Number = Math.floor(e.playheadTime * 100);
+				var vpos:Number = Math.floor(BreezeVideo(e.target).currentTime * 100);
 				var Mins:Number = Math.floor(vpos / 100);						
 				var Hours:Number = Math.floor(Mins / 60);
 				Mins = Mins % 60;
@@ -314,7 +318,7 @@
 				
 				time.text = ''+Hours_str+':'+Mins_str;
 				
-				var total:Number = Math.floor(e.target.totalTime);						
+				var total:Number = Math.floor(BreezeVideo(e.target).duration);						
 				Hours = Math.floor(total / 60);
 				Mins = total % 60;
 				if (Hours < 10) Hours_str = '0'+ Hours;
@@ -324,14 +328,14 @@
 				
 				time.text += ' / '+Hours_str+':'+Mins_str;
 				
-				if (breeze_comment.hasComment) {  
+				if (breeze_comment.hasComment && comment_container.visible) {  
 					breeze_comment.prepareComment(vpos);
 				}
 			}
 			
 			private function jumpTime(e:SliderEvent):void
 			{
-				bvideo.playheadTime = e.value;		
+				bvideo.currentTime = e.value;		
 			}			
 			
 		]]>
@@ -341,7 +345,9 @@
 	
     <mx:VBox id="big_container" width="100%" x="0" y="0" visible="true">    	   
 		<mx:Canvas id="black_container" width="100%" height="384" backgroundColor="black">	
-	    <breezevideo:BreezeVideo width="512" height="384" volume="{volslider.value}" source="{video_file}" autoPlay="true" id="bvideo" playheadUpdateInterval="30" x="0" y="0" autoRewind="false"  horizontalCenter="0" verticalCenter="0" />
+		<breezevideo:BreezeVideo id="bvideo" autoPlay="true" width="512" height="384" volume="{volslider.value}"   horizontalCenter="0" verticalCenter="0" />
+	    <!--<breezevideo:BreezeVideoOld width="512" height="384" volume="{volslider.value}" source="{video_file}" autoPlay="true" id="bvideo" playheadUpdateInterval="30" x="0" y="0" autoRewind="false"  horizontalCenter="0" verticalCenter="0"  />-->
+		
         <mx:Canvas id="comment_container" x="0" y="0" width="512" height="384"  visible="true" verticalScrollPolicy="off" horizontalScrollPolicy="off"  horizontalCenter="0" verticalCenter="0">
                 
         </mx:Canvas>
@@ -353,8 +359,8 @@
     <mx:VBox id="container2" height="40" width="100%" backgroundAlpha="0.5" backgroundColor="#EEEEEE" paddingTop="10" paddingLeft="10" paddingRight="10">        
         <mx:HBox horizontalGap="3">        	
         <mx:Button id="pause" label="||"/>
-		<mx:HSlider id="slider" tickInterval="5" value="{bvideo.playheadTime}"  maximum="{bvideo.totalTime}" />
-		<mx:Text id="time" />
+		<mx:HSlider id="slider" tickInterval="5" value="{bvideo.currentTime}"  maximum="{bvideo.duration}" />
+		<mx:Text id="time" text="" />
 		
 		<mx:Button id="repeat_switch" icon="{repeat_img}" width="25"/>							
 		<mx:PopUpMenuButton labelField="@label" id="comment_switch" icon="{comment_img}" dataProvider="{comment_numbers}"/>		
@@ -364,5 +370,5 @@
 		
 		</mx:HBox>
 		</mx:VBox>
- 
+ <!--<breezevideo:BreezeVideoOld id="bvideo" />-->
 </mx:Application>

@@ -9,11 +9,11 @@ package idv.littlebtc
 	import mx.events.*;
 	use namespace mx_internal;
 	
-	public class BreezeVideo extends VideoDisplay
+	public class BreezeVideoOld extends VideoDisplay
 	{		
 		public var smoothing:Boolean = false;
 		
-		public function BreezeVideo()
+		public function BreezeVideoOld()
 		{
 			addEventListener(FlexEvent.CREATION_COMPLETE, setSmooth);
 			

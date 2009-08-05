@@ -445,7 +445,7 @@ nicofox_ui.manager.popup_command =
     open: function() {
       if (this.recent_row < 0) { return; }
       if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
-      if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4)$/)) { return; }
+      if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4|swf)$/)) { return; }
   
       var file = Cc["@mozilla.org/file/local;1"]
                  .createInstance(Ci.nsILocalFile);
@@ -728,10 +728,7 @@ nicofox_ui.manager.popup_command =
 
       /* If we cannot find the file, do not show the following things */
       if (file.exists()) {
-        /* NicoFox player do not support SWF currently */
-        if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.swf$/)) { 
-          document.getElementById('popup-open').style.display ='block';
-        }
+        document.getElementById('popup-open').style.display ='block';
         document.getElementById('popup-open-external').style.display = 'block';
         document.getElementById('popup-open-folder').style.display = 'block';
         document.getElementById('popup-move-folder').style.display = 'block';

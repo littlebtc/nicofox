@@ -158,13 +158,13 @@ package idv.littlebtc
 			for (i = 0; i < this.numChildren; i++) {
 				object = this.getChildAt(i);
 				var field:BreezeTextField = object as BreezeTextField;			
-				field.x = 512 + (512 + field.width)*(field.vpos-100-this.time) / 400;
+				field.x = 512 + (512 + field.width) * (field.vpos - 100 - this.time) / 400;
 				object = null;
 			}
 			
 		}
 		public function updateTime(time:Number):void {
-			this.time = time;			
+			this.time = time;					
 			updateNakaPosition();
 		}
 		public function recycleField(object:DisplayObject):void {
