@@ -1,4 +1,3 @@
-Components.utils.reportError('download_manager.js//'+new Date().getTime());
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
@@ -117,6 +116,10 @@ var smilefox_sqlite = {
   /* Cache the SQLite Result */
   rows_cache: [],
   cached: false,
+  /* Is asynchronous query running? */
+  asyncRunning: false,
+  /* Is the database clear (first-run clean up)? */
+  clearStatus: false,
   /* Are we at private browsing mode? */
   in_private: false,
   /* Record field names (will be convient for Async fetch) */
@@ -155,9 +158,6 @@ var smilefox_sqlite = {
       if (prefs.getBoolPref('first_run') || prefs.getBoolPref('first_run_0.3')) {
         this.checkUpgrade();
       }
-
-      /* Privacy */
-      this.cleanPrivate();
     }
 
   },
@@ -308,7 +308,6 @@ var smilefox_sqlite = {
   },
   /* Select data from Database */
   select: function() {
-    Components.utils.reportError('smilefox_sqlite.select//'+new Date().getTime());
     if (!this.db_connect) {this.load();}
     if (this.cached) { return this.rows_cache; }
     var statement = this.db_connect.createStatement("SELECT * FROM smilefox ORDER BY id DESC");
@@ -317,45 +316,83 @@ var smilefox_sqlite = {
     this.rows_cache = rows;
     this.cached = true;
     statement.reset();
-    return rows;
+    return rows.concat();
   },
   /* Use asynchronous queries, supported in 1.9.1+ 
-     XXX: NOT DONE YET
   */
-  selectAsync: function(callback) {
+  selectAsync: function(successCallback, failCallback) {
     if (!this.db_connect) {this.load();}
-    if (this.cached) { return this.rows_cache; }
-    
+    /* Fetch from cache */
+    if (this.cached) {
+      successCallback(this.rows_cache.concat());
+      return;
+    }
+    /* Prevent multiple queries at once */
+    if (this.asyncRunning) {
+      failCallback();
+      return;
+    }
     /* Callback should be a function */
-    if (typeof callback != 'function') { return; }
+    if (typeof successCallback != 'function') { return; }
+    if (typeof failCallback != 'function') { return; }
+    this.asyncRunning = true;
 
     /* Prepare cache */
     this.rows_cache = new Array();
     var statement = this.db_connect.createStatement("SELECT * FROM smilefox ORDER BY id DESC");
-    statement.executeAsync({
-      callback: callback,
-      /* Fetch the result */
-      handleResult: function(aResultSet) {
+    var callback = {
+      successCallback: function(rows) {
+        /* Record rows cache */
+        smilefox_sqlite.rows_cache = rows.concat();
+        smilefox_sqlite.cached = true;
+        successCallback(rows);
+      },
+      failCallback: failCallback,
+    };
+    this.executeAsync(statement, true, callback);
+  },
+  executeAsync: function(statement, isSelect, callback) {
+    var statements = [];
+    /* For the first time, execute some maintenance queries */
+    if (!this.clearStatus) {
+      statements.push(this.db_connect.createStatement("DELETE FROM `smilefox` WHERE `in_private` = 1"));
+      statements.push(this.db_connect.createStatement("UPDATE `smilefox` SET `status` = 3 WHERE `status` > 4"));
+      this.clearStatus = true;
+    }
+    /* Push the requested statement */
+    statements.push(statement);
+    /* Implementation of MozIStorageStatementCallback */
+    if (isSelect) {
+      callback.cache = [];
+      /* handleResult will be used in SELECT only */
+      callback.handleResult = function(aResultSet) {
         for (var row = aResultSet.getNextRow(); row ; row = aResultSet.getNextRow()) {
 	  var rowObj = new Object();
           for (var i = 0; i < smilefox_sqlite.fields.length; i++) {
             rowObj[smilefox_sqlite.fields[i]] = row.getResultByName(smilefox_sqlite.fields[i]); 
           }
-          smilefox_sqlite.rows_cache.push(rowObj);
+          this.cache.push(rowObj);
         }
-      },
-      handleError: function() {
-        /* XXX: This should throw an exception or something like that */
-      },
-      handleCompletion: function(aReason) {  
-        if (aReason != Ci.mozIStorageStatementCallback.REASON_FINISHED) {
-          /* XXX: This should throw an exception or something like that */
-          return;
-        }
-        smilefox_sqlite.cached = true;
-        this.callback();
-      }  
-    });
+      };
+    }
+    callback.handleError =  function(error) {
+      Components.utils.error('[nicofox] Error during SQLite Queries:' + error.message);
+    };
+    callback.handleCompletion = function(aReason) { 
+      smilefox_sqlite.asyncRunning = false;
+      /* Handle error */
+      if (aReason != Ci.mozIStorageStatementCallback.REASON_FINISHED) {
+        this.failCallback();
+        return;
+      }
+      /* Return callback, with/without rows data */
+      if (isSelect) {
+        this.successCallback(this.cache);
+      } else {
+        this.successCallback();
+      }
+    };  
+    this.db_connect.executeAsync(statements, statements.length, callback);
   },
   selectId: function (id) {
     if (!this.db_connect) {this.load();}
@@ -538,10 +575,30 @@ var smilefox_sqlite = {
 */
 nicofox.download_manager = 
 {
-   getDownloads: function() {
-     var rows = smilefox_sqlite.select();
-     return rows.concat();
-     Components.utils.reportError('End of nicofox.download_manager.getDownloads//'+new Date().getTime());
+   /* There may be multiple instances waiting for select result,
+      put a tray and notify all instances for results when done. 
+   */
+   selectTray: [],
+   /* Use Async query to get download lists  */
+   getDownloadsAsync: function(callback) {
+     /* Put callback into tray */
+     if (typeof callback != 'function') { return; }
+     this.selectTray.push(callback);
+     /* Run selectAsync for first item only */
+     if (this.selectTray.length == 1) {
+       smilefox_sqlite.selectAsync(nicofox.hitch(this, 'processAsyncResults'), nicofox.hitch(this, 'processAsyncError'));
+     }
+   },
+   /* Run all callbacks in tray */
+   processAsyncResults: function(rows) {
+     for (var i = 0; i < this.selectTray.length; i++) {
+       this.selectTray[i].call(null, rows);
+     }
+     /* Empty the tray */
+     this.selectTray = [];
+   },
+   processAsyncError: function() {
+     Components.utils.reportError('[nicofox] Error occured in getDownloadsAsync SQLite queries');
    },
    getDownloadCount: function() {
      return download_count;
@@ -582,8 +639,8 @@ nicofox.download_manager =
    },
    go: function()
    {
-  download_runner.start();
-  download_runner.prepare();
+     download_runner.start();
+     download_runner.prepare();
    }
 }
 
@@ -592,7 +649,6 @@ var waiting_count = 0;
 var download_max = prefs.getIntPref('download_max');
 var download_runner =
 {
-  ready: false,
   is_stopped: true,
   download_triggered: 0,
   download_canceled: 0,
@@ -600,34 +656,21 @@ var download_runner =
   economy_invoked: false, /* For economy mode notification */
   economy_switch: false, /* For cheking current mode */
   query: new Array(),
-  initialize: function()
-  {
-  if (this.ready)
-  { return false; }
-  var downloads = smilefox_sqlite.select();
-  /* If there is something remained unexpected status, we will let it fail */
-  for (var i = 0; i < downloads.length; i++) {
-  if (downloads[i].status > 4)
-      {
-        smilefox_sqlite.updateStatus(downloads[i].id, 3); 
-          triggerDownloadListeners('update', downloads[i].id, {status: 3});
-        
-      }
-    }
-    this.ready = true;
-  },
+  /* Make download manager start running */
   start: function() {
     this.is_stopped = false;
   },
   prepare: function() {
-    if (!this.ready)
-    { this.initialize(); }
     if (unloading || this.is_stopped)
     { return; }
     /* Re-select so we can purge our content */
-    var downloads = smilefox_sqlite.select();
+    nicofox.download_manager.getDownloadsAsync(nicofox.hitch(download_runner, 'prepareCallback'));//smilefox_sqlite.select();
+  },
+  /* After download list asynchronously received */
+  prepareCallback: function(downloads) {
     var i = downloads.length - 1;
     waiting_count = 0;
+  
     while (i >= 0)
     {
       if (downloads[i].status == 0 || (downloads[i].status == 4 && !this.economy_switch))

@@ -1,29 +1,10 @@
-Components.utils.reportError('overlay.js//'+new Date().getTime());
-Components.utils.import("resource://nicofox/download_manager.js");
 Components.utils.import("resource://nicofox/common.js");
-Components.utils.import("resource://nicofox/urlparser.js");
 
 if (!nicofox_ui) {var nicofox_ui = {};}
 
 nicofox_ui.overlay = {
   /* Prepare for nsIPromptService */
   promptSvc: null,
-  icon_listener: { 
-    add: function(id, content) {
-      nicofox_ui.overlay.refreshIcon();
-    },
-    remove: function(id) {
-      nicofox_ui.overlay.refreshIcon();
-    },
-    update: function(id, content) {
-      nicofox_ui.overlay.refreshIcon();
-    },
-    stop: function() {
-      nicofox_ui.overlay.refreshIcon();
-    },
-    rebuild: function() {
-    }
-  },
   bar_opened: false,
   page_listener: {
     QueryInterface: function(aIID)
@@ -36,6 +17,8 @@ nicofox_ui.overlay = {
     },
     onLocationChange: function(aProgress, aRequest, aURI)
     {
+     /* XXX: Why parser? */
+     Components.utils.import("resource://nicofox/urlparser.js");
      /* Test if we are in supported website and change the "Download" button */
      if (aURI && nicofox.parser.prototype.supported_sites.nico.test(aURI.spec)) {
        document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
@@ -55,8 +38,6 @@ nicofox_ui.overlay = {
     onLinkIconAvailable: function() {return 0;}
   },
   onLoad: function() {
-   Components.utils.reportError('onLoad//'+new Date().getTime());
-//   this.nico_dl_observer = new nicofox_download_observer();
    /* initialization code */
    nicofox_ui.overlay.initialized = true;
 
@@ -73,16 +54,12 @@ nicofox_ui.overlay = {
    gBrowser.addProgressListener(nicofox_ui.overlay.page_listener,
    Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
 
-   nicofox.download_listener.addListener(nicofox_ui.overlay.icon_listener);
-   nicofox.download_manager.go();
-
   },
   onUnload: function() {
     window.removeEventListener("load", nicofox_ui.overlay.onLoad, false);
     window.removeEventListener("unload", nicofox_ui.overlay.onUnload, false);
     gBrowser.removeProgressListener(nicofox_ui.overlay.page_listener,
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
-    nicofox.download_listener.removeListener(nicofox_ui.overlay.icon_listener);
   },
   onMenuItemCommand: function(e) {
     nicofox_ui.overlay.collapseBar();
@@ -125,7 +102,8 @@ nicofox_ui.overlay = {
     nicofox_icon.setAttribute('label', nicofox.strings.getString('processing'));
     nicofox_icon.className = 'statusbarpanel-iconic-text';
 
-    urlparser = new nicofox.parser();
+    Components.utils.import("resource://nicofox/urlparser.js");
+    var urlparser = new nicofox.parser();
     urlparser.return_to = nicofox.hitch(nicofox_ui.overlay, 'confirmDownload', url, dont_confirm);
     urlparser.goParse(url);
   },
@@ -161,7 +139,6 @@ nicofox_ui.overlay = {
       pref_window.focus();
   },
   confirmDownload: function(Video, url, dont_confirm) {
-    nicofox_ui.overlay.refreshIcon();
     /* Download failed */
     if(Video == false) {
       this.promptSvc.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorParseFailed'));
@@ -217,6 +194,7 @@ nicofox_ui.overlay = {
     else
     {
     }*/
+    Components.utils.import("resource://nicofox/download_manager.js");
     nicofox.download_manager.add(Video, url);
     nicofox_ui.overlay.openBar(false);
     /*dlmanager.focus();*/
@@ -249,19 +227,6 @@ nicofox_ui.overlay = {
     var exists = file.exists();
     return exists;
   },
-  refreshIcon: function() {
-    var nicofox_icon = document.getElementById('nicofox-icon');
-    var download_count = nicofox.download_manager.getDownloadCount();
-    var waiting_count = nicofox.download_manager.getWaitingCount();
-    if (download_count > 0) {
-      nicofox_icon.setAttribute ('label', download_count + '/' + (download_count + waiting_count));
-      nicofox_icon.className = 'statusbarpanel-iconic-text';
-    } else {
-      nicofox_icon.setAttribute ('label', '');
-      nicofox_icon.className = 'statusbarpanel-iconic';
-    }
-  },
 };
 window.addEventListener("load", nicofox_ui.overlay.onLoad, false);
 window.addEventListener("unload", nicofox_ui.overlay.onUnload, false);
-Components.utils.reportError('end of overlay.js//'+new Date().getTime());

@@ -13,9 +13,9 @@ nicofox_ui.manager = {
   load: function() {
     nicofox_ui.manager.prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
-    
-    nicofox_ui.manager.rows = nicofox.download_manager.getDownloads();
-    nicofox_ui.manager.download_tree.assignTreeView();
+
+    /* Get download manager list */
+    nicofox.download_manager.getDownloadsAsync(nicofox.hitch(nicofox_ui.manager, 'getDownloadsCallback'));
 
     /* For XULRunner 1.9.1+, use type="search" */
     var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
@@ -24,10 +24,6 @@ nicofox_ui.manager = {
     { document.getElementById('smilefox-search').type = 'search'; }
 
     nicofox.download_manager.go();
-    if (nicofox.download_manager.getDownloadCount() == 0) {
-      document.getElementById('smilefox-toolbar-start').disabled = true;
-      document.getElementById('smilefox-toolbar-stop').disabled = true;
-    }
     document.getElementById('smilefox-popup').addEventListener('popupshowing', function(e) {
     nicofox_ui.manager.popup_command.activate.call(nicofox_ui.manager.popup_command, e)}, false);
     document.getElementById('smilefox-tree').focus();
@@ -82,8 +78,13 @@ nicofox_ui.manager = {
        }
      };
     nicofox.download_listener.addListener(nicofox_ui.manager.listener);
+    Components.utils.reportError(document.location.href);
   },
-
+  /* Callback for getDownloads */
+  getDownloadsCallback:function(rows) {
+    nicofox_ui.manager.rows = rows;
+    nicofox_ui.manager.download_tree.assignTreeView();
+  },
   updateRowSpeed: function(num) {
     /* Initialize */
     if (this.rows[num].current_bytes == 0 || this.rows[num].max_bytes == 0) {
@@ -113,17 +114,35 @@ nicofox_ui.manager = {
     boxobject.rowCountChanged(index, num);
     this.updateToolbar();
   },
+  /* refreshIcon merged XXX: Document */
   updateToolbar: function() {
-    if (nicofox.download_manager.getDownloadCount() > 0) {
+    /* nicofox-icon is in overlay */
+    var nicofox_icon = document.getElementById('nicofox-icon');
+    var download_count = nicofox.download_manager.getDownloadCount();
+    var waiting_count = nicofox.download_manager.getWaitingCount();
+
+    if (download_count > 0) {
       document.getElementById('smilefox-toolbar-start').disabled = true;
       document.getElementById('smilefox-toolbar-stop').disabled = false;
+      if (nicofox_icon) {
+        nicofox_icon.setAttribute ('label', download_count + '/' + (download_count + waiting_count));
+        nicofox_icon.className = 'statusbarpanel-iconic-text';
+      }
     }
-    else if ((nicofox.download_manager.getDownloadCount() + nicofox.download_manager.getWaitingCount()) == 0) {
+    else if (download_count + waiting_count == 0) {
       document.getElementById('smilefox-toolbar-start').disabled = true;
       document.getElementById('smilefox-toolbar-stop').disabled = true;
+      if (nicofox_icon) {
+        nicofox_icon.setAttribute ('label', '');
+        nicofox_icon.className = 'statusbarpanel-iconic';
+      }
     } else {
       document.getElementById('smilefox-toolbar-start').disabled = false;
       document.getElementById('smilefox-toolbar-stop').disabled = true;
+      if (download_count == 0 && nicofox_icon) {
+        nicofox_icon.setAttribute ('label', '');
+        nicofox_icon.className = 'statusbarpanel-iconic';
+      }
     }
   },
   toolbarClose: function()
@@ -164,7 +183,7 @@ nicofox_ui.manager = {
   start: function()
   {
     /* Start will also be called after video is added, so ... */
-    download_runner.prepare();
+    nicofox.download_manager.go();
     document.getElementById('smilefox-toolbar-start').disabled = true;
     document.getElementById('smilefox-toolbar-stop').disabled = false;
   },
@@ -210,10 +229,16 @@ nicofox_ui.manager = {
   },
 
   doSearch: function() {
-    var keyword = document.getElementById('smilefox-search').value;
-    
+    /* Empty the manager rows */
     this.updateTreeCount(0, -nicofox_ui.manager.rows.length);
-    this.rows = nicofox.download_manager.getDownloads();
+    nicofox_ui.manager.rows = [];
+    /* XXX: Why we should refetch contents during search? */
+    nicofox.download_manager.getDownloadsAsync(nicofox.hitch(nicofox_ui.manager, 'searchCallback'));
+  },
+  searchCallback: function(rows) {
+    var keyword = document.getElementById('smilefox-search').value;
+    this.rows = rows;
+//    this.rows = nicofox.download_manager.getDownloads();
     this.updateTreeCount(0, nicofox_ui.manager.rows.length);
 
     if (keyword) {
@@ -751,4 +776,3 @@ nicofox_ui.manager.popup_command =
 
 window.addEventListener("load", nicofox_ui.manager.load, false);
 window.addEventListener("unload", nicofox_ui.manager.unload, false);
-
