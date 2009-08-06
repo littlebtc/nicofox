@@ -78,7 +78,6 @@ nicofox_ui.manager = {
        }
      };
     nicofox.download_listener.addListener(nicofox_ui.manager.listener);
-    Components.utils.reportError(document.location.href);
   },
   /* Callback for getDownloads */
   getDownloadsCallback:function(rows) {
