@@ -38,13 +38,13 @@ package idv.littlebtc
 		{
 			var use_object:DisplayObject;
 			var hit_objects:Array = new Array();
-			/* If it is not all out at all */
+			/* If the pool is not full */
 			if (this.numChildren < comment_max) {
 				var tf:BreezeTextField = new BreezeTextField(this.comment_type);
 				tf.visible = false;			  
 				use_object = this.addChild(tf);
 			} else {
-			/* Hey, we have a full pull! */
+			/* Hey, we have a full pool! */
 				var last_field:BreezeTextField = this.getChildAt(this.numChildren - 1) as BreezeTextField;
 						
 				if (last_field.comment_for != -1) {
@@ -157,14 +157,14 @@ package idv.littlebtc
 			var i:int;
 			for (i = 0; i < this.numChildren; i++) {
 				object = this.getChildAt(i);
-				var field:BreezeTextField = object as BreezeTextField;			
+				var field:BreezeTextField = object as BreezeTextField;
 				field.x = 512 + (512 + field.width) * (field.vpos - 100 - this.time) / 400;
 				object = null;
 			}
 			
 		}
 		public function updateTime(time:Number):void {
-			this.time = time;					
+			this.time = time;
 			updateNakaPosition();
 		}
 		public function recycleField(object:DisplayObject):void {

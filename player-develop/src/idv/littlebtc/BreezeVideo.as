@@ -3,6 +3,7 @@
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.events.AsyncErrorEvent;
 	import flash.events.Event;	
 	import flash.events.NetStatusEvent;
@@ -24,7 +25,9 @@
 	public class BreezeVideo extends UIComponent
 	{
 		[Event(name = "timeUpdate")]
+		[Event(name = "seeked")]
 		[Event(name = "ended")]
+		
 		private var _src:String;
 		private var _width:Number;
 		private var _height:Number;
@@ -32,6 +35,8 @@
 		
 		private var _isSwf:Boolean = false;
 		private var _swfFps:Number;
+		private var _swfLoader:Loader;
+		private var _swfMask:Sprite;
 		private var _swfMovieClip:MovieClip;
 		
 		private var _connection:NetConnection;
@@ -48,7 +53,7 @@
 		private var _duration:Number = 0;			
 		private var _loop:Boolean = false;
 		private var _volume:Number = 0.75;		
-		private var _updateInterval:Number = 25;
+		private var _updateInterval:Number = 30;
 		private var _playing:Boolean = false;
 		
 		public function BreezeVideo()
@@ -60,10 +65,19 @@
 			if (url.match(/\.swf$/)) {
 				/* Initialize Loader */
 				var loaderTemp:Loader = new Loader();
-				var loader:Loader = Loader(this.addChild(loaderTemp));				
-				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, swfComplete);
+				_swfLoader = Loader(this.addChild(loaderTemp));				
+				_swfLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, swfComplete);
+				
+				/* Set up the mask */
+				_swfMask = new Sprite();
+				_swfMask.graphics.beginFill(0xFF0000);
+				_swfMask.graphics.drawRect(0, 0, super.width, super.height);				
+				_swfMask.graphics.endFill();
+				_swfMask = Sprite(this.addChild(_swfMask));
+				_swfLoader.mask = _swfMask;
+				
 				/* Use ForcibleLoader to load AVM1 SWF */
-				var fLoader:ForcibleLoader = new ForcibleLoader(loader);
+				var fLoader:ForcibleLoader = new ForcibleLoader(_swfLoader);
 				fLoader.load(new URLRequest(url));			
 			} else {
 				_video = new Video();
@@ -94,6 +108,8 @@
 			_swfMovieClip.soundTransform = transform;
 			/* Proceess comlete event */
 			_swfMovieClip.addEventListener(Event.ENTER_FRAME, swfEnterFrame);
+			/* Resize */
+			dispatchEvent(new Event('resize'));
 			
 			/* Initialize Timer */
 			_intervalTimer = new Timer(_updateInterval, 0);
@@ -144,13 +160,18 @@
 				case "NetStream.Play.Stop":
 					/* Test loop or not */
 					if (_loop) {
-						_stream.seek(0);
+						_stream.seek(0);						
+						_ended = false;
 						_stream.resume();
 					} else {
 						pause();
 						dispatchEvent(new Event('ended'));
 						_ended = true;
 					}
+					break;
+					
+				case "NetStream.Seek.Notify":
+					dispatchEvent(new Event('seeked'));
 					break;
             }			
 		}
@@ -176,6 +197,8 @@
 			if (_swfMovieClip.currentFrame >= _swfMovieClip.totalFrames - 1 && _playing) {
 				if (_loop) {
 					_swfMovieClip.gotoAndPlay(1);
+					_ended = false;
+					dispatchEvent(new Event('seeked'));
 				} else {
 					pause();
 					dispatchEvent(new Event('ended'));
@@ -187,8 +210,16 @@
 			var scale:Number;
 			if (_isSwf && _swfMovieClip) {
 				scale = Math.min(super.width / 512, super.height / 384);
-				_swfMovieClip.scaleX = scale;
-				_swfMovieClip.scaleY = scale;
+				_swfLoader.scaleX = scale;
+				_swfLoader.scaleY = scale;
+				
+				/* Set up the mask */
+				_swfMask.graphics.clear();
+				_swfMask.graphics.beginFill(0xFF0000);
+				_swfMask.graphics.drawRect(0, 0, super.width, super.height);				
+				_swfMask.graphics.endFill();
+				//_swfLoader.mask = _swfMask;				
+			
 			} else if (_video) {
 				scale = Math.min(super.width / _streamWidth, super.height / _streamHeight);
 				_video.width = _streamWidth * scale;
@@ -209,6 +240,8 @@
 					if (_ended) {
 						_swfMovieClip.gotoAndPlay(1);
 						_ended = false;
+						dispatchEvent(new Event('seeked'));
+						dispatchEvent(new Event('timeUpdate'));
 					} else {
 						_swfMovieClip.play();				
 					} 
@@ -216,8 +249,11 @@
 					if (_ended) {
 						_stream.seek(0);
 						_ended = false;
+						_stream.resume();
+						dispatchEvent(new Event('timeUpdate'));
+					} else {
+						_stream.resume();
 					}
-					_stream.resume();
 				}
 				_intervalTimer.start();
 				_playing = true;
@@ -270,6 +306,7 @@
 				} else {
 					_swfMovieClip.gotoAndStop(new int(value * _swfFps));
 				}
+				dispatchEvent(new Event('seeked'));
 			} else if (_stream) {
 				_stream.seek(value);
 			}

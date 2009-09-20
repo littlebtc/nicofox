@@ -25,11 +25,14 @@ package idv.littlebtc
 		private var shita_sprite:BreezeCommentSprite;
 		private var naka_sprite:BreezeCommentSprite;
 		private var comment_num:int;
-
+		/* Indicate whether we should stop updating comments */
+		public var _freezed:Boolean;
+		
 		// private var is_kavideo:Boolean;
 		
 		public function BreezeCommentReader(app:Object)
 		{	
+			_freezed = false;
 			myapp = app;
 
 			naka_sprite = new BreezeCommentSprite('naka');
@@ -228,7 +231,34 @@ package idv.littlebtc
 			} 
 			return false;
 		}
-		private var skipCount:int = 0;
+
+		private var _firstCommentIndex:int = -1;
+		private var _lastCommentIndex:int = -1;
+		private var _lastNakaCommentIndex:int = -1;
+		//private var skipCount:int = 0;
+		
+		/* After seeking, clear the old comment reading line */
+		public function purgeIndex():void
+		{
+			_freezed = true;
+			_firstCommentIndex = -1;
+			_lastCommentIndex = -1;
+			_lastNakaCommentIndex = -1;
+			var comment:Object;
+			for each(comment in comment_list)
+			{			
+				if (comment.object)
+				{
+					if (comment.pos == 'naka') naka_sprite.recycleField(comment.object);
+					else if (comment.pos == 'shita') shita_sprite.recycleField(comment.object);
+					else if (comment.pos == 'ue') ue_sprite.recycleField(comment.object);
+					delete comment.object;
+				}
+			}		
+			_freezed = false;
+		}
+		
+		/* After timeupdate event by BreezeVideo, update comments in a fixed interval */
 		public function prepareComment(time:Number):void
 		{
 			naka_sprite.updateTime(time);
@@ -240,12 +270,10 @@ package idv.littlebtc
 			if (myapp.comment_container.visible==false)
 			{return; }
 			
-			if (skipCount < 3) {		
-				skipCount++;
+			/* Check if freezed */
+			if (_freezed) {
 				return;
 			}
-			
-			skipCount = 0;				
 			
 			var i: int = 0, k:int=0;
 			var comment:Object, format:TextFormat;
@@ -254,43 +282,59 @@ package idv.littlebtc
 			var scale:Number;
 			var matrix:Matrix;
 			var num:int = 0;
-			for each(comment in comment_list)
-			{	
-				//if (num > 3) return;
-				if (comment.pos == 'shita'  && comment.vpos <= time && comment.vpos+300 >= time )
-				{
-					if(!comment.object)
-					{
-									
+			
+			if (!comment_list || comment_list.length == 0) { return; }
+			
+			/* Test if there is new comments to load */
+			while (_lastCommentIndex + 1 < comment_list.length) {
+				comment = comment_list[_lastCommentIndex + 1];				
+				/* We reach the front */
+				if (comment.vpos > time) { break; }
+				/* When we find elements that needs to load... */
+				if (comment.vpos + 300 >= time ) {
+					if (comment.pos == 'shita' && !comment.object) {
 						comment.object = shita_sprite.addComment(comment);
-						num++;						
-					}														
-				}
-				else if(comment.pos == 'ue'  && comment.vpos <= time && comment.vpos+300 >= time )
-				{
-					if(!comment.object)
-					{												
-						comment.object = ue_sprite.addComment(comment);
-						num++;						
 					}
-
+					if (comment.pos == 'ue' && !comment.object) {
+						comment.object = ue_sprite.addComment(comment);
+					}				
+				}
+				_lastCommentIndex++;
+			}
+			
+			/* Test if there is new naka comments to load */
+			while (_lastNakaCommentIndex + 1 < comment_list.length)
+			{
+				comment = comment_list[_lastNakaCommentIndex + 1];				
+				/* We reach the front */
+				if (comment.vpos - 100 > time) { break; }
+				/* When we find elements that needs to load... */
+				if (comment.vpos + 300 >= time ) {
+					if (comment.pos == 'naka' && !comment.object) {
+						comment.object = naka_sprite.addComment(comment);
+					}
+				}
+				_lastNakaCommentIndex++;
+			}
+			
+			/* Test if there old comments to hide */
+			while (_firstCommentIndex < comment_list.length) {
+				/* When there is no element, skip */
+				if (_firstCommentIndex < 0) {
+					if (_lastCommentIndex < 0) { break; }
+					else { _firstCommentIndex = 0; }
 				}
 				
-				else if (comment.pos == 'naka' && comment.vpos -100 <= (time) && comment.vpos +300 >= (time) )
+				comment = comment_list[_firstCommentIndex];				
+				
+				/* We reach the front */
+				if (comment.vpos + 300 >= time)
 				{
-					if(!comment.object)
-					{												
-						comment.object = naka_sprite.addComment(comment);
-						num++;						
-					}
-					else
-                    {
-                          //comment.object.x = 512+(512+comment.object.width)*(comment.vpos-100-time) / 400;
-    					          
-                    }
-
+					break;
 				}
-				else if (comment.object)
+				
+				/* Test if the element is going to be removed */
+				if (comment.object)
 				{
 					/* Avoid clearing processing data */
 				   if ((comment.object as BreezeTextField).comment_for != comment.no) {
@@ -304,24 +348,16 @@ package idv.littlebtc
 					//textfield_pool.object = comment.object;
 					comment.object = null;
 				   }
+				   
 				}
+				_firstCommentIndex++;
 			}
-			//myapp.textArea.text = '?'+check_head+'/'+check_tail + "\n"+ myapp.textArea.text;
+			
 		}
 		
 		public function cleanComment():void
 		{
-			var comment:Object;
-			for each(comment in comment_list)
-			{			
-				if (comment.object)
-				{
-					if (comment.pos == 'naka') naka_sprite.recycleField(comment.object);
-					else if (comment.pos == 'shita') shita_sprite.recycleField(comment.object);
-					else if (comment.pos == 'ue') ue_sprite.recycleField(comment.object);
-					delete comment.object;
-				}
-			}		
+			this.purgeIndex();
 			comment_list = new Array();
 			
 		}

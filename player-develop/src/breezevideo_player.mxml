@@ -216,6 +216,7 @@
 								
 				bvideo.addEventListener('timeUpdate', updateTime);
 				//bvideo.addEventListener(VideoEvent.REWIND, videoReplay);
+				bvideo.addEventListener('seeked', updateSeeked);
 				bvideo.addEventListener('ended', updatePlaybackStatus);				
 				
 				slider.addEventListener(SliderEvent.CHANGE, jumpTime);
@@ -292,8 +293,14 @@
 								
 			}
 			
-							
-			private function updateTime(e:Event):void
+			private function updateSeeked(e:Event):void
+			{
+				if (breeze_comment.hasComment) {  
+					breeze_comment.purgeIndex();
+				}			
+			}
+			
+			private function updateTime(e:Event):void			
 			{
 				/* Some facts about Nico Nico Douga marqueeplayer:
 				 (in brief, but may be wrong) 
