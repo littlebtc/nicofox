@@ -267,7 +267,7 @@ nicofox_ui.manager = {
     if (nicofox.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
       file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     }
-    file_picker.appendFilter(nicofox.strings.getString('supportedType'), '*.flv; *.mp4');
+    file_picker.appendFilter(nicofox.strings.getString('supportedType'), '*.flv; *.mp4; *.swf');
     if (file_picker.show() == Ci.nsIFilePicker.returnOK)
     {
       /* XXX: Find a better way to make a function */
