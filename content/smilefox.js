@@ -277,7 +277,7 @@ nicofox_ui.manager = {
       var video_uri_spec = video_uri.spec;
       var comment_uri_spec = '';
 
-      var comment_file_path = file.path.replace(/(flv|mp4)$/, 'xml');
+      var comment_file_path = file.path.replace(/(flv|mp4|swf)$/, 'xml');
       var comment_file = Cc["@mozilla.org/file/local;1"]
                         .createInstance(Ci.nsILocalFile);
       comment_file.initWithPath(comment_file_path);

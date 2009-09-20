@@ -51,7 +51,7 @@ function readUsernames()
      var login_manager = Cc["@mozilla.org/login-manager;1"]
                          .getService(Ci.nsILoginManager);
      /* Nico uses secure.nicovideo.jp for login */
-     var logins = login_manager.findLogins({}, 'http://www.nicovideo.jp', 'https://secure.nicovideo.jp', null);
+     var logins = login_manager.findLogins({}, 'https://secure.nicovideo.jp', 'https://secure.nicovideo.jp', null);
      document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
      document.getElementById('autologin_username').selectedIndex = 0;
      for (var i = 0; i < logins.length; i++)

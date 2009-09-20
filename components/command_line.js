@@ -44,7 +44,7 @@ function openPlayer(aFile) {
   Components.utils.reportError(aFile.leafName);
   var comment_uri_spec = '';
 
-  var comment_file_path = aFile.path.replace(/(flv|mp4)$/, 'xml');
+  var comment_file_path = aFile.path.replace(/(flv|mp4|swf)$/, 'xml');
   var comment_file = Cc["@mozilla.org/file/local;1"]
                     .createInstance(Ci.nsILocalFile);
   comment_file.initWithPath(comment_file_path);
