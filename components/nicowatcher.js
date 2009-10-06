@@ -45,7 +45,7 @@ var Nicowatcher = {
 		else if (contentType == Components.interfaces.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST)
 		{
 			url = contentLocation.spec;
-			if(prefs.getBoolPref('nicowa_blocker') && url.match(/^http:\/\/www.nicovideo.jp\/api\/getmarquee/))
+			if(prefs.getBoolPref('nicowa_blocker') && url.indexOf('http://flapi.nicovideo.jp/api/getmarqueev3') == 0 )
 			{
 				return Components.interfaces.nsIContentPolicy.REJECT_REQUEST;
 			}
