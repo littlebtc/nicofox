@@ -1,4 +1,4 @@
-package idv.littlebtc
+package tc.littleb.breezevideo
 {
 	//import com.adobe.serialization.json.*;
 	
@@ -12,7 +12,7 @@ package idv.littlebtc
 	
 	import mx.core.*;
 				
-	public class BreezeCommentReader
+	public class Comment
 	{
 		private var myapp:Object;
 		private var comment_xml:XML;		
@@ -22,23 +22,23 @@ package idv.littlebtc
 		private var check_tail:Number;
 		private var check_head_vpos:Number;
 		private var check_tail_vpos:Number;
-		private var ue_sprite:BreezeCommentSprite;
-		private var shita_sprite:BreezeCommentSprite;
-		private var naka_sprite:BreezeCommentSprite;
+		private var ue_sprite:CommentSprite;
+		private var shita_sprite:CommentSprite;
+		private var naka_sprite:CommentSprite;
 		private var comment_num:int;
 		/* Indicate whether we should stop updating comments */
 		public var _freezed:Boolean;
 		
 		// private var is_kavideo:Boolean;
 		
-		public function BreezeCommentReader(app:Object)
+		public function Comment(app:Object)
 		{	
 			_freezed = false;
 			myapp = app;
 
-			naka_sprite = new BreezeCommentSprite('naka');
-			shita_sprite = new BreezeCommentSprite('shita');
-			ue_sprite = new BreezeCommentSprite('ue');
+			naka_sprite = new CommentSprite('naka');
+			shita_sprite = new CommentSprite('shita');
+			ue_sprite = new CommentSprite('ue');
 						
 			var uic:UIComponent = new UIComponent();
 			//var square1:Sprite = new Sprite();
@@ -258,7 +258,7 @@ package idv.littlebtc
 			}		
 			_freezed = false;
 		}
-		/* After timeupdate event by BreezeVideo, update comments in a fixed interval */
+		/* After timeupdate event by Video, update comments in a fixed interval */
 		public function prepareComment(time:Number):void
 		{
 			var startTime:int = getTimer();
@@ -352,7 +352,7 @@ package idv.littlebtc
 				if (comment.object)
 				{
 					/* Avoid clearing processing data */
-				   if ((comment.object as BreezeTextField).comment_for != comment.no) {
+				   if ((comment.object as CommentTextField).comment_for != comment.no) {
 				   		comment.object = null;
 					
 				   } else {

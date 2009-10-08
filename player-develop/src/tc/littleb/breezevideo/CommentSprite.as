@@ -1,10 +1,10 @@
-package idv.littlebtc
+package tc.littleb.breezevideo
 {
 	import flash.display.*;
 	import flash.text.*;
 	import flash.utils.*;
 	
-	public class BreezeCommentSprite extends Sprite
+	public class CommentSprite extends Sprite
 	{
 		private var time:Number;
 		private var comment_type:String;
@@ -12,11 +12,11 @@ package idv.littlebtc
 			 
 		//private var comment_pool:Array;
 		
-		public function BreezeCommentSprite(new_type:String)
+		public function CommentSprite(new_type:String)
 		{
 			super();
 			if (new_type != 'shita' && new_type != 'ue' && new_type != 'naka') {
-				throw new Error('BreezeCommentSprite: Unreconized Type.');
+				throw new Error('CommentSprite: Unreconized Type.');
 				return false;				
 			}
 
@@ -25,7 +25,7 @@ package idv.littlebtc
 			//nico_bevel_black.highlightColor = 0xFFFFFF;	
 		    var i:int, j:int;
 			for (i = 0; i < comment_max; i++) {
-			  var tf:BreezeTextField = new BreezeTextField(new_type);
+			  var tf:CommentTextField = new CommentTextField(new_type);
 			  tf.visible = false;			  
 			  this.addChild(tf);
 			}			
@@ -40,18 +40,18 @@ package idv.littlebtc
 			var hit_objects:Array = new Array();
 			/* If the pool is not full */
 			if (this.numChildren < comment_max) {
-				var tf:BreezeTextField = new BreezeTextField(this.comment_type);
+				var tf:CommentTextField = new CommentTextField(this.comment_type);
 				tf.visible = false;			  
 				use_object = this.addChild(tf);
 			} else {
 			/* Hey, we have a full pool! */
-				var last_field:BreezeTextField = this.getChildAt(this.numChildren - 1) as BreezeTextField;
+				var last_field:CommentTextField = this.getChildAt(this.numChildren - 1) as CommentTextField;
 						
 				if (last_field.comment_for != -1) {
 								
 					/* Ouch, our container is full */
 					/* Move the first item to the last */
-					(this.getChildAt(0) as BreezeTextField).resetFormat();
+					(this.getChildAt(0) as CommentTextField).resetFormat();
 					this.setChildIndex(this.getChildAt(0), this.numChildren - 1);                
 					use_object = this.getChildAt(this.numChildren - 1);
 					
@@ -68,7 +68,7 @@ package idv.littlebtc
 					for (i = 0; i < this.numChildren; i++) {
 						/* Find the last availble one */
 						use_object = this.getChildAt(i);
-						if ((use_object as BreezeTextField).comment_for == -1) {							
+						if ((use_object as CommentTextField).comment_for == -1) {							
 							break;
 						} else {
 							hit_objects.push({x: use_object.x, y: use_object.y, width: use_object.width, height: use_object.height});
@@ -78,7 +78,7 @@ package idv.littlebtc
 			}
 			
 			/* Set some necessary variable */
-			var use_field:BreezeTextField = use_object as BreezeTextField;
+			var use_field:CommentTextField = use_object as CommentTextField;
 			use_field.comment_for = info.no;
 			clearInterval(use_field.interval_id);			
 			use_field.x = 512;
@@ -160,8 +160,8 @@ package idv.littlebtc
 				nowTime = getTimer();
 				if (nowTime - startTime > 5) { break; }
 				object = this.getChildAt(i);
-				var field:BreezeTextField = object as BreezeTextField;
-				if (field.width < 512 || Math.random() * Math.min(field.width / 512, 4) < 1 ) {
+				var field:CommentTextField = object as CommentTextField;
+				if (field.width < 512 || Math.random() * Math.min(field.width / 512, 3) < 1 ) {
 					field.x = 512 + (512 + field.width) * (field.vpos - 100 - this.time) / 400;
 				}
 				object = null;
@@ -176,7 +176,7 @@ package idv.littlebtc
 			/* Put it at last, then release it */	
 			if (this.numChildren > this.comment_max) throw new Error('Strange!');
 			this.setChildIndex(object, this.numChildren - 1);
-			(object as BreezeTextField).resetFormat();
+			(object as CommentTextField).resetFormat();
 
 		}
 		private function yHitTest(y1:Number, height1:Number, y2:Number, height2:Number):Boolean

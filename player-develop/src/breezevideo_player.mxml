@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application
 	xmlns:mx="http://www.adobe.com/2006/mxml"
-	xmlns:breezevideo="idv.littlebtc.*" 
+	xmlns:breezevideo="tc.littleb.breezevideo.*" 
 	creationComplete="goProcessing();" 
 	paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0" 
 	layout="absolute" verticalScrollPolicy="off" horizontalScrollPolicy="off"
@@ -18,7 +18,7 @@
 			import mx.events.*;
 			import flash.events.Event;
 			import flash.display.StageDisplayState;
-			import idv.littlebtc.*;
+			import tc.littleb.breezevideo.*;
 			import flash.ui.*;
 			
 			public var hide_timeout_activated:Boolean;
@@ -210,7 +210,7 @@
 				bvideo.src = video_file;
 				comment_file = Application.application.parameters.commentFile;
 				
-				breeze_comment = new BreezeCommentReader(Application.application);				
+				breeze_comment = new Comment(Application.application);				
 				breeze_comment.loadComment(comment_file);
 				
 								

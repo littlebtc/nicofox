@@ -1,10 +1,10 @@
-package idv.littlebtc
+package tc.littleb.breezevideo
 {
 	import flash.filters.*;
 	import flash.text.*;
 	import flash.utils.*;
 
-	public class BreezeTextField extends TextField
+	public class CommentTextField extends TextField
 	{
 		public var comment_type:String;
 		public var comment_for:int;
@@ -13,11 +13,11 @@ package idv.littlebtc
 		private var nico_bevel:BevelFilter;
 		private var nico_bevel_black:BevelFilter;			
 				
-		public function BreezeTextField(new_type:String)
+		public function CommentTextField(new_type:String)
 		{
 			super();
 			if (new_type != 'shita' && new_type != 'ue' && new_type != 'naka') {
-				throw new Error('BreezeCommentSprite: Unreconized Type.');
+				throw new Error('CommentTextField: Unreconized Type.');
 				return false;				
 			}
 			var format:TextFormat = new TextFormat();								

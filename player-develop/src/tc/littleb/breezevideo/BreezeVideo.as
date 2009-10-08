@@ -1,4 +1,4 @@
-﻿package idv.littlebtc 
+﻿package tc.littleb.breezevideo
 {			
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
