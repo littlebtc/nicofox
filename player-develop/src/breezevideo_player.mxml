@@ -218,6 +218,7 @@
 				//bvideo.addEventListener(VideoEvent.REWIND, videoReplay);
 				bvideo.addEventListener('seeked', updateSeeked);
 				bvideo.addEventListener('ended', updatePlaybackStatus);				
+				bvideo.addEventListener('loadedmetadata', updateMetadata);
 				
 				slider.addEventListener(SliderEvent.CHANGE, jumpTime);
 				//doggy.addEventListener(MouseEvent.CLICK, testScale);
@@ -229,7 +230,7 @@
 				
 				
 				Application.application.addEventListener('resize', goResize);
-				
+								
 
 /*				var pt1:Point = new flash.geom.Point(0, 50);
 				pt1 = ue_container.localToGlobal(pt1);		
@@ -254,6 +255,13 @@
 				else repeat_img = repeat_img_no;
 			}
 
+			private function updateMetadata(e:Event):void
+			{
+				if (bvideo.keyframeTimes.length > 0) {
+					slider.tickValues = bvideo.keyframeTimes.concat();
+				}
+			}
+			
 			private function videoReplay( event:VideoEvent ):void
 			{
 				event.target.play();
@@ -366,7 +374,7 @@
     <mx:VBox id="container2" height="40" width="100%" backgroundAlpha="0.5" backgroundColor="#EEEEEE" paddingTop="10" paddingLeft="10" paddingRight="10">        
         <mx:HBox horizontalGap="3">        	
         <mx:Button id="pause" label="||"/>
-		<mx:HSlider id="slider" tickInterval="5" value="{bvideo.currentTime}"  maximum="{bvideo.duration}" />
+		<mx:HSlider id="slider" value="{bvideo.currentTime}"  maximum="{bvideo.duration}" tickLength="0" slideDuration="0" liveDragging="true" />
 		<mx:Text id="time" text="" />
 		
 		<mx:Button id="repeat_switch" icon="{repeat_img}" width="25"/>							

@@ -152,13 +152,18 @@ package idv.littlebtc
 			return use_object;
 		}
 		public function updateNakaPosition():void {
-
 			var object:DisplayObject;
 			var i:int;
+			var startTime:int = getTimer();
+			var nowTime:int;
 			for (i = 0; i < this.numChildren; i++) {
+				nowTime = getTimer();
+				if (nowTime - startTime > 5) { break; }
 				object = this.getChildAt(i);
 				var field:BreezeTextField = object as BreezeTextField;
-				field.x = 512 + (512 + field.width) * (field.vpos - 100 - this.time) / 400;
+				if (field.width < 512 || Math.random() * Math.min(field.width / 512, 4) < 1 ) {
+					field.x = 512 + (512 + field.width) * (field.vpos - 100 - this.time) / 400;
+				}
 				object = null;
 			}
 			

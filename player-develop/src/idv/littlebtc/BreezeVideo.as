@@ -46,15 +46,17 @@
 		private var _streamHeight:Number;
 		
 		private var _intervalTimer:Timer;
+		private var _seekTimer:Timer;
 		private var _ended:Boolean = false;
 		
 		private var _autoPlay:Boolean = false;
-		private var _currentTime:Number;
+		private var _previousTime:Number;
 		private var _duration:Number = 0;			
+		private var _keyframeTimes:Array = [];
 		private var _loop:Boolean = false;
-		private var _volume:Number = 0.75;		
-		private var _updateInterval:Number = 30;
 		private var _playing:Boolean = false;
+		private var _updateInterval:Number = 30;
+		private var _volume:Number = 0.75;					
 		
 		public function BreezeVideo()
 		{
@@ -140,6 +142,10 @@
 				_intervalTimer = new Timer(_updateInterval, 0);
 				_intervalTimer.addEventListener(TimerEvent.TIMER, intervalUpdate);
 				
+				/* To fix time asynchrously update for seeking */
+				_seekTimer = new Timer(1, 0);
+				_seekTimer.addEventListener(TimerEvent.TIMER, seekTest);
+				
 				/* Play or pause depending on autoplay */
 				_stream.play(_src);
 				_stream.pause();
@@ -160,6 +166,7 @@
 				case "NetStream.Play.Stop":
 					/* Test loop or not */
 					if (_loop) {
+						_previousTime = _stream.time;
 						_stream.seek(0);						
 						_ended = false;
 						_stream.resume();
@@ -171,7 +178,8 @@
 					break;
 					
 				case "NetStream.Seek.Notify":
-					dispatchEvent(new Event('seeked'));
+					_seekTimer.start();
+					
 					break;
             }			
 		}
@@ -183,14 +191,40 @@
 		}
 		/* Implementatation of Client object for NetStream */
 		public function onMetaData(info:Object):void {
+
 			_duration = info.duration;
 			_streamWidth = info.width;
 			_streamHeight = info.height;
+			
+			/* Read Keyframes */
+			if (info.keyframes) {
+				/* For FLV */
+				if (info.keyframes.times is Array) {
+					_keyframeTimes = info.keyframes.times;
+				}
+			} else if ((info.seekpoints) && (info.seekpoints is Array)) {
+				var i:int;
+				for (i = 0; i < info.seekpoints.length; i++) {
+					if (info.seekpoints[i].time) {
+						_keyframeTimes.push(info.seekpoints[i].time);
+					}
+				}
+			}
+			
+			dispatchEvent(new Event('loadedmetadata'));
 			dispatchEvent(new Event('resize'));
 		}
 		
 		private function intervalUpdate(e:TimerEvent):void {
 			dispatchEvent(new Event('timeUpdate'));
+		}
+		
+		private function seekTest(e:TimerEvent):void {
+			if (_previousTime != _stream.time) {				
+				dispatchEvent(new Event('seeked'));
+				dispatchEvent(new Event('timeUpdate'));
+				_seekTimer.reset();
+			}
 		}
 		private function swfEnterFrame(e:Event):void {
 			/* Processing last frame, loop or not */
@@ -247,6 +281,7 @@
 					} 
 				} else if (_stream) {
 					if (_ended) {
+						_previousTime = _stream.time;
 						_stream.seek(0);
 						_ended = false;
 						_stream.resume();
@@ -300,17 +335,21 @@
 			return 0;
 		}		
 		public function set currentTime(value:Number):void {
+			_ended = false;
 			if (_isSwf && _swfMovieClip) {
 				if (_playing) {
 					_swfMovieClip.gotoAndPlay(new int(value * _swfFps));
 				} else {
 					_swfMovieClip.gotoAndStop(new int(value * _swfFps));
 				}
+				_ended = false;
 				dispatchEvent(new Event('seeked'));
+				dispatchEvent(new Event('timeUpdate'));
 			} else if (_stream) {
+				_previousTime = _stream.time;
 				_stream.seek(value);
 			}
-			dispatchEvent(new Event('timeUpdate'));
+			
 		}
 		[Bindable("readonly",event="timeUpdate")]
 		public function get duration():Number {						
@@ -347,6 +386,14 @@
 			}
 			_src = value;
 			this.loadVideo(value);			
+		}
+		
+		[Bindable("readonly")]
+		public function get keyframeTimes():Array {						
+			if (_stream) {
+				return _keyframeTimes;
+			}
+			return [];
 		}
 
 		/*

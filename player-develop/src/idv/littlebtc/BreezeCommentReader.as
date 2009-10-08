@@ -8,6 +8,7 @@ package idv.littlebtc
 	import flash.geom.*;
 	import flash.net.*;
 	import flash.text.*;
+	import flash.utils.*;
 	
 	import mx.core.*;
 				
@@ -257,11 +258,13 @@ package idv.littlebtc
 			}		
 			_freezed = false;
 		}
-		
 		/* After timeupdate event by BreezeVideo, update comments in a fixed interval */
 		public function prepareComment(time:Number):void
 		{
-			naka_sprite.updateTime(time);
+			var startTime:int = getTimer();
+			var nowTime:int;
+			
+			
 			//myapp.textArea.text = '+'+textfield_pool.usageCount+'+';
 			//if (time % 1000 < 10)
 			//{
@@ -274,7 +277,7 @@ package idv.littlebtc
 			if (_freezed) {
 				return;
 			}
-			
+			naka_sprite.updateTime(time);
 			var i: int = 0, k:int=0;
 			var comment:Object, format:TextFormat;
 			//myapp.textArea.text='';
@@ -282,11 +285,15 @@ package idv.littlebtc
 			var scale:Number;
 			var matrix:Matrix;
 			var num:int = 0;
-			
+			var commentArea:Number = 0;
 			if (!comment_list || comment_list.length == 0) { return; }
 			
+			commentArea = 0;
 			/* Test if there is new comments to load */
 			while (_lastCommentIndex + 1 < comment_list.length) {
+				nowTime = getTimer();
+				if (commentArea > 512 * 384 || nowTime - startTime > 15) { break; }
+				
 				comment = comment_list[_lastCommentIndex + 1];				
 				/* We reach the front */
 				if (comment.vpos > time) { break; }
@@ -294,17 +301,24 @@ package idv.littlebtc
 				if (comment.vpos + 300 >= time ) {
 					if (comment.pos == 'shita' && !comment.object) {
 						comment.object = shita_sprite.addComment(comment);
+						commentArea += comment.object.width * comment.object.height;
 					}
 					if (comment.pos == 'ue' && !comment.object) {
 						comment.object = ue_sprite.addComment(comment);
+						commentArea += comment.object.width * comment.object.height;
 					}				
 				}
 				_lastCommentIndex++;
 			}
 			
+			commentArea = 0;
+
 			/* Test if there is new naka comments to load */
 			while (_lastNakaCommentIndex + 1 < comment_list.length)
 			{
+				nowTime = getTimer();
+				if (commentArea > 512 * 384 / 3 || nowTime - startTime > 20) { break; }
+
 				comment = comment_list[_lastNakaCommentIndex + 1];				
 				/* We reach the front */
 				if (comment.vpos - 100 > time) { break; }
@@ -312,6 +326,7 @@ package idv.littlebtc
 				if (comment.vpos + 300 >= time ) {
 					if (comment.pos == 'naka' && !comment.object) {
 						comment.object = naka_sprite.addComment(comment);
+						commentArea += comment.object.width * comment.object.height;
 					}
 				}
 				_lastNakaCommentIndex++;
@@ -348,7 +363,7 @@ package idv.littlebtc
 					//textfield_pool.object = comment.object;
 					comment.object = null;
 				   }
-				   
+				
 				}
 				_firstCommentIndex++;
 			}
