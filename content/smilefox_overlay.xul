@@ -31,8 +31,8 @@
     
   </toolbox>
 <tree id="smilefox-tree" flex="8" context="smilefox-popup"
-onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) alert('?');"
-onclick="if (event.detail == 2) alert('?');"
+onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox_ui.manager.popup_command.openViaEnter(); }"
+onclick="if (event.detail == 2) { nicofox_ui.manager.popup_command.openViaClick(event); }"
 >
   <treecols>
     <treecol label="&tree.videoTitle;" id="tree-title" flex="5"/>

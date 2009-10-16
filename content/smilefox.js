@@ -458,40 +458,58 @@ nicofox_ui.manager.popup_command =
   recent_col: -1,
   cell_text: null,
   multiple_select: true, 
-    cancel: function() {
-      if (this.recent_row < 0) { return; }  
-      nicofox.download_manager.cancel(nicofox_ui.manager.rows[this.recent_row].id);
-    },
-    retry: function() {
-      if (this.recent_row < 0) { return; }  
-      nicofox.download_manager.retry(nicofox_ui.manager.rows[this.recent_row].id);
-    },
-    open: function() {
-      if (this.recent_row < 0) { return; }
-      if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
-      if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4|swf)$/)) { return; }
-  
-      var file = Cc["@mozilla.org/file/local;1"]
-                 .createInstance(Ci.nsILocalFile);
-      file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
-      if (!file.exists()) { return false; }
-      var video_uri = Cc["@mozilla.org/network/io-service;1"]
-                     .getService(Ci.nsIIOService).newFileURI(file);
-      var video_uri_spec = video_uri.spec;
-      var comment_uri_spec = '';
+  cancel: function() {
+    if (this.recent_row < 0) { return; }  
+    nicofox.download_manager.cancel(nicofox_ui.manager.rows[this.recent_row].id);
+  },
+  retry: function() {
+    if (this.recent_row < 0) { return; }  
+    nicofox.download_manager.retry(nicofox_ui.manager.rows[this.recent_row].id);
+  },
+  open: function() {
+    if (this.recent_row < 0) { return; }
+    if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
+    if (!nicofox_ui.manager.rows[this.recent_row].video_file.match(/\.(flv|mp4|swf)$/)) { return; }
+
+    /* XXX: Find a better way to make a function */
+    var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+    file.initWithPath(nicofox_ui.manager.rows[this.recent_row].video_file);
+    if (!file.exists()) { return false; }
+    var video_uri = Cc["@mozilla.org/network/io-service;1"]
+                   .getService(Ci.nsIIOService).newFileURI(file);
+    var video_uri_spec = video_uri.spec;
+    var comment_uri_spec = '';
     
-      if (nicofox_ui.manager.rows[this.recent_row].comment_file) {
-      var file = Cc["@mozilla.org/file/local;1"]
-                 .createInstance(Ci.nsILocalFile);
+    if (nicofox_ui.manager.rows[this.recent_row].comment_file) {
+      var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
       file.initWithPath(nicofox_ui.manager.rows[this.recent_row].comment_file);
       if (!file.exists()) { return false; }
       var comment_uri = Cc["@mozilla.org/network/io-service;1"]
                   .getService(Ci.nsIIOService).newFileURI(file);
       comment_uri_spec = comment_uri.spec; 
-      }
+    }
       
     window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: nicofox_ui.manager.rows[this.recent_row].video_title});  
-  }, 
+  },
+  /* Open the file via enter key */
+  openViaEnter: function() {
+    var tree = document.getElementById('smilefox-tree');
+    this.recent_row = tree.currentIndex;
+    this.open();
+  },
+  /* Open the file via click */
+  openViaClick: function(e) {
+    var tree = document.getElementById('smilefox-tree');
+    var row = { }, col = { }, child = { };
+    tree.treeBoxObject.getCellAt(e.clientX, e.clientY, row, col, child);
+    this.recent_row = row.value;
+    this.recent_col = col.value;
+    /* Column out of range */
+    if (!this.recent_col) {
+      return;
+    } 
+    this.open();   
+  },
   openExternal: function() {
     if (this.recent_row < 0) { return; }
     if (!nicofox_ui.manager.rows[this.recent_row].video_file) { return; }
