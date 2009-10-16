@@ -244,7 +244,18 @@ nicofox.download.helper.nico.prototype = {
       {
         if (aStateFlags & 1) /* STATE_START = 1 */
         {
-          this.downloaderCallback('start', {});
+         /* Process HTTP Errors
+	  * nsIChannel will throw NS_ERROR_NOT_AVAILABLE when there is no connection
+          * (even for requestSucceeded), so use the try-catch way  */
+          var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
+          try {
+            if (channel.responseStatus != 200) {
+              throw new Error();
+            }
+            this.downloaderCallback('start', {});
+          } catch(e) {
+            this.downloaderCallback('video_fail', {}); 
+          }
         }
         if (aStateFlags & 16) /* STATE_STOP = 16 */
         {
@@ -344,10 +355,10 @@ nicofox.download.helper.nico.prototype = {
   /* Remove all downloaded files */
   removeFiles: function() {
     /* Remove files */
-    if (this.movie_file != undefined) this.movie_file.remove(false);
-    if (this.ms_file != undefined) this.ms_file.remove(false);
-    if (this.ms_file2 != undefined) this.ms_file2.remove(false);
-    if (this.movie_prepare_file != undefined) this.movie_prepare_file.remove(false);
+    if (this.movie_file != undefined && this.movie_file.exists()) this.movie_file.remove(false);
+    if (this.ms_file != undefined && this.ms_file.exists()) this.ms_file.remove(false);
+    if (this.ms_file2 != undefined && this.ms_files2.exists()) this.ms_file2.remove(false);
+    if (this.movie_prepare_file != undefined && this.movie_prepare_file.exists()) this.movie_prepare_file.remove(false);
   },
 
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
