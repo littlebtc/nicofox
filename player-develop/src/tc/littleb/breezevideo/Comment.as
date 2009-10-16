@@ -12,94 +12,102 @@ package tc.littleb.breezevideo
 	
 	import mx.core.*;
 				
-	public class Comment
+	public class Comment extends UIComponent
 	{
-		private var myapp:Object;
-		private var comment_xml:XML;		
-		private var nico_bevel:BevelFilter;
-		private var comment_list:Array;
-		private var check_head:Number;
-		private var check_tail:Number;
-		private var check_head_vpos:Number;
-		private var check_tail_vpos:Number;
-		private var ue_sprite:CommentSprite;
-		private var shita_sprite:CommentSprite;
-		private var naka_sprite:CommentSprite;
-		private var comment_num:int;
+		[Event(name = "commentReady")]
+
+		private var _commentFile:String;
+		private var _commentDisplayNum:int = -1;
+		private var _commentNum:int = 0;
+		
+		private var _commentRequest:URLRequest;
+		private var _commentList:Array;
+		private var _commentDisplayList:Array;
+		private var _commentXML:XML;
+		
+		private var _firstCommentIndex:int = -1;
+		private var _lastCommentIndex:int = -1;
+		private var _lastNakaCommentIndex:int = -1;
+
+		private var _ueSprite:CommentSprite;
+		private var _shitaSprite:CommentSprite;
+		private var _nakaSprite:CommentSprite;
+
+		private var _uic:UIComponent;
+
+		private var _fileReadCompleted: Boolean = false;
 		/* Indicate whether we should stop updating comments */
 		public var _freezed:Boolean;
 		
 		// private var is_kavideo:Boolean;
 		
-		public function Comment(app:Object)
+		public function Comment()
 		{	
 			_freezed = false;
-			myapp = app;
+			//myapp = app;
 
-			naka_sprite = new CommentSprite('naka');
-			shita_sprite = new CommentSprite('shita');
-			ue_sprite = new CommentSprite('ue');
-						
-			var uic:UIComponent = new UIComponent();
-			//var square1:Sprite = new Sprite();
-			var square1:Sprite = new Sprite();
-			square1.graphics.beginFill(0xFF0000);
-			square1.graphics.drawRect(0, 0, 512, 384);
-			var square2:Sprite = new Sprite();
-			square2.graphics.beginFill(0xFF0000);
-			square2.graphics.drawRect(0, 0, 512, 384);
-			var square3:Sprite = new Sprite();
-			square3.graphics.beginFill(0xFF0000);
-			square3.graphics.drawRect(0, 0, 512, 384);			
+			_nakaSprite = new CommentSprite('naka');
+			_shitaSprite = new CommentSprite('shita');
+			_ueSprite = new CommentSprite('ue');
 			
-			uic.addChild(square1);
-			uic.addChild(square2);
-			uic.addChild(square3);
-
-			ue_sprite.mask = square1;
-			shita_sprite.mask = square2;
-			naka_sprite.mask = square3;
+			_uic = new UIComponent();
+			_ueSprite.mask = generateMask();
+			_shitaSprite.mask = generateMask();
+			_nakaSprite.mask = generateMask();
 			
-			uic.addChild(ue_sprite);
-			uic.addChild(shita_sprite);
-			uic.addChild(naka_sprite);
-			//naka_sprite.visible = false;
-			myapp.comment_container.addChild(uic);
+			_uic.addChild(_ueSprite);
+			_uic.addChild(_shitaSprite);
+			_uic.addChild(_nakaSprite);
+			//_nakaSprite.visible = false;
+			this.addChild(_uic);
+			//myapp.comment_container.addChild(uic);
 			
 		}
-		public function loadComment(url:String, number:int = 0):void
-		{		    	
-			comment_num = number;
-            var request:URLRequest = new URLRequest(url);
-            var loader:URLLoader = new URLLoader();
-            
+		/* Generate a mask for sprite */
+		private function generateMask():Sprite {
+			var square:Sprite = new Sprite();
+			square.graphics.beginFill(0xFF0000);
+			square.graphics.drawRect(0, 0, 512, 384);
+			square = Sprite(_uic.addChild(square));
+			return square;
+		}
+		private function _loadComment(url:String):void
+		{
+			_fileReadCompleted = false;
             // Check if we have no comment
             if (!url) {
-            	comment_list = [];
-            	
-            	// XXX: do it on mxml   				
-				myapp.comment_img = myapp.comment_img_no;
-				myapp.comment_switch.label = "";
-				myapp.comment_switch.enabled = false;
-            	return;
+            	_commentList = [];
+				_commentDisplayList = [];
+            	dispatchEvent(new Event('commentReady'));
+				return;
             }
-            // If it is KeyTalks JSON, try to parse it as JSON
-            //* TODO: KeyTalks support is temporary removed
-            /*var is_json:RegExp = /\.json$/;
-            if (url.match(is_json)) {
-            	is_kavideo = true;
-			  	loader.addEventListener(Event.COMPLETE, goParseJSON);           	
-            } else {
-            	is_kavideo = false;
-            	loader.addEventListener(Event.COMPLETE, goParse);
-            }*/
-            loader.addEventListener(Event.COMPLETE, goParse);
-            try {
+			
+			var request:URLRequest = new URLRequest(url);
+			var loader:URLLoader = new URLLoader(); 
+			// If it is KeyTalks JSON, try to parse it as JSON
+			//* TODO: KeyTalks support is temporary removed
+			/*var is_json:RegExp = /\.json$/;
+			if (url.match(is_json)) {
+				is_kavideo = true;
+				loader.addEventListener(Event.COMPLETE, goParseJSON);           	
+			} else {
+				is_kavideo = false;
+				loader.addEventListener(Event.COMPLETE, goParse);
+			}*/
+			loader.addEventListener(Event.COMPLETE, goParse);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, _failRead);
+			try {				
                 loader.load(request);
 
             } catch (error:Error) {
                 trace("Unable to load requested document.");
+				_failRead();
             }
+		}
+		private function _failRead():void {
+			_commentList = [];
+			_commentDisplayList = [];
+			dispatchEvent(new Event('commentReady'));
 		}
 		/*private function goParseJSON(e:Event):void
 		{
@@ -108,7 +116,7 @@ package tc.littleb.breezevideo
 			var comment_json:Object;
 			//throw new Error(loader2.data);
 			comment_json = JSON.decode(loader2.data);
-			comment_list = new Array();
+			_commentList = new Array();
 			var item:Object;
 			for each (item in comment_json) {		
 				*//* Process the comment list *//*				
@@ -124,22 +132,22 @@ package tc.littleb.breezevideo
 					text:item[7],
 					pos:(item[0]=='0')?'naka':'shita', color: item[3], size:item[4]
 				};								
-				comment_list.push(comment);
+				_commentList.push(comment);
 			}
 			
 		}*/
 		private function goParse(e:Event):void
 		{
-			comment_xml = new XML();
+			_commentXML = new XML();
 			var loader2:URLLoader = URLLoader(e.target);
-			comment_xml = XML(loader2.data);	 
-			var video_id:String = comment_xml.view_counter.@id;
-			var comment_id:String = comment_xml.thread.@thread;
-			comment_list = new Array();
+			_commentXML = XML(loader2.data);	 
+			var video_id:String = _commentXML.view_counter.@id;
+			var comment_id:String = _commentXML.thread.@thread;
+			_commentList = new Array();
 			var item:XML;
 			var count:Number;
-			
-			for each (item in comment_xml.child('chat'))
+			//_commentNum = _commentXML.child('chat').length();
+			for each (item in _commentXML.child('chat'))
 			{
 				/* Filter out deleted commment */
 				if (item.@deleted == 1) {
@@ -197,47 +205,38 @@ package tc.littleb.breezevideo
 				{
 					comment.size = 'meduim';					
 				}
-				comment_list.push(comment);					
+				_commentList.push(comment);					
+			}
+			_commentList.sortOn(['no'], [Array.NUMERIC | Array.DESCENDING]);
+			_commentNum = _commentList.length;
+			_changeDisplayNum();
+			_fileReadCompleted = true;
+			dispatchEvent(new Event('commentReady'));
+		}
+		private function _changeDisplayNum():void {
+			if (!_commentList || _commentList.length == 0) { return; }
+			_freezed = true;
+			if (_commentDisplayNum == 0) {
+				_commentDisplayNum = _commentList.length;
 			}
 			
-			var cresults:XMLList = myapp.comment_numbers.(@value == -1);
-			var citem:XML;
-            for each(citem in cresults) {
-                citem.@value = comment_list.length;
-            }
-			
-
-			//
+			_commentDisplayList = _commentList.concat();
 			/* Sort the comment list and splice */
-			if (comment_num!=0)
-			{
-				comment_list.sortOn(['no'], [Array.NUMERIC | Array.DESCENDING]);
-				comment_list = comment_list.slice(0, Math.min((comment_num-1), (comment_list.length - 1)));
-				comment_list.sortOn(['no'], [Array.NUMERIC]);
+			if (_commentDisplayNum > 0)
+			{				
+				_commentDisplayList = _commentDisplayList.slice(0, Math.min((_commentDisplayNum), (_commentDisplayList.length)));
+				_commentDisplayList.sortOn(['no'], [Array.NUMERIC]);
+				/* Sort the comment list. This CANNOT be done by: 
+				_commentList.sortOn(['vpos'], [Array.NUMERIC])
+				Because sortOn is NOT STABLE, so I have done a simple merge sort:
+				*/			
+				_commentDisplayList = merge_sort(_commentDisplayList);
 			}
-			/* Sort the comment list. This CANNOT be done by: 
-			comment_list.sortOn(['vpos'], [Array.NUMERIC])
-			Because sortOn is NOT STABLE, so I have done a simple merge sort:
-			*/
-			comment_list = merge_sort(comment_list);
-			check_head = -1;	
-			check_tail = -1;
 			
-
-		}
-		
-		public function hasComment():Boolean {
-			if (comment_list && comment_list.length > 0) {
-				return true;
-			} 
-			return false;
+			_commentDisplayNum = _commentDisplayList.length;			
+			_freezed = false;
 		}
 
-		private var _firstCommentIndex:int = -1;
-		private var _lastCommentIndex:int = -1;
-		private var _lastNakaCommentIndex:int = -1;
-		//private var skipCount:int = 0;
-		
 		/* After seeking, clear the old comment reading line */
 		public function purgeIndex():void
 		{
@@ -246,13 +245,13 @@ package tc.littleb.breezevideo
 			_lastCommentIndex = -1;
 			_lastNakaCommentIndex = -1;
 			var comment:Object;
-			for each(comment in comment_list)
+			for each(comment in _commentDisplayList)
 			{			
 				if (comment.object)
 				{
-					if (comment.pos == 'naka') naka_sprite.recycleField(comment.object);
-					else if (comment.pos == 'shita') shita_sprite.recycleField(comment.object);
-					else if (comment.pos == 'ue') ue_sprite.recycleField(comment.object);
+					if (comment.pos == 'naka') _nakaSprite.recycleField(comment.object);
+					else if (comment.pos == 'shita') _shitaSprite.recycleField(comment.object);
+					else if (comment.pos == 'ue') _ueSprite.recycleField(comment.object);
 					delete comment.object;
 				}
 			}		
@@ -270,14 +269,14 @@ package tc.littleb.breezevideo
 			//{
 				//textfield_pool.purge();
 			//}
-			if (myapp.comment_container.visible==false)
+			if (this.visible==false)
 			{return; }
 			
 			/* Check if freezed */
 			if (_freezed) {
 				return;
 			}
-			naka_sprite.updateTime(time);
+			_nakaSprite.updateTime(time);
 			var i: int = 0, k:int=0;
 			var comment:Object, format:TextFormat;
 			//myapp.textArea.text='';
@@ -286,25 +285,25 @@ package tc.littleb.breezevideo
 			var matrix:Matrix;
 			var num:int = 0;
 			var commentArea:Number = 0;
-			if (!comment_list || comment_list.length == 0) { return; }
+			if (!_commentDisplayList || _commentDisplayList.length == 0) { return; }
 			
 			commentArea = 0;
 			/* Test if there is new comments to load */
-			while (_lastCommentIndex + 1 < comment_list.length) {
+			while (_lastCommentIndex + 1 < _commentDisplayList.length) {
 				nowTime = getTimer();
 				if (commentArea > 512 * 384 || nowTime - startTime > 15) { break; }
 				
-				comment = comment_list[_lastCommentIndex + 1];				
+				comment = _commentDisplayList[_lastCommentIndex + 1];
 				/* We reach the front */
 				if (comment.vpos > time) { break; }
 				/* When we find elements that needs to load... */
-				if (comment.vpos + 300 >= time ) {
+				if (comment.vpos + 300 >= time)  {
 					if (comment.pos == 'shita' && !comment.object) {
-						comment.object = shita_sprite.addComment(comment);
+						comment.object = _shitaSprite.addComment(comment);
 						commentArea += comment.object.width * comment.object.height;
 					}
 					if (comment.pos == 'ue' && !comment.object) {
-						comment.object = ue_sprite.addComment(comment);
+						comment.object = _ueSprite.addComment(comment);
 						commentArea += comment.object.width * comment.object.height;
 					}				
 				}
@@ -314,33 +313,32 @@ package tc.littleb.breezevideo
 			commentArea = 0;
 
 			/* Test if there is new naka comments to load */
-			while (_lastNakaCommentIndex + 1 < comment_list.length)
+			while (_lastNakaCommentIndex + 1 < _commentDisplayList.length)
 			{
 				nowTime = getTimer();
 				if (commentArea > 512 * 384 / 3 || nowTime - startTime > 20) { break; }
 
-				comment = comment_list[_lastNakaCommentIndex + 1];				
+				comment = _commentDisplayList[_lastNakaCommentIndex + 1];
 				/* We reach the front */
 				if (comment.vpos - 100 > time) { break; }
 				/* When we find elements that needs to load... */
 				if (comment.vpos + 300 >= time ) {
 					if (comment.pos == 'naka' && !comment.object) {
-						comment.object = naka_sprite.addComment(comment);
+						comment.object = _nakaSprite.addComment(comment);
 						commentArea += comment.object.width * comment.object.height;
 					}
 				}
 				_lastNakaCommentIndex++;
 			}
-			
 			/* Test if there old comments to hide */
-			while (_firstCommentIndex < comment_list.length) {
+			while (_firstCommentIndex < _commentDisplayList.length) {
 				/* When there is no element, skip */
 				if (_firstCommentIndex < 0) {
 					if (_lastCommentIndex < 0) { break; }
 					else { _firstCommentIndex = 0; }
 				}
 				
-				comment = comment_list[_firstCommentIndex];				
+				comment = _commentDisplayList[_firstCommentIndex];
 				
 				/* We reach the front */
 				if (comment.vpos + 300 >= time)
@@ -357,10 +355,9 @@ package tc.littleb.breezevideo
 					
 				   } else {
 				   					
-					if (comment.pos == 'naka') naka_sprite.recycleField(comment.object);//naka_sprite.removeChild(comment.object);
-					else if (comment.pos == 'shita') shita_sprite.recycleField(comment.object);
-					else if (comment.pos == 'ue') ue_sprite.recycleField(comment.object);
-					//textfield_pool.object = comment.object;
+					if (comment.pos == 'naka') _nakaSprite.recycleField(comment.object);
+					else if (comment.pos == 'shita') _shitaSprite.recycleField(comment.object);
+					else if (comment.pos == 'ue') _ueSprite.recycleField(comment.object);
 					comment.object = null;
 				   }
 				
@@ -370,11 +367,39 @@ package tc.littleb.breezevideo
 			
 		}
 		
-		public function cleanComment():void
+		private function _clearComment():void
 		{
 			this.purgeIndex();
-			comment_list = new Array();
+			_commentDisplayList = new Array();
 			
+		}
+		
+		public function get commentFile():String {
+			return _commentFile;
+		}
+		public function set commentFile(url:String):void {
+			this._clearComment();
+			this._loadComment(url);
+			_commentFile = url;
+		}
+
+		public function get commentDisplayNum():int {
+			return _commentDisplayNum;
+		}
+		public function set commentDisplayNum(number:int):void {			
+			this._clearComment();			
+			if (_fileReadCompleted) {
+				_commentDisplayNum = number;
+				_changeDisplayNum();
+				dispatchEvent(new Event('commentReady'));
+			} else {
+				_commentDisplayNum = number;
+				
+			}
+		}		
+
+		public function get commentNum():int {
+			return _commentNum;
 		}
 		private function yHitTest(y1:Number, height1:Number, y2:Number, height2:Number):Boolean
 		{

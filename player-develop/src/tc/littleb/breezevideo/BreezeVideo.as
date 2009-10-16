@@ -55,7 +55,7 @@
 		private var _keyframeTimes:Array = [];
 		private var _loop:Boolean = false;
 		private var _playing:Boolean = false;
-		private var _updateInterval:Number = 30;
+		private var _updateInterval:Number = 40;
 		private var _volume:Number = 0.75;					
 		
 		public function BreezeVideo()
@@ -84,6 +84,7 @@
 			} else {
 				_video = new Video();
 				_video.smoothing = true;
+				_video.deblocking = 1;
 				
 				_connection = new NetConnection();
 	            _connection.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
@@ -122,6 +123,7 @@
 			if (this._autoPlay) {
 				play();
 			}
+			dispatchEvent(new Event('loadedSwf'));
 		}
 		private function connectStream():void {
 				_stream = new NetStream(_connection);
@@ -267,7 +269,7 @@
 			return _playing;
 		}
 		
-		public function play():void {
+		public function play():void {			
 			if (!_playing) {
 				if (_isSwf && _swfMovieClip){
 					/* Rewind Manually if at the last frame */
@@ -290,9 +292,10 @@
 						_stream.resume();
 					}
 				}
-				_intervalTimer.start();
+				if (_intervalTimer) {
+					_intervalTimer.start();
+				}
 				_playing = true;
-				
 			}
 		}
 		public function pause():void {
@@ -302,10 +305,13 @@
 				} else if (_stream) {
 					_stream.pause();
 				}
-				_intervalTimer.stop();
+				
+				if (_intervalTimer) {
+					_intervalTimer.reset();
+				}
 				_playing = false;
 				
-			}		
+			}					
 		}
 		[Bindable]
 		public function get volume():Number {

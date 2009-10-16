@@ -46,15 +46,13 @@ package tc.littleb.breezevideo
 			this.comment_for = -1;
 			this.autoSize = 'left';
 			this.type = 'dynamic';
-			this.selectable = false;
-			
+			this.selectable = false;		
 		}
 		public function resetFormat():void {
 			//this.setTextFormat(this.defaultTextFormat);
 			//this.filters = [nico_bevel];
 			this.text = '';
 			this.comment_for = -1;
-	
 		}
 		public function formatSelect(size:String, color:String):void
 		{

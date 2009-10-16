@@ -9,7 +9,7 @@ package tc.littleb.breezevideo
 		private var time:Number;
 		private var comment_type:String;
 		private const comment_max:int = 50;
-			 
+		
 		//private var comment_pool:Array;
 		
 		public function CommentSprite(new_type:String)
@@ -21,12 +21,13 @@ package tc.littleb.breezevideo
 			}
 
 			this.comment_type = new_type;
+			//this.cacheAsBitmap = true;
 			//nico_bevel_black = nico_bevel.clone();
 			//nico_bevel_black.highlightColor = 0xFFFFFF;	
 		    var i:int, j:int;
 			for (i = 0; i < comment_max; i++) {
 			  var tf:CommentTextField = new CommentTextField(new_type);
-			  tf.visible = false;			  
+			  tf.visible = false;
 			  this.addChild(tf);
 			}			
 			if (new_type == 'naka') {
@@ -151,22 +152,29 @@ package tc.littleb.breezevideo
 			/* Return a DisplayObject so it can be recycled */
 			return use_object;
 		}
+		private var _previousTime:int;
+		private var _hideItems:int = 0;
 		public function updateNakaPosition():void {
 			var object:DisplayObject;
 			var i:int;
 			var startTime:int = getTimer();
 			var nowTime:int;
+			var commentArea:int = 0;
 			for (i = 0; i < this.numChildren; i++) {
 				nowTime = getTimer();
-				if (nowTime - startTime > 5) { break; }
+				if (nowTime - startTime > 5) { 					
+					break;
+				}
 				object = this.getChildAt(i);
 				var field:CommentTextField = object as CommentTextField;
-				if (field.width < 512 || Math.random() * Math.min(field.width / 512, 3) < 1 ) {
+				
+				if (field.width < 256 || Math.random() * Math.pow(Math.min(field.width / 256, 10) * _previousTime, 2)  < 5) {
 					field.x = 512 + (512 + field.width) * (field.vpos - 100 - this.time) / 400;
+					commentArea += field.x * field.y;
 				}
 				object = null;
 			}
-			
+			_previousTime = (nowTime - startTime);
 		}
 		public function updateTime(time:Number):void {
 			this.time = time;
