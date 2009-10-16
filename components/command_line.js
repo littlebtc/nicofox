@@ -41,7 +41,6 @@ function openPlayer(aFile) {
   var video_uri = Cc["@mozilla.org/network/io-service;1"]
                  .getService(Ci.nsIIOService).newFileURI(aFile);
   var video_uri_spec = video_uri.spec;
-  Components.utils.reportError(aFile.leafName);
   var comment_uri_spec = '';
 
   var comment_file_path = aFile.path.replace(/(flv|mp4|swf)$/, 'xml');
@@ -53,7 +52,7 @@ function openPlayer(aFile) {
                 .getService(Ci.nsIIOService).newFileURI(comment_file);
      comment_uri_spec = comment_uri.spec; 
   }    
-  window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: aFile.leafName});  
+  openDialog(null, 'chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: video_uri_spec, comment: comment_uri_spec, title: aFile.leafName});  
 }	 
  
 function openDialog(parentWindow, url, windowName, features)
