@@ -58,7 +58,7 @@ nicofox.parser.nico.prototype = {
     this.Video = s.Video;
 
     /* Test if this is a community video */
-    var community_test = html.match(/<img alt=\"([^\"]*)\" src=\"http\:\/\/icon\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)\.jpg\?[0-9]+\" class=\"[0-9A-Z\_]+\">/i);
+    var community_test = html.match(/<img alt=\"([^\"]*)\" src=\"http\:\/\/icon\.nimg\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)\.jpg\?[0-9]+\" class=\"[0-9A-Z\_]+\">/i);
 
     if (community_test) {
       this.Video.comment_type = community_test[3];
