@@ -531,27 +531,23 @@ nicofox_ui.manager.popup_command =
     }
     if (external_process) {
       var os_string = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
-      var process;
-      var file_path;
       if (os_string == 'WINNT') {
-        /* Using IWinProcess by dafi to fix the poor Unicode support of nsIProcss 
-           See: http://dafizilla.wordpress.com/2008/10/08/nsiprocess-windows-and-unicode/ */
-        process = Cc["@dafizilla.sourceforge.net/winprocess;1"]
-                  .createInstance().QueryInterface(Ci.IWinProcess);
-        file_path = file.path;
+        /* Use JS Ctype implementation */
+        Components.utils.import("resource://nicofox/ProcessRunner.jsm");
+        processRunner.run(external_path.path, [file.path], "nsIProcess");
       } else {
-        process = Components.classes["@mozilla.org/process/util;1"]
+        var process = Components.classes["@mozilla.org/process/util;1"]
         .createInstance(Components.interfaces.nsIProcess);
         var unicode_converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
                                 .createInstance(Ci.nsIScriptableUnicodeConverter);
         unicode_converter.charset = 'utf-8';      
-        file_path = unicode_converter.ConvertFromUnicode(file.path);
+        var file_path = unicode_converter.ConvertFromUnicode(file.path);
+        try {
+          process.init(external_path);
+          var parameter = [file_path];
+          process.run(false, parameter, 1);
+        } catch(e) {} /* FIXME: Error display */
       }
-      try {
-        process.init(external_path);
-        var parameter = [file_path];
-        process.run(false, parameter, 1);
-      } catch(e) {} /* FIXME: Error display */
     } else {
       /* Normal approach */
       try {
