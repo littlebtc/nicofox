@@ -535,6 +535,10 @@ nicofox_ui.manager.popup_command =
         /* Use JS Ctype implementation */
         Components.utils.import("resource://nicofox/ProcessRunner.jsm");
         processRunner.run(external_path.path, [file.path], "nsIProcess");
+      } else if (os_string == 'Darwin') {
+        /* For OSX, use launchWithDoc */
+        external_path.QueryInterface(Ci.nsILocalFileMac);
+        external_path.launchWithDoc(file, false);
       } else {
         var process = Components.classes["@mozilla.org/process/util;1"]
         .createInstance(Components.interfaces.nsIProcess);
