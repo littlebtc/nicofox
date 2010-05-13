@@ -2,15 +2,6 @@ var Cc = Components.classes;
 var Ci = Components.interfaces;
 
 
-/* Get the URI of the player (due to Flash security) */
-var em = Components.classes["@mozilla.org/extensions/manager;1"].
-         getService(Components.interfaces.nsIExtensionManager);
-var file = em.getInstallLocation('nicofox@littlebtc').getItemFile('nicofox@littlebtc', "player/nicofox_player.htm");
-
-var uri = Cc["@mozilla.org/network/io-service;1"]
-.getService(Ci.nsIIOService).newFileURI(file);
-
-var player_src = uri.spec;
 function load()
 {
   /* Find the path */
@@ -41,7 +32,26 @@ function load()
   browser.webNavigation.allowPlugins = true;
   browser.webNavigation.allowSubframes = false;
 
-  // load a page
+  loadNicoFoxPlayer(browser);
+}
+/* Workaround for async addonmanager fixes */
+function loadNicoFoxPlayer(browser) {
+  /* For newer version of Fx with new addon manager */
+  if (!Components.interfaces.nsIExtensionManager) {
+    Components.utils.import("resource://gre/modules/AddonManager.jsm");
+    AddonManager.getAddonByID("nicofox@littlebtc", (function(browser) {
+     return function(addon) {
+        browser.contentDocument.location.href = addon.getResourceURL("player")+"/nicofox_player.htm";
+     }})(browser) );
+    return;
+  }
+  /* Get the URI of the player (due to Flash security) */
+  var em = Components.classes["@mozilla.org/extensions/manager;1"].
+           getService(Components.interfaces.nsIExtensionManager);
+  var file = em.getInstallLocation('nicofox@littlebtc').getItemFile('nicofox@littlebtc', "player/nicofox_player.htm");
+  
+  var uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newFileURI(file);
+
+  var player_src = uri.spec;
   browser.contentDocument.location.href = player_src;
 }
-
