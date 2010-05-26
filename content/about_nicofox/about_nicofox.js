@@ -20,7 +20,7 @@ var aboutNicoFox = {
   /* Select terms to find */
   terms: '',
   /* Choose an tag to show */
-  tagId: -1,
+  tagName: '',
 
   /* When loaded, load bookmark items and tags */
   load: function() {
@@ -58,8 +58,8 @@ var aboutNicoFox = {
        XXX: Need parameters to set how to sort */
     var options = aboutNicoFox.historySvc.getNewQueryOptions();
     options.queryType = Ci.nsINavHistoryQueryOptions.QUERY_TYPE_BOOKMARKS;
-    if (aboutNicoFox.tagId >= 0) {
-      options.resultType = Ci.nsINavHistoryQueryOptions.RESULTS_AS_TAG_CONTENTS;
+    if (aboutNicoFox.tagName) {
+      //options.resultType = Ci.nsINavHistoryQueryOptions.RESULTS_AS_TAG_CONTENTS;
     }
     
     /* Set queries to http://www.nicovideo.jp/watch/
@@ -68,9 +68,12 @@ var aboutNicoFox = {
     query.uri = aboutNicoFox.makeURI('http://www.nicovideo.jp/watch/');
     query.searchTerms = aboutNicoFox.terms;
     query.uriIsPrefix = true;
-    if (aboutNicoFox.tagId >= 0) {
-      query.setFolders([aboutNicoFox.tagId], 1);
+    if (aboutNicoFox.tagName) {
+      query.tags = [aboutNicoFox.tagName];
     }
+/*    if (aboutNicoFox.tagId >= 0) {
+      query.setFolders([aboutNicoFox.tagId], 1);
+    }*/
 
     /* Execute the query */
     var result = this.historySvc.executeQuery(query, options);
@@ -180,13 +183,13 @@ var aboutNicoFox = {
           tagItem.className = 'tag-normal';
           tagItem.textContent = tagNames[i] + ' (' + tagCounts[i] + ')';
           
-          tagItem.addEventListener('click', (function(id) {
+          tagItem.addEventListener('click', (function(id, name) {
             return function(e) {
-              aboutNicoFox.selectTag(id);
+              aboutNicoFox.selectTag(id, name);
               e.stopPropagation();
               e.preventDefault();
             }
-          })(tagIds[i]) , false);
+          })(tagIds[i], tagNames[i]) , false);
           tagList.appendChild(tagItem);
         }
       },
@@ -204,8 +207,8 @@ var aboutNicoFox = {
 
   },
   /* Fire when using select an tag in interface */
-  selectTag: function(id) {
-    aboutNicoFox.tagId = id;
+  selectTag: function(id, name) {
+    aboutNicoFox.tagName = name;
     aboutNicoFox.loadBookmarks();
     /* Clean and refresh the interface */
     var actives = document.getElementsByClassName('tag-active');
