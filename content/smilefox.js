@@ -530,28 +530,8 @@ nicofox_ui.manager.popup_command =
       var external_path = nicofox.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
     }
     if (external_process) {
-      var os_string = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
-      if (os_string == 'WINNT') {
-        /* Use JS Ctype implementation */
-        Components.utils.import("resource://nicofox/ProcessRunner.jsm");
-        processRunner.run(external_path.path, [file.path], "nsIProcess");
-      } else if (os_string == 'Darwin') {
-        /* For OSX, use launchWithDoc */
-        external_path.QueryInterface(Ci.nsILocalFileMac);
-        external_path.launchWithDoc(file, false);
-      } else {
-        var process = Components.classes["@mozilla.org/process/util;1"]
-        .createInstance(Components.interfaces.nsIProcess);
-        var unicode_converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                                .createInstance(Ci.nsIScriptableUnicodeConverter);
-        unicode_converter.charset = 'utf-8';      
-        var file_path = unicode_converter.ConvertFromUnicode(file.path);
-        try {
-          process.init(external_path);
-          var parameter = [file_path];
-          process.run(false, parameter, 1);
-        } catch(e) {} /* FIXME: Error display */
-      }
+      Components.utils.import("resource://nicofox/ProcessRunner.jsm");
+      processRunner.openFileWithProcess(external_path, file, "nsIProcess");
     } else {
       /* Normal approach */
       try {
