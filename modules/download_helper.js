@@ -1,12 +1,10 @@
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
-var EXPORTED_SYMBOLS = ['nicofox'];
+var EXPORTED_SYMBOLS = ['DownloadUtils'];
 
 Components.utils.import('resource://nicofox/common.js');
 
-var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-              .getService(Ci.nsIPromptService);
 /* Multiple downloads helper, for simultaneously handle multiple persist without progress checking 
    XXX: file checks
 */
@@ -14,10 +12,10 @@ var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 if (!nicofox) { var nicofox = {}; }
 if (!nicofox.download) { nicofox.download = {}; }
 
-nicofox.download.helper = {};
+DownloadUtils = {};
 
-nicofox.download.helper.multiple = function() { }
-nicofox.download.helper.multiple.prototype = {
+DownloadUtils.multiple = function() { }
+DownloadUtils.multiple.prototype = {
   persists: [],
   files: [],
   adding: true,
@@ -104,6 +102,6 @@ nicofox.download.helper.multiple.prototype = {
   }
 }
 /* Finally import modules that we need */
-Components.utils.import('resource://nicofox/download_helper_nico.js');
+Components.utils.import('resource://nicofox/download_helper_nico.js', DownloadUtils);
 //Components.utils.import('resource://nicofox/download_helper_parasite.js');
 //Components.utils.import('resource://nicofox/download_helper_keytalks.js');

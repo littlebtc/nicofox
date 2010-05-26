@@ -1,14 +1,19 @@
 var EXPORTED_SYMBOLS = ['nicofox'];
 
-var Cc = Components.classes;
-var Ci = Components.interfaces;
+const Cc = Components.classes;
+const Ci = Components.interfaces;
 
 if (!nicofox) { var nicofox = {}; }
+Components.utils.import("resource://nicofox/Services.jsm"); 
+Components.utils.import("resource://nicofox/Core.jsm");
 
-/* Load prefs */
-nicofox.prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                          .getService(Components.interfaces.nsIPrefService);
-nicofox.prefs = nicofox.prefs.getBranch("extensions.nicofox.");
+/* XXX: Temp */
+nicofox.prefs = Core.prefs;
+
+nicofox.__defineGetter__('_ioService', function() {
+  delete nicofox['_ioService'];
+  return nicofox['_ioService'] = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+});
 
 nicofox.goAjax = function(url, type, funcok, funcerr, post_data) {
   var http_request;
@@ -68,9 +73,7 @@ nicofox.hitch = function(object, name) {
 
 /* Open a link in the new tab */
 nicofox.openInTab = function(url) {
-  var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
-          .getService(Ci.nsIWindowMediator);
-  var mainWindow = wm.getMostRecentWindow("navigator:browser");
+  var mainWindow = Services.wm.getMostRecentWindow("navigator:browser");
   
   /* If we cannot found browser, create one */
  if (!mainWindow) {
@@ -127,39 +130,10 @@ nicofox.nicoLogin = function(funcok, funcerr) {
   post_data = {};
 };
 
-/* Strings using JavaScript+XPCOM way, more stable? */
-nicofox.strings = {
-  bundle: null, 
-  init: function() {
-   var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
-   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicofox.properties');
-  }, 
-  getString: function(str) {
-    if (this.bundle === null) this.init();
-    return this.bundle.GetStringFromName(str);
-  },
-  getFormattedString: function (key, arr) {
-    if (toString.call(arr) === "[object Array]") {return '';} // Technology from jQuery
-    return this.bundle.formatStringFromName(key, arr, arr.length);
-  }
-};
+/* XXX: Temp */
+nicofox.strings = Core.strings;
+nicofox.monkey_strings = Core.monkeyStrings;
 
-nicofox.monkey_strings = {
-  bundle: null, 
-  init: function() {
-   var bundle_service = Cc['@mozilla.org/intl/stringbundle;1'].getService(Ci.nsIStringBundleService);
-   this.bundle = bundle_service.createBundle('chrome://nicofox/locale/nicomonkey.properties');
-  }, 
-  getString: function(str) {
-    if (this.bundle === null) this.init();
-    return this.bundle.GetStringFromName(str);
-  },
-  getFormattedString: function (key, arr) {
-    if (toString.call(arr) === "[object Array]") {return '';} // Technology from jQuery
-    if (this.bundle === null) this.init();
-    return this.bundle.formatStringFromName(key, arr, arr.length);
-  }
-};
 /* Fix common reserved characters in filesystems by converting to full-width */
 nicofox.fixReservedCharacters = function(title) {
   title = title.replace(/\//g, "\uFF0F");
@@ -177,4 +151,14 @@ nicofox.fixReservedCharacters = function(title) {
   //title = title.replace(/\[/g, '〔');
   //title = title.replace(/\]/g, '〕');
   return title;
+}
+
+/* Get the URI of the file; if the file is not exists, return empty string */
+nicofox.newURIByFile = function(filePath) {
+  var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+  file.initWithPath(filePath);
+  if (file.exists()) {
+    return Services.io.newFileURI(file).spec;
+  }
+  return '';
 }

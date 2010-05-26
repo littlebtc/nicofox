@@ -1,7 +1,7 @@
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
-var EXPORTED_SYMBOLS = ['nicofox'];
+var EXPORTED_SYMBOLS = ['Nico'];
 
 Components.utils.import('resource://nicofox/common.js');
 
@@ -10,12 +10,9 @@ var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 /* Multiple downloads helper, for simultaneously handle multiple persist without progress checking 
    XXX: file checks
 */
-if (!nicofox) { var nicofox = {}; }
-if (!nicofox.download) { nicofox.download = {}; }
-if (!nicofox.download.helper) { nicofox.download.helper = {}; }
 
-nicofox.download.helper.nico = function() { };
-nicofox.download.helper.nico.prototype = {
+Nico = function() { };
+Nico.prototype = {
   download_comment: false,
   canceled: false,
   ms_lock: false,
@@ -305,7 +302,9 @@ nicofox.download.helper.nico.prototype = {
       var owner_post_header = 
       '<thread click_revision="0" fork="1" user_id="'+params.user_id+'" res_from="-1000" version="20061206" thread="'+params.thread_id+'"/>';
     }
-    this.download_helper = new nicofox.download.helper.multiple();
+    /* XXX: Workaround */
+    Components.utils.import("resource://nicofox/download_helper.js");
+    this.download_helper = new DownloadUtils.multiple();
     this.download_helper.doneCallback = nicofox.hitch(this, 'callback', 'completed', {});
     this.download_helper.addDownload(params.ms, null , post_header, this.ms_file, true, nicofox.hitch(this, 'processNicoComment', params));
     if(this.uploader_comment) {

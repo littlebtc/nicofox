@@ -48,14 +48,10 @@ nicofox.parser.nico.prototype = {
       }
       this.return_to(false); return;
     }
-
-    /* Use sandbox for security */
-    var s = Components.utils.Sandbox("about:blank");                         
-    Components.utils.evalInSandbox('var Video = {'+reg_array[2]+'}', s);
-    if (typeof s.Video != "object") {
-      this.return_to(false); return;
-    }
-    this.Video = s.Video;
+    var video_string = reg_array[2];
+    /* Chang the format to valid JSON and parse it */
+    video_string = video_string.replace(/^\s+([0-9a-z]+)\:\s+/img, "\'$1\':").replace(/\'/g, '"');
+    this.Video = JSON.parse('{'+video_string+'}');
 
     /* Test if this is a community video */
     var community_test = html.match(/<img alt=\"([^\"]*)\" src=\"http\:\/\/icon\.nimg\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)\.jpg\?[0-9]+\" class=\"[0-9A-Z\_]+\">/i);
