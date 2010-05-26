@@ -59,13 +59,11 @@ processRunner.openFileWithProcess = function(process, file, safeString) {
   
   /* For others, use nsIProcess with utf8 parameters */
   } else {
-    var process = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
+    var processRunner = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
     var unicode_converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
     unicode_converter.charset = 'utf-8';      
-    try {
-      process.init(process);
-      var parameter = [unicode_converter.ConvertFromUnicode(file.path)];
-      process.run(false, parameter, 1);
-    } catch(e) {} /* FIXME: Error display */
+    processRunner.init(process);
+    var parameter = [unicode_converter.ConvertFromUnicode(file.path)];
+    processRunner.run(false, parameter, 1);
   }
 };
