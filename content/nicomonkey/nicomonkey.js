@@ -74,9 +74,13 @@ function start()
     if(GM_getValue('comment_helper'))
     {
       if (document.getElementById('flvplayer')
-      && (document.getElementById('flvplayer').src.indexOf('new') == -1)
-      )
-      window.setTimeout(addCommentHelper, 10);
+      //&& (document.getElementById('flvplayer').src.indexOf('new') == -1)
+      ) {
+        var playerVerMatch = document.getElementById('flvplayer').src.match(/([0-9]+)$/);
+        if (playerVerMatch && parseInt(playerVerMatch[0], 10) < 1262084704) {
+          window.setTimeout(addCommentHelper, 10);
+        }
+      }
     }
 
     /* Bookmark helper, aka "Superlist" */
@@ -405,9 +409,9 @@ function commentHelperSelect(e)
 
 function listenMainPage()
 {
-document.addEventListener('DOMAttrModified', function(event)
+document.addEventListener('DOMNodeInserted', function(event)
   {
-    if(event.target.id == 'tag_modeA' || event.target.id == 'tag_modeB') { pushLinks(true); }
+    if(event.target.id == 'category_recent') { pushLinks(true); }
   }
 , false);
 }
@@ -417,7 +421,8 @@ function pushLinks(mainpage)
   /* Fetching the video links */
   if (mainpage == true)
   {
-    videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")]', document.getElementById('category_recent'));
+	  videos = document.querySelectorAll('a.watch,a.video');
+    //videos = $$('.//a [@class="watch" or substring(@class,string-length(@class)-string-length(" watch")+1)=" watch" or starts-with(@class,"watch ") or contains(@class," watch ")]', document.getElementById('category_recent'));
   }
   /* Taiwan version ranking doesn't follow the original css rule */
   else if (window.location.href.match(/^http:\/\/tw\.nicovideo\.jp\/ranking\//)) 
@@ -426,16 +431,17 @@ function pushLinks(mainpage)
   }
   else
   {
-    videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*)]');
+	  videos = document.querySelectorAll('a.watch,a.video');
+    //videos = $$('.//a [@class="video" or substring(@class,string-length(@class)-string-length(" video")+1)=" video" or starts-with(@class,"video ") or contains(@class," video ")] | .//a [@class="g-video-link" and not (*)]');
   }
   /* Run every link to check what we like */
   for (var i = 0; i < videos.length; i++)
   {
     var video = videos[i];
     var href = video.href;
-
+    
     /* Is it truly a "watch" or "mylist" links? */
-    if (href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)/* || href.match(/^http:\/\/(tw|www)\.nicovideo\.jp\/mylist\/[0-9]+$/)*/)
+    if (href.match(/(\/)?watch\/[a-z]{0,2}[0-9]+$/) || href.match(/^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+$/)/* || href.match(/^http:\/\/(tw|www)\.nicovideo\.jp\/mylist\/[0-9]+$/)*/)
     {
       /* If it is, we will add a "download" link, to help Smilefox work :) */
       var download_link = document.createElement('a');
