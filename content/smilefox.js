@@ -1,9 +1,12 @@
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
+if (!nicofox) { nicofox = {}; }
+if (!nicofoxOld) { nicofoxOld = {}; }
 /* Import Download manager Javascript code modules */
-Components.utils.import('resource://nicofox/common.js');
-Components.utils.import('resource://nicofox/download_manager.js');
+Components.utils.import('resource://nicofox/common.js', nicofoxOld);
+Components.utils.import('resource://nicofox/download_manager.js', nicofoxOld);
+
 
 if (!nicofox_ui) {var nicofox_ui = {};}
 nicofox_ui.manager = {
@@ -15,7 +18,7 @@ nicofox_ui.manager = {
                       .getService(Ci.nsIPromptService);
 
     /* Get download manager list */
-    nicofox.download_manager.getDownloadsAsync(nicofox.hitch(nicofox_ui.manager, 'getDownloadsCallback'));
+    nicofoxOld.nicofox.download_manager.getDownloadsAsync(nicofoxOld.nicofox.hitch(nicofox_ui.manager, 'getDownloadsCallback'));
 
     /* For XULRunner 1.9.1+, use type="search" */
     var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
@@ -23,7 +26,7 @@ nicofox_ui.manager = {
     if (xulapp_info.platformVersion.indexOf('1.9.0') != 0)
     { document.getElementById('smilefox-search').type = 'search'; }
 
-    nicofox.download_manager.go();
+    nicofoxOld.nicofox.download_manager.go();
     document.getElementById('smilefox-popup').addEventListener('popupshowing', function(e) {
     nicofox_ui.manager.popup_command.activate.call(nicofox_ui.manager.popup_command, e)}, false);
     document.getElementById('smilefox-tree').focus();
@@ -77,7 +80,7 @@ nicofox_ui.manager = {
          nicofox_ui.manager.doSearch();
        }
      };
-    nicofox.download_listener.addListener(nicofox_ui.manager.listener);
+    nicofoxOld.nicofox.download_listener.addListener(nicofox_ui.manager.listener);
   },
   /* Callback for getDownloads */
   getDownloadsCallback:function(rows) {
@@ -117,8 +120,8 @@ nicofox_ui.manager = {
   updateToolbar: function() {
     /* nicofox-icon is in overlay */
     var nicofox_icon = document.getElementById('nicofox-icon');
-    var download_count = nicofox.download_manager.getDownloadCount();
-    var waiting_count = nicofox.download_manager.getWaitingCount();
+    var download_count = nicofoxOld.nicofox.download_manager.getDownloadCount();
+    var waiting_count = nicofoxOld.nicofox.download_manager.getWaitingCount();
 
     if (download_count > 0) {
       document.getElementById('smilefox-toolbar-start').disabled = true;
@@ -182,16 +185,16 @@ nicofox_ui.manager = {
   start: function()
   {
     /* Start will also be called after video is added, so ... */
-    nicofox.download_manager.go();
+    nicofoxOld.nicofox.download_manager.go();
     document.getElementById('smilefox-toolbar-start').disabled = true;
     document.getElementById('smilefox-toolbar-stop').disabled = false;
   },
   stop: function()
   {
     /* If downloading, confirm */
-    if (!this.prompts.confirm(null, nicofox.strings.getString('stopDownloadTitle'), nicofox.strings.getString('stopDownloadMsg')))
+    if (!this.prompts.confirm(null, nicofox.Core.strings.getString('stopDownloadTitle'), nicofox.Core.strings.getString('stopDownloadMsg')))
     { return; }
-    nicofox.download_manager.cancelAll();
+    nicofoxOld.nicofox.download_manager.cancelAll();
   },
 
   optionsWindow: function() {
@@ -218,7 +221,7 @@ nicofox_ui.manager = {
   },
 
   unload: function() {
-    nicofox.download_listener.removeListener(nicofox_ui.manager.listener);
+    nicofoxOld.nicofox.download_listener.removeListener(nicofox_ui.manager.listener);
     window.removeEventListener("load", nicofox_ui.manager.load, false);
     window.removeEventListener("unload", nicofox_ui.manager.unload, false);
     document.getElementById('smilefox-popup').removeEventListener('popupshowing', function(e) {
@@ -232,12 +235,12 @@ nicofox_ui.manager = {
     this.updateTreeCount(0, -nicofox_ui.manager.rows.length);
     nicofox_ui.manager.rows = [];
     /* XXX: Why we should refetch contents during search? */
-    nicofox.download_manager.getDownloadsAsync(nicofox.hitch(nicofox_ui.manager, 'searchCallback'));
+    nicofoxOld.nicofox.download_manager.getDownloadsAsync(nicofoxOld.nicofox.hitch(nicofox_ui.manager, 'searchCallback'));
   },
   searchCallback: function(rows) {
     var keyword = document.getElementById('smilefox-search').value;
     this.rows = rows;
-//    this.rows = nicofox.download_manager.getDownloads();
+//    this.rows = nicofoxOld.nicofox.download_manager.getDownloads();
     this.updateTreeCount(0, nicofox_ui.manager.rows.length);
 
     if (keyword) {
@@ -263,11 +266,11 @@ nicofox_ui.manager = {
   },
   openFileInPlayer: function() {
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    file_picker.init(window, nicofox.strings.getString('chooseVideoFile'), null);
-    if (nicofox.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
-      file_picker.displayDirectory = nicofox.prefs.getComplexValue('save_path', Ci.nsILocalFile);
+    file_picker.init(window, nicofox.Core.strings.getString('chooseVideoFile'), null);
+    if (nicofox.Core.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
+      file_picker.displayDirectory = nicofox.Core.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     }
-    file_picker.appendFilter(nicofox.strings.getString('supportedType'), '*.flv; *.mp4; *.swf');
+    file_picker.appendFilter(nicofox.Core.strings.getString('supportedType'), '*.flv; *.mp4; *.swf');
     if (file_picker.show() == Ci.nsIFilePicker.returnOK)
     {
       /* XXX: Find a better way to make a function */
@@ -313,8 +316,8 @@ nicofox_ui.manager.download_tree = {
 
         case 'tree-economy':
         if (nicofox_ui.manager.rows[row].status == 1 || nicofox_ui.manager.rows[row].status >= 6) {
-          if (nicofox_ui.manager.rows[row].video_economy == 1) return  nicofox.strings.getString('economyYes');
-          else return nicofox.strings.getString('economyNo');
+          if (nicofox_ui.manager.rows[row].video_economy == 1) return  nicofox.Core.strings.getString('economyYes');
+          else return nicofox.Core.strings.getString('economyNo');
         }
         return;  
 
@@ -322,22 +325,22 @@ nicofox_ui.manager.download_tree = {
         switch (nicofox_ui.manager.rows[row].status)
         {
           case 0:
-          return nicofox.strings.getString('progressWaiting');
+          return nicofox.Core.strings.getString('progressWaiting');
           case 1:
-          return nicofox.strings.getString('progressCompleted');
+          return nicofox.Core.strings.getString('progressCompleted');
           case 2:
-          return nicofox.strings.getString('progressCanceled');
+          return nicofox.Core.strings.getString('progressCanceled');
           case 3:
-          return nicofox.strings.getString('progressFailed');
+          return nicofox.Core.strings.getString('progressFailed');
           case 4:
-          return nicofox.strings.getString('progressScheduled');
+          return nicofox.Core.strings.getString('progressScheduled');
            
           case 5:
-          return nicofox.strings.getString('progressLoading');
+          return nicofox.Core.strings.getString('progressLoading');
           case 6:
-          return nicofox.strings.getString('progressCommentDownloading');
+          return nicofox.Core.strings.getString('progressCommentDownloading');
           case 7:
-          return nicofox.strings.getString('progressVideoDownloading');
+          return nicofox.Core.strings.getString('progressVideoDownloading');
           default:
           return 'Buggy!';
         }
@@ -460,11 +463,11 @@ nicofox_ui.manager.popup_command =
   multiple_select: true, 
   cancel: function() {
     if (this.recent_row < 0) { return; }  
-    nicofox.download_manager.cancel(nicofox_ui.manager.rows[this.recent_row].id);
+    nicofoxOld.nicofox.download_manager.cancel(nicofox_ui.manager.rows[this.recent_row].id);
   },
   retry: function() {
     if (this.recent_row < 0) { return; }  
-    nicofox.download_manager.retry(nicofox_ui.manager.rows[this.recent_row].id);
+    nicofoxOld.nicofox.download_manager.retry(nicofox_ui.manager.rows[this.recent_row].id);
   },
   open: function() {
     if (this.recent_row < 0) { return; }
@@ -521,13 +524,13 @@ nicofox_ui.manager.popup_command =
         
     var external_process = false;
     /*  flv/mp4/swf detection and custom player */
-    if (nicofox.prefs.getBoolPref("external_video_player") && nicofox_ui.manager.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
+    if (nicofox.Core.prefs.getBoolPref("external_video_player") && nicofox_ui.manager.rows[this.recent_row].video_file.match(/(flv|mp4)$/)) {
       external_process = true;
-      var external_path = nicofox.prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
+      var external_path = nicofox.Core.prefs.getComplexValue("external_video_player_path", Components.interfaces.nsILocalFile);
     }
-    else if (nicofox.prefs.getBoolPref("external_swf_player") && nicofox_ui.manager.rows[this.recent_row].video_file.match(/(swf)$/)) {
+    else if (nicofox.Core.prefs.getBoolPref("external_swf_player") && nicofox_ui.manager.rows[this.recent_row].video_file.match(/(swf)$/)) {
       external_process = true;
-      var external_path = nicofox.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
+      var external_path = nicofox.Core.prefs.getComplexValue("external_swf_player_path", Components.interfaces.nsILocalFile);
     }
     if (external_process) {
       Components.utils.import("resource://nicofox/ProcessRunner.jsm");
@@ -594,7 +597,7 @@ nicofox_ui.manager.popup_command =
 
     /* Show file picker */
     var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    file_picker.init(window, nicofox.strings.getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
+    file_picker.init(window, nicofox.Core.strings.getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
     file_picker.displayDirectory = video_file.parent;
     if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
       var move_to = file_picker.file;
@@ -604,7 +607,7 @@ nicofox_ui.manager.popup_command =
    
     /* No same desination */
     if (move_to.equals(video_file.parent)) {
-      nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMovePath'));
+      nicofox_ui.manager.prompts.alert(window, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorMovePath'));
       return;
     }
  
@@ -612,7 +615,7 @@ nicofox_ui.manager.popup_command =
     var video_file_check = move_to.clone();
     video_file_check.append(video_file.leafName);
     if (video_file_check.exists()) {
-      nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
+      nicofox_ui.manager.prompts.alert(window, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorMove'));
       return;
     }
 
@@ -621,7 +624,7 @@ nicofox_ui.manager.popup_command =
       var comment_file_check = move_to.clone();
       comment_file_check.append(comment_file.leafName);
       if (comment_file_check.exists()) {
-        nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
+        nicofox_ui.manager.prompts.alert(window, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorMove'));
         return;
       }
     }
@@ -629,7 +632,7 @@ nicofox_ui.manager.popup_command =
       var uploader_comment_file_check = move_to.clone();
       uploader_comment_file_check.append(uploader_comment_file.leafName);
       if (uploader_comment_file_check.exists()) {
-        nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
+        nicofox_ui.manager.prompts.alert(window, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorMove'));
         return;
       }
     }
@@ -640,17 +643,17 @@ nicofox_ui.manager.popup_command =
       if (comment_exists) comment_file.moveTo(move_to ,''); 
       if (uploader_comment_exists) uploader_comment_file.moveTo(move_to ,''); 
     } catch(e) {
-      nicofox_ui.manager.prompts.alert(window, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorMove'));
+      nicofox_ui.manager.prompts.alert(window, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorMove'));
     }
     /* Change the database */
     var comment_file_path = '';
     if (comment_exists) { comment_file_path = comment_file.path; }
-    nicofox.download_manager.moveFile(nicofox_ui.manager.rows[this.recent_row].id, video_file.path, comment_file_path);
+    nicofoxOld.nicofox.download_manager.moveFile(nicofox_ui.manager.rows[this.recent_row].id, video_file.path, comment_file_path);
   },
   go: function() {
     if (this.recent_row < 0) { return; }
     if (!nicofox_ui.manager.rows[this.recent_row].url) { return; }
-    nicofox.openInTab(nicofox_ui.manager.rows[this.recent_row].url);
+    nicofoxOld.nicofox.openInTab(nicofox_ui.manager.rows[this.recent_row].url);
   },
   copy: function() {
     if (this.recent_row < 0) { return; }
@@ -686,7 +689,7 @@ nicofox_ui.manager.popup_command =
       }
     }
     for (var i = 0; i < removing_ids.length; i++) {
-      nicofox.download_manager.remove(removing_ids[i]);  
+      nicofoxOld.nicofox.download_manager.remove(removing_ids[i]);  
     }
   },
   activate: function(e) {
@@ -735,7 +738,7 @@ nicofox_ui.manager.popup_command =
       cell_text = cell_text.substr(0, 15) + "\u2026";
     }
     if (cell_text) {
-      document.getElementById('popup-copy-cell').label = nicofox.strings.getFormattedString('copyCell', [ cell_text ]);
+      document.getElementById('popup-copy-cell').label = nicofox.Core.strings.getFormattedString('copyCell', [ cell_text ]);
       document.getElementById('popup-copy-cell').style.display = 'block';
     } else {
     }

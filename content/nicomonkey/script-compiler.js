@@ -1,4 +1,3 @@
-Components.utils.import('resource://nicofox/common.js');
 
 if (!nicofox_ui) {var nicofox_ui = {};}
 if (!nicofox_ui.monkey) { nicofox_ui.monkey = {};}
@@ -286,7 +285,8 @@ nicofox_ui.monkey.script_storage.prototype.goDownload = function(Video, url) {
   nicofox_ui.overlay.goDownloadFromVideoPage(Video, url);
 }
 nicofox_ui.monkey.script_storage.prototype.getString = function(str) {
-  return nicofox.monkey_strings.getString(str);
+  Components.utils.import("resource://nicofox/Core.jsm", nicofox);
+  return nicofox.Core.monkeyStrings.getString(str);
 }
 
 /* Add bookmark (Firefox 3+ only) */

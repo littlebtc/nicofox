@@ -13,6 +13,7 @@
   <keyset id="smilefox-keyset">
   <key id="select-all-key" modifiers="accel" key="A" oncommand="nicofox_ui.manager.popup_command.selectAll();"/>
   </keyset>
+
 <vbox id="smilefox-main" flex="1">
   <toolbox>
     <toolbar id="download_toolbar">
