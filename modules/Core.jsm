@@ -16,7 +16,7 @@ var stringsHelperGenerator = function(url){
 }
 stringsHelperGenerator.prototype = {
   getString: function(str) {
-    if (this._bundle === null) return '囧';
+    if (this._bundle === null) return '';
     return this._bundle.GetStringFromName(str);
   },
   getFormattedString: function (key, arr) {
