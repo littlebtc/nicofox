@@ -20,12 +20,6 @@ nicofox_ui.manager = {
     /* Get download manager list */
     nicofoxOld.nicofox.download_manager.getDownloadsAsync(nicofoxOld.nicofox.hitch(nicofox_ui.manager, 'getDownloadsCallback'));
 
-    /* For XULRunner 1.9.1+, use type="search" */
-    var xulapp_info = Cc["@mozilla.org/xre/app-info;1"]  
-                     .getService(Ci.nsIXULAppInfo);  
-    if (xulapp_info.platformVersion.indexOf('1.9.0') != 0)
-    { document.getElementById('smilefox-search').type = 'search'; }
-
     nicofoxOld.nicofox.download_manager.go();
     document.getElementById('smilefox-popup').addEventListener('popupshowing', function(e) {
     nicofox_ui.manager.popup_command.activate.call(nicofox_ui.manager.popup_command, e)}, false);

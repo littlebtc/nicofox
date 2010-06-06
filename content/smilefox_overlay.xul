@@ -24,7 +24,7 @@
       <toolbarbutton id="smilefox-toolbar-stop" label="&stop.label;" oncommand="nicofox_ui.manager.stop();" disabled="true" />
       <toolbarbutton id="smilefox-toolbar-option" label="&options.label;" oncommand="nicofox_ui.manager.optionsWindow();" disabled="false" />
       <spacer flex="1" />
-      <textbox value="" emptytext="&search.label;" width="300" id="smilefox-search" type="timed" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
+      <textbox value="" emptytext="&search.label;" width="300" id="smilefox-search" type="search" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
       <toolbarbutton id="smilefox-toolbar-open" tooltiptext="&openPlayer.tooltiptext;" oncommand="nicofox_ui.manager.openFileInPlayer();" disabled="false"  class="toolbarbutton-iconic" />
       <toolbarbutton id="smilefox-toolbar-close" tooltiptext="&close.tooltiptext;" oncommand="nicofox_ui.manager.toolbarClose();" disabled="false"  class="toolbarbutton-iconic" />
 
