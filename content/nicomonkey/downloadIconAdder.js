@@ -2,10 +2,10 @@
  * Append download icon on every video link, if user logged in */
 
 /* Icon in base64 data URL */
-var dl_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAMUlEQVQoz2NgwAT/0TBe8B8dENI0lDXAQwWHBgyN/wkBbDaRpJhsT6NoIkYxeiBgAAC7ec0ziwfsxAAAAABJRU5ErkJggg==';
+var dl_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAMUlEQVQoz2NgwAT/0TBe8B8dENI0lDXAQwWHBgyN/wkBbDaRpJhsT6NoIkYxeiBgAAC7ec0ziwfsxAAAAABJRU5ErkJggg==";
 
 /* Add CSS Style */
-GM_addStyle('.fox-dl-link { text-decoration: none !important; display: inline-block; width: 12px; background: url(' + dl_uri + ') center center no-repeat;}');
+GM_addStyle(".fox-dl-link { text-decoration: none !important; display: inline-block; width: 12px; background: url(" + dl_uri + ") center center no-repeat;}");
 
 /* XXX: mylist & account manager page in nicovideo contains a lot of AJAX, skip it for the recent */
 if (document.location.pathname.indexOf("/my") != 0) {
@@ -46,10 +46,10 @@ function addDownloadIcons(rootDoc) {
       continue;
     }
     
-    var downloadLink = document.createElement('a');
-    downloadLink.className = 'fox-dl-link';
-    downloadLink.href = href+'?smilefox=get';
-    downloadLink.innerHTML = '&nbsp;';
+    var downloadLink = document.createElement("a");
+    downloadLink.className = "fox-dl-link";
+    downloadLink.href = href+"?smilefox=get";
+    downloadLink.innerHTML = "&nbsp;";
 
     videoLink.parentNode.insertBefore(downloadLink, videoLink.nextSibling);
   }

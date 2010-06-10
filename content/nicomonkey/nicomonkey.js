@@ -1,13 +1,5 @@
 /* NOTE: NicoMonkey is not compatible with GM! */
 
-var comment_naka_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAIlJREFUOE+9lF0OwCAIg9nNPBo3d0PDpviTEbqZEHn6UtLCQUT5KvgTKLrgwDL5UmVKKTNzKekdE62hAtMnfRgaAM7HDwJHKADYQ0HAByrutqao629/k47qfqvypjsak44K/USpVevMpc1wH36QWeNGAcDzNQ2Cf9x9TQT8Sjmu0t79AKgF4y//CV9HbAYNfLwgAAAAAElFTkSuQmCC';
-var comment_ue_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAERJREFUOE9jZGBg+A/EVAf/Gf4rUg9DHUk9A0GOG4KGQpxMTUxVw5DClLquBCdRanp71KWQbD8aplQPAqobOBpRNEinAC1++Owoo4AmAAAAAElFTkSuQmCC';
-var comment_shita_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAEBJREFUOE9jZGBg+A/EVAcgQ6mNqW4g2OfUduWooaNhSoNkNZpOqZ+saBWm/xX/M1ALQ8tn6hkIctgQNJTKsQ8AQAj47EvrtdgAAAAASUVORK5CYII=';
-var transparent_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAABtJREFUOE9jYBgFoyEwGgKjITAaAqMhMIJCAAAG+QABfCL3XAAAAABJRU5ErkJggg==';
-
-var comment_big_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAQhJREFUOE/dlGENg0AMhW8yMIABDKAABTjAARawgAZM4AIzt3136dLdKL1k/FqTZkvWe33vtd0jhBBfeXsAepnbtsV932PXdW6tkHQLAST+GLTv+yTvLEX+OI5mTWFNHtJxHMm3X0IBZ1AmPM/zaUrDZVnMmnVdY9u2MvTrddIqkO+tX9VKNU3ztgY2t4DCjsAC8hZQvCamaUqg+F4BbHsq0oUhDfiuBmI1sEE1S9hJE/bWYXsOKl6WAMgnHOBvUD2cM6lsgQAbVnyCygMeDcNgypTTxWOGWNiRQZEll8Mn/wXelDUBmqg3IU1TAClkIB6g/C6rhjJ1HJkpwDXsrGbFCfu3X8ta6p68hKWr5mJCJAAAAABJRU5ErkJggg==';
-var comment_medium_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAAK5JREFUOE/VlN0NgCAMhPGdbViAQdiADViBXViCLVimciYY/CEWg1FJ7gFSP9qrZRJCUNbwBehoDQculbOyVEqRlJIVy4amlMg59zGotZZijBshU6g+DyG0Mj96ijIBgI9FgHnv170xZolp9KQNrT8AtPYUl30DSnnV/p15eitTlFsEABpT9vC3C3r2k+89vRga3kT9B/rImKJBWuuxs899zcqjz729J47X/dcznQEV5Sf2x+oA8AAAAABJRU5ErkJggg==';
-var comment_small_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjM2qefiJQAAALZJREFUOE/lk9ENwyAMROkyzMEgbMAGrMAKzMASbMEytIfkCBKoXYkqH4nED8SPu7N5KaXqZ23/AN29tgOb890qb4Z672tKSepKZh/QnPP/oMYYDv5daSmlAUip1rpijwGvoc65I8fePvaZKNZQFFprB6U0gjjDRYuRnENDCIOac6Ngn6KZgK9QqEMB8qOCWffJhQiKn3pg3yjhC+TnFFaRYYyRGyU656GAIWOhypvf/g8qn670DZtl7reHU6OQAAAAAElFTkSuQmCC';
 
 var tag_add_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB9klEQVQ4T4WSSY8SURSF60/0VuO/IKn4e3pjWmN0q3Y0Rk20nXbOccdQJdXMFm0RIEwpAhTIEEJIAQIh0ShapBlyfPclVWmExsXZ3HfPd8997wm1Wg3VahWVSgXlchmlUgnFYhG6rqNQKOwBEHZJMAwDq9VqQ/1+n0Oy2exOiECTyWCaJp/c7XYdCNVYCqRSqXMhAkWmZppGhXw+r0+nUywWC14nYCaTgaZpWyECTbUbmfmURTZnsxnGP3pIGDI/63Q6SCaTiMfjGxCBJtuRl8slyDz5+Q1Pj6/hobQPzZD4WbvdphSIRqNrEIHtaE0mE940n88x+t7D0fFVvPp8C+9O7uIZA9mQVqtFKRAMBh2IkMvlLrMdrfF4zJu+mnk8kvfxRr2Dj9oDvD+5twZpNpuUAn6/n0M4JZ1Oi2xHazQa8aZGr4gn/gO8VQ8dyJFygHjZzc/r9TqlgCRJe84uiURCZDtaw+FwA/Lhy328DN3AC+UmFss5TxEOh+H1ei+u3SjbT1RV1RoMBg7k8acreB64jtexQ/z+8+us+ZKzwlnFYjExEolY9BN5XFNn5tuYnVqO2ePxcPNWACkUComBQMCin2g/MZlZfc18LoCkKIqL3bRFH6zRaGw17wSQZFl2+Xw+i8xut3vD/F8AiU11MfOFf+u2/gL5GCirQDsa6AAAAABJRU5ErkJggg==';
 
@@ -69,19 +61,6 @@ function start()
     && document.getElementById('flvplayer_container') /* Logged in */
     )
   {
-    /* Add comment helper, if the player is old player */
-    if(GM_getValue('comment_helper'))
-    {
-      if (document.getElementById('flvplayer')
-      //&& (document.getElementById('flvplayer').src.indexOf('new') == -1)
-      ) {
-        var playerVerMatch = document.getElementById('flvplayer').src.match(/([0-9]+)$/);
-        if (playerVerMatch && parseInt(playerVerMatch[0], 10) < 1262084704) {
-          window.setTimeout(addCommentHelper, 10);
-        }
-      }
-    }
-
     /* Bookmark helper, aka "Superlist" */
     if (document.getElementById('mylist_add_submit') && GM_getValue('superlist'))
     { document.getElementById('mylist_add_submit').addEventListener('click', function(e){NM_bookmark();}, true); }
@@ -304,108 +283,6 @@ function videoUtilitiesTab(e)
   return false;
 }
 
-function addCommentHelper()
-{
-  /* Add CSS */
-  GM_addStyle('#comment_helper p {line-height: 30px; } #comment_helper img {border: 1px solid #999999; margin: 1px; vertical-align: middle;} #comment_helper_premium { margin-left: 5px; } #comment_helper textarea {font-family: sans-serif; font-size: 9pt; width: 245px; overflow: hidden; height: 25px; margin:0; padding: 0; vertical-align: middle;} #comment_helper .fox-ch-selected {border: 3px solid #33FF99;}');
-
-  /* The comment helper */
-  var comment_helper = document.createElement('div');
-  comment_helper.id = 'comment_helper';
-
-  comment_helper.innerHTML = 
-  '<a href="#" class="ch_link" id="comment_helper_naka"><img src="'+comment_naka_uri+'" class="fox-ch-selected" /></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_ue"><img src="'+comment_ue_uri+'" /></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_shita"><img src="'+comment_shita_uri+'" /></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_big"><img src="'+comment_big_uri+'" /></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_medium"><img src="'+comment_medium_uri+'"  class="fox-ch-selected"/></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_small"><img src="'+comment_small_uri+'" /></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_white"><img src="'+transparent_uri+'"  class="fox-ch-selected" style="background: #FFFFFF;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_red"><img src="'+transparent_uri+'" style="background: #FF0000;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_pink"><img src="'+transparent_uri+'" style="background: #FF8080;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_orange"><img src="'+transparent_uri+'" style="background: #FFCC00;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_yellow"><img src="'+transparent_uri+'" style="background: #FFFF00;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_green"><img src="'+transparent_uri+'" style="background: #00FF00;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_cyan"><img src="'+transparent_uri+'" style="background: #00FFFF;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_blue"><img src="'+transparent_uri+'" style="background: #0000FF;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_purple"><img src="'+transparent_uri+'" style="background: #C000FF;"></a>'+
-  '<span id="comment_helper_premium" style="display: none;">'+
-  '<a href="#" class="ch_link" id="comment_helper_white2"><img src="'+transparent_uri+'" style="background: #CCCC99;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_red2"><img src="'+transparent_uri+'" style="background: #CC0033;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_orange2"><img src="'+transparent_uri+'" style="background: #FF6600;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_yellow2"><img src="'+transparent_uri+'" style="background: #999900;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_green2"><img src="'+transparent_uri+'" style="background: #00CC66;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_blue2"><img src="'+transparent_uri+'" style="background: #33FFFC;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_purple2"><img src="'+transparent_uri+'" style="background: #6633CC;"></a>'+
-  '<a href="#" class="ch_link" id="comment_helper_black"><img src="'+transparent_uri+'" style="background: #000000;"></a>'+
-  '</span>'+
-  '<textarea rows="1" value="" onchange="$(\'flvplayer\').SetVariable(\'inputArea.ChatInput1.text\', this.value);" onkeyup="this.onchange();"></textarea>';
-
-  /* Inserted in WATCHFOOTER is the right way, but broken in Taiwan (new); So I do a bad workaround. */
-  var flvplayer_container = document.getElementById('flvplayer_container')
-  flvplayer_container.parentNode.insertBefore(comment_helper ,flvplayer_container.nextSibling);
-
-  var helper_links = comment_helper.getElementsByTagName('a')
-  for (var i = 0; i < helper_links.length; i++)  
-  {
-    helper_links[i].addEventListener('click', commentHelperSelect, false);
-  }
-
-  var js = 'if (User.isPremium) {$(\'comment_helper_premium\').show() }'; 
-  location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
-}
-
-var ch_position = 'naka';
-var ch_positions = ['naka', 'shita', 'ue']
-var ch_size = 'medium';
-var ch_sizes = ['medium', 'big', 'small']
-var ch_color = 'white';
-var ch_colors = ['white', 'red', 'pink', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple',
-                 'white2', 'red2', 'orange2', 'yellow2', 'green2', 'blue2', 'purple2', 'black'];
-
-function commentHelperSelect(e)
-{
-  var id = e.target.id;
-  /* When click on img, the id will be empty */
-  if (!id) { id = e.target.parentNode.id; }
-  if (!id) { return; }
-  
-  var sel = id.match(/comment\_helper\_(.*)$/);
-  if(!sel) { return; }
-  sel = sel[1];
-  if (ch_positions.indexOf(sel) != -1)
-  {  
-    document.getElementById('comment_helper_'+ch_position).getElementsByTagName('img')[0].className = '';
-    document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
-    
-    ch_position = sel;
-  }
-  if (ch_sizes.indexOf(sel) != -1)
-  {
-    document.getElementById('comment_helper_'+ch_size).getElementsByTagName('img')[0].className = '';
-    document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
-
-    ch_size = sel;
-  }
-  if (ch_colors.indexOf(sel) != -1)
-  {
-    document.getElementById('comment_helper_'+ch_color).getElementsByTagName('img')[0].className = '';
-    document.getElementById('comment_helper_'+sel).getElementsByTagName('img')[0].className = 'fox-ch-selected';
-
-    ch_color = sel;
-  }
-
-  var mail_inputs = [];
-  if (ch_positions.indexOf(ch_position) != 0) mail_inputs.push(ch_position);
-  if (ch_sizes.indexOf(ch_size) != 0) mail_inputs.push(ch_size);
-  if (ch_colors.indexOf(ch_color) != 0) mail_inputs.push(ch_color);
-
-  var mail_input = mail_inputs.join(' ');
-  var js = '$(\'flvplayer\').SetVariable(\'inputArea.MailInput.text\',\''+mail_input+'\');'; 
-  location.href='javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
-  e.stopPropagation();
-  e.preventDefault();
-}
 
 function killPlayer()
 {

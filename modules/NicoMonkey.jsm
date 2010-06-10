@@ -41,24 +41,6 @@ function fetchUrlContentsAsync(url, callback) {
 
 }
 
-/* XXX: Temp from Greasemonkey compiler */
-function getUrlContents(aUrl){
-  var  ioService=Components.classes["@mozilla.org/network/io-service;1"]
-    .getService(Components.interfaces.nsIIOService);
-  var  scriptableStream=Components
-    .classes["@mozilla.org/scriptableinputstream;1"]
-    .getService(Components.interfaces.nsIScriptableInputStream);
-
-  var  channel=ioService.newChannel(aUrl, null, null);
-  var  input=channel.open();
-  scriptableStream.init(input);
-  var  str=scriptableStream.read(input.available());
-  scriptableStream.close();
-  input.close();
-
-  return str;
-}
-
 ///////////////////////////////////////////////////////////// from prefmanager.js
 GM_PrefManager.MIN_INT_32 = -0x80000000;
 GM_PrefManager.MAX_INT_32 = 0x7FFFFFFF;
@@ -450,7 +432,7 @@ var NicoMonkey = {
   initScripts: function(href) {
     /* XXX: Hack */
     var scripts = [];
-    if ( /^http:\/\/(www|tw|de|es|ch)\.nicovideo\.jp\/.*/.test(href) ) {
+    if ( /^http:\/\/(www|tw|de|es|ch)\.nicovideo\.jp\//.test(href) ) {
       scripts.push({
         name: "NicoMonkey",
         namespace: "http://littleb.tc/nicofox/nicomonkey/legacy",
@@ -458,12 +440,22 @@ var NicoMonkey = {
         _url: "chrome://nicofox/content/nicomonkey/nicomonkey.js"
       });
     }
+    /* Add download icon to videos, applied on niconico-wide site */
     if (/^http:\/\/[a-z]+\.nicovideo\.jp\//.test(href)) {
       scripts.push({
         name: "NicoMonkey Download Link Adder",
         namespace: "http://littleb.tc/nicofox/nicomonkey/icon_adder",
         unwrap: false,
         _url: "chrome://nicofox/content/nicomonkey/downloadIconAdder.js"
+      });
+    }
+    /* Add comment input helper for tw/de/es version of Nicovideo, which are still using old player */
+    if (/^http:\/\/(tw|de|es)\.nicovideo\.jp\/watch\//.test(href)) {
+      scripts.push({
+        name: "NicoMonkey Comment Helper",
+        namespace: "http://littleb.tc/nicofox/nicomonkey/comment_helper",
+        unwrap: false,
+        _url: "chrome://nicofox/content/nicomonkey/commentHelper.js"
       });
     }
     return scripts;
