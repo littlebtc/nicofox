@@ -43,7 +43,7 @@ function addCommentHelper() {
   '<a href="#" id="comment_helper_ue" style="background:url('+comment_ue_uri+')">&nbsp;</a>'+
   '<a href="#" id="comment_helper_shita" style="background:url('+comment_shita_uri+')">&nbsp;</a>'+
   '<a href="#" id="comment_helper_big" style="background:url('+comment_big_uri+')">&nbsp;</a>'+
-  '<a href="#" id="comment_helper_medium" style="background:url('+comment_medium_uri+')">&nbsp;</a>'+
+  '<a href="#" id="comment_helper_medium" style="background:url('+comment_medium_uri+')" class="fox-ch-selected">&nbsp;</a>'+
   '<a href="#" id="comment_helper_small" style="background:url('+comment_small_uri+')">&nbsp;</a>'+
   '<a href="#" id="comment_helper_white" class="fox-ch-selected" style="background: #FFFFFF;">&nbsp;</a>'+
   '<a href="#" id="comment_helper_red" style="background: #FF0000;">&nbsp;</a>'+
@@ -54,7 +54,7 @@ function addCommentHelper() {
   '<a href="#" id="comment_helper_cyan" style="background: #00FFFF;">&nbsp;</a>'+
   '<a href="#" id="comment_helper_blue" style="background: #0000FF;">&nbsp;</a>'+
   '<a href="#" id="comment_helper_purple" style="background: #C000FF;">&nbsp;</a>'+
-  '<span id="comment_helper_premium" >'+
+  '<span id="comment_helper_premium" style="display: none;">'+
   '<a href="#" id="comment_helper_white2" style="background: #CCCC99;">&nbsp;</a>'+
   '<a href="#" id="comment_helper_red2" style="background: #CC0033;">&nbsp;</a>'+
   '<a href="#" id="comment_helper_orange2" style="background: #FF6600;">&nbsp;</a>'+
