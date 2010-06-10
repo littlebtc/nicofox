@@ -7,7 +7,6 @@ if (!nicofox_ui) {var nicofox_ui = {};}
 
 nicofox_ui.overlay = {
   /* Prepare for nsIPromptService */
-  promptSvc: null,
   bar_opened: false,
   page_listener: {
     QueryInterface: function(aIID)
@@ -43,9 +42,6 @@ nicofox_ui.overlay = {
   onLoad: function() {
    /* initialization code */
    nicofox_ui.overlay.initialized = true;
-
-   /* Load services */
-   nicofox_ui.overlay.promptSvc = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 
    /* Cancel some function for non-firefox */
    /* XXX: Untested */
@@ -143,13 +139,14 @@ nicofox_ui.overlay = {
       pref_window.focus();
   },
   confirmDownload: function(Video, url, dont_confirm) {
+    Components.utils.import("resource://nicofox/Services.jsm", nicofox);
     /* Download failed */
     if(Video == false) {
-      this.promptSvc.alert(null, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorParseFailed'));
+      nicofox.Services.prompt.alert(null, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorParseFailed'));
       return;
     }
     if (Video.isDeleted) {
-      this.promptSvc.alert(null, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorDeleted'));
+      nicofox.Services.prompt.alert(null, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorDeleted'));
       return;
     }
 
@@ -168,7 +165,7 @@ nicofox_ui.overlay = {
     }
     var save_path = nicofox.Core.prefs.getComplexValue('save_path', Ci.nsILocalFile);
     if (!this.checkFile(save_path, file_title)) {
-      this.promptSvc.alert(null, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorFileExisted'));
+      nicofox.Services.prompt.alert(null, nicofox.Core.strings.getString('errorTitle'), nicofox.Core.strings.getString('errorFileExisted'));
       return;
     }
 
