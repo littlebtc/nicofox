@@ -33,7 +33,7 @@
       <menulist id="nicomonkey.sound_converter" preference="pref-nicomonkey.sound_converter" >
      <menupopup>
      <menuitem value="http://nicosound.anyap.info/sound/%1" label="にこ☆さうんど＃" />
-     <menuitem value="http://www.nicomimi.com/play/%1" label="nicomimi-にこみみ-" />
+     <menuitem value="http://www.nicomimi.net/play/%1" label="nicomimi-にこみみ-" />
      <menuitem value="http://tunes.labolo.net/mp3/%1" label="NicoTunes" />
      </menupopup>
      </menulist>
