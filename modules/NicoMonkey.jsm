@@ -347,7 +347,7 @@ var nicoMonkeyAdditions = {};
 nicoMonkeyAdditions.getString = function(str) {
   Components.utils.import("resource://nicofox/Core.jsm");
   return Core.monkeyStrings.getString(str);
-}
+};
 
 /* Add bookmark (Firefox 3+ only) */
 nicoMonkeyAdditions.bookmark = function(url, title) {
@@ -360,7 +360,7 @@ nicoMonkeyAdditions.bookmark = function(url, title) {
     var bookmarkId = bookmarkService.insertBookmark(bookmarkService.unfiledBookmarksFolder, uri, -1, "");
     bookmarkService.setItemTitle(bookmarkId, title);
   }
-}
+};
 /* Add tag to places */
 nicoMonkeyAdditions.addTag = function(url, title, str) {
   if (typeof str != 'string') { return; }
@@ -382,7 +382,18 @@ nicoMonkeyAdditions.addTag = function(url, title, str) {
     taggingServ.tagURI(uri, [str], 1); //First argument = URI
   }
 
-}
+};
+
+/* After parsing video info in NicoMonkey script, call the VideoInfoReader to write it */
+nicoMonkeyAdditions.writeVideoInfo = function(url, nicoDataJSON, otherDataJSON) {
+  if (typeof url != "string" ||
+      typeof nicoDataJSON != "string" ||
+      typeof otherDataJSON != "string") {
+    return;
+  }
+  Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
+  VideoInfoReader.readViaNicoMonkey(url, nicoDataJSON, otherDataJSON);
+};
 ///////////////////////////////////////////////////////////// End of NicoMonkey specific
 
 // Examines the stack to determine if an API should be callable.
@@ -518,6 +529,7 @@ var NicoMonkey = {
       //sandbox.NM_goDownload = GM_hitch(nicoMonkeyAdditions, 'goDownload');
       sandbox.NM_bookmark = GM_hitch(nicoMonkeyAdditions, 'bookmark');
       sandbox.NM_addTag = GM_hitch(nicoMonkeyAdditions, 'addTag');
+      sandbox.NM_writeVideoInfo = GM_hitch(nicoMonkeyAdditions, 'writeVideoInfo');
       
       sandbox.__proto__ = safeWin;
       

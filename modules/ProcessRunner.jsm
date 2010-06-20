@@ -1,6 +1,6 @@
 /* vim: sw=2 ts=2 sts=2 et filetype=javascript  
-*/
-/* A simple implementation to open application with specific file:
+ *
+ * A simple implementation to open application with specific file
  */
 const Cc = Components.classes;
 const Ci = Components.interfaces;
