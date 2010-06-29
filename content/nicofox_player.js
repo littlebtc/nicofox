@@ -41,7 +41,7 @@ function loadNicoFoxPlayer(browser) {
     Components.utils.import("resource://gre/modules/AddonManager.jsm");
     AddonManager.getAddonByID("nicofox@littlebtc", (function(browser) {
      return function(addon) {
-        browser.contentDocument.location.href = addon.getResourceURL("player")+"/nicofox_player.htm";
+        browser.contentDocument.location.href = addon.getResourceURI("player").spec + "/nicofox_player.htm";
      }})(browser) );
     return;
   }
