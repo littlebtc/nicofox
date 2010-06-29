@@ -19,14 +19,55 @@ let VideoInfoReader = {};
  * - cachedVideoInfos is an object that stores URL-info mapping in hash.
  * - cachedQueue is a queue, used for expiring the cache.
  */
-var cachedInfos = {};
+var cachedInfo = {};
 var cachedQueue = [];
-const maxCacheNum = 10;
+
+/* Use a timer for cache expiration */
+var expirationTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+var expirationTimerCallback = {};
+expirationTimerCallback.notify = function(timer) {
+  /* Expire the oldest item */
+  var url = cachedQueue[0].url;
+  delete(cachedInfo[url]);
+  cachedQueue.shift();
+  if (cachedQueue.length == 0) {
+    timer.cancel();
+  } else {
+    timer.delay = Math.max(100, expirationDelay + cachedQueue[0].time - new Date().getTime());
+  }
+  Components.utils.reportError(JSON.stringify(cachedInfo));
+  Components.utils.reportError(JSON.stringify(cachedQueue));
+};
+
+/* Expiraiton time for every info, in milliseconds */
+var expirationDelay = 60000; /* 60 sec */
 
 /* Wrtie info into cache */
-function writeCache(info) {
-
+function writeCache(url, info) {
+  /* Find the old item and remove it from the queue */
+  if (cachedInfo[url]) {
+    cachedQueue = cachedQueue.filter(function(element, index, array) {
+      return (element.url != this.url);
+    }, {url: url});
+  }
+  cachedInfo[url] = info;
+  cachedQueue.push({
+    time: new Date().getTime(),
+    url: url
+  });
+  /* If the timer is not running, make it running with a specific delay */
+  if (!expirationTimer.callback) {
+    var delay = Math.max(100, expirationDelay + cachedQueue[0].time - new Date().getTime());
+    expirationTimer.initWithCallback(
+      expirationTimerCallback,
+      delay,
+      Ci.nsITimer.TYPE_REPEATING_SLACK
+    );
+  }
+  Components.utils.reportError(JSON.stringify(cachedInfo));
+  Components.utils.reportError(JSON.stringify(cachedQueue));
 }
+
 
 /* Parse the video info, and write it into cache. 
  * @param url The URL of the video.
@@ -57,6 +98,7 @@ function writeCache(info) {
 function parseVideoInfo(url, nicoData, otherData) {
   /* Put otherData into a info object */
   var info = otherData;
+  info.nicoData = nicoData;
   /* Add the timestamp */
   info.loadTime = new Date().getTime();
   
@@ -79,7 +121,10 @@ function parseVideoInfo(url, nicoData, otherData) {
     }
   } else {
     Components.utils.reportError("NicoFox VideoInfoReader Error: Not a valid Nico Nico Douga URL");
+    return;
   }
+  /* Write the data into cache */
+  writeCache(url, info);
 }
 
 /* Inner reader to make asynchorous request to the video page, and response after read */
