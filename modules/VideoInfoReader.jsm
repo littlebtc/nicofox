@@ -16,16 +16,16 @@ let VideoInfoReader = {};
 /* Store info in a simple cache queue after reading,
  * to decrease the total number of request to the Nico Nico Douga website. 
  * This is private and cannot be read from out of the module.
+ * - cachedVideoInfos is an object that stores URL-info mapping in hash.
+ * - cachedQueue is a queue, used for expiring the cache.
  */
-var cachedInfos = [];
+var cachedInfos = {};
+var cachedQueue = [];
 const maxCacheNum = 10;
 
 /* Wrtie info into cache */
 function writeCache(info) {
-  if (cachedInfos.length > maxCacheNum) {
-    cachedInfos.shift();
-  }
-  cachedInfo.push(info);
+
 }
 
 /* Parse the video info, and write it into cache. 
@@ -63,19 +63,19 @@ function parseVideoInfo(url, nicoData, otherData) {
   /* Idendity (a),(b) type URLs */
   var videoIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/.test(url);
   var commentIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/.test(url);
-  if (videoIdURLMatch) {
-    info.commentType = VideoIdUrlMatch[1];
-  } else if (commentIdUrlMatch)
+  if (videoIdUrlMatch) {
+    info.commentType = videoIdUrlMatch[1];
+  } else if (commentIdUrlMatch) {
     info.commentId = commentIdUrlMatch[1];
     /* Carefully distinguish (c) type URLs */
     if (nicoData.Video.isMymemory) {
-      info.commentType = "mymemory";
+      info.commentType = "mymemory" + info.commentId;
     } else if (nicoData.Video.communityId) {
       info.commentType = "co" + nicoData.Video.communityId;
     } else if (nicoData.Video.channelId) {
       info.commentType = "ch" + nicoData.Video.channelId;
     } else {
-      info.commentType = "unknown";
+      info.commentType = "comment" + info.commentId;
     }
   } else {
     Components.utils.reportError("NicoFox VideoInfoReader Error: Not a valid Nico Nico Douga URL");
@@ -119,7 +119,7 @@ innerFetcher.prototype.fetchError = function() {
 /* Public Methods. */
 
 /* Parse JSON into object and read the video info */
-VideoInfoReader.readViaNicoMonkey = function(url, nicoDataJSON, otherDataJSON) {
+VideoInfoReader.readFromNicoMonkey = function(url, nicoDataJSON, otherDataJSON) {
   var nicoData = {};
   var otherData = {};
   try {
@@ -131,6 +131,7 @@ VideoInfoReader.readViaNicoMonkey = function(url, nicoDataJSON, otherDataJSON) {
   }
   parseVideoInfo(url, nicoData, otherData);
 };
+
 
 VideoInfoReader.readByUrl = function(url) {
   var innerFetcherInstance = new innerFetcher(url);

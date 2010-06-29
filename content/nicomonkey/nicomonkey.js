@@ -154,48 +154,24 @@ function start_inject()
   var Video = {};
   /* Try to make unsafeWindow safer */
   if ((typeof unsafeWindow.Video) != 'object') { return; }
-  for (var key in unsafeWindow.Video) {
-    var value = unsafeWindow.Video[key];
-    /* Video has null value */
-    if (value === null) {
-      Video[key] = null;
-    }
-    /* If it is an array ... */
-    if (Object.prototype.toString.call(unsafeWindow.Video) === '[object Array]') {
-      /* Check its contents */
-      Video[key] = [];
-      if (!value.length && (typeof value.length) != 'number') { continue; }
-      for (var i = 0; i < value.length; i++) {
-        if ((typeof value[i]) != 'string') { continue; }
-          Video[key].push(value[i]);
-      }
-    }
-    else if ((typeof value) != 'string' && (typeof value) != 'number' && (typeof value) != 'boolean') {
-      continue;
-    } else {
-        Video[key] = unsafeWindow.Video[key];
-    }
+  var VideoJSON = "";
+  try {
+    VideoJSON = JSON.stringify(unsafeWindow.Video);
+    Video = JSON.parse(VideoJSON);
+  } catch(e) {
+    throw new Error("Cannot convert Video parameter into JSON!");
+    return;
   }
+  window.setTimeout(function() {
+    NM_writeVideoInfo(document.location.href, VideoJSON, "{}");
+  }, 10);
   
   /* XXX it should not be here, but it is used to reduce the render times */
   /* Fetch the community name by the link node (fixed in 0.3.6) */
   var community_nodes = $$('.//a[starts-with(@href, "http://ch.nicovideo.jp/community") or starts-with(@href, "http://ch.nicovideo.jp/channel") ]');
 
   if (community_nodes.length > 0) {
-    var community_test = community_nodes[0].href.match(/^http\:\/\/ch\.nicovideo\.jp\/(community|channel)\/([a-z]{0,2}[0-9]+)$/i);  
-    Video.comment_type = community_test[2];
-  }
-  else if (Video.isMymemory)
-  {
-    Video.comment_type = 'mymemory' + Video.v;
-  }
-  else if (window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[0-9]+/))
-  {
-    Video.comment_type = 'comment' + Video.v;
-  }
-  else
-  {
-    Video.comment_type = window.location.href.match(/http:\/\/(www|tw|es|de)\.nicovideo\.jp\/watch\/[a-z]{2}[0-9]+/)[1] ;
+
   }
 
   var niconicofarm = "\r\n";
@@ -208,7 +184,7 @@ function start_inject()
 
   document.getElementById('fox-dl-this1').addEventListener('click', function(e)
   {
-    NM_goDownload(Video, window.location.href);
+    //NM_goDownload(Video, window.location.href);
     e.stopPropagation();
     e.preventDefault();
 
@@ -217,7 +193,7 @@ function start_inject()
   if (document.getElementById('fox-dl-this2')) 
    document.getElementById('fox-dl-this2').addEventListener('click', function(e)
   {
-    NM_goDownload(Video, window.location.href);
+    //NM_goDownload(Video, window.location.href);
     e.stopPropagation();
     e.preventDefault();
 

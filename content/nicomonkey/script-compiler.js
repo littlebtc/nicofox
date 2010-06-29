@@ -15,9 +15,10 @@ isGreasemonkeyable: function(url) {
   var scheme=Components.classes["@mozilla.org/network/io-service;1"]
     .getService(Components.interfaces.nsIIOService)
     .extractScheme(url);
+  // XX: add nicovideo.jp easy test
   return (
     (scheme == "http" || scheme == "https" || scheme == "file") &&
-    !/hiddenWindow\.html$/.test(url)
+    !/hiddenWindow\.html$/.test(url) && /nicovideo\.jp\//.test(url)
   );
 },
 /* From greasemonkey */
@@ -37,9 +38,9 @@ contentLoad: function(e) {
 
   if (nicofox_ui.monkey.compiler.isGreasemonkeyable(href)) {
     Components.utils.import("resource://nicofox/Core.jsm")
-    Components.utils.import("resource://nicofox/NicoMonkey.jsm")
     if (Core.prefs.getBoolPref("nicomonkey.enable")){ 
-      NicoMonkey.domContentLoaded({ wrappedJSObject: unsafeWin }, window);
+      Components.utils.import("resource://nicofox/NicoMonkey.jsm", nicofox)
+      nicofox.NicoMonkey.domContentLoaded({ wrappedJSObject: unsafeWin }, window);
     }
     //GM_listen(unsafeWin, "pagehide", GM_hitch(this, "contentUnload"));
   }
