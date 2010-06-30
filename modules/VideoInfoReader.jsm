@@ -99,19 +99,21 @@ function parseVideoInfo(url, nicoData, otherData, callbackThisObj, callbackFuncN
   info.loadTime = new Date().getTime();
   
   /* Idendity (a),(b) type URLs */
-  var videoIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{0,2}[0-9]+)$/.test(url);
-  var commentIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/.test(url);
+  var videoIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/.exec(url);
+  var commentIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/.exec(url);
   if (videoIdUrlMatch) {
     info.commentType = videoIdUrlMatch[1];
+    Components.utils.reportError("Match Video ID!");
   } else if (commentIdUrlMatch) {
     info.commentId = commentIdUrlMatch[1];
+    Components.utils.reportError("Match Comment ID!");
     /* Carefully distinguish (c) type URLs */
-    if (nicoData.Video.isMymemory) {
+    if (nicoData.isMymemory) {
       info.commentType = "mymemory" + info.commentId;
-    } else if (nicoData.Video.communityId) {
-      info.commentType = "co" + nicoData.Video.communityId;
-    } else if (nicoData.Video.channelId) {
-      info.commentType = "ch" + nicoData.Video.channelId;
+    } else if (nicoData.channelId) {
+      info.commentType = "ch" + nicoData.channelId;
+    } else if (nicoData.communityId) {
+      info.commentType = "co" + nicoData.communityId;
     } else {
       info.commentType = "comment" + info.commentId;
     }
@@ -138,8 +140,14 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
   /* Find the Video parameter on the page */
   var regexMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*)\}\;\s+(-->)?\s?<\/script>/);
   if (!regexMatch) {
-    /* XXX: Autologin removed, anti-flood. Display a message. */
-    Components.utils.reportError("NicoFox VideoReader down: Cannot fetch Video parameter. Maybe you are not logged in or the antiflood process is on.");
+    /* Two cases if Video is not present: (1) had User variable: error, anti-flood (2) has no User variable: not logged in */
+    var userMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var User = \{ id\: false/);
+    if (userMatch) {
+      Components.utils.reportError("NicoFox VideoReader down: Cannot fetch Video parameter. Antiflood is on, or the video had been deleted.");
+    } else {
+      /* XXX: Autologin */
+      Components.utils.reportError("NicoFox VideoReader down: User is not logged in.");
+    }
     return;
   }
   
