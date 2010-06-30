@@ -197,7 +197,7 @@ nicofox_ui.overlay = {
     else
     {
     }*/
-    Components.utils.import("resource://nicofox/download_manager.js", nicofoxOld);
+    Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofoxOld);
     nicofoxOld.nicofox.download_manager.add(Video, url);
     nicofox_ui.overlay.openBar(false);
     /*dlmanager.focus();*/

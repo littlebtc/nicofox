@@ -5,7 +5,7 @@ if (!nicofox) { nicofox = {}; }
 if (!nicofoxOld) { nicofoxOld = {}; }
 /* Import Download manager Javascript code modules */
 Components.utils.import('resource://nicofox/common.js', nicofoxOld);
-Components.utils.import('resource://nicofox/download_manager.js', nicofoxOld);
+Components.utils.import('resource://nicofox/DownloadManager.jsm', nicofoxOld);
 Components.utils.import("resource://nicofox/Core.jsm", nicofox);
 
 if (!nicofox_ui) {var nicofox_ui = {};}
