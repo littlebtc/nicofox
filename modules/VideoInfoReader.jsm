@@ -58,11 +58,7 @@ function writeCache(url, info) {
   /* If the timer is not running, make it running with a specific delay */
   if (!expirationTimer.callback) {
     var delay = Math.max(100, expirationDelay + cachedQueue[0].time - new Date().getTime());
-    expirationTimer.initWithCallback(
-      expirationTimerCallback,
-      delay,
-      Ci.nsITimer.TYPE_REPEATING_SLACK
-    );
+    expirationTimer.initWithCallback(expirationTimerCallback, delay, Ci.nsITimer.TYPE_REPEATING_SLACK);
   }
   Components.utils.reportError(JSON.stringify(cachedInfo));
   Components.utils.reportError(JSON.stringify(cachedQueue));
@@ -95,7 +91,7 @@ function writeCache(url, info) {
  *   "mymemory": My-memory comments.
  *   "comment123456789012": Others which is hard to distinguish.
  */
-function parseVideoInfo(url, nicoData, otherData) {
+function parseVideoInfo(url, nicoData, otherData, callbackThisObj, callbackFuncName) {
   /* Put otherData into a info object */
   var info = otherData;
   info.nicoData = nicoData;
@@ -125,12 +121,17 @@ function parseVideoInfo(url, nicoData, otherData) {
   }
   /* Write the data into cache */
   writeCache(url, info);
+  
+  /* If there is callback, call the callback */
+  if (callbackThisObj && callbackFuncName) {
+    callbackThisObj[callbackFuncName].call(callbackThisObj, url, info);
+  }
 }
 
 /* Inner reader to make asynchorous request to the video page, and response after read */
-function innerFetcher(url) {
+function innerFetcher(url, callbackThisObj, callbackFuncName) {
   Components.utils.import("resource://nicofox/Network.jsm");
-  Network.fetchUrlAsync(url, this, 'readVideoPage', 'fetchError');
+  Network.fetchUrlAsync(url, this, "readVideoPage", "fetchError");
 }
 /* The responser to the video page. */
 innerFetcher.prototype.readVideoPage = function(url, content) {
@@ -154,7 +155,7 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
     return;
   }
   var otherData = {};
-  parseVideoInfo(url, nicoData, otherData);
+  parseVideoInfo(url, nicoData, otherData, callbackThisObj, callbackFuncName);
 };
 /* When fetchUrlAsync cannot read the page, throw an error. */
 innerFetcher.prototype.fetchError = function() {
@@ -178,6 +179,15 @@ VideoInfoReader.readFromNicoMonkey = function(url, nicoDataJSON, otherDataJSON) 
 };
 
 
-VideoInfoReader.readByUrl = function(url) {
-  var innerFetcherInstance = new innerFetcher(url);
+VideoInfoReader.readByUrl = function(url, callbackThisObj, callbackFuncName) {
+  if (!callbackThisObj || typeof callbackThisObj[callbackFuncName] != "function" ) {
+    throw new Error('Wrong parameter in readByUrl');
+    return;
+  }
+  if (cachedInfo[url]) {
+    /* If there is cache, use the cache */
+    callbackThisObj[callbackFuncName].call(callbackThisObj, url, cachedInfo[url]);
+  } else {
+    var innerFetcherInstance = new innerFetcher(url, callbackThisObj, callbackFuncName);
+  }
 };
