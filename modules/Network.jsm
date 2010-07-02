@@ -1,12 +1,12 @@
 /* vim: sw=2 ts=2 sts=2 et filetype=javascript
  * Network related helpers
  */
-var EXPORTED_SYMBOLS = ['Network'];
+var EXPORTED_SYMBOLS = [ "Network" ];
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-var Network = {}
+let Network = {}
 
 /* Asynchrously fetch content of one URL */
 Network.fetchUrlAsync = function(url, thisObj, successCallback, failCallback) {
@@ -14,7 +14,7 @@ Network.fetchUrlAsync = function(url, thisObj, successCallback, failCallback) {
   Components.utils.import("resource://nicofox/Services.jsm");
   Components.utils.import("resource://gre/modules/NetUtil.jsm");
   
-  if (!thisObj || typeof thisObj[successCallback] != 'function' || typeof thisObj[failCallback] != 'function') {
+  if (!thisObj || typeof thisObj[successCallback] != "function" || typeof thisObj[failCallback] != "function") {
     throw new Error('Wrong parameter in fetchUrlAsync');
     return;
   }

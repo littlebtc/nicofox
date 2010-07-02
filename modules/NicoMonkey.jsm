@@ -392,7 +392,7 @@ nicoMonkeyAdditions.writeVideoInfo = function(url, nicoDataJSON, otherDataJSON) 
     return;
   }
   Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-  VideoInfoReader.readViaNicoMonkey(url, nicoDataJSON, otherDataJSON);
+  VideoInfoReader.readFromNicoMonkey(url, nicoDataJSON, otherDataJSON);
 };
 ///////////////////////////////////////////////////////////// End of NicoMonkey specific
 
