@@ -19,12 +19,12 @@ NicoWatcher.prototype = {
   contractID: CONTRACT_ID,
   _xpcom_categories: [
     { category: "content-policy" },
-    { category: "app-startup", service: true }
   ],
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIContentPolicy, Ci.nsIObserver, Ci.nsIWeakReference]),
   _nicowaBlocker: null,
   /* Implements nsIContentPolicy */
   shouldLoad: function(contentType, contentLocation, requestOrigin, requestingNode, mimeTypeGuess, extra) {
+    if (this._nicowaBlocker === null) { this._initPref(); }
     if (contentType == Ci.nsIContentPolicy.TYPE_DOCUMENT) {
       var url = contentLocation.spec;
       /* Simplify the filter code to make it faster (don't check Nicovideo URL here) */
@@ -54,23 +54,9 @@ NicoWatcher.prototype = {
   },
   /* Implements nsIObserver */
   observe: function(subject, topic, data) {
-    /* In app-startup, profiles are unavailable */
-    if (topic == "app-startup") {
-      var obs = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-      obs.addObserver(this, "final-ui-startup", false);
-      obs.addObserver(this, "quit-application", false);
-      return;
-    }
     /* In Startup or pref changed, cache the value of nicowa_blocker (avoid pref access in shouldLoad) */
     Components.utils.import("resource://nicofox/Core.jsm");
     switch(topic) {
-      case "final-ui-startup":
-      var obs = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-      obs.removeObserver(this, "final-ui-startup");
-      Core.prefs.addObserver("nicowa_blocker", this, false);
-      this._nicowaBlocker = Core.prefs.getBoolPref("nicowa_blocker");
-      break;
-      
       case "nsPref:changed":
       this._nicowaBlocker = Core.prefs.getBoolPref("nicowa_blocker");
       break;
@@ -81,9 +67,18 @@ NicoWatcher.prototype = {
       Core.prefs.removeObserver("nicowa_blocker", this);
       break;
     }
+  },
+  _initPref: function() {
+    Components.utils.import("resource://nicofox/Core.jsm");
+    Components.utils.import("resource://nicofox/Services.jsm");
+    Services.obs.addObserver(this, "quit-application", false);
+    Core.prefs.addObserver("nicowa_blocker", this, false);
+    this._nicowaBlocker = Core.prefs.getBoolPref("nicowa_blocker");
   }
 }
 
-function NSGetModule(compMgr, fileSpec) {
-  return XPCOMUtils.generateModule([NicoWatcher]);
+if (XPCOMUtils.generateNSGetFactory) {
+  var NSGetFactory = XPCOMUtils.generateNSGetFactory([NicoWatcher]);
+} else {
+  var NSGetModule = XPCOMUtils.generateNSGetModule([NicoWatcher]);
 }
