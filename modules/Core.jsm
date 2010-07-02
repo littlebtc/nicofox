@@ -1,6 +1,7 @@
 /* vim: sw=2 ts=2 sts=2 et filetype=javascript 
-*/
-/* Save the preferences and strings, core elements of NicoFox */
+ *
+ * Save the preferences and strings and other core elements of NicoFox
+ */
 var EXPORTED_SYMBOLS = ['Core'];
 
 const Cc = Components.classes;
@@ -32,3 +33,4 @@ Core.prefs = Services.prefs.getBranch("extensions.nicofox.")
 /* Use the generator to create strings helper */
 Core.strings = new stringsHelperGenerator("chrome://nicofox/locale/nicofox.properties");
 Core.monkeyStrings = new stringsHelperGenerator("chrome://nicofox/locale/nicomonkey.properties");
+
