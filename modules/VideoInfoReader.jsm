@@ -2,7 +2,7 @@
  *
  * Read, parse and cache video info from Nico Nico Douga from two ways:
  * (1) Manually read it via AJAX request during the download process
- * (2) Automatically read it when page finishing loading (which still contains some security concern)
+ * (2) Automatically read it when page loaded via NicoMonkey (data sandboxed by JSON API)
  *
  */
 
@@ -13,9 +13,9 @@ var EXPORTED_SYMBOLS = [ "VideoInfoReader" ];
 
 let VideoInfoReader = {};
 
-/* Store info in a simple cache queue after reading,
+/* Store info in a cache queue with expiration after reading,
  * to decrease the total number of request to the Nico Nico Douga website. 
- * This is private and cannot be read from out of the module.
+ * This is private and should not be read from out of the module.
  * - cachedVideoInfos is an object that stores URL-info mapping in hash.
  * - cachedQueue is a queue, used for expiring the cache.
  */
@@ -163,6 +163,7 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
     return;
   }
   var otherData = {};
+  /* Parse the data and store the video info */
   parseVideoInfo(url, nicoData, otherData, callbackThisObj, callbackFuncName);
 };
 /* When fetchUrlAsync cannot read the page, throw an error. */
@@ -172,7 +173,7 @@ innerFetcher.prototype.fetchError = function() {
 
 /* Public Methods. */
 
-/* Parse JSON into object and read the video info */
+/* Called when NicoMonkey had read the data on a loaded web page and sent it as JSON string */
 VideoInfoReader.readFromNicoMonkey = function(url, nicoDataJSON, otherDataJSON) {
   var nicoData = {};
   var otherData = {};
@@ -183,10 +184,11 @@ VideoInfoReader.readFromNicoMonkey = function(url, nicoDataJSON, otherDataJSON) 
     Components.utils.reportError("NicoFox VideoReader down: Cannot read video data from video page via NicoMonkey");
     return;
   }
+  /* Parse the data and store the video info */
   parseVideoInfo(url, nicoData, otherData);
 };
 
-
+/* Called by Download Manager, to request video info for a specific URL */
 VideoInfoReader.readByUrl = function(url, callbackThisObj, callbackFuncName) {
   if (!callbackThisObj || typeof callbackThisObj[callbackFuncName] != "function" ) {
     throw new Error('Wrong parameter in readByUrl');
