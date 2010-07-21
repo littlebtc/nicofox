@@ -23,13 +23,9 @@ nicofox_ui.overlay = {
      Components.utils.import("resource://nicofox/urlparser.js", nicofoxOld);
      /* Test if we are in supported website and change the "Download" button */
      if (aURI && nicofoxOld.nicofox.parser.prototype.supported_sites.nico.test(aURI.spec)) {
-       document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
-       nicofox_ui.overlay.openBar(true);
+       //document.getElementById('smilefox-toolbar-download').setAttribute('disabled', false);
      } else {
-       document.getElementById('smilefox-toolbar-download').setAttribute('disabled', true);
-       if (aURI && aURI.spec.match(/^http:\/\/(www|tw|es|de)\.nicovideo\.jp\//)) {
-         nicofox_ui.overlay.openBar(true);
-       }
+       //document.getElementById('smilefox-toolbar-download').setAttribute('disabled', true);
      }
      return 0;
     },
@@ -43,17 +39,12 @@ nicofox_ui.overlay = {
    /* initialization code */
    nicofox_ui.overlay.initialized = true;
 
-   /* Cancel some function for non-firefox */
-   /* XXX: Untested */
-   if (!Ci.nsINavBookmarksService) {
-     nicofox.Core.prefs.setBoolPref('nicomonkey.supertag', false);
-     nicofox.Core.prefs.setBoolPref('nicomonkey.superlist', false);
-   }
-
    /* Listen pages */
    gBrowser.addProgressListener(nicofox_ui.overlay.page_listener,
    Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
-
+   
+   /* Register panel initializer */
+   document.getElementById("nicofox-library").addEventListener("popupshowing", function() { nicofox.panel.onPopupShowing(); }, false);
   },
   onUnload: function() {
     window.removeEventListener("load", nicofox_ui.overlay.onLoad, false);
@@ -62,24 +53,11 @@ nicofox_ui.overlay = {
     Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
   },
   onMenuItemCommand: function(e) {
-    nicofox_ui.overlay.collapseBar();
+  //  nicofox_ui.overlay.collapseBar();
+ document.getElementById('nicofox-library').hidden = false; document.getElementById('nicofox-library').openPopup(document.getElementById("nicofox-icon"), 'before_end', 0, 0, false, false);
   },
   openBar: function(auto_triggered) {
-    /* Auto triggered and not dismissed */
-    if (auto_triggered
-    && nicofox.Core.prefs.getBoolPref("bar_autoopen")
-    && ! this.bar_opened)
-    {
-      document.getElementById('nicofox-splitter').collapsed = false;
-      document.getElementById('smilefox-space').collapsed = false;
-      document.getElementById('smilefox-entry').setAttribute('checked', 'true');
-      this.bar_opened = true;
-    } else if (!auto_triggered) {
-      document.getElementById('nicofox-splitter').collapsed = false;
-      document.getElementById('smilefox-space').collapsed = false;
-      document.getElementById('smilefox-entry').setAttribute('checked', 'true');
-      this.bar_opened = true;
-    }
+    // nicofox.Core.prefs.getBoolPref("bar_autoopen")
   },
   goDownload: function(url, dont_confirm) {
     /* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
@@ -106,21 +84,6 @@ nicofox_ui.overlay = {
     var urlparser = new nicofoxOld.nicofox.parser();
     urlparser.return_to = nicofoxOld.nicofox.hitch(nicofox_ui.overlay, 'confirmDownload', url, dont_confirm);
     urlparser.goParse(url);
-  },
-  /* Nicovideo only: Nicomonkey -> DL check */
-  goDownloadFromVideoPage: function(Video, url) {
-    /* Though for nsILocalFile, it is not a right way to access the preference, but it DID work! */
-    var value = nicofox.Core.prefs.getComplexValue("save_path",Ci.nsISupportsString).data;
-    if (!value) {
-      var file_picker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-      file_picker.init(window, nicofox.Core.strings.getString('errorPathNotDefined'), Ci.nsIFilePicker.modeGetFolder);
-      if (file_picker.show() == Ci.nsIFilePicker.returnOK) {
-        nicofox.Core.prefs.setComplexValue('save_path', Ci.nsILocalFile, file_picker.file);
-      } else {
-        return;
-      }
-    }
-    this.confirmDownload(Video, url, true);
   },
   openOptions: function() {
       /* instantApply needs dialog = no */
@@ -184,19 +147,6 @@ nicofox_ui.overlay = {
        if (!params.out) { return; }
     }
 
-    /* Send the add request to download manager */
-/*    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                          .getService(Components.interfaces.nsIWindowMediator);
-    var dlmanager = wm.getMostRecentWindow("smilefox:dlmanager");
-
-    if(!dlmanager)
-    {
-      var dlmanager = window.openDialog("chrome://nicofox/content/smilefox.xul",
-                    "smilefox", "dialog=no,chrome,centerscreen,resizable=yes,width=770,height=450", {Video: Video, url: url});
-    }
-    else
-    {
-    }*/
     Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofoxOld);
     nicofoxOld.nicofox.download_manager.add(Video, url);
     nicofox_ui.overlay.openBar(false);
@@ -205,13 +155,7 @@ nicofox_ui.overlay = {
   },
   collapseBar: function()
   {
-    document.getElementById('nicofox-splitter').collapsed = !document.getElementById('nicofox-splitter').collapsed;
-    document.getElementById('smilefox-space').collapsed = !document.getElementById('smilefox-space').collapsed;
-    if (document.getElementById('smilefox-space').collapsed) {
-      document.getElementById('smilefox-entry').removeAttribute('checked');
-    } else {
-      document.getElementById('smilefox-entry').setAttribute('checked', 'true');
-    }
+    /**/
   },
   checkFile: function(path, filename) {
     if (

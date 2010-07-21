@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://nicofox/skin/smilefox.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://nicofox/locale/smilefox.dtd">
+<overlay id="smilefox-overlay" 
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <stringbundleset id="stringbundleset"></stringbundleset>
+  <keyset id="smilefox-keyset"></keyset>
+  <vbox id="smilefox-main" width="450" height="450">
+  <hbox>
+    <label value="&window.title;" />
+    <label value="Options" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
+  </hbox>
+  <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
+  <richlistbox id="smilefoxList" style="height: 400px;" context="smilefoxPopup"
+               onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox.panel.commands.open(this.selectedItem); }"
+               onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"
+  >
+  </richlistbox>
+  <vbox id="smilefoxNotMigrated" align="center" pack="center" height="100"
+        hidden="true">
+    <label value="Before using the NicoFox download manager," />
+    <label value="You need to configure the download folder first." class="text-link" />
+  </vbox>
+  <popupset id="smilefoxPopupset">
+    <menupopup id="smilefoxPopup" onpopupshowing="return nicofox.panel.generateContextMenu(event);" onpopuphiding="">
+      <menuitem label="&popup.missing.label;" accesskey="" id="smilefoxPopupMissing" disabled="true" />
+      <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="smilefoxPopupCancel" />
+      <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="smilefoxPopupRetry" />
+      <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="smilefoxPopupOpen" default="true" 
+                oncommand= "nicofox.panel.commands.open(document.getElementById('smilefoxList').selectedItem);"/>
+      <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="smilefoxPopupOpenExternal" oncommand="nicofox_ui.manager.popup_command.openExternal()" />
+      <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.openFolder();" id="smilefoxPopupOpenFolder"/>
+      <menuitem label="&popup.moveFolder.label;"  accesskey="&popup.moveFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="smilefoxPopupMoveFolder"/>
+      <menuseparator id="smilefoxPopupSeparator1" />
+      <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="smilefoxPopupGo" oncommand="nicofox_ui.manager.popup_command.go();" />
+      <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="smilefoxPopupCopy" oncommand="nicofox_ui.manager.popup_command.copy();" />
+     <menuseparator  id="smilefoxPopupSeparator2"/>
+     <menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="smilefoxPopupSelectAll" oncommand="nicofox_ui.manager.popup_command.selectAll();" />
+      <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="smilefoxPopupRemove" oncommand="nicofox_ui.manager.popup_command.remove();"/>
+    </menupopup>
+  </popupset>
+</vbox>
+</overlay>
+

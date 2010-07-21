@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
-<?xul-overlay href="chrome://nicofox/content/smilefox_overlay.xul" type="text/css"?>
+<?xul-overlay href="chrome://nicofox/content/smilefoxPanel.xul" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://nicofox/locale/nicofox.dtd">
 
 <overlay id="nicofox-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
+  <script type="application/x-javascript" src="chrome://nicofox/content/smilefoxPanel.js"/>
   <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/script-compiler.js" />
   <stringbundleset id="stringbundleset">
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
@@ -16,18 +17,20 @@
              oncommand="nicofox_ui.overlay.onMenuItemCommand(event);"
    position="2" />
   </menupopup>
-
- <statusbar id="status-bar">
-<hbox id="nicofox-panel-container">
-<panel id="nicofox-library" hidden="true"
-oautofocus="true" level="top" stlye="display: none;">
-  <vbox id="smilefox-main" height="300">
-  </vbox>
-  </panel>
+  
+  <statusbar id="status-bar">
+  <hbox id="nicofox-panel-container">
+    <panel id="nicofox-library" hidden="true" noautofocus="true" level="top" stlye="display: none;">
+      <vbox id="smilefox-main" height="400">
+      </vbox>
+    </panel>
+<!--    <panel id="smilefox-download-confirm" hidden="true" noautohide="true" level="top" stlye="display: none;">
+      <vbox height="150" width="300">
+        <label value="!" />
+      </vbox>
+    </panel>-->
 </hbox>
    <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png" label="" oncommand="event.stopPropagation();  document.getElementById('nicofox-library').hidden = false; document.getElementById('nicofox-library').openPopup(this, 'before_end', 0, 0, false, false);"/> 
-<hbox id="nicofox-panels">
-</hbox>
  </statusbar>
  <vbox id="appcontent">
  <splitter id="nicofox-splitter" collapsed="true" />
