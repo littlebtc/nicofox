@@ -1,35 +1,11 @@
-treechildren::-moz-tree-progressmeter
-{
+/* Referenced from: toolkit/themes/pinstripe/mozapps/downloads/downloads.css */
+richlistitem[type="smilefox"] {
+  overflow-x: hidden;
+  padding: 3px;
 }
-#smilefox-toolbar-start
-{
-list-style-image: url("chrome://nicofox/skin/resultset_next.png");
+richlistitem[type="smilefox"]:not([selected="true"]):nth-child(odd) {
+  background-color: -moz-oddtreerow;
 }
-#smilefox-toolbar-stop
-{
-list-style-image: url("chrome://nicofox/skin/stop.png");
+label[sfstatus="2"], label[sfstatus="3"] {
+  color: GrayText;
 }
-#smilefox-toolbar-download
-{
-list-style-image: url("chrome://nicofox/skin/film_save.png");
-}
-#smilefox-toolbar-open
-{
-list-style-image: url("chrome://nicofox/skin/folder_page_white.png");
-}
-#smilefox-toolbar-option
-{
-list-style-image: url("chrome://nicofox/skin/wrench.png");
-}
-#smilefox-toolbar-close
-{
-list-style-image: url("chrome://nicofox/skin/close.png");
--moz-image-region: rect(0px, 16px, 16px, 0px);
-}
-
-#smilefox-toolbar-close:hover
-{
-list-style-image: url("chrome://nicofox/skin/close.png");
--moz-image-region: rect(0px, 32px, 16px, 16px);
-}
-
