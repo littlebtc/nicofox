@@ -1,65 +1,92 @@
-var Cc = Components.classes;
-var Ci = Components.interfaces;
+/* vim: sw=2 ts=2 sts=2 et filetype=javascript
+ *
+ * Manages video downloads, including scheduler for higher-qualiy videos and (some) amount control
+ *
+ * The status for downloads:
+ *  0: Queued
+ *  1: Completed
+ *  2: Canceled
+ *  3: Failed
+ *  
+ */
 
-var EXPORTED_SYMBOLS = ['nicofox'];
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+
+var EXPORTED_SYMBOLS = [ "nicofox", "DownloadManager" ];
+
+let DownloadManager = {};
+/* Store private objects of the download manager */
+let DownloadManagerPrivate = {};
+
 if (!nicofox) { var nicofox = {}; }
 Components.utils.import('resource://nicofox/download_helper.js');
 Components.utils.import('resource://nicofox/common.js');
-Components.utils.import("resource://nicofox/Services.jsm"); 
+Components.utils.import("resource://nicofox/Services.jsm");
+Components.utils.import("resource://nicofox/Core.jsm");
 
-var unloading = false;
+/* Is the download manager currently up? */
+var working = false;
 
-/* Watch download max modification */
-var prefs = nicofox.prefs; /* FIXME: Is there another way? */
-prefs.QueryInterface(Ci.nsIPrefBranch2);
+/* Number of videos downloading */
+var activeDownloadCount = 0;
+var waiting_count = 0;
+var downloadMax = Core.prefs.getIntPref("download_max");
 
-var prefObserver = 
-{
+/* Are we in private browsing mode? */
+var inPrivate = false;
+
+/* Observe the maxium number of downloads allowed in pref, change it after changed */
+var prefObserver = {
   observe: function(subject, topic, data) {
-    if (topic == 'nsPref:changed' && data == 'download_max') {
-      download_max = prefs.getIntPref('download_max');
+    if (topic == "nsPref:changed" && data == "download_max") {
+      downloadMax = Core.prefs.getIntPref("download_max");
     }
   },
   register: function() {
-    prefs.addObserver('', this, false);
+    Core.prefs.addObserver("download_max", this, false);
   },
   unregister: function() {
-    prefs.removeObserver('', this, false);
+    Core.prefs.removeObserver("download_max", this, false);
   },
 };
 
 /* Make a observer to check the private mode (for Fx 3.1b2+) and the quitting of the browser */
-nicofox.download_observer = {
-  quit_confirmed: false,
+var downloadObserver = {
   observe: function(subject, topic, data) {
-
-    if (topic == 'quit-application-requested')
-    {
-      if (download_count > 0)
-      {
-        if (!Services.prompt.confirm(null, nicofox.strings.getString('closeSmileFoxTitle'), nicofox.strings.getString('closeSmileFoxMsg'))){
-            subject.QueryInterface(Ci.nsISupportsPRBool);
-            subject.data = true;
-            return;
+    switch(topic) {
+      case "quit-application-requested":
+      if (activeDownloadCount > 0) {
+        if (!Services.prompt.confirm(null, 
+                                     Core.strings.getString('closeSmileFoxTitle'),
+                                     Core.strings.getString('closeSmileFoxMsg'))){
+          subject.QueryInterface(Ci.nsISupportsPRBool);
+          subject.data = true;
+          return;
         }
        this.unregisterReq();
-      }   
-    } else if (topic == 'quit-application')
-    {
-       unloading = true;
-       download_runner.cancelAll();
-       this.unregisterGra();
-       prefObserver.unregister();
-    } else if (topic == 'private-browsing') {
-      if (data == 'enter') {
-        smilefox_sqlite.inPrivate = true;
-      } else if (data == 'exit') {
-        unloading = true;
-        download_runner.cancelAll();
-        smilefox_sqlite.inPrivate = false;
-	smilefox_sqlite.cleanPrivate();
-        triggerDownloadListeners('rebuild', null, null); 
       }
+      break;
+      
+      case "quit-application":
+      working = false;
+      download_runner.cancelAll();
+      this.unregisterGra();
+      prefObserver.unregister();
+      break;
+      
+      case "private-browsing":
+      if (data == 'enter') {
+        inPrivate = true;
+      } else if (data == 'exit') {
+        working = false;
+        download_runner.cancelAll();
+        inPrivate = false;
+      	smilefox_sqlite.cleanPrivate();
+        triggerDownloadListeners('rebuild', null, null); 
+        working = true;
+      }
+      break;
     }
   },
   register: function() {
@@ -75,35 +102,33 @@ nicofox.download_observer = {
     Services.obs.removeObserver(this, "private-browsing", false);
   }
 }
-prefObserver.register();
-nicofox.download_observer.register();
 
-var download_listeners = [];
 
-/* A download listener for all application that need to know the download status */
-nicofox.download_listener = 
-{
-  addListener: function(listener) {
-    download_listeners.push(listener);
-  },
-  removeListener: function(listener) {
-    download_listeners.splice(download_listeners.indexOf(listener), 1);
-  },
-}
+/* Space to store all download listeners */
+var downloadListeners = [];
 
 /* A function to call all of the listeners */
 function triggerDownloadListeners(listener_event, id, content)
 {
   var i;
   if ((typeof listener_event) != 'string') {return false;}
-  for (i = 0; i < download_listeners.length; i++)
+  for (i = 0; i < downloadListeners.length; i++)
   { 
-    if ((typeof download_listeners[i][listener_event]) == 'function')
-    { download_listeners[i][listener_event].call(download_listeners[i], id, content); }
+    if ((typeof downloadListeners[i][listener_event]) == 'function')
+    { downloadListeners[i][listener_event].call(downloadListeners[i], id, content); }
   }
 }
 
+/* Database Schemas */
+var dbSchemaString = '("id" INTEGER PRIMARY KEY  NOT NULL  , "url" VARCHAR , "video_id" VARCHAR , "comment_id" VARCHAR , "comment_type" VARCHAR , "video_title" VARCHAR , "description" TEXT, "tags" VARCHAR, "video_type" VARCHAR , "video_economy" VARCHAR , "video_file" VARCHAR , "comment_file" VARCHAR , "uploader_comment_file" VARCHAR, "thumbnail_file" VARCHAR, "current_bytes" INTEGER , "max_bytes" INTEGER , "start_time" INTEGER , "end_time" INTEGER , "add_time" INTEGER , "info" TEXT, "status" INTEGER, "in_private" INTEGER )';
 
+var dbFieldsString = "'id', 'url', 'video_id', 'comment_id', 'comment_type', 'video_title', 'description', 'tags', 'video_type', 'video_economy', 'video_file', 'comment_file', 'uploader_comment_file', 'thumbnail_file', 'current_bytes', 'max_bytes', 'start_time', 'end_time', 'add_time', 'info', 'status', 'in_private'";
+
+var dbFields =  ['id', 'url', 'video_id', 'comment_id', 'comment_type', 'video_title', 'description', 'tags', 'video_type', 'video_economy', 'video_file', 'comment_file', 'uploader_comment_file', 'thumbnail_file', 'current_bytes', 'max_bytes', 'start_time', 'end_time', 'add_time', 'info', 'status', 'in_private'];
+
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
 var smilefox_sqlite = {
   /* Cache the SQLite Result */
   rows_cache: [],
@@ -113,7 +138,7 @@ var smilefox_sqlite = {
   /* Is the database clear (first-run clean up)? */
   clearStatus: false,
   /* Are we at private browsing mode? */
-  inPrivate: false,
+  //inPrivate: false,
   /* Record field names (will be convient for Async fetch) */
   fields: ['id', 'url', 'video_id', 'comment_id', 'comment_type', 'video_title', 'description', 'tags', 'video_type', 'video_economy', 'video_file', 'comment_file', 'uploader_comment_file', 'thumbnail_file', 'current_bytes', 'max_bytes', 'start_time', 'end_time', 'add_time', 'info', 'status', 'in_private'],
   load: function() {
@@ -121,7 +146,7 @@ var smilefox_sqlite = {
     try {  
       var privateSvc = Components.classes["@mozilla.org/privatebrowsing;1"]  
                                  .getService(Components.interfaces.nsIPrivateBrowsingService);  
-      this.inPrivate = privateSvc.privateBrowsingEnabled;  
+      inPrivate = privateSvc.privateBrowsingEnabled;  
     } catch(ex) {
       /* Exception called from Fx 3.1b2- should be ignored */
     }  
@@ -134,14 +159,14 @@ var smilefox_sqlite = {
       this.db_connect = Services.storage.openDatabase(file);
       this.createTable();
 
-      prefs.setBoolPref('first_run', false);
-      prefs.setBoolPref('first_run_0.3', false);
+      Core.prefs.setBoolPref('first_run', false);
+      Core.prefs.setBoolPref('first_run_0.3', false);
     } else {
       /* Otherwise we will open the database */
       this.db_connect = Services.storage.openDatabase(file);
 
       /* Check and update the database as needed */
-      if (prefs.getBoolPref('first_run') || prefs.getBoolPref('first_run_0.3')) {
+      if (Core.prefs.getBoolPref('first_run') || Core.prefs.getBoolPref('first_run_0.3')) {
         this.checkUpgrade();
       }
     }
@@ -155,81 +180,6 @@ var smilefox_sqlite = {
     statement.execute();
     this.purgeCache();
     
-  },
-  /* 0.1 Database Upgrade check */
-  checkUpgrade: function() {
-    Components.utils.reportError('CheckUpgrade!');
-    if (!this.db_connect) {return;}
-    /* Read fields infos */
-    var statement = this.db_connect.createStatement("PRAGMA table_info (smilefox)");
-    statement.execute();
-    var rows = this.fetchArray(statement);
-    statement.reset();
-    var columns = [];
-    for (i = 0; i < rows.length; i++) {
-      columns.push(rows[i].name);
-    }
-    /* If the upgrade is needed ... */
-    if (columns.indexOf('uploader_comment_file') == -1) {
-      Components.utils.reportError('DB Upgrade!');
-
-      /* Get everything we want */
-      var rows = this.select();
-
-      /* Backup DB (may be failed!) */
-      var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
-      file.append("smilefox.sqlite");
-      try {
-        file.copyTo(null, 'smilefox-upgrade0.3-backup'+Date.parse(new Date())+'.sqlite');
-      } catch (e) {
-        Services.prompt.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorBackup'));
-	return;
-      }
-      /* BOOM! */
-      var statement = this.db_connect.createStatement("DROP TABLE smilefox");
-      statement.execute();
-      statement.reset();
-
-      /* Re-create the table */
-      this.createTable();
-
-      /* Now rewrite... */
-      for (var i = 0; i < rows.length; i++) {
-        /* Mark-as-failed check */
-        if (rows[i].status > 4) {
-	  rows[i].status = 2;
-	}
-	/* SQL String >"< */
-        var sql = 'INSERT INTO smilefox (`url`, `video_id`, `comment_id`, `comment_type`, `video_title`, '
-	+'`video_type`, `video_economy`, `video_file`, `comment_file`, `current_bytes`, '
-	+'`max_bytes`, `start_time`, `end_time`, `add_time`, `status`, `in_private`)'
-	+'VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)';
-	var statement = this.db_connect.createStatement(sql);
-	statement.bindUTF8StringParameter(0, rows[i].url);
-        statement.bindUTF8StringParameter(1, rows[i].video_id);
-        statement.bindUTF8StringParameter(2, rows[i].comment_id);
-        statement.bindUTF8StringParameter(3, rows[i].comment_type);
-        statement.bindUTF8StringParameter(4, rows[i].video_title);
-        statement.bindUTF8StringParameter(5, rows[i].video_type);
-        statement.bindUTF8StringParameter(6, rows[i].video_economy);
-        statement.bindUTF8StringParameter(7, rows[i].video_file);
-        statement.bindUTF8StringParameter(8, rows[i].comment_file);
-        statement.bindUTF8StringParameter(9, rows[i].current_bytes);
-        statement.bindUTF8StringParameter(10, rows[i].max_bytes);
-        statement.bindUTF8StringParameter(11, rows[i].start_time);
-        statement.bindUTF8StringParameter(12, rows[i].end_time);
-        statement.bindUTF8StringParameter(13, rows[i].add_time);
-        statement.bindInt32Parameter(14, rows[i].status);
-	/* Inprivate must be 0 */
-        statement.bindInt32Parameter(15, 0);
-
-	statement.execute();
-	statement.reset();
-      }
-    }
-    this.purgeCache();
-    prefs.setBoolPref('first_run', false);
-    prefs.setBoolPref('first_run_0.3', false);
   },
   /* Table creation */
   cleanPrivate: function() {
@@ -246,11 +196,9 @@ var smilefox_sqlite = {
     var i = 0;
     var rows = new Array();
 
-    while (statement.executeStep())
-    {
+    while (statement.executeStep()) {
       rows[i] = new Object();
-      for (var j = 0; j < statement.columnCount; j++)
-      {
+      for (var j = 0; j < statement.columnCount; j++) {
         var name = statement.getColumnName(j);
         var value = null;
         switch(statement.getTypeOfIndex(j))
@@ -259,13 +207,11 @@ var smilefox_sqlite = {
           value = null;
           break;
           case 1: // VALUE_TYPE_INTEGER 
-          if (name == 'start_time')
-          {
+          if (name == 'start_time') {
             /* getInt64 implementation has a bug */
             value = statement.getUTF8String(j).valueOf();
           }
-          else
-          {
+          else {
             value = statement.getInt32(j);
           }
           break;
@@ -387,13 +333,10 @@ var smilefox_sqlite = {
     statement.reset();
     return rows[0];
   },
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
   add: function (Video, url) {
-    /* Change parasitestage url
-       XXX: Dirty
-       Commented out until we actully support parasitestage */
-    /* if (url.indexOf('http://www.parasitestage.net/') == 0) {
-       url = url.replace(/^http:\/\/www\./, 'http://');
-    } */
     var statement = this.db_connect.createStatement("INSERT INTO smilefox (url, video_id, comment_id, comment_type, video_title, add_time, status, in_private) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)");
     statement.bindUTF8StringParameter(0, url);
     statement.bindUTF8StringParameter(1, Video.id);
@@ -408,7 +351,7 @@ var smilefox_sqlite = {
     var add_time = now_date.getTime();
     statement.bindInt32Parameter(5, add_time);
     statement.bindInt32Parameter(6, 0);
-    statement.bindInt32Parameter(7, (this.inPrivate)?1:0);
+    statement.bindInt32Parameter(7, (inPrivate)?1:0);
 
     statement.execute();
     statement.reset();
@@ -428,7 +371,7 @@ var smilefox_sqlite = {
       if(!id || isNaN(id)) { return false; }
       var stmt = this.db_connect.createStatement("UPDATE `smilefox` SET `status` = ?1, `in_private` = ?2 WHERE `id` = ?3");
       stmt.bindInt32Parameter(0, stat);
-      stmt.bindInt32Parameter(1, (this.inPrivate)?1:0);
+      stmt.bindInt32Parameter(1, (inPrivate)?1:0);
       stmt.bindInt32Parameter(2, id);
       stmt.execute();
       stmt.reset();
@@ -552,6 +495,262 @@ var smilefox_sqlite = {
     }
   },
 }
+/* Statement Storage */
+var storedStatements = { /* ... */ };
+
+/* Generate a mozIStorageStatementCallback implementation.
+ * @param callerName       Function name using the callback. Used in error log message.
+ * @param thisObj          this object for the callback
+ * @param successCallback  Name of callback function in thisObj, called if the statement finished successfully
+ * @param failCallback     Name of callback function in thisObj, called if the statement failed.
+ * @param selectFields     Array, if assigned, it will generate handleResult() implementation, read fields assigned in this array.
+ * If there is more parameter present, they will be appended into successCallback.
+ */
+function generateStatementCallback(callerName, thisObj, successCallback, failCallback, selectFields) {
+  /* Prepare a callback storage */
+  var callback = {};
+  /* Implement handleResult if needed */
+  if (selectFields && Object.prototype.toString.call(selectFields) === "[object Array]") {
+    if (selectFields.length > 0) {
+      callback.resultArray = [];
+      callback.handleResult = function(aResultSet) {
+        for (var row = aResultSet.getNextRow(); row ; row = aResultSet.getNextRow()) {
+	        var rowObj = new Object();
+          for (var i = 0; i < selectFields.length; i++) {
+            rowObj[selectFields[i]] = row.getResultByName(selectFields[i]); 
+          }
+          this.resultArray.push(rowObj);
+        }
+      };
+    }
+  }
+  callback.handleError =  function(aError) {
+    Components.utils.error("NicoFox DownloadManager Down: Error during SQLite Queries on " + callerName + ":" + aError.message);
+    thisObj[failCallback].call(thisObj);
+  };
+  callback.handleCompletion = function(aReason) { 
+    /* Check for completion reason */
+    if (aReason != Ci.mozIStorageStatementCallback.REASON_FINISHED) {
+      Components.utils.error("NicoFox DownloadManager Down: Error during SQLite Queries on " + callerName + ", Reason:" + aReason);
+      return;
+    }
+    /* Append extra parameters */
+    var argsArray = [this.resultArray];
+    if (arguments.length > 5) {
+      argsArray.push(arguments.splice(5, arguments.length - 5));
+    }
+    /* Call the callback */
+    thisObj[successCallback].apply(thisObj, argsArray);
+  };
+  return callback;  
+}
+
+/* Private */
+
+/* Store mozIStorageConnection of the download manager database */
+DownloadManagerPrivate.dbConnection = null;
+
+/* Create Download Manager Table if not exists */
+DownloadManagerPrivate.createTable =  function() {
+  var statement = this.dbConnection.createStatement("CREATE TABLE IF NOT EXISTS smilefox" + dbSchemaString);
+  var callback = generateStatementCallback("createTable", this, "finishStartup", "failStartup")
+  statement.executeAsync(callback);
+}
+/* Check the database schema, if the schema is the old (0.1) one, call DownloadManagerPrivate.executeUpgrde. */
+DownloadManagerPrivate.checkUpgrade = function() {
+  /* Read fields infos */
+  var statement = this.dbConnection.createStatement("PRAGMA table_info (smilefox)");
+  var callback = generateStatementCallback("checkUpgrade", this, "executeUpgrade", "failStartup", [name])
+  statement.executeAsync(callback);
+};
+
+/* Run the upgrade after the schema check */
+DownloadManagerPrivate.executeUpgrade = function(resultArray) {
+  /* Check if we need to upgrade db */
+  var needUpgrade = true;
+  for (var i = 0; i < resultArray.length; i++) {
+    if (resultArray[i].name == "uploader_comment_file") {
+      needUpgrade = false;
+    }
+  }
+  if (!needUpgrade) {
+    Components.utils.reportError("No Upgrade Required!");
+    DownloadManagerPrivate.finishStartup();
+    return;
+  }
+  Components.utils.reportError("Need Upgrade!");
+  /* Backup DB (may be failed!) */
+  var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
+  file.append("smilefox.sqlite");
+  try {
+    file.copyTo(null, "smilefox-upgrade0.6-backup" + Date.parse(new Date()) + ".sqlite");
+  } catch (e) {
+    /* Do not block upgrade */
+    Components.utils.error("Unable to backup database from NicoFox 0.1.");
+  }
+  /* Use the way in http://www.sqlite.org/faq.html#q11 to regenerate table.
+     executeAsync() with multiple statement will create a transaction, so no need to do this manually. */
+  var statements = [];
+  /* Step 1: add new column and clean up */
+  statements.push(this.dbConnection.createStatement("UPDATE smilefox SET `status` = 2 WHERE `status` > 4")); /* Cleanup */
+  statements.push(this.dbConnection.createStatement("ALTER TABLE smilefox ADD COLUMN `description` TEXT"));
+  statements.push(this.dbConnection.createStatement("ALTER TABLE smilefox ADD COLUMN `tags` VARCHAR"));
+  statements.push(this.dbConnection.createStatement("ALTER TABLE smilefox ADD COLUMN `uploader_comment_file` VARCHAR"));
+  statements.push(this.dbConnection.createStatement("ALTER TABLE smilefox ADD COLUMN `thumbnail_file` VARCHAR"));
+  statements.push(this.dbConnection.createStatement("ALTER TABLE smilefox ADD COLUMN `info` TEXT"));
+  statements.push(this.dbConnection.createStatement("ALTER TABLE smilefox ADD COLUMN `in_private` INTEGER DEFAULT 0"));
+  /* Step 2: remove one column */
+  statements.push(this.dbConnection.createStatement(
+  'CREATE TEMPORARY TABLE smilefox_upgrade' + dbSchemaString + ";\n" +
+  "INSERT INTO smilefox_upgrade SELECT " + dbFieldsString + " FROM smilefox;\n" +
+  "DROP TABLE smilefox;\n" +
+  "CREATE TABLE smilefox" + dbSchemaString + ";\n" +
+  "INSERT INTO smilefox SELECT " + dbFieldsString + " FROM smilefox_upgrade;\n" + 
+  "DROP TABLE smilefox_upgrade;"));
+ 
+  var callback = generateStatementCallback("executeUpgrade", this, "finishStartup", "failStartup")
+  this.dbConnection.executeAsync(statements, statements.length, callback);
+};
+/* Clean the table status: (1) Private browsing remaining items (2) Halt downloading items */
+DownloadManagerPrivate.cleanUp = function() {
+  var statements = [];
+  statements.push(this.dbConnection.createStatement("DELETE FROM `smilefox` WHERE `in_private` = 1"));
+  statements.push(this.dbConnection.createStatement("UPDATE `smilefox` SET `status` = 3 WHERE `status` > 4"));
+  var callback = generateStatementCallback("executeUpgrade", this, "finishStartup", "failStartup")
+  this.dbConnection.executeAsync(statements, statements.length, callback);
+}
+/* Run after creation/clean up/upgrade */
+DownloadManagerPrivate.finishStartup = function() {
+  Core.prefs.setBoolPref('first_run', false);
+  Core.prefs.setBoolPref('first_run_0.3', false); 
+  working = true;
+};
+/* Handle failed startup */
+DownloadManagerPrivate.failStartup = function() {
+};
+
+/* Public */
+
+/* Startup script (this should be loaded on profile-after-changed event?) */
+DownloadManager.startup = function() {
+  /* Load the observer */
+  prefObserver.register();
+  downloadObserver.register();
+  
+  /* Private Browsing checking XXX: 1.9.1b2- compatibility */
+  var privateSvc = Cc["@mozilla.org/privatebrowsing;1"].getService(Ci.nsIPrivateBrowsingService);
+  inPrivate = privateSvc.privateBrowsingEnabled;  
+    
+  var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
+  file.append("smilefox.sqlite");
+
+  DownloadManagerPrivate.dbConnection = Services.storage.openDatabase(file);
+  if (!file.exists()) {
+    /* Add the smilefox database/ table if it is not established */
+    DownloadManagerPrivate.createTable();
+
+    Core.prefs.setBoolPref('first_run', false);
+    Core.prefs.setBoolPref('first_run_0.3', false);
+  } else {
+    /* Check and update the database as needed */
+    if (Core.prefs.getBoolPref('first_run') || Core.prefs.getBoolPref('first_run_0.3')) {
+      DownloadManagerPrivate.checkUpgrade();
+    } else {
+      DownloadManagerPrivate.cleanUp();
+    }
+  }
+}
+
+/* Asynchorouslly get all items in the download manager */
+DownloadManager.getDownloads = function(thisObj, successCallback, failCallback) {
+  if (!working) {
+    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
+    thisObj[failCallback].call(thisObj);
+    return;
+  }
+  /* Use stored statment if exists, or createa a new one.
+   * executeAsync will reset the statement, so no need to reset. */
+  if (!storedStatements.getDownloads) {
+    storedStatements.getDownloads = DownloadManagerPrivate.dbConnection.createStatement("SELECT * FROM `smilefox` ORDER BY `id` DESC");
+  }
+  var callback = generateStatementCallback("getDownloads", thisObj, successCallback, failCallback, dbFields);
+  storedStatements.getDownloads.executeAsync(callback);
+};
+
+DownloadManager.getDownload = function(id, thisObj, successCallback, failCallback) {
+  if (!working) {
+    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
+    thisObj[failCallback].call(thisObj);
+    return;
+  }
+  /* Use stored statment if exists, or create a new one.
+   * executeAsync will reset the statement, so no need to reset. */
+  if (!storedStatements.getDownload) {
+    storedStatements.getDownload = DownloadManagerPrivate.dbConnection.createStatement("SELECT * FROM `smilefox` WHERE `id` = :id");
+  }
+  storedStatements.getDownload.params.id = id;
+  var callback = generateStatementCallback("getDownload", thisObj, successCallback, failCallback, dbFields);
+  storedStatements.getDownload.executeAsync(callback);
+
+};
+
+/* Add a download entry to be proceed by download manager.
+ * Note that video info will be read AFTER the entry was added.
+ */
+DownloadManager.addDownload = function(url) {
+  if (!working) {
+    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
+    thisObj[failCallback].call(thisObj);
+    return;
+  }
+  /* Use stored statment if exists, or create a new one. */
+  if (!storedStatements.addDownload) {
+    storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
+  }
+  /* Beware: reset(); won't clear any params. Make sure to reset all params! */
+  var params = {};
+  params.url = url;
+  params.video_title = url.slice(url.lastIndexOf("/") + 1);
+  params.add_time = new Date().getTime();
+  /* If no preload is required, set the status to -1 (info pending).
+     Otherwise, set it to 0 (queued). */
+  if (Core.prefs.getBoolPref("preload_info_before_download")) {
+    params.status = -1;
+  } else {
+    params.status = 0;
+  }
+  params.in_private = (inPrivate)?1:0;
+  for (var key in params) {
+    storedStatements.addDownload.params[key] = params[key];
+  }
+  /* lastInsertRowID is not reliable in asynchorous execution, so do it synchrously */
+  storedStatements.addDownload.execute();
+  storedStatements.addDownload.reset();
+  var lastInsertRowID = DownloadManagerPrivate.dbConnection.lastInsertRowID;
+//  params.id = lastInsertRowId;
+  triggerDownloadListeners('add', lastInsertRowID, params);
+};
+
+DownloadManager.addListener = function(listener) {
+ downloadListeners.push(listener);
+};
+DownloadManager.removeListener = function(listener) {
+  downloadListeners.splice(downloadListeners.indexOf(listener), 1);
+};
+
+/* Readonly */
+DownloadManager.__defineGetter__("working", function() {
+  return working;
+}
+);
+DownloadManager.__defineGetter__("activeDownloadCount", function() {
+  return activeDownloadCount;
+}
+);
+DownloadManager.__defineGetter__("DBConnection", function() {
+  return DownloadManagerPrivate.dbConnection;
+}
+);
 
 /* 
    Providing communication between download manager interface and core
@@ -584,7 +783,7 @@ nicofox.download_manager =
      Components.utils.reportError('[nicofox] Error occured in getDownloadsAsync SQLite queries');
    },
    getDownloadCount: function() {
-     return download_count;
+     return activeDownloadCount;
 
    },
    getWaitingCount: function() {
@@ -627,10 +826,6 @@ nicofox.download_manager =
    }
 }
 
-var download_count = 0;
-var waiting_count = 0;
-var download_max = prefs.getIntPref('download_max');
-
 /* A internal download scheduler */
 var download_runner =
 {
@@ -646,7 +841,7 @@ var download_runner =
     this.stopped = false;
   },
   prepare: function() {
-    if (unloading || this.stopped)
+    if (!working || this.stopped)
     { return; }
     /* Re-select so we can purge our content */
     nicofox.download_manager.getDownloadsAsync(nicofox.hitch(download_runner, 'prepareCallback'));//smilefox_sqlite.select();
@@ -661,14 +856,14 @@ var download_runner =
       if (downloads[i].status == 0 || (downloads[i].status == 4 && !this.inEconomy))
       {
         waiting_count++;
-        if (download_count >= download_max) {
+        if (activeDownloadCount >= downloadMax) {
           i--;
           continue;
         }
 	waiting_count--;
         /* Now download begins */
 	this.download_triggered++;
-        download_count++;
+        activeDownloadCount++;
         smilefox_sqlite.updateStatus(downloads[i].id, 5);
         triggerDownloadListeners('update', downloads[i].id, {status: 5});
         new_query = {id: downloads[i].id};
@@ -693,7 +888,7 @@ var download_runner =
             /* Economy mode is on and user do not like it */
             case 'economy_break':
             var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-            download_count--;
+            activeDownloadCount--;
             this.downloader.removeFiles();
 
             var info = smilefox_sqlite.updateScheduled(id);
@@ -740,7 +935,7 @@ var download_runner =
             if (this.downloader.current_bytes != this.downloader.max_bytes) {
               this.downloader.removeFiles();
               this.downloader.fail();
-              Services.prompt.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorIncomplete'));
+              Services.prompt.alert(null, Core.strings.getString('errorTitle'), Core.strings.getString('errorIncomplete'));
               return;
             }
             smilefox_sqlite.updateBytes(id, {current_bytes: this.downloader.current_bytes, max_bytes: this.downloader.max_bytes});
@@ -752,7 +947,7 @@ var download_runner =
             /* If the download observer says we fail */
             this.downloader.removeFiles();
             this.downloader.fail();
-            Services.prompt.alert(null, nicofox.strings.getString('errorTitle'), nicofox.strings.getString('errorIncomplete'));
+            Services.prompt.alert(null, Core.strings.getString('errorTitle'), Core.strings.getString('errorIncomplete'));
             break;
 
             case 'completed':
@@ -761,7 +956,7 @@ var download_runner =
             this.downloader.movie_file.moveTo(null, this.downloader.file_title+'.'+this.downloader.type);
 
             var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-            download_count--;
+            activeDownloadCount--;
 
             var info = smilefox_sqlite.updateComplete(id);
             triggerDownloadListeners('update', id, info);
@@ -770,7 +965,7 @@ var download_runner =
 
             case 'fail':
             var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-            download_count--;
+            activeDownloadCount--;
             this.downloader.removeFiles();
 
             var info = smilefox_sqlite.updateStopped(id, 3);
@@ -781,7 +976,7 @@ var download_runner =
 
             case 'fail2': /* Do not remove files */
             var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-            download_count--;
+            activeDownloadCount--;
 
             var info = smilefox_sqlite.updateStopped(id, 3);
             triggerDownloadListeners('update', id, info);
@@ -791,7 +986,7 @@ var download_runner =
              
             case 'cancel':
             var removed_query = download_runner.query.splice(download_runner.query.indexOf(this), 1);
-            download_count--;
+            activeDownloadCount--;
 
             var info = smilefox_sqlite.updateStopped(id, 2);
             triggerDownloadListeners('update', id, info);
@@ -816,7 +1011,7 @@ var download_runner =
 
         this.query[k].downloader.callback = nicofox.hitch(this.query[k], 'processCallback', downloads[i].id); // query.length will be next query id
         /* FIXME: Check the filename scheme! */
-        var file_title = prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
+        var file_title = Core.prefs.getComplexValue('filename_scheme', Ci.nsISupportsString).data;
         file_title = file_title.replace(/\%TITLE\%/, nicofox.fixReservedCharacters(downloads[i].video_title));
         file_title = file_title.replace(/\%ID\%/, nicofox.fixReservedCharacters(downloads[i].video_id));
                     /* Add comment filename */
@@ -839,17 +1034,17 @@ var download_runner =
       i--;
     }
     /* When all done, display it */
-    if (download_count == 0) {
+    if (activeDownloadCount == 0) {
       if (!this.stopped && (this.download_triggered - this.download_canceled) > 0) {
         allDone();
       }
       if (download_runner.hitEconomy) {
         /* Economy is on, so something is not downloaded */
-        if (prefs.getBoolPref('economy_notice')) {
+        if (Core.prefs.getBoolPref('economy_notice')) {
           var check = {value: false};
-          Services.prompt.alertCheck(null, nicofox.strings.getString('economyNoticeTitle'), nicofox.strings.getString('economyNoticeMessage'), nicofox.strings.getString('economyNoticeNeverAsk') , check);
+          Services.prompt.alertCheck(null, Core.strings.getString('economyNoticeTitle'), Core.strings.getString('economyNoticeMessage'), Core.strings.getString('economyNoticeNeverAsk') , check);
 	  if (check.value) {
-            prefs.setBoolPref('economy_notice', false);
+            Core.prefs.setBoolPref('economy_notice', false);
 	  }
 	}
         download_runner.hitEconomy = false;
@@ -920,7 +1115,7 @@ function allDone() {
   var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]
                        .getService(Components.interfaces.nsIAlertsService);
   alerts_service.showAlertNotification("chrome://nicofox/skin/logo.png", 
-                                    nicofox.strings.getString('alertCompleteTitle'), nicofox.strings.getString('alertCompleteText'), 
+                                    Core.strings.getString('alertCompleteTitle'), Core.strings.getString('alertCompleteText'), 
                                     false, "", null);
 
 }
