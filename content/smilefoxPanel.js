@@ -283,4 +283,4 @@ nicofox.panel.getFileInstance = function(path) {
 nicofox.panel.unload = function() {
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);
 }
-window.addEventListener("unload", function() { nicofox.panel.unload(); })
+window.addEventListener("unload", function() { nicofox.panel.unload(); }, false);
