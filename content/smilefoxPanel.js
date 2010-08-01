@@ -73,11 +73,18 @@ nicofox.panel.responseThumbnailCheck = function(resultArray) {
 
 /* Do when user agreed to use the thumbnail download function... */
 nicofox.panel.enableThumbnail = function() {
-  //nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
+  nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
   document.getElementById("smilefoxThumbNotice").hidden = true;
   document.getElementById("smilefoxThumbProgress").hidden = false;
   /* Ask download manager to fetch thumbnails */
   nicofox.DownloadManager.fetchThumbnails();
+};
+/* When user don't want to download thumbnail... */
+nicofox.panel.disableThumbnail = function() {
+  nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
+  nicofox.Core.prefs.setBoolPref("download_thumbnail", false);
+  document.getElementById("smilefoxThumbNotice").hidden = true;
+  document.getElementById("smilefoxThumbProgress").hidden = false;
 };
 
 /* Display all downloaded item after the asynchorous request. */
@@ -234,8 +241,8 @@ nicofox.panel.listener.thumbnailFetcherProgress = function(id, content) {
 
 };
 nicofox.panel.listener.thumbnailAvailable = function(id, content) {
-  var image = document.getElementById("smileFoxListItem" + id).querySelector("image");
-  image.setAttribute("src", content);
+  var listItem = document.getElementById("smileFoxListItem" + id);
+  listItem.setAttribute("thumbnail", content);
 };
 
 nicofox.panel.listener.downloadAdded = function(id, content) {
