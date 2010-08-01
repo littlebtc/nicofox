@@ -224,6 +224,7 @@ thumbnailFetcher.start = function(resultArray) {
 thumbnailFetcher.processItem = function() {
   this.runningItem = this.undoneItems.shift();
   Components.utils.import("resource://nicofox/DownloadUtils.jsm");
+  Components.utils.reportError("Process " + this.runningItem.id);
   /* Check if the video files exists */
   var videoFilePath = this.runningItem.video_file;
   var videoFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
@@ -247,6 +248,7 @@ thumbnailFetcher.processItem = function() {
 };
 /* Write data into database */
 thumbnailFetcher.writeDb = function() {
+  Components.utils.reportError("Running " + this.runningItem.id);
   triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
   var statement = this.statementModel.clone();
   statement.params.thumbnail_file = this.runningItem.thumbnail_file;
@@ -257,6 +259,7 @@ thumbnailFetcher.writeDb = function() {
 
 /* After database written, update progress, schedule for next process */
 thumbnailFetcher.finishWrite = function() {
+  Components.utils.reportError("Done " + this.runningItem.id);
   triggerDownloadListeners('thumbnailFetcherProgress', null, this.itemCount - this.undoneItems.length);
   if (this.undoneItems.length == 0) { 
     allDone(); // XXX

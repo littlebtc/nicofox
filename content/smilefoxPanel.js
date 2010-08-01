@@ -84,7 +84,6 @@ nicofox.panel.disableThumbnail = function() {
   nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
   nicofox.Core.prefs.setBoolPref("download_thumbnail", false);
   document.getElementById("smilefoxThumbNotice").hidden = true;
-  document.getElementById("smilefoxThumbProgress").hidden = false;
 };
 
 /* Display all downloaded item after the asynchorous request. */
@@ -288,6 +287,7 @@ nicofox.panel.getFileInstance = function(path) {
   return file;
 }
 nicofox.panel.unload = function() {
+  Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);
 }
 window.addEventListener("unload", function() { nicofox.panel.unload(); }, false);
