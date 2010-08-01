@@ -32,9 +32,14 @@ NicoWatcher.prototype = {
         var winWat = Cc["@mozilla.org/embedcomp/window-watcher;1"].getService(Ci.nsIWindowWatcher);
         if (winWat.activeWindow && winWat.activeWindow.nicofox_ui && winWat.activeWindow.nicofox_ui.overlay) {
           /* We have no setTimeout(), so... */
-          var timer_event = { notify: function () {winWat.activeWindow.nicofox_ui.overlay.goDownload(url);} }
+          var timerEvent = {
+            notify: function () {
+              Components.utils.import("resource://nicofox/DownloadManager.jsm");
+              DownloadManager.addDownload(url.substring(0, url.indexOf("?")));
+            } 
+          }
           var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-          timer.initWithCallback(timer_event, 10, Ci.nsITimer.TYPE_ONE_SHOT);
+          timer.initWithCallback(timerEvent, 10, Ci.nsITimer.TYPE_ONE_SHOT);
         }
         
         return Ci.nsIContentPolicy.REJECT_REQUEST;
