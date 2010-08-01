@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!-- Binding for Download Manager items -->
+<bindings xmlns="http://www.mozilla.org/xbl"
+          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+          xmlns:xbl="http://www.mozilla.org/xbl">
+  <binding id="smilefox-download-queued" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:hbox flex="1">      
+        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:vbox flex="1">
+          <xul:label xbl:inherits="value=sfvideotitle" flex="1" />
+          <xul:label xbl:inherits="value=sftextstatus" flex="1" />
+        </xul:vbox>
+      </xul:hbox>
+    </content>
+  </binding>
+  <binding id="smilefox-download-completed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:hbox flex="1">      
+        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:vbox flex="1">
+          <xul:label xbl:inherits="value=sfvideotitle" flex="1" />
+          <xul:label xbl:inherits="value=sftextstatus" flex="1" />
+        </xul:vbox>
+      </xul:hbox>
+    </content>
+  </binding>
+  <binding id="smilefox-download-canceled" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:hbox flex="1">      
+        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:vbox flex="1">
+          <xul:label xbl:inherits="value=sfvideotitle" flex="1" class="smilefoxInactiveItem" />
+          <xul:label value="Failed" flex="1" class="smilefoxInactiveItem"/>
+        </xul:vbox>
+      </xul:hbox>
+    </content>
+  </binding>
+  <binding id="smilefox-download-failed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:hbox flex="1">      
+        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:vbox flex="1">
+          <xul:label xbl:inherits="value=sfvideotitle" flex="1" class="smilefoxInactiveItem" />
+          <xul:label value="Canceled" flex="1" class="smilefoxInactiveItem"/>
+        </xul:vbox>
+      </xul:hbox>
+    </content>
+  </binding>
+  <binding id="smilefox-download-scheduled" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:hbox flex="1">      
+        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:vbox flex="1">
+          <xul:label xbl:inherits="value=sfvideotitle" flex="1" />
+          <xul:hbox flex="1">
+            <xul:label xbl:inherits="value=sftextstatus" flex="1" />
+            <xul:label value="Scheduled" flex="1"/>
+          </xul:hbox>
+        </xul:vbox>
+      </xul:hbox>
+    </content>
+  </binding>
+  <binding id="smilefox-download-downloading" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:hbox flex="1">      
+        <xul:image class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:vbox flex="1">
+          <xul:label xbl:inherits="value=sfvideotitle" flex="1" />
+          <xul:hbox flex="1">
+            <xul:progressmeter xbl:inherits="mode=progresstype,value=currentbytes,max=maxbytes" flex="1" />
+          </xul:hbox>
+        </xul:vbox>
+      </xul:hbox>
+    </content>
+  </binding>
+</bindings>
+

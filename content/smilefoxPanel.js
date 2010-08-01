@@ -4,6 +4,11 @@
 Components.utils.import("resource://nicofox/Services.jsm", nicofox);
 nicofox.panel = {};
 
+/* Cached active download's DOM instance */
+nicofox.panel.activeDownloadInstances = {
+
+};
+
 /* The panel should be loaded only when the first time of popupshowing event. This boolean will record this. */
 nicofox.panel.loaded = false;
 
@@ -27,8 +32,7 @@ nicofox.panel.load = function() {
     window.setTimeout(function() { nicofox.panel.waitForDb(12) } , 10);
     return;
   }
-  Components.utils.reportError(new Date().getTime());
-  nicofox.DownloadManager.getDownloads(this, "displayDownloads", "dbFail");
+  this.init();
 };
 
 /* Wait DB for 60 sec timeout, check the status per 5 seconds */
@@ -36,7 +40,7 @@ nicofox.panel.waitForDb = function(waitCount) {
   /* XXX: How about UI? */
   if (nicofox.DownloadManager.working) {
     Components.utils.reportError("!");
-    nicofox.DownloadManager.getDownloads(this, "displayDownloads", "dbFail");
+    this.init();
     return;
   }
   waitCount--;
@@ -45,6 +49,35 @@ nicofox.panel.waitForDb = function(waitCount) {
   } else {
     window.setTimeout(function() { nicofox.panel.waitForDb(waitCount) } , 5000);
   }
+};
+/* Initialize after we know the manager is working. */
+nicofox.panel.init = function() {
+  /* Listen to download events. */
+  nicofox.DownloadManager.addListener(this.listener);
+  
+  /* Get all download items. */
+  nicofox.DownloadManager.getDownloads(this, "displayDownloads", "dbFail");
+  
+  /* Check whether to prompt user to download thumbnail */ 
+  if (!nicofox.Core.prefs.getBoolPref("thumbnail_check") && nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
+    nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
+  }
+};
+/* If there is not thumbnail file data stored in database, prompt user to download for all old records. */
+nicofox.panel.responseThumbnailCheck = function(resultArray) {
+  if (resultArray[0].count == 0) {
+    document.getElementById("smilefoxThumbNotice").hidden = false;
+  } else {
+  }
+};
+
+/* Do when user agreed to use the thumbnail download function... */
+nicofox.panel.enableThumbnail = function() {
+  //nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
+  document.getElementById("smilefoxThumbNotice").hidden = true;
+  document.getElementById("smilefoxThumbProgress").hidden = false;
+  /* Ask download manager to fetch thumbnails */
+  nicofox.DownloadManager.fetchThumbnails();
 };
 
 /* Display all downloaded item after the asynchorous request. */
@@ -61,66 +94,39 @@ nicofox.panel.displayDownloads = function(resultArray) {
 
 /* Update the <listitem> when new download were added or the status had changed. */
 nicofox.panel.updateDownloadItem = function(listItem, result) {
-  /* Build items under <listitem> for the first time */
-  if (!listItem.hasChildNodes()) {
-  }
   listItem.setAttribute("type", "smilefox");
-  listItem.setAttribute("sfid", result.id);
-  listItem.setAttribute("sfurl", result.url);
-  listItem.setAttribute("sfvideotitle", result.video_title);
+  if (result.thumbnail_file) {
+    var thumbFile = nicofox.panel.getFileInstance(result.thumbnail_file);
+    var thumbUrl = nicofox.Services.io.newFileURI(thumbFile).spec;
+    listItem.setAttribute("thumbnail", thumbUrl);
+  }
+  if (result.id) {
+    listItem.setAttribute("sfid", result.id);
+    listItem.setAttribute("id", "smileFoxListItem" + result.id);
+  }
+  if (result.url) {
+    listItem.setAttribute("sfurl", result.url);
+  }
+  if (result.video_title) {
+    listItem.setAttribute("sfvideotitle", result.video_title);
+  }
   if (result.video_economy == 1) {
     listItem.setAttribute("sfeconomy", result.video_economy);
+    listItem.setAttribute("sftextstatus", "Low Quality");
   }
+  if (result.video_file) {
     listItem.setAttribute("sfvideofile", result.video_file);
+  }
   if (result.comment_file) {
     listItem.setAttribute("sfcommentfile", result.comment_file);
   }
-  listItem.setAttribute("sfuploadercommentfile", result.uploader_commment_file);
-  listItem.setAttribute("sfstatus", result.status);
-  var imageLabel = document.createElement("image");
-  imageLabel.style.backgroundColor = "black";
-  imageLabel.setAttribute("width", "64");
-  imageLabel.setAttribute("height", "48");
-    
-  var vbox1 = document.createElement("vbox");
-  vbox1.setAttribute("flex", "1");
-    
-  var hbox1 = document.createElement("hbox");
-  hbox1.setAttribute("flex", "1");
-  var titleLabel = document.createElement("label");
-  titleLabel.setAttribute("value", result.video_title);
-  titleLabel.setAttribute("sfstatus", result.status);
-  titleLabel.className = "smilefoxVideoTitle";
-  hbox1.appendChild(titleLabel);
-  vbox1.appendChild(hbox1);
-    
-  var hbox2 = document.createElement("hbox");
-  hbox2.setAttribute("flex", "1");
-  /* Display progress bar when video info is not retrived */
-  if (result.status == 0 && !result.video_id) {
-    var progress = document.createElement("progressmeter");
-    progress.setAttribute("mode", "undetermined");
-    progress.setAttribute("flex", "1");
-    hbox2.appendChild(progress);
+  if (result.uploader_comment_file) {
+    listItem.setAttribute("sfuploadercommentfile", result.uploader_commment_file);
   }
-  if (result.status > 1) {
-    var statusLabel = document.createElement("label");
-    var statusLabels = ["progressWaiting", "progressCompleted", "progressCanceled", "progressFailed", "progressLoading", "progressCommentDownloading", "progressVideoDownloading"];
-    statusLabel.setAttribute("value", nicofox.Core.strings.getString(statusLabels[result.status]));
-    statusLabel.setAttribute("sfstatus", result.status);
-    statusLabel.className = "smilefoxStatus"
-    hbox2.appendChild(statusLabel);
+  /* Avoid 0 to be considered as false */
+  if (typeof result.status == "number") {
+    listItem.setAttribute("sfstatus", result.status);
   }
-  if (result.video_economy == 1) {
-    var qualityLabel = document.createElement("label");
-    qualityLabel.setAttribute("value", "Low Quality");
-    qualityLabel.className = "smilefoxQuality";
-    hbox2.appendChild(qualityLabel);
-  }
-  vbox1.appendChild(hbox2);
-    
-  listItem.appendChild(imageLabel);
-  listItem.appendChild(vbox1);
 };
 
 nicofox.panel.dbFail = function() {
@@ -134,7 +140,7 @@ nicofox.panel.displayContextMenuItems = [
 [ "Open", "OpenExternal", "OpenFolder", "MoveFolder", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 1 Completed */ 
 [ "Retry", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 2 Canceled */ 
 [ "Retry", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 3 Failed */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 4 Downloading */ 
+[ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 4 Scheduled */ 
 [ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 5 Downloading */ 
 [ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 6 Downloading */ 
 [ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 7 Downloading */ 
@@ -211,6 +217,61 @@ nicofox.panel.openOptionsWindow = function() {
     features += ",modal";
   }
   window.openDialog(optionsURL, "", features);
+  /* In some OS (linux for example), the panel will not be autohide :( */
+  document.getElementById("nicofox-library").hidden = true;
+};
+
+/* A download listener to DownloadManager */
+nicofox.panel.listener = {
+
+};
+nicofox.panel.listener.thumbnailFetcherCount = function(id, content) {
+  document.getElementById("smilefoxThumbProgressMeter").setAttribute("max", content);
+  document.getElementById("smilefoxThumbProgressMeter").setAttribute("value", 0);
+};
+nicofox.panel.listener.thumbnailFetcherProgress = function(id, content) {
+  document.getElementById("smilefoxThumbProgressMeter").setAttribute("value", content);
+
+};
+nicofox.panel.listener.thumbnailAvailable = function(id, content) {
+  var image = document.getElementById("smileFoxListItem" + id).querySelector("image");
+  image.setAttribute("src", content);
+};
+
+nicofox.panel.listener.downloadAdded = function(id, content) {
+  Components.utils.reportError("Panel: download added!" + id + JSON.stringify(content));
+  var list = document.getElementById("smilefoxList");
+  var listItem = document.createElement("richlistitem");
+  nicofox.panel.updateDownloadItem(listItem, content);
+  listItem.setAttribute("progresstype", "undetermined");
+  list.insertBefore(listItem, list.firstChild);
+};
+nicofox.panel.listener.downloadUpdated = function(id, content) {
+  Components.utils.reportError("Panel: download updated!" + id + JSON.stringify(content));
+  var listItem = document.getElementById("smileFoxListItem"+ id);
+  nicofox.panel.updateDownloadItem(listItem, content);
+  /* If the status is "downloading", update the progress type */
+  if (content.status == 7) {
+    listItem.setAttribute("progresstype", "undetermined");
+  }
+};
+nicofox.panel.listener.downloadProgressUpdated = function(id, content) {
+  var listItem = document.getElementById("smileFoxListItem"+ id);
+  if (!listItem) { return; }
+  listItem.setAttribute("progresstype", "determined");
+  listItem.setAttribute("currentbytes", content.currentBytes);
+  listItem.setAttribute("maxbytes", content.maxBytes);
+};
+nicofox.panel.listener.downloadVideoCompleted = function(id, content) {
+  var listItem = document.getElementById("smileFoxListItem"+ id);
+  if (!listItem) { return; }
+  listItem.setAttribute("progresstype", "undetermined");
+};
+nicofox.panel.listener.downloadRemoved = function(id) {
+  var list = document.getElementById("smilefoxList");
+  var listItem = document.getElementById("smileFoxListItem"+ id);
+  if (!listItem) { return; }
+  list.removeChild(listItem);
 };
 
 /* Helper: Get a nsILocalFile instance from a path */
@@ -219,3 +280,7 @@ nicofox.panel.getFileInstance = function(path) {
   file.initWithPath(path);
   return file;
 }
+nicofox.panel.unload = function() {
+  nicofox.DownloadManager.removeListener(nicofox.panel.listener);
+}
+window.addEventListener("unload", function() { nicofox.panel.unload(); })
