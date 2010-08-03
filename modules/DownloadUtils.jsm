@@ -197,6 +197,7 @@ DownloadUtils.nico.prototype = {
     Components.utils.import("resource://nicofox/FileBundle.jsm");
     this._fileBundle = new FileBundle.nico(info);
     if (this._fileBundle.occupied()) {
+      Services.prompt.alert(null, Core.strings.getString("errorTitle"), Core.strings.getString("errorFileExisted"));
       this.callback.call(this, "fail", {});
     }
     /* Is there any uploader's comment? */
@@ -233,7 +234,7 @@ DownloadUtils.nico.prototype = {
     this._getFlvParams = decodeQueryString(responseText);
     /* :( for channel videos, we need to get the thread key */
     if (this._getFlvParams.needs_key) {
-      Network.fetchUrlAsync("http://flapi.nicovideo.jp/api/getthreadkey?thread="+ this.commentId, null, this, "parseThreadKey", "failParse");
+      Network.fetchUrlAsync("http://flapi.nicovideo.jp/api/getthreadkey?thread="+ this._getFlvParams.thread_id, null, this, "parseThreadKey", "failParse");
     } else {
       this.prepareDownload();
     }
@@ -391,13 +392,16 @@ DownloadUtils.nico.prototype = {
       return;
     }
     /* Fill the query string per thread key needed or not needed case */
-    if (this._getFlvParams.needs_key) {
-      var commentQueryString = '<packet>'+
-      '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.optional_thread_id+'"/>'+
-      '<thread force_184="'+this._getThreadKeyParams.force_184+'" threadkey="'+this._getThreadKeyParams._threadKey+'" click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>'+
-      '</packet>';
+    if (this._getFlvParams.needs_key && this._info.nicoData.channelId) {
+      var commentQueryString = 
+      '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20090904" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'"/><thread_leaves thread="'+ this._getFlvParams.thread_id +'" user_id="'+this._getFlvParams.user_id+'"  threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'">0-'+ Math.ceil(this._info.nicoData.length / 60) +':100</thread_leaves></packet>';
       var uploaderCommentQueryString =
-      '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.optional_thread_id+'"/>';
+      '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
+    } else if (this._getFlvParams.needs_key) {
+      var commentQueryString = 
+      '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20061206" res_from="-1000" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams._threadKey+'" force_184="'+this._getThreadKeyParams.force_184+'"></packet>';
+      var uploaderCommentQueryString =
+      '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     } else {
       var commentQueryString = '<packet>'+
       '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>'+

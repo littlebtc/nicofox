@@ -18,7 +18,7 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-var EXPORTED_SYMBOLS = [ "nicofox", "DownloadManager" ];
+var EXPORTED_SYMBOLS = [ "DownloadManager" ];
 
 let DownloadManager = {};
 /* Store private objects of the download manager */
@@ -367,12 +367,21 @@ DownloadManagerPrivate.exitPrivateBrowsing = function() {
   statement.reset();
 };
 
+/* After receiving record for the download that needs to retry, call downloadQueueRunner to run it. */
+DownloadManagerPrivate.afterRetryDownloadRead = function(resultArray) {
+  var item = resultArray[0];
+  /* Only allow retrying to failed or canceled item. */
+  if (item.status != 2 && item.status != 3) { return; }
+  downloadQueue.push(item);
+  downloadQueueRunner.process();
+};
+
 /* Handle failed startup */
 DownloadManagerPrivate.failStartup = function() {
   
 };
 /* Handle failed statement operation */
-DownloadManagerPrivate.failDbOperation = function() {
+DownloadManagerPrivate.dbFail = function() {
 };
 
 /* Update download item with given parameters
@@ -396,7 +405,7 @@ DownloadManagerPrivate.updateDownload = function(id, params) {
     statement.params[key] = params[key];
   }
   statement.params.id = id;
-  var callback = generateStatementCallback("DownloadManagerPrivate.updateDownload", this, "notifyUpdatedDownload", "failDbOperation", null, id, params);
+  var callback = generateStatementCallback("DownloadManagerPrivate.updateDownload", this, "notifyUpdatedDownload", "dbFail", null, id, params);
   statement.executeAsync(callback);
 };
 
@@ -434,11 +443,11 @@ DownloadManager.startup = function() {
     /* Add the smilefox database/ table if it is not established */
     DownloadManagerPrivate.createTable();
 
-    Core.prefs.setBoolPref('first_run', false);
-    Core.prefs.setBoolPref('first_run_0.3', false);
+    Core.prefs.setBoolPref("first_run", false);
+    Core.prefs.setBoolPref("first_run_0.3", false);
   } else {
     /* Check and update the database as needed */
-    if (Core.prefs.getBoolPref('first_run') || Core.prefs.getBoolPref('first_run_0.3')) {
+    if (Core.prefs.getBoolPref("first_run") || Core.prefs.getBoolPref("first_run_0.3")) {
       DownloadManagerPrivate.checkUpgrade();
     } else {
       DownloadManagerPrivate.cleanUp();
@@ -481,7 +490,7 @@ DownloadManager.getDownloads = function(thisObj, successCallback, failCallback) 
   var callback = generateStatementCallback("getDownloads", thisObj, successCallback, failCallback, dbFields);
   storedStatements.getDownloads.executeAsync(callback);
 };
-
+/* Get single download. XXX: Why return array instead of object? */
 DownloadManager.getDownload = function(id, thisObj, successCallback, failCallback) {
   if (!working) {
     Components.utils.reportError("DownloadManager is not working. This should not be happened.");
@@ -539,6 +548,17 @@ DownloadManager.addDownload = function(url) {
   downloadQueueRunner.process();
 };
 
+/* If the download is running, cancel the download. */
+DownloadManager.cancelDownload = function(id) {
+  if (activeDownloads[id] && activeDownloads[id].downloader) {
+    activeDownloads[id].downloader.cancel();
+  }
+};
+/* Retry download: Read video download first, then call DownloadManagerPrivate. */
+DownloadManager.retryDownload = function(id) {
+  DownloadManager.getDownload(id, DownloadManagerPrivate, "afterRetryDownloadRead", "dbFail");
+};
+
 /* Remove download item for given ID. 
  * Result should be handled by listener. XXX: but how about error handling?
  */
@@ -551,10 +571,11 @@ DownloadManager.removeDownload = function(id) {
   /* Use stored statment if exists, or create a new one.
    * executeAsync will reset the statement, so no need to reset. */
   if (!storedStatements.removeDownload) {
-    storedStatements.removeDownload = DownloadManagerPrivate.dbConnection.createStatement("DELETE FROM `smilefox` WHERE `id` = :id");
+    /* To be sure we will not remove item in progress. */
+    storedStatements.removeDownload = DownloadManagerPrivate.dbConnection.createStatement("DELETE FROM `smilefox` WHERE `id` = :id AND `status` NOT IN (5,6,7)");
   }
   storedStatements.removeDownload.params.id = id;
-  var callback = generateStatementCallback("removeDownload", this, "notifyRemovedDownload", "failDbOperation", null, id);
+  var callback = generateStatementCallback("removeDownload", DownloadManagerPrivate, "notifyRemovedDownload", "dbFail", null, id);
   storedStatements.removeDownload.executeAsync(callback);
 };
 
@@ -586,10 +607,6 @@ nicofox.download_manager = {
    moveFile: function(id, video_file, comment_file) {
      var info = smilefox_sqlite.updatePath(id, {video_file: video_file, comment_file: comment_file});
      triggerDownloadListeners('update', id, info);
-   },
-   cancel: function(id)
-   {
-     download_runner.cancel(id);
    },
    cancelAll: function()
    {
@@ -636,6 +653,26 @@ downloadQueueRunner.prepareQueue = function(resultArray) {
   downloadQueue = resultArray;
 };
 
+/* When economy timer off, add status = 4 (hi-quality pending) items */
+downloadQueueRunner.rescheduleEconomyItem = function() {
+  if (!working) {
+    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
+    thisObj[failCallback].call(thisObj);
+    return;
+  }
+  var statement = DownloadManagerPrivate.dbConnection.createStatement("SELECT * FROM `smilefox` WHERE `status` = 4 ORDER BY `id` ASC");
+  var callback = generateStatementCallback("downloadQueueRunner.rescheduleEconomyItem", this, "prepareEconomyQueue", "dbFail", dbFields);
+  statement.executeAsync(callback);
+}
+
+/* Write "High-quality penging" item in the queue. */
+downloadQueueRunner.prepareEconomyQueue = function(resultArray) {
+  /* Directly points the result to the downloadQueue */
+  downloadQueue = downloadQueue.concat(resultArray);
+  /* XXX: This will hit only if download is running and something is out of economy, or the timer calls that the economy mode is all.
+     In both cases we need to check the queue. But can we split it out? */
+  downloadQueueRunner.process();
+};
 /* Check and (re-)process some items enter/exit the queue. */
 downloadQueueRunner.process = function() {
   if (stopped) { return; }
@@ -697,7 +734,7 @@ function handleDownloaderEvent(type, content) {
     /* Run the economy timer */
 	  if (!economyModeCheckTimer) {
       economyModeCheckTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-      economyModeCheckTimer.initWithCallback( nicofox_timer, 600000, Ci.nsITimer.TYPE_REPEATING_SLACK);
+      economyModeCheckTimer.initWithCallback( economyTimerCallback, 600000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 	  }
     /* Update Download Manager Record */
     DownloadManagerPrivate.updateDownload(id, {"status": 4, "video_economy": 1});
@@ -708,9 +745,8 @@ function handleDownloaderEvent(type, content) {
 	  atEconomyMode = false;
 	  if (economyModeCheckTimer) {
       economyModeCheckTimer.cancel();
-	    economyModeCheckTimer = null;
 	  }
- 	  downloadQueueRunner.process(); 
+    downloadQueueRunner.rescheduleEconomyItem();
 	  break;
 
     /* Video download is started */
@@ -813,20 +849,19 @@ function handleDownloaderEvent(type, content) {
 };*/
 
 /* Economy mode timer */
-var nicofox_timer = {
+var economyTimerCallback = {
   notify: function(timer) {
     var now = new Date();
 
     /* Economy mode is fired when 19-2 in Japan time (UTC+9) => 10-17 in UTC time */
     if (now.getUTCHours() >= 17 || now.getUTCHours() < 10) {
-      download_runner.inEconomy = false;
-      economyModeCheckTimer.cancel();
-      economyModeCheckTimer = null;
-      nicofox.download_manager.go();
+      atEconomyMode = false;
+      timer.cancel();
+      downloadQueueRunner.rescheduleEconomyItem();
     } 
     else
     {
-      download_runner.inEconomy = true;
+      atEconomyMode = true;
     }
   }
 };

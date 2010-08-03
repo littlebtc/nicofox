@@ -50,8 +50,8 @@ FileBundle.nico = function(info) {
                                  .replace(/\%ID\%/, fixReservedCharacters(info.nicoData.id));
    
   /* Add comment type in filename */
-  if (info.nicoData.comment_type != 'www' && info.nicoData.comment_type) {
-    this.fileTitle = this.fileTitle.replace(/\%COMMENT\%/, fixReservedCharacters('['+info.nicoData.commentType+']'));
+  if (info.commentType != 'www' && info.commentType) {
+    this.fileTitle = this.fileTitle.replace(/\%COMMENT\%/, fixReservedCharacters('['+info.commentType+']'));
   } else {
     this.fileTitle = this.fileTitle.replace(/\%COMMENT\%/, '');
   }

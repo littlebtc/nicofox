@@ -1,7 +1,9 @@
 /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*-
  * vim: sw=2 ts=2 sts=2 et filetype=javascript
  */
+
 Components.utils.import("resource://nicofox/Services.jsm", nicofox);
+
 nicofox.panel = {};
 
 /* Cached active download's DOM instance */
@@ -102,9 +104,11 @@ nicofox.panel.displayDownloads = function(resultArray) {
 nicofox.panel.updateDownloadItem = function(listItem, result) {
   listItem.setAttribute("type", "smilefox");
   if (result.thumbnail_file) {
-    var thumbFile = nicofox.panel.getFileInstance(result.thumbnail_file);
-    var thumbUrl = nicofox.Services.io.newFileURI(thumbFile).spec;
-    listItem.setAttribute("thumbnail", thumbUrl);
+    var thumbFile = new nicofox.panel._fileInstance(result.thumbnail_file);
+    if (thumbFile.exists()) {
+      var thumbUrl = nicofox.Services.io.newFileURI(thumbFile).spec;
+      listItem.setAttribute("thumbnail", thumbUrl);
+    }
   }
   if (result.id) {
     listItem.setAttribute("sfid", result.id);
@@ -115,6 +119,9 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   }
   if (result.video_title) {
     listItem.setAttribute("sfvideotitle", result.video_title);
+  }
+  if (result.video_type) {
+    listItem.setAttribute("sfvideotype", result.video_type);
   }
   if (result.video_economy == 1) {
     listItem.setAttribute("sfeconomy", result.video_economy);
@@ -142,15 +149,16 @@ nicofox.panel.dbFail = function() {
  * Like /toolkit/mozapps/downloads/content/downloads.js on mozilla-central
  */
 nicofox.panel.displayContextMenuItems = [
-[ "Go", "Copy", "Separator2", "SelectAll", "Remove"], /* 0 Waiting */
-[ "Open", "OpenExternal", "OpenFolder", "MoveFolder", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 1 Completed */ 
-[ "Retry", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 2 Canceled */ 
-[ "Retry", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 3 Failed */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 4 Scheduled */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 5 Downloading */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 6 Downloading */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ], /* 7 Downloading */ 
-[ "Missing", "Retry", "Separator1", "Go", "Copy", "Separator2", "SelectAll", "Remove" ] /* File Missing, since we don't make status = 8, it is a hack.  */ 
+[ "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove"], /* 0 Waiting */
+[ "Open", "OpenExternal", "OpenFolder", /*"MoveFolder",*/ "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 1 Completed */ 
+[ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 2 Canceled */ 
+[ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 3 Failed */ 
+[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 4 Scheduled */ 
+[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 5 Downloading */ 
+[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 6 Downloading */ 
+[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 7 Downloading */ 
+[], /*Reserved */
+[ "Missing", "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 9 File Missing (hack) */ 
 ];
 
 nicofox.panel.generateContextMenu = function(aEvent) {
@@ -171,9 +179,9 @@ nicofox.panel.generateContextMenu = function(aEvent) {
   } 
   
   /* Check for file missing case */
-  var file = nicofox.panel.getFileInstance(selectedItem.getAttribute("sfvideofile"));
-  if (!file.exists()) {
-    sfStatus = 8;
+  var file = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
+  if (sfStatus == 1 && !file.exists()) {
+    sfStatus = 9;
   }
   
   var displayItems = nicofox.panel.displayContextMenuItems[sfStatus];
@@ -185,23 +193,109 @@ nicofox.panel.generateContextMenu = function(aEvent) {
 
 /* Handle Commands */
 nicofox.panel.commands = {
+  /* "Play with NicoFox Player" */
   open: function(selectedItem) {
-    var videoFile = nicofox.panel.getFileInstance(selectedItem.getAttribute("sfvideofile"));
+    /* Open if the status is completed and file exists */
+    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    var videoFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
+    if (sfStatus != 1 || !videoFile.exists()) { return; }
+    
     var videoUrl = nicofox.Services.io.newFileURI(videoFile).spec;
     
     /* Check if comment XML file exists */
     var commentUrl = "";
     
     if (selectedItem.hasAttribute("sfcommentfile")) {
-      var commentFile = nicofox.panel.getFileInstance(selectedItem.getAttribute("sfcommentfile"));
+      var commentFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfcommentfile"));
       if (commentFile.exists()) {
         commentUrl = nicofox.Services.io.newFileURI(commentFile).spec;
       }
     }
-      
     window.openDialog('chrome://nicofox/content/nicofox_player.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: videoUrl, comment: commentUrl, title: selectedItem.getAttribute("sfvideotitle")});
+  },
+  /* Cancel */
+  cancel: function(selectedItem) {
+    var id = parseInt(selectedItem.getAttribute("sfid"), 10);
+    nicofox.DownloadManager.cancelDownload(id);
+  },
+  /* Retry */
+  retry: function(selectedItem) {
+    var id = parseInt(selectedItem.getAttribute("sfid"), 10);
+    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    if (sfStatus == 2 || sfStatus == 3) { /* Canceled or Failed */
+      nicofox.DownloadManager.retryDownload(id);
+    }
+  },
+  /* Open with External Player */
+  openExternal: function(selectedItem) {
+    /* Open if the status is completed and file exists */
+    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    var videoFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
+    if (sfStatus != 1 || !videoFile.exists()) { return; }
+    
+    /* Select the external player if desired */
+    var sfVideoType = selectedItem.getAttribute("sfvideotype");
+    var externalApplication = null;
+    Components.utils.import("resource://nicofox/Core.jsm", nicofox);
+    if (sfVideoType == "swf" && nicofox.Core.prefs.getBoolPref("external_swf_player")) {
+      externalApplication = nicofox.Core.prefs.getComplexValue("external_swf_player_path", Ci.nsILocalFile);
+    } else if (nicofox.Core.prefs.getBoolPref("external_video_player")) {
+      externalApplication = nicofox.Core.prefs.getComplexValue("external_video_player_path", Ci.nsILocalFile);
+    }
+    if (externalApplication) {
+      /* Use ProcessRunner to run the external application */
+      Components.utils.import("resource://nicofox/ProcessRunner.jsm");
+      processRunner.openFileWithProcess(externalApplication, videoFile, "nsIProcess");
+    } else {
+      /* Try to do the default action */
+      try {
+        videoFile.launch();
+      } catch(e) {
+        /* For *nix, launch() didn't work, so...  */
+        /* See also: http://mxr.mozilla.org/seamonkey/source/toolkit/mozapps/downloads/content/downloads.js */
+        var videoUri = nicofox.Services.io.newFileURI(videoFile);
+        var protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"].getService(Ci.nsIExternalProtocolService);
+        protocolService.loadUrl(videoUri);
+      }
+    }
+  },
+  /* Open in Folder (or "Reveal") */
+  openFolder: function(selectedItem) {
+    /* Open if the status is completed and file exists */
+    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    var videoFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
+    if (sfStatus != 1 || !videoFile.exists()) { return; }
+    try {
+      videoFile.reveal();
+    } catch(e) {
+      /* For *nix, reveal() didn't work, so...  */
+      /* See also: http://mxr.mozilla.org/seamonkey/source/toolkit/mozapps/downloads/content/downloads.js */
+      var videoPathUri = nicofox.Services.io.newFileURI(videoFile.parent);
+      var protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"].getService(Ci.nsIExternalProtocolService);
+      protocolService.loadUrl(videoPathUri);
+    }
+  },
+  /* Open video page in new tab. XXX: This assume we can find gBrowser */
+  goVideoPage: function(selectedItem) {
+    var sfUrl = selectedItem.getAttribute("sfurl");
+    gBrowser.addTab(sfUrl);
+  },
+  /* Copy the video URL */
+  copyVideoUrl: function(selectedItem) {
+    var sfUrl = selectedItem.getAttribute("sfurl");
+    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);  
+    clipboardHelper.copyString(sfUrl);  
+  },
+  /* Remove selected item */
+  remove: function(selectedItem) {
+    var id = parseInt(selectedItem.getAttribute("sfid"), 10);
+    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    if (sfStatus < 5 || sfStatus > 7) { /* Canceled or Failed */
+      nicofox.DownloadManager.removeDownload(id);
+    }
   }
 };
+
 
 /* Open "NicoFox Option" */
 /* Modified from: toolkit/mozapps/extensions/content/extensions.js */
@@ -281,11 +375,7 @@ nicofox.panel.listener.downloadRemoved = function(id) {
 };
 
 /* Helper: Get a nsILocalFile instance from a path */
-nicofox.panel.getFileInstance = function(path) {
-  var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
-  file.initWithPath(path);
-  return file;
-}
+nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1", "nsILocalFile", "initWithPath");
 nicofox.panel.unload = function() {
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);
