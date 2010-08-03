@@ -595,6 +595,10 @@ DownloadManager.__defineGetter__("activeDownloadCount", function() {
   return activeDownloadCount;
 }
 );
+DownloadManager.__defineGetter__("queuedDownloadCount", function() {
+  return downloadQueue.length;
+}
+);
 DownloadManager.__defineGetter__("DBConnection", function() {
   return DownloadManagerPrivate.dbConnection;
 }
@@ -738,6 +742,7 @@ function handleDownloaderEvent(type, content) {
 	  }
     /* Update Download Manager Record */
     DownloadManagerPrivate.updateDownload(id, {"status": 4, "video_economy": 1});
+ 	  downloadQueueRunner.process(); 
     break;
 
     /* Downloader found the economy mode is off for any "High-quality" video */
@@ -772,6 +777,11 @@ function handleDownloaderEvent(type, content) {
     Services.prompt.alert(null, Core.strings.getString("errorTitle"), Core.strings.getString("errorIncomplete"));
     break;
     
+    case "thumbnail_done":
+    Components.utils.reportError("!");
+    triggerDownloadListeners("thumbnailAvailable", id, content);
+    break;
+
     case "completed":
     /* Finialize download */
     delete(activeDownloads[id]);
@@ -869,10 +879,16 @@ var economyTimerCallback = {
 
 /* All done message */
 function allDone() {
-  var alerts_service = Components.classes["@mozilla.org/alerts-service;1"]
-                       .getService(Components.interfaces.nsIAlertsService);
-  alerts_service.showAlertNotification("chrome://nicofox/skin/logo.png", 
+  var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+  /* XXX: WIP */
+  if (hitEconomy) {
+    alertsService.showAlertNotification("chrome://nicofox/skin/logo.png", 
+                                    Core.strings.getString('alertCompleteTitle'), "...But some video is in low quality and will be downloaded later.", 
+                                    false, "", null);
+    hitEconomy = false;
+  } else {
+    alertsService.showAlertNotification("chrome://nicofox/skin/logo.png", 
                                     Core.strings.getString('alertCompleteTitle'), Core.strings.getString('alertCompleteText'), 
                                     false, "", null);
-
+  }
 }

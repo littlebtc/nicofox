@@ -179,11 +179,12 @@ nicofox.panel.generateContextMenu = function(aEvent) {
   } 
   
   /* Check for file missing case */
-  var file = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
-  if (sfStatus == 1 && !file.exists()) {
-    sfStatus = 9;
+  if (selectedItem.hasAttribute("sfvideofile")) {
+    var file = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
+    if (sfStatus == 1 && !file.exists()) {
+      sfStatus = 9;
+    }
   }
-  
   var displayItems = nicofox.panel.displayContextMenuItems[sfStatus];
   for (var i = 0; i < displayItems.length; i++) {
     document.getElementById("smilefoxPopup" + displayItems[i]).hidden = false;
@@ -376,6 +377,7 @@ nicofox.panel.listener.downloadRemoved = function(id) {
 
 /* Helper: Get a nsILocalFile instance from a path */
 nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1", "nsILocalFile", "initWithPath");
+/* XXX: Remove listener used only */
 nicofox.panel.unload = function() {
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);

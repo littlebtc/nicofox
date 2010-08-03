@@ -418,7 +418,7 @@ DownloadUtils.nico.prototype = {
       this._extraItemsDownloader.addDownload(this._getFlvParams.ms, null , uploaderCommentQueryString, this._fileBundle.files.uploaderComment, true);
     }
     if(this._getThumbnail && this._info.nicoData.thumbnail) {
-      this._extraItemsDownloader.addDownload(this._info.nicoData.thumbnail, null , null, this._fileBundle.files.thumbnail, true);
+      this._extraItemsDownloader.addDownload(this._info.nicoData.thumbnail, null , null, this._fileBundle.files.thumbnail, true, this, "notifyThumbnailDone");
     }
     this._extraItemsDownloader.doneAdding();
   },
@@ -449,24 +449,28 @@ DownloadUtils.nico.prototype = {
 
   /* Remove all downloaded files */
   removeFiles: function() {
-    if (!this._filesCreated) { return; }
+    if (!this._filesCreated || !this._fileBundle) { return; }
     /* Remove files */
-    if (this._fileBundle.video.exists()) this._fileBundle.video.remove(false);
-    if (this._fileBundle.videoTemp.exists()) this._fileBundle.videoTemp.remove(false);
-    if(this._getComment && this._fileBundle.comment.exists()) { 
-        this._fileBundle.comment.remove(false);
+    if (this._fileBundle.files.video.exists()) this._fileBundle.files.video.remove(false);
+    if (this._fileBundle.files.videoTemp.exists()) this._fileBundle.files.videoTemp.remove(false);
+    if(this._getComment && this._fileBundle.files.comment.exists()) { 
+        this._fileBundle.files.comment.remove(false);
     }
-    if(this._getUploaderComment && this._fileBundle.uploaderComment.exists()) { 
-        this._fileBundle.uploaderComment.remove(false);
+    if(this._getUploaderComment && this._fileBundle.files.uploaderComment.exists()) { 
+        this._fileBundle.files.uploaderComment.remove(false);
     }
-    if(this._getThumbnail && this._fileBundle.thumbnail.exists()) { 
-        this._fileBundle.thumbnail.remove(false);
+    if(this._getThumbnail && this._fileBundle.files.thumbnail.exists()) { 
+        this._fileBundle.files.thumbnail.remove(false);
     }
   },
-
+  /* When thumbnail file is done downloading, notify it (so the manager UI can display the thumbnail) */
+  notifyThumbnailDone: function() {
+    if (this._fileBundle.files.thumbnail) {
+      this.callback("thumbnail_done", Services.io.newFileURI(this._fileBundle.files.thumbnail).spec);
+    }
+  },
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
-  processNicoComment: function()
-  {
+  processNicoComment: function() {
     if (this.cancelled) { return; }
     var boon_comment = Core.prefs.getBoolPref('boon_comment');
     var replace_filters = Core.prefs.getBoolPref('replace_filters'); 
