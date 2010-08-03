@@ -163,17 +163,16 @@ function start_inject()
     return;
   }
   window.setTimeout(function() {
-    NM_writeVideoInfo(document.location.href, VideoJSON, "{}");
+    var otherInfo = {};
+    otherInfo.hasOwnerThread = false;
+    /* Check whether the uploader comments (thread) exists on this video */
+    var flashvars = document.getElementById("flvplayer").getAttribute("flashvars");
+    if (flashvars) {
+      otherInfo.hasOwnerThread = (flashvars.search(/\&has_owner_thread=1\&/) != -1);
+    }
+    NM_writeVideoInfo(document.location.href, VideoJSON, JSON.stringify(otherInfo));
   }, 10);
   
-  /* XXX it should not be here, but it is used to reduce the render times */
-  /* Fetch the community name by the link node (fixed in 0.3.6) */
-  var community_nodes = $$('.//a[starts-with(@href, "http://ch.nicovideo.jp/community") or starts-with(@href, "http://ch.nicovideo.jp/channel") ]');
-
-  if (community_nodes.length > 0) {
-
-  }
-
   var niconicofarm = "\r\n";
   /* check if Video.v is a pure integer... (mymemory / community / other countries ver.), (for hatena::diary and niconicofarm) */
 

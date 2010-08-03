@@ -131,18 +131,21 @@ function parseVideoInfo(url, nicoData, otherData, thisObj, callbackFuncName) {
   /* Idendity (a),(b) type URLs */
   var videoIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/.exec(url);
   var commentIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/.exec(url);
-  if (videoIdUrlMatch) {
+  if (videoIdUrlMatch && !nicoData.channelId) {
     info.commentType = videoIdUrlMatch[1];
     Components.utils.reportError("Match Video ID!");
+  } else if (videoIdUrlMatch) {
+    /* XXX: soxxxxx will redirect to comment id URL, but can we dectect it?*/ 
+    info.commentType = "ch" + nicoData.channelId;
   } else if (commentIdUrlMatch) {
     info.commentId = commentIdUrlMatch[1];
     Components.utils.reportError("Match Comment ID!");
     /* Carefully distinguish (c) type URLs */
     if (nicoData.isMymemory) {
       info.commentType = "mymemory" + info.commentId;
-    } else if (nicoData.channelId) {
+    } else if (nicoData.mainCommunityId && nicoData.channelId) {
       info.commentType = "ch" + nicoData.channelId;
-    } else if (nicoData.communityId) {
+    } else if (nicoData.mainCommunityId) {
       info.commentType = "co" + nicoData.communityId;
     } else {
       info.commentType = "comment" + info.commentId;
@@ -237,7 +240,7 @@ VideoInfoReader.readByUrl = function(url, simpleInfoAllowed, thisObj, successCal
   }
   if (cachedInfo[url]) {
     /* If there is cache, use the cache */
-    thisObj[callbackFuncName].call(thisObj, url, cachedInfo[url]);
+    thisObj[successCallback].call(thisObj, url, cachedInfo[url]);
   } else {
     /* Push it into queue */
     pageReadQueue.push({
