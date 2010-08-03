@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/"?>
+
+<!DOCTYPE html[
+<!ENTITY % htmlDTD PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+%htmlDTD;
+<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+%brandDTD;
+<!ENTITY % aboutDTD SYSTEM "chrome://global/locale/about.dtd" >
+%aboutDTD;
+<!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
+%globalDTD;
+<!ENTITY % prefDTD SYSTEM "chrome://nicofox/locale/prefwindow.dtd" >
+%prefDTD;
+]>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <title>NicoFox Migration</title>
+  <script type="application/x-javascript" src="chrome://nicofox/content/inpage/migration.js"></script>
+  <link rel="stylesheet" href="chrome://nicofox/content/inpage/style.css" type="text/css" media="screen" />
+  <body>
+     <form>
+       <h1>設定 NicoFox 的下載資料</h1>
+       <p id="oldDb">您的資料庫是 0.1 版時的舊版資料庫，需要進行升級。將會在設定時進行升級。</p>
+       <h2>下載資料夾</h2>
+       <p>&downloader.save_path.label; <xul:filefield id="savePath" width="300"/>
+       <xul:button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectDir();" /></p>
+       <h2>下載項目和檔名格式</h2>
+       <p id="nndd">這看起來是 NNDD 的影片下載路徑。</p>
+       <p>透過您已使用過的下載工具和自己的使用習慣，決定欲下載的項目、和其檔案命名方式。</p>
+       <p>下載方案：
+         <select id="downloadSolution">
+           <option value="default">NicoFox 0.6 以後預設（NNDD 相容方式）</option>
+           <option value="nicoplayer">NicoPlayer 方式</option>
+           <option value="nicofox04">NicoFox 0.4 以前版本方式</option>
+           <option value="custom">自訂</option>
+         </select>
+      </p>
+      <p>下載內容和檔案命名方式：</p>
+      <ul>
+        <li><input type="checkbox" id="downloadVideo" /><label for="downloadVideo"> 影片：</label>
+            <input type="text" id="videoFileScheme" size="50"/>.flv/mp4/swf</li>
+        <li><input type="checkbox" id="downloadComment" /><label for="downloadComment"> 評論：</label>
+            <input type="text" id="commentFileScheme" size="50"/>.xml</li>
+        <li><input type="checkbox" id="downloadUploaderComment" /><label for="downloadUploaderComment"> 投稿者評論：</label>
+            <input type="text" id="uploaderCommentFileScheme" size="50"/>.xml</li>
+        <li><input type="checkbox" id="downloadThumbnail" /><label for="downloadTumbnail"> 縮圖：</label>
+            <input type="text" id="thumbnailScheme" size="50"/><select id="thumbExt"><option value="jpeg">.jpeg</option><option value="jpg">.jpg</option></select></li>
+      </ul>
+      <p>（目前 NicoFox 暫不支援其他內容的下載，例如 NNDD 的市場資訊和 NicoPlayer 的純文字影片簡介。）</p>
+      <p><input type="checkbox" id="renameAll" checked="true" /><label for="renameAll">為下載管理員中的所有舊項目重新命名</label></p>
+      <p><input type="checkbox" id="redownloadThumbnail" checked="true" /><label for="redownloadThumbnail">為下載管理員中的所有舊項目補齊縮圖</label></p>
+      <input type="submit" value="進行設定" />
+    </form>
+  </body>
+</html>
