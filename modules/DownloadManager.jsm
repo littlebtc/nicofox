@@ -688,7 +688,6 @@ downloadQueueRunner.removeEconomyItems = function() {
 /* Check and (re-)process some items enter/exit the queue. */
 downloadQueueRunner.process = function() {
   if (stopped) { return; }
-  Components.utils.reportError(JSON.stringify(downloadQueue));
   while(downloadQueue.length > 0 && activeDownloadCount < downloadMax) {
     var item = downloadQueue.shift();
     /* If we are sure that economy mode is enabled (e.g. first hi-quality pending video falls into economy mode) , don't process it. */
