@@ -54,7 +54,6 @@
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" />
           <xul:hbox flex="1">
-            <xul:label xbl:inherits="value=sftextstatus" flex="1" />
             <xul:label value="Scheduled" flex="1"/>
           </xul:hbox>
         </xul:vbox>

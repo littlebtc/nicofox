@@ -7,11 +7,11 @@
   <stringbundleset id="stringbundleset"></stringbundleset>
   <keyset id="smilefox-keyset"></keyset>
   <vbox id="smilefox-main" width="450" height="450">
-  <hbox>
+  <hbox height="20" align="center">
     <label value="&window.title;" />
-    <label value="Options" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
+    <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
   </hbox>
-  <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
+  <!--<textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>-->
   <vbox id="smilefoxThumbNotice" hidden="true">
     <description>NicoFox can download the thumbnail, and display it in the download manager now.</description>
     <description>Do you want to enable thumbnail download and download thumbnail for previous video downloads now?</description>
@@ -23,7 +23,7 @@
     <label value="Download thumbnails for previous video downloads..." />
     <progressmeter id="smilefoxThumbProgressMeter" />
   </vbox>
-  <richlistbox id="smilefoxList" height="400" context="smilefoxPopup"
+  <richlistbox id="smilefoxList" height="430" context="smilefoxPopup"
                onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox.panel.commands.open(this.selectedItem); }"
                onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"
   >

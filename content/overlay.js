@@ -13,6 +13,8 @@ nicofox_ui.overlay = {
    document.getElementById("nicofox-library").addEventListener("popupshowing", function() { nicofox.panel.onPopupShowing(); }, false);
 
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
+  /* Update download manager statusbar, then register for changes */
+  nicofox.refreshIcon();
   nicofox.DownloadManager.addListener(nicofox.listener);
   },
   onUnload: function() {
@@ -21,33 +23,27 @@ nicofox_ui.overlay = {
   },
   onMenuItemCommand: function(e) {
     document.getElementById('nicofox-library').hidden = false;
-    document.getElementById('nicofox-library').openPopup(document.getElementById("nicofox-icon"), 'before_end', 0, 0, false, false);
+    document.getElementById('nicofox-library').openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
   },
 };
 /* Refresh statusbar download notification */
 nicofox.refreshIcon = function() {
-  var nicofoxIcon = document.getElementById("nicofox-icon");
+  var nicofoxLabel = document.getElementById("nicofoxStatusbarLabel");
   var downloadCount = nicofox.DownloadManager.activeDownloadCount;
   var waitingCount = nicofox.DownloadManager.queuedDownloadCount;
   if (downloadCount > 0) {
-    nicofoxIcon.setAttribute ("label", downloadCount + "/" + (downloadCount + waitingCount));
-    nicofoxIcon.className = "statusbarpanel-iconic-text";
+    nicofoxLabel.setAttribute("value", downloadCount + "/" + (downloadCount + waitingCount));
+    nicofoxLabel.hidden = false;
   } else {
-    nicofoxIcon.setAttribute ("label", "");
-    nicofoxIcon.className = "statusbarpanel-iconic";
+    nicofoxLabel.setAttribute("value", "");
+    nicofoxLabel.hidden = true;
   }
 };
 /* XXX: to display status in statusbar */
 nicofox.listener = {
 
 };
-nicofox.listener.downloadAdded = function(id, content) {
-  nicofox.refreshIcon();
-};
-nicofox.listener.downloadUpdated = function(id, content) {
-  nicofox.refreshIcon();
-};
-nicofox.listener.downloadVideoCompleted = function(id, content) {
+nicofox.listener.queueChanged = function(id, content) {
   nicofox.refreshIcon();
 };
 window.addEventListener("load", nicofox_ui.overlay.onLoad, false);

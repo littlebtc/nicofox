@@ -197,7 +197,7 @@ function generateStatementCallback(callerName, thisObj, successCallback, failCal
 }
 
 /* A instance to run thumbnail fetching. */
-thumbnailFetcher = {};
+var thumbnailFetcher = {};
 /* Is fetcher running? */
 thumbnailFetcher.running = false;
 /* Cached undone and running items */
@@ -222,6 +222,7 @@ thumbnailFetcher.start = function(resultArray) {
  * Use DownloadUtils.multipleHelper and assign a callback to write the record back to SQLite.
  */
 thumbnailFetcher.processItem = function() {
+  if (this.undoneItems.length == 0) { return; }
   this.runningItem = this.undoneItems.shift();
   Components.utils.import("resource://nicofox/DownloadUtils.jsm");
   Components.utils.reportError("Process " + this.runningItem.id);
@@ -667,7 +668,7 @@ downloadQueueRunner.rescheduleEconomyItem = function() {
   var statement = DownloadManagerPrivate.dbConnection.createStatement("SELECT * FROM `smilefox` WHERE `status` = 4 ORDER BY `id` ASC");
   var callback = generateStatementCallback("downloadQueueRunner.rescheduleEconomyItem", this, "prepareEconomyQueue", "dbFail", dbFields);
   statement.executeAsync(callback);
-}
+};
 
 /* Write "High-quality penging" item in the queue. */
 downloadQueueRunner.prepareEconomyQueue = function(resultArray) {
@@ -677,9 +678,17 @@ downloadQueueRunner.prepareEconomyQueue = function(resultArray) {
      In both cases we need to check the queue. But can we split it out? */
   downloadQueueRunner.process();
 };
+
+/* Remove economy items when we hit economy mode to make queue contains no high quality pending videos (will be added after economy timer hit) */
+downloadQueueRunner.removeEconomyItems = function() {
+  downloadQueue = downloadQueue.filter(function(element, index, array) {
+    return (element.status != 4);
+  });
+};
 /* Check and (re-)process some items enter/exit the queue. */
 downloadQueueRunner.process = function() {
   if (stopped) { return; }
+  Components.utils.reportError(JSON.stringify(downloadQueue));
   while(downloadQueue.length > 0 && activeDownloadCount < downloadMax) {
     var item = downloadQueue.shift();
     /* If we are sure that economy mode is enabled (e.g. first hi-quality pending video falls into economy mode) , don't process it. */
@@ -689,10 +698,15 @@ downloadQueueRunner.process = function() {
     /* Initialize object */
     activeDownloads[item.id] = { url: item.url };
     activeDownloadCount++;
-    /* Change the status to "downloading" in the database, then start the download */
-    DownloadManagerPrivate.updateDownload(item.id, {status: 7});
+    /* Start the download */
     downloadQueueRunner.initDownloader(item.id, item.video_economy);
+
+    /* Change the status to "downloading" in the database asynchrously */
+    DownloadManagerPrivate.updateDownload(item.id, {status: 7});
   }
+  /* Call the listeners that queue had changed */
+  triggerDownloadListeners("queueChanged", null, {});
+  
   if (downloadQueue.length == 0 && activeDownloadCount == 0) {
     allDone();
   }
@@ -741,17 +755,14 @@ function handleDownloaderEvent(type, content) {
       economyModeCheckTimer.initWithCallback( economyTimerCallback, 600000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 	  }
     /* Update Download Manager Record */
-    DownloadManagerPrivate.updateDownload(id, {"status": 4, "video_economy": 1});
- 	  downloadQueueRunner.process(); 
+    DownloadManagerPrivate.updateDownload(id, {"status": 4, "video_title": content.video_title, "video_economy": 1});
+ 	  downloadQueueRunner.removeEconomyItems();
+ 	  downloadQueueRunner.process();
     break;
 
     /* Downloader found the economy mode is off for any "High-quality" video */
     case "economy_off":
-	  atEconomyMode = false;
-	  if (economyModeCheckTimer) {
-      economyModeCheckTimer.cancel();
-	  }
-    downloadQueueRunner.rescheduleEconomyItem();
+    /* Do nothing recently. :P */
 	  break;
 
     /* Video download is started */
@@ -805,7 +816,7 @@ function handleDownloaderEvent(type, content) {
     DownloadManagerPrivate.updateDownload(id, {"status": 2, "end_time": new Date().getTime()});
  	  downloadQueueRunner.process(); 
     break;
-    }
+  }
 }
         /* Economy is on, so something is not downloaded */
 /*        if (Core.prefs.getBoolPref('economy_notice')) {

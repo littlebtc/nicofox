@@ -255,7 +255,7 @@ DownloadUtils.nico.prototype = {
     /* Distinguish Economy mode; if user don't want it, cancel the download */
     if (this._getFlvParams.url.search(/low$/) != -1) {
       if (Core.prefs.getIntPref("economy") == 1) {
-        this.callback("economy_break", {});
+        this.callback("economy_break", {video_title: this._info.nicoData.title});
         return;
       }	
       this._economy = true; 

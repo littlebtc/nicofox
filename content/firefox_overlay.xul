@@ -30,7 +30,11 @@
       </vbox>
     </panel>-->
 </hbox>
-   <statusbarpanel id="nicofox-icon" class="statusbarpanel-iconic" src="chrome://nicofox/skin/logo_16.png" label="" oncommand="event.stopPropagation();  document.getElementById('nicofox-library').hidden = false; document.getElementById('nicofox-library').openPopup(this, 'before_end', 0, 0, false, false);"/> 
+   <statusbarpanel id="nicofoxStatusbarContainer" onclick="event.stopPropagation();  document.getElementById('nicofox-library').hidden = false; document.getElementById('nicofox-library').openPopup(this, 'before_end', 0, 0, false, false);">
+     <!-- For rein skin compatibility -->
+     <image id="nicofox-icon" src="chrome://nicofox/skin/logo_16.png"/> 
+     <label id="nicofoxStatusbarLabel" hidden="true" />
+   </statusbarpanel>
  </statusbar>
  <vbox id="appcontent">
  <splitter id="nicofox-splitter" collapsed="true" />
