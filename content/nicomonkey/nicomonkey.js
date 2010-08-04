@@ -106,7 +106,7 @@ function start()
       download_link.className = 'fox-dl-link';
       download_link.id = 'fox-dl-this1';
       download_link.title = NM_getString('download');
-      download_link.href = '#';
+      download_link.href = document.location.href.replace(/\?[^?]+/, "") + "?smilefox=get";
       download_link.innerHTML = '&nbsp;';
 
       var h1 = null;
@@ -128,7 +128,7 @@ function start()
       download_link.className = 'fox-dl-link';
       download_link.id = 'fox-dl-this2';
       download_link.title = NM_getString('download');
-      download_link.href = '#';
+      download_link.href = document.location.href.replace(/\?[^?]+/, "") + "?smilefox=get";
       download_link.innerHTML = '&nbsp;';
 
       /* Find for non-expanded mode */

@@ -45,6 +45,8 @@ function addDownloadIcons(rootDoc) {
     if (videoLink.getElementsByTagName("img").length > 0) {
       continue;
     }
+    /* Temp check: avoid double video download icon (link will be added by nicomonkey.js */
+    if (videoLink.className == "fox-dl-link") { return; }
     
     var downloadLink = document.createElement("a");
     downloadLink.className = "fox-dl-link";
