@@ -292,7 +292,7 @@ DownloadManagerPrivate.createTable =  function() {
 DownloadManagerPrivate.checkUpgrade = function() {
   /* Read fields infos */
   var statement = this.dbConnection.createStatement("PRAGMA table_info (smilefox)");
-  var callback = generateStatementCallback("checkUpgrade", this, "executeUpgrade", "failStartup", [name])
+  var callback = generateStatementCallback("checkUpgrade", this, "executeUpgrade", "failStartup", ["name"])
   statement.executeAsync(callback);
 };
 
@@ -439,14 +439,15 @@ DownloadManager.startup = function() {
   var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
   file.append("smilefox.sqlite");
 
-  DownloadManagerPrivate.dbConnection = Services.storage.openDatabase(file);
   if (!file.exists()) {
+    DownloadManagerPrivate.dbConnection = Services.storage.openDatabase(file);
     /* Add the smilefox database/ table if it is not established */
     DownloadManagerPrivate.createTable();
 
     Core.prefs.setBoolPref("first_run", false);
     Core.prefs.setBoolPref("first_run_0.3", false);
   } else {
+    DownloadManagerPrivate.dbConnection = Services.storage.openDatabase(file);
     /* Check and update the database as needed */
     if (Core.prefs.getBoolPref("first_run") || Core.prefs.getBoolPref("first_run_0.3")) {
       DownloadManagerPrivate.checkUpgrade();
