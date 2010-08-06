@@ -39,14 +39,17 @@ processRunner.openFileWithProcess = function(process, file, safeString) {
     Components.utils.import("resource://gre/modules/ctypes.jsm");
     var lib = ctypes.open("shell32.dll");
     var SW_SHOW = 5;
+    /* For 3.6 (1.9.2) compatiblity, though js-ctype is not suggested to use on 1.9.2. */
+    var strType = (ctypes.jschar)?ctypes.jschar.ptr:ctypes.ustring;
+    
     var shellExecute = lib.declare("ShellExecuteW",
                                   ctypes.stdcall_abi,
                                   ctypes.int32_t, /* HINSTANCE (return) */
                                   ctypes.int32_t, /* HWND hwnd */
-                                  ctypes.ustring, /* LPCTSTR lpOperation */
-                                  ctypes.ustring, /* LPCTSTR lpFile */
-                                  ctypes.ustring, /* LPCTSTR lpParameters */
-                                  ctypes.ustring, /* LPCTSTR lpDirectory */
+                                  strType, /* LPCTSTR lpOperation */
+                                  strType, /* LPCTSTR lpFile */
+                                  strType, /* LPCTSTR lpParameters */
+                                  strType, /* LPCTSTR lpDirectory */
                                   ctypes.int32_t  /* int nShowCmd */);
     var result = shellExecute(0, "open", process.path, argument, "", SW_SHOW);
     /*if (result > 32) { return true; }
