@@ -176,9 +176,9 @@ FileBundle.setDefaultFolder = function() {
   } else {
     /* Others */
     try {
-      rootFolder = Services.dirsvc.get("XDGVids", Ci.nsiLocalFile);
+      rootFolder = Services.dirsvc.get("XDGVids", Ci.nsILocalFile);
     } catch(e) {
-      rootFolder = Services.dirsvc.get("Home", Ci.nsiLocalFile);
+      rootFolder = Services.dirsvc.get("Home", Ci.nsILocalFile);
     }
   }
   return rootFolder.path;
