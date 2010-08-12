@@ -130,6 +130,61 @@ FileBundle.nico.prototype.createVideoTemp = function() {
   return true;
 };
 
+/* Create and set the default download folder */
+FileBundle.setDefaultFolder = function() {
+  /* MacOS X:         Movies/NicoFox
+     Windows Vista/7: Videos/NicoFox 
+     Windows XP/2k  : My Documents/NicoFox (Since it's hard to get where Video is)
+     Linux XDG:       Videos/NicoFox
+     Fallback:        ~/NicoFox */
+
+  /* Step 1: Find the root folder for NicoFox on each OS */
+  var rootFolder = null;
+  var os = Services.appinfo.OS;
+  if (os == "WINNT") {
+    /* Are we in Windows Vista/7 and Gecko 2.0 (js-ctypes don't support pointer until bug 513788 landed)? */
+    var oscpu = Cc["@mozilla.org/network/protocol;1?name=http"].getService(Ci.nsIHttpProtocolHandler).oscpu;
+    Components.utils.import("resource://gre/modules/ctypes.jsm");
+    if (oscpu.search(/Windows NT 6\./)!= -1 && ctypes.jschar) {
+      /* Use js-ctypes to fetch where Videos folder is since nsIDirectoryService doesn't know it.
+         Since CSIDL is somehow deprecated, is there a good way to do parse GUID to js-ctypes? */
+      var lib = ctypes.open("shell32.dll");
+      var CSIDL_MYVIDEO = 0x000E;
+      var MAX_PATH = 1024;
+      var pathArray = ctypes.jschar.array()(MAX_PATH);
+      var SHGetSpecialFolderPath = lib.declare("SHGetSpecialFolderPathW",
+                                               ctypes.stdcall_abi,
+                                               ctypes.bool, /* bool(return) */
+                                               ctypes.int32_t, /* HWND hwnd */
+                                               ctypes.jschar.array().ptr, /* LPTSTR lpszPath */
+                                               ctypes.int32_t, /* int csidl */
+                                               ctypes.bool /* BOOL fCreate */);
+      var result = SHGetSpecialFolderPath(0, pathArray, CSIDL_MYVIDEO, true);
+      /* Read path and parse it into nsILocalFile for successful execution. */
+      if (result) {
+        var path = pathArray.readString();
+        rootFolder = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile)
+                                                    .initWithPath(path);
+      }
+    }
+    /* Fallback to My Documents if we cannot find Videos folder. */
+    if (!rootFolder) {
+      rootFolder = Services.dirsvc.get("Pers", Ci.nsILocalFile);
+    }
+  } else if (os == "Darwin") {
+    /* Fro OSX, try NS_OSX_MOVIE_DOCUMENTS_DIR */
+    rootFolder = Services.dirsvc.get("Mov", Ci.nsILocalFile);
+  } else {
+    /* Others */
+    try {
+      rootFolder = Services.dirsvc.get("XDGVids", Ci.nsiLocalFile);
+    } catch(e) {
+      rootFolder = Services.dirsvc.get("Home", Ci.nsiLocalFile);
+    }
+  }
+  return rootFolder.path;
+};
+
 /* Check if the user had installed NNDD for video downloading */
 FileBundle.isNNDDFolder = function() {
   var logFile = Core.prefs.getComplexValue("save_path", Ci.nsILocalFile);
