@@ -60,10 +60,6 @@ nicofox.panel.init = function() {
   /* Get all download items. */
   nicofox.DownloadManager.getDownloads(this, "displayDownloads", "dbFail");
   
-  /* Check whether to prompt user to download thumbnail */ 
-  if (!nicofox.Core.prefs.getBoolPref("thumbnail_check") && nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
-    nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
-  }
 };
 /* If there is not thumbnail file data stored in database, prompt user to download for all old records. */
 nicofox.panel.responseThumbnailCheck = function(resultArray) {
@@ -90,6 +86,13 @@ nicofox.panel.disableThumbnail = function() {
 
 /* Display all downloaded item after the asynchorous request. */
 nicofox.panel.displayDownloads = function(resultArray) {
+  /* Check whether to prompt user to download thumbnail */ 
+  if (resultArray.length > 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check") && nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
+    nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
+  } else if (resultArray.length == 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check")) {
+    nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
+  }
+  
   var list = document.getElementById("smilefoxList");
   /* XXX: Don't do it at once */
   for (var i = 0; i < resultArray.length; i++) {
