@@ -151,20 +151,19 @@ FileBundle.setDefaultFolder = function() {
       var lib = ctypes.open("shell32.dll");
       var CSIDL_MYVIDEO = 0x000E;
       var MAX_PATH = 1024;
-      var pathArray = ctypes.jschar.array()(MAX_PATH);
+      var pathArray = new (ctypes.jschar.array(MAX_PATH));
       var SHGetSpecialFolderPath = lib.declare("SHGetSpecialFolderPathW",
                                                ctypes.stdcall_abi,
                                                ctypes.bool, /* bool(return) */
                                                ctypes.int32_t, /* HWND hwnd */
-                                               ctypes.jschar.array().ptr, /* LPTSTR lpszPath */
+                                               ctypes.jschar.ptr, /* LPTSTR lpszPath */
                                                ctypes.int32_t, /* int csidl */
                                                ctypes.bool /* BOOL fCreate */);
       var result = SHGetSpecialFolderPath(0, pathArray, CSIDL_MYVIDEO, true);
       /* Read path and parse it into nsILocalFile for successful execution. */
       if (result) {
-        var path = pathArray.readString();
         rootFolder = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile)
-                                                    .initWithPath(path);
+        rootFolder.initWithPath(pathArray.readString());
       }
     }
     /* Fallback to My Documents if we cannot find Videos folder. */
