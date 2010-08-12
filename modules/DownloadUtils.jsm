@@ -198,7 +198,8 @@ DownloadUtils.nico.prototype = {
     this._fileBundle = new FileBundle.nico(info);
     if (this._fileBundle.occupied()) {
       Services.prompt.alert(null, Core.strings.getString("errorTitle"), Core.strings.getString("errorFileExisted"));
-      this.callback.call(this, "fail", {});
+      this.callback("fail", {});
+      return;
     }
     /* Is there any uploader's comment? */
     this.uploder_comment = false;	
@@ -308,7 +309,7 @@ DownloadUtils.nico.prototype = {
   getVideo: function() {
     /* Don't waste time */
     if (this._canceled) { return; }
-
+    
     /* Make URI and cache key */
     var videoUri = Services.io.newURI(this._getFlvParams.url, null, null);
 
@@ -326,6 +327,7 @@ DownloadUtils.nico.prototype = {
     /* We need a listener to watch the download progress */
     var listener = {
       _parentInstance: this,
+      _unsuccessfulStart: false,
       onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
         if (aStateFlags & 1) {
          /* Process HTTP Errors
@@ -334,23 +336,23 @@ DownloadUtils.nico.prototype = {
           var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
           try {
             if (channel.responseStatus != 200) {
+              Components.utils.reportError("Hit 403!");
               throw new Error();
             }
             this._parentInstance.callback("start", {});
           } catch(e) {
-            this._parentInstance.failVideoDownload(); 
+            this._unsuccessfulStart = true;
           }
         }
         else if (aStateFlags & 16) {
           /* Download failed. In this case, PERSIST_FLAGS_CLEANUP_ON_FAILURE will done the cleanup */
 	        if (aStatus != 0 /* NS_OK */) {
             this._parentInstance.failVideoDownload();
-             return;
+            return;
           }
-          /* Donwnload incompleted. Will not clean up file, we should do it manually. */
-          if (this._parentInstance._videoCurrentBytes != this._parentInstance._videoMaxBytes) {
+          /* Donwnload incompleted or connection error or initial response is 403. Will not clean up file, we should do it manually. */
+          if (this._unsuccessfulStart || this._parentInstance._videoCurrentBytes != this._parentInstance._videoMaxBytes) {
             Components.utils.reportError("incomplete!");
-            this._parentInstance._fileBundle.files.videoTemp.remove(false);
             this._parentInstance.failVideoDownload();
             return;
           }
@@ -380,7 +382,10 @@ DownloadUtils.nico.prototype = {
   /* Call when video downloads failed */
   failVideoDownload: function() {
     this._canceled = true;
-    this.callback("fail", {});
+    if (this._fileBundle.files.videoTemp.exists()) {
+      this._fileBundle.files.videoTemp.remove(false);
+    }
+    this.callback("video_fail", {});
   },
   /* Get extra items (e.g. comments, uploader comments, thumbnail) */
   getExtraItems: function() {

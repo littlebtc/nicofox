@@ -130,8 +130,8 @@ FileBundle.nico.prototype.createVideoTemp = function() {
   return true;
 };
 
-/* Create and set the default download folder */
-FileBundle.setDefaultFolder = function() {
+/* Create and set the default download folder. Return true for success, false for failure. */
+FileBundle.setDefaultPath = function() {
   /* MacOS X:         Movies/NicoFox
      Windows Vista/7: Videos/NicoFox 
      Windows XP/2k  : My Documents/NicoFox (Since it's hard to get where Video is)
@@ -139,7 +139,7 @@ FileBundle.setDefaultFolder = function() {
      Fallback:        ~/NicoFox */
 
   /* Step 1: Find the root folder for NicoFox on each OS */
-  var rootFolder = null;
+  var downloadDir = null;
   var os = Services.appinfo.OS;
   if (os == "WINNT") {
     /* Are we in Windows Vista/7 and Gecko 2.0 (js-ctypes don't support pointer until bug 513788 landed)? */
@@ -162,26 +162,40 @@ FileBundle.setDefaultFolder = function() {
       var result = SHGetSpecialFolderPath(0, pathArray, CSIDL_MYVIDEO, true);
       /* Read path and parse it into nsILocalFile for successful execution. */
       if (result) {
-        rootFolder = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile)
-        rootFolder.initWithPath(pathArray.readString());
+        downloadDir = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile)
+                                                     .initWithPath(pathArray.readString());
       }
     }
     /* Fallback to My Documents if we cannot find Videos folder. */
-    if (!rootFolder) {
-      rootFolder = Services.dirsvc.get("Pers", Ci.nsILocalFile);
+    if (!downloadDir) {
+      downloadDir = Services.dirsvc.get("Pers", Ci.nsILocalFile);
     }
   } else if (os == "Darwin") {
     /* Fro OSX, try NS_OSX_MOVIE_DOCUMENTS_DIR */
-    rootFolder = Services.dirsvc.get("Mov", Ci.nsILocalFile);
+    downloadDir = Services.dirsvc.get("Mov", Ci.nsILocalFile);
   } else {
     /* Others */
     try {
-      rootFolder = Services.dirsvc.get("XDGVids", Ci.nsILocalFile);
+      downloadDir = Services.dirsvc.get("XDGVids", Ci.nsILocalFile);
     } catch(e) {
-      rootFolder = Services.dirsvc.get("Home", Ci.nsILocalFile);
+      downloadDir = Services.dirsvc.get("Home", Ci.nsILocalFile);
     }
   }
-  return rootFolder.path;
+  /* Step 2: Append NicoFox and do some check; create if not exists. */
+  downloadDir.append("NicoFox");
+  if (downloadDir.exists()) {
+    if (!downloadDir.isWritable() || !downloadDir.isDirectory()) {
+      return false;
+    }
+  } else {
+    try {
+      downloadDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+    } catch(e) {
+      return false;
+    }
+  }
+  Core.prefs.setComplexValue("save_path", Ci.nsILocalFile, downloadDir);
+
 };
 
 /* Check if the user had installed NNDD for video downloading */

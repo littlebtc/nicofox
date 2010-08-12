@@ -435,7 +435,13 @@ DownloadManager.startup = function() {
     
   /* Read the preference */
   downloadMax = Core.prefs.getIntPref("download_max");
-  
+
+  /* Set default download path */  
+  if (!Core.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
+    Components.utils.import("resource://nicofox/FileBundle.jsm");
+    FileBundle.setDefaultPath();
+  }
+
   var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
   file.append("smilefox.sqlite");
 
@@ -689,6 +695,7 @@ downloadQueueRunner.removeEconomyItems = function() {
 /* Check and (re-)process some items enter/exit the queue. */
 downloadQueueRunner.process = function() {
   if (stopped) { return; }
+  Components.utils.reportError(JSON.stringify(downloadQueue));
   while(downloadQueue.length > 0 && activeDownloadCount < downloadMax) {
     var item = downloadQueue.shift();
     /* If we are sure that economy mode is enabled (e.g. first hi-quality pending video falls into economy mode) , don't process it. */
@@ -783,9 +790,12 @@ function handleDownloaderEvent(type, content) {
     
     case "video_fail":
     /* If the download observer says we fail */
-    this.removeFiles();
-    this.fail();
+    delete(activeDownloads[id]);
+    activeDownloadCount--;
+    
     Services.prompt.alert(null, Core.strings.getString("errorTitle"), Core.strings.getString("errorIncomplete"));
+    DownloadManagerPrivate.updateDownload(id, {"status": 3, "end_time": new Date().getTime()});
+ 	  downloadQueueRunner.process(); 
     break;
     
     case "thumbnail_done":
