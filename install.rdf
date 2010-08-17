@@ -20,14 +20,14 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox / Iceweasel ... -->
         <em:minVersion>3.6</em:minVersion>
-        <em:maxVersion>4.0b4pre</em:maxVersion>
+        <em:maxVersion>4.0b5pre</em:maxVersion>
       </Description>
     </em:targetApplication>
     <em:targetApplication>
       <Description>
         <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id> <!-- SeaMonkey -->
         <em:minVersion>2.1a1pre</em:minVersion>
-        <em:maxVersion>2.1a3pre</em:maxVersion>
+        <em:maxVersion>2.1b1pre</em:maxVersion>
       </Description>
     </em:targetApplication>
 
