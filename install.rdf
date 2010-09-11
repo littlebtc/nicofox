@@ -6,6 +6,7 @@
     <em:name>NicoFox</em:name>
     <em:version>0.6a</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your video watching experience!</em:description>
+    <em:unpack>true</em:unpack>
     <em:creator>Littlebtc</em:creator>
     <em:contributor>Logo and Icon designed by tdk4 in ptt.cc</em:contributor>
     <em:contributor>NicoFox contains some source codes by others that are licensed under various licenses.</em:contributor>
