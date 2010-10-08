@@ -329,6 +329,7 @@ DownloadUtils.nico.prototype = {
       _parentInstance: this,
       _unsuccessfulStart: false,
       onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
+        if (this._parentInstance._canceled) { return; }
         if (aStateFlags & 1) {
          /* Process HTTP Errors
 	        * nsIChannel will throw NS_ERROR_NOT_AVAILABLE when there is no connection
@@ -447,8 +448,8 @@ DownloadUtils.nico.prototype = {
     }
     if (this._extraItemsDownloader) {
       this._extraItemsDownloader.cancelAll();
+      this.removeFiles();
     }
-    this.removeFiles();
     this.callback("cancel",{});
   },
 
