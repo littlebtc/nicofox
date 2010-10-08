@@ -518,12 +518,7 @@ DownloadManager.getDownload = function(id, thisObj, successCallback, failCallbac
 /* Add a download entry to be proceed by download manager.
  * Note that video info will be read AFTER the entry was added.
  */
-DownloadManager.addDownload = function(url) {
-  if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
-    thisObj[failCallback].call(thisObj);
-    return;
-  }
+DownloadManager.addDownload = function(url, info) {
   /* Use stored statment if exists, or create a new one. */
   if (!storedStatements.addDownload) {
     storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
@@ -709,7 +704,7 @@ downloadQueueRunner.process = function() {
     downloadQueueRunner.initDownloader(item.id, item.video_economy);
 
     /* Change the status to "downloading" in the database asynchrously */
-    DownloadManagerPrivate.updateDownload(item.id, {status: 7});
+    //DownloadManagerPrivate.updateDownload(item.id, {status: 7});
   }
   /* Call the listeners that queue had changed */
   triggerDownloadListeners("queueChanged", null, {});
@@ -774,7 +769,7 @@ function handleDownloaderEvent(type, content) {
 
     /* Video download is started */
     case "start":
-    //DownloadManagerPrivate.updateDownload(id, {"status": 7});
+    DownloadManagerPrivate.updateDownload(id, {"status": 7});
     break;
 
     case "progress_change":
