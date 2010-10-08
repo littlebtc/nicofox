@@ -31,7 +31,7 @@
         <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="smilefoxInactiveItem" />
-          <xul:label value="Failed" flex="1" class="smilefoxInactiveItem"/>
+          <xul:label value="Canceled" flex="1" class="smilefoxInactiveItem"/>
         </xul:vbox>
       </xul:hbox>
     </content>
@@ -42,7 +42,7 @@
         <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="smilefoxInactiveItem" />
-          <xul:label value="Canceled" flex="1" class="smilefoxInactiveItem"/>
+          <xul:label value="Failed" flex="1" class="smilefoxInactiveItem"/>
         </xul:vbox>
       </xul:hbox>
     </content>

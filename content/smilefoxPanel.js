@@ -24,7 +24,9 @@ nicofox.panel.onPopupShowing = function() {
   }
   this.load();
 };
-
+nicofox.panel.onPopupShown = function() {
+  document.getElementById("smilefoxList").focus();
+};
 /* Load Panel */
 nicofox.panel.load = function() {
   this.loaded = true;
@@ -92,17 +94,24 @@ nicofox.panel.displayDownloads = function(resultArray) {
   } else if (resultArray.length == 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check")) {
     nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
   }
-  
-  var list = document.getElementById("smilefoxList");
-  /* XXX: Don't do it at once */
-  for (var i = 0; i < resultArray.length; i++) {
-    var result = resultArray[i];
-    var listItem = document.createElement("richlistitem");
-    nicofox.panel.updateDownloadItem(listItem, result);
-    list.appendChild(listItem);
-  }
+  /* Initialize a timer to append items */
+  this.timerCallback.resultArray = resultArray;
+  this.timerCallback.list =  document.getElementById("smilefoxList");
+  this.timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+  this.timer.initWithCallback(this.timerCallback, 10, Ci.nsITimer.TYPE_REPEATING_SLACK);
 };
-
+nicofox.panel.timerCallback = {};
+/* Append one item at a shot */
+nicofox.panel.timerCallback.notify = function(timer) {
+  var result = this.resultArray.shift();
+  if (!result) { 
+    timer.cancel();
+    return;
+  }
+  var listItem = document.createElement("richlistitem");
+  nicofox.panel.updateDownloadItem(listItem, result);
+  this.list.appendChild(listItem);
+};
 /* Update the <listitem> when new download were added or the status had changed. */
 nicofox.panel.updateDownloadItem = function(listItem, result) {
   listItem.setAttribute("type", "smilefox");
