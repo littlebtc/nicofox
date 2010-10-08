@@ -11,6 +11,7 @@ nicofox_ui.overlay = {
 
    /* Register panel initializer */
    document.getElementById("nicofox-library").addEventListener("popupshowing", function() { nicofox.panel.onPopupShowing(); }, false);
+   document.getElementById("nicofox-library").addEventListener("popupshown", function() { nicofox.panel.onPopupShown(); }, false);
 
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   /* Update download manager statusbar, then register for changes */
