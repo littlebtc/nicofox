@@ -1,6 +1,0 @@
-<!ENTITY window.title "NicoFox 下载">
-<!ENTITY msg "是否确定要下载此视频和其评论？">
-<!ENTITY dontAsk.label "下次不要再询问">
-<!ENTITY dontAsk.accesskey "N">
-<!ENTITY download "下载">
-<!ENTITY cancel "取消">

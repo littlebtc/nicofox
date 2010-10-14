@@ -1,6 +1,0 @@
-<!ENTITY window.title "Téléchargement NicoFox">
-<!ENTITY msg "Confirmez-vous le téléchargement de cette vidéo et de son commentaire ?">
-<!ENTITY dontAsk.label "Ne plus me le demander">
-<!ENTITY dontAsk.accesskey "N">
-<!ENTITY download "Télécharger">
-<!ENTITY cancel "Annuler">
