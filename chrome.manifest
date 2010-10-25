@@ -6,7 +6,6 @@ locale	nicofox		zh-TW	locale/zh-TW/
 locale	nicofox		zh-HK	locale/zh-TW/
 skin	nicofox		classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefox_overlay.xul
-overlay chrome://navigator/content/navigator.xul	chrome://nicofox/content/seamonkey_overlay.xul
 
 # Gecko 2.0 Compartibility
 component {62ca6b17-975f-4c70-b497-33146a16c797} components/nicowatcher.js
