@@ -30,11 +30,11 @@ pref("extensions.nicofox.economy_notice", true);
 pref("extensions.nicofox.preload_info_before_download", true);
 pref("extensions.nicofox.thumbnail_check", false);
 
-// NicoMonkey
+/////////////////////////////////////////// NicoMonkey
 pref("extensions.nicofox.nicomonkey.enable", true);
 pref("extensions.nicofox.nicomonkey.toolbar", true);
 pref("extensions.nicofox.nicomonkey.comment_helper", false);
-pref("extensions.nicofox.nicomonkey.player_killer", false);
+// pref("extensions.nicofox.nicomonkey.player_killer", false); // Removed in 0.6
 
 // New in 0.3.5
 pref("extensions.nicofox.nicomonkey.third_party_notice", true);
@@ -42,7 +42,7 @@ pref("extensions.nicofox.nicomonkey.third_party_notice", true);
 // New in 0.3
 pref("extensions.nicofox.nicomonkey.sound_converter", 'http://nicosound.anyap.info/sound/%1');
 pref("extensions.nicofox.nicomonkey.supertag", true);
-pref("extensions.nicofox.nicomonkey.superlist", false);
+// pref("extensions.nicofox.nicomonkey.superlist", false); // Removed in 0.6
 
 // Easter Egg!
 pref("extensions.nicofox.tsundere", false);

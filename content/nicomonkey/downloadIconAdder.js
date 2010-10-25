@@ -38,7 +38,7 @@ function addDownloadIcons(rootDoc) {
     var pathname = videoLink.pathname;
     
     /* 1st check: whether it is the link to video page */ 
-    if (!host.match(/^(www|tw|de|es)\.nicovideo\.jp$/) || !pathname.match(/^\/watch\/[0-9a-z]+/)) {
+    if (!/^(?:www|tw|de|es)\.nicovideo\.jp$/.test(host) || !/^\/watch\/[0-9a-z]+/.test(pathname)) {
       continue;
     }
     /* 2nd check: the child of this node should not contains <img> (prevents thumbnail injection) */

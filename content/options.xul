@@ -17,10 +17,8 @@
       <preference id="pref-nicomonkey.enable" name="extensions.nicofox.nicomonkey.enable" type="bool" onchange="nicomonkeySwitch();" />
       <preference id="pref-nicomonkey.toolbar" name="extensions.nicofox.nicomonkey.toolbar" type="bool" onchange="toolbarSwitch();" />
       <preference id="pref-nicomonkey.comment_helper" name="extensions.nicofox.nicomonkey.comment_helper" type="bool"/>
-      <preference id="pref-nicomonkey.player_killer" name="extensions.nicofox.nicomonkey.player_killer" type="bool"/>
       <preference id="pref-nicomonkey.sound_converter" name="extensions.nicofox.nicomonkey.sound_converter" type="string"/>
       <preference id="pref-nicomonkey.supertag" name="extensions.nicofox.nicomonkey.supertag" type="bool"/>
-      <preference id="pref-nicomonkey.superlist" name="extensions.nicofox.nicomonkey.superlist" type="bool"/>
       <preference id="pref-nicowa_blocker" name="extensions.nicofox.nicowa_blocker" type="bool"/>
     </preferences>
     <checkbox id="nicowa_blocker" preference="pref-nicowa_blocker" label="&nicowa_blocker.label;" accesskey="&nicowa_blocker.accesskey;" />
@@ -39,9 +37,7 @@
      </menulist>
      </hbox>
      <checkbox id="nicomonkey.comment_helper" preference="pref-nicomonkey.comment_helper" label="&nicomonkey.comment_helper.label;" accesskey="&nicomonkey.comment_helper.accesskey;" />
-     <checkbox id="nicomonkey.player_killer" preference="pref-nicomonkey.player_killer" label="&nicomonkey.player_killer.label;" accesskey="&nicomonkey.player_killer.accesskey;" />
      <checkbox id="nicomonkey.supertag" preference="pref-nicomonkey.supertag" label="&nicomonkey.supertag.label;" accesskey="&nicomonkey.supertag.accesskey;" />
-     <!--<checkbox id="nicomonkey.superlist" preference="pref-nicomonkey.superlist" label="&nicomonkey.superlist.label;" accesskey="&nicomonkey.superlist.accesskey;" />-->
     </groupbox>
   </prefpane>
   <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/nicofox_downloader.png">

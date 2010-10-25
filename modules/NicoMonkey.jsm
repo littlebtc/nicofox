@@ -443,12 +443,12 @@ var NicoMonkey = {
   initScripts: function(href) {
     /* XXX: Hack */
     var scripts = [];
-    if ( /^http:\/\/(www|tw|de|es|ch)\.nicovideo\.jp\//.test(href) ) {
+    if ( /^http:\/\/(?:www|tw|de|es|ch)\.nicovideo\.jp\//.test(href) ) {
       scripts.push({
-        name: "NicoMonkey",
-        namespace: "http://littleb.tc/nicofox/nicomonkey/legacy",
+        name: "NicoMonkey Video Tools",
+        namespace: "http://littleb.tc/nicofox/nicomonkey/videotools",
         unwrap: false,
-        _url: "chrome://nicofox/content/nicomonkey/nicomonkey.js"
+        _url: "chrome://nicofox/content/nicomonkey/videoTools.js"
       });
     }
     /* Add download icon to videos, applied on niconico-wide site */
@@ -461,7 +461,7 @@ var NicoMonkey = {
       });
     }
     /* Add comment input helper for tw/de/es version of Nicovideo, which are still using old player */
-    if (/^http:\/\/(tw|de|es)\.nicovideo\.jp\/watch\//.test(href)) {
+    if (/^http:\/\/(?:tw|de|es)\.nicovideo\.jp\/watch\//.test(href)) {
       scripts.push({
         name: "NicoMonkey Comment Helper",
         namespace: "http://littleb.tc/nicofox/nicomonkey/comment_helper",
