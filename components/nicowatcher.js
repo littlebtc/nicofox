@@ -28,26 +28,23 @@ NicoWatcher.prototype = {
     if (contentType == Ci.nsIContentPolicy.TYPE_DOCUMENT) {
       var url = contentLocation.spec;
       /* Simplify the filter code to make it faster (don't check Nicovideo URL here) */
-      if (url.search(/\?smilefox\=get$/) != -1) {
-        var winWat = Cc["@mozilla.org/embedcomp/window-watcher;1"].getService(Ci.nsIWindowWatcher);
-        if (winWat.activeWindow && winWat.activeWindow.nicofox_ui && winWat.activeWindow.nicofox_ui.overlay) {
-          /* We have no setTimeout(), so... */
-          var timerEvent = {
-            notify: function () {
-              Components.utils.import("resource://nicofox/DownloadManager.jsm");
-              DownloadManager.addDownload(url.substring(0, url.indexOf("?")));
-            } 
-          }
-          var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-          timer.initWithCallback(timerEvent, 10, Ci.nsITimer.TYPE_ONE_SHOT);
+      if (/\?smilefox\=get$/.test(url)) {
+        /* We have no setTimeout(), so... */
+        var timerEvent = {
+          notify: function () {
+            Components.utils.import("resource://nicofox/DownloadManager.jsm");
+            DownloadManager.addDownload(url.substring(0, url.indexOf("?")));
+          } 
         }
+        var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+        timer.initWithCallback(timerEvent, 10, Ci.nsITimer.TYPE_ONE_SHOT);
         
         return Ci.nsIContentPolicy.REJECT_REQUEST;
       }
     /* Block NicoWa if needed */
-    } else if (contentType == Ci.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST) {
+    } else if (this._nicowaBlocker && contentType == Ci.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST) {
       var url = contentLocation.spec;
-      if(this._nicowaBlocker && url.indexOf('http://flapi.nicovideo.jp/api/getmarqueev3') == 0 ) {
+      if(url.indexOf('http://flapi.nicovideo.jp/api/getmarqueev3') == 0 ) {
         return Ci.nsIContentPolicy.REJECT_REQUEST;
       }
     }
