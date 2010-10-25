@@ -12,14 +12,13 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
   <script type="application/x-javascript" src="chrome://nicofox/content/smilefoxPanel.js"/>
-  <script type="application/x-javascript" src="chrome://nicofox/content/nicomonkey/script-compiler.js" />
   <stringbundleset id="stringbundleset">
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
     <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
   </stringbundleset>
   <menupopup id="menu_viewPopup">
     <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;" type="checkbox" checked="false" autocheck="false"
-             oncommand="nicofox_ui.overlay.onMenuItemCommand(event);"
+             oncommand="nicofox.overlay.onMenuItemCommand(event);"
    position="2" />
   </menupopup>
   
@@ -31,7 +30,7 @@
           <label value="&window.title;" />
           <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
         </hbox>
-        <!--<textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>-->
+        <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox_ui.manager.doSearch();"/>
         <vbox id="smilefoxThumbNotice" hidden="true">
           <description>NicoFox can download the thumbnail, and display it in the download manager now.</description>
           <description>Do you want to enable thumbnail download and download thumbnail for previous video downloads now?</description>
@@ -43,9 +42,10 @@
           <label value="Download thumbnails for previous video downloads..." />
           <progressmeter id="smilefoxThumbProgressMeter" />
         </vbox>
-        <richlistbox id="smilefoxList" height="430" context="smilefoxPopup"
+        <richlistbox id="smilefoxList" context="smilefoxPopup"
                      onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox.panel.commands.open(this.selectedItem); }"
-                     onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }">
+                     onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"
+                     flex="1">
         </richlistbox>
         <popupset id="smilefoxPopupset">
           <menupopup id="smilefoxPopup" onpopupshowing="return nicofox.panel.generateContextMenu(event);" onpopuphiding="">
