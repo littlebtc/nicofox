@@ -392,6 +392,9 @@ nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1"
 /* XXX: Remove listener used only */
 nicofox.panel.unload = function() {
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
+  if (this.timer) {
+    this.timer.cancel();
+  }
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);
 }
 window.addEventListener("unload", function() { nicofox.panel.unload(); }, false);
