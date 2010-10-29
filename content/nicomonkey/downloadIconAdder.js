@@ -13,7 +13,7 @@ if (document.location.pathname.indexOf("/my") != 0) {
 }
 
 /* Nicovideo Homepage had "tab" ajax update, so we should watch the DOM change to inject new links */
-if (document.location.host == "www.nicovideo.jp" && document.location.pathname =="/") {
+if (document.location.host == "www.nicovideo.jp" && /^\/video_top\/?$/.test(document.location.pathname)) {
   document.addEventListener("DOMNodeInserted", function(event) {
     /* Category_recent contians updated video list, so inject it */
     if(event.target.id == "category_recent") { 
