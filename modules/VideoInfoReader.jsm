@@ -10,7 +10,8 @@
  * 
  * What is NicoFox's approach to solve the problems? 
  * - If user loaded a video page, the info (from NicoMonkey) will be automatically cached for a short time.
- * - When user want to download a video, if the info is cached, use the cached info, otherwise, call /getthumbinfo/ to get "simple" info.
+ * - When user want to download a video, if the info is cached, use the cached info, 
+ *   Otherwise, call /getthumbinfo/ to get "simple" info which will not be cached.
  * - When we actully start downloading, VideoInfoReader will be called again, to make sure video stream access won't be blocked:
  *   If the cached info is not expired, then it should be ok; if not, the video page will be reloaded and should be OK again.
  */
@@ -177,9 +178,8 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
   var regexMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*)\}\;\s+(-->)?\s?<\/script>/);
   if (!regexMatch) {
     /* Two cases if Video is not present: (1) had User variable: error, anti-flood (2) has no User variable: not logged in */
-    var userMatch = content.match(/var User = \{ id\: [0-9]+/);
     var reason = "";
-    if (userMatch) {
+    if (/var User = \{ id\: [0-9]+/.test(content)) {
       Components.utils.reportError("NicoFox VideoReader down: Cannot fetch Video parameter. Antiflood is on, or the video had been deleted.");
       reason = "error";
     } else {
@@ -199,7 +199,7 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
     nicoData = JSON.parse('{'+videoString+'}');
   } catch(e) {
     Components.utils.reportError("NicoFox VideoReader down: Cannot convert Video parameter into JSON");
-    this.callbackThisObj[this.failCallback].call(this.callbackThisObj);
+    this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "jsonfail");
     return;
   }
   var otherData = {};
@@ -212,7 +212,46 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
 /* When fetchUrlAsync cannot read the page, throw an error. */
 innerFetcher.prototype.fetchError = function() {
   Components.utils.reportError("NicoFox VideoReader down: Cannot read video page on Nico Nico Douga.");
-  this.callbackThisObj.failCallback.call(this.callbackThisObj);
+  this.callbackThisObj[this.failCallback].call(this.callbackThisObj);
+};
+
+/* Inner reader to make asynchorous request to the /getthumbinfo/ XML, and response after read "simple info"*/
+function innerSimpleFetcher(url, thisObj, successCallback, failCallback) {
+  this.callbackThisObj = thisObj;
+  this.successCallback = successCallback;
+  this.failCallback = failCallback;
+  this.originalUrl = url;
+  /* Replace /getthumbinfo/ URL, change www.nicovideo.jp to ext.nicovideo.jp to avoid redirect. */
+  url = url.replace(/^http:\/\/www\./, "http://ext.");
+  url = url.replace(/\/watch\//, "/api/getthumbinfo/");
+  Components.utils.import("resource://nicofox/Network.jsm");
+  Network.fetchUrlAsync(url, "", this, "readVideoXML", "fetchError");
+}
+/* The responser to /getthumbinfo/ XML. (Using E4X) */
+innerSimpleFetcher.prototype.readVideoXML = function(url, content) {
+  content = content.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
+  var infoXML = new XML(content);
+  /* Report failed for not correct response. */
+  if (infoXML.@status != "ok") {
+    this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "xmlerr");
+    return;
+  }
+  /* Try to match the info type similar as innerFetcher. */
+  var info = {
+    nicoData: {
+      title: infoXML.thumb.title.toString(),
+      thumbnail: infoXML.thumb.thumbnail_url.toString()
+    }
+  };
+  /* If there is callback, call the callback */
+  if (this.callbackThisObj && this.successCallback) {
+    this.callbackThisObj[this.successCallback].call(this.callbackThisObj, this.originalUrl, info);
+  }
+};
+/* When fetchUrlAsync cannot read the page, throw an error. */
+innerSimpleFetcher.prototype.fetchError = function() {
+  Components.utils.reportError("NicoFox VideoReader down: Cannot read video XML on Nico Nico Douga.");
+  this.callbackThisObj[thhis.failCallback].call(this.callbackThisObj);
 };
 
 /* Public Methods. */
@@ -242,17 +281,22 @@ VideoInfoReader.readByUrl = function(url, simpleInfoAllowed, thisObj, successCal
     /* If there is cache, use the cache */
     thisObj[successCallback].call(thisObj, url, cachedInfo[url]);
   } else {
-    /* Push it into queue */
-    pageReadQueue.push({
-      url: url,
-      thisObj: thisObj,
-      successCallback: successCallback,
-      failCallback: failCallback,
-    });
-    /* If the timer is not running, make it run in a specific delay */
-    if (!pageReadTimer.callback) {
-      var delay = 50;
-      pageReadTimer.initWithCallback(pageReadTimerCallback, delay, Ci.nsITimer.TYPE_REPEATING_SLACK);
+    /* For simple info: get it from /getthumbinfo/ XML, and don't use cache and queue */
+    if (simpleInfoAllowed) {
+      var innerSimpleFetcherInstance = new innerSimpleFetcher(url, thisObj, successCallback, failCallback);
+    } else {
+      /* Push it into queue */
+      pageReadQueue.push({
+        url: url,
+        thisObj: thisObj,
+        successCallback: successCallback,
+        failCallback: failCallback,
+      });
+      /* If the timer is not running, make it run in a specific delay */
+      if (!pageReadTimer.callback) {
+        var delay = 50;
+        pageReadTimer.initWithCallback(pageReadTimerCallback, delay, Ci.nsITimer.TYPE_REPEATING_SLACK);
+      }
     }
   }
 };
