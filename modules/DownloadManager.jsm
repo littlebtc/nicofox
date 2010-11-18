@@ -519,6 +519,8 @@ DownloadManager.getDownload = function(id, thisObj, successCallback, failCallbac
  * Note that video info will be read AFTER the entry was added.
  */
 DownloadManager.addDownload = function(url, info) {
+  /* XXX: URL Checker should not be here. */
+  if (!/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
   /* Use stored statment if exists, or create a new one. */
   if (!storedStatements.addDownload) {
     storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
