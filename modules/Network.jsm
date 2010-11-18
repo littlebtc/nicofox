@@ -35,12 +35,20 @@ Network.fetchUrlAsync = function(url, postQueryString, thisObj, successCallback,
       thisObj[failCallback].call(thisObj, url, str);
       return;
     }
-    var scriptableInputStream = Cc["@mozilla.org/scriptableinputstream;1"].createInstance(Ci.nsIScriptableInputStream);
-    scriptableInputStream.init(aInputStream);
-    var str = scriptableInputStream.read(aInputStream.available());
-    scriptableInputStream.close();
+    /* Convert utf-8 input stream. From https://developer.mozilla.org/en/Code_snippets/File_I%2f%2fO */
+    var converterInputStream = Cc["@mozilla.org/intl/converter-input-stream;1"].createInstance(Ci.nsIConverterInputStream);
+    converterInputStream.init(aInputStream, "UTF-8", 0, 0);
+    var data = "";
+    let (str = {}) {
+      let read = 0;
+      do { 
+        read = converterInputStream.readString(0xffffffff, str);
+        data += str.value;
+      } while (read != 0);
+    }
+    converterInputStream.close();
     aInputStream.close();
-    thisObj[successCallback].call(thisObj, url, str);
+    thisObj[successCallback].call(thisObj, url, data);
   });
 
 }
