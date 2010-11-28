@@ -415,7 +415,7 @@ DownloadManagerPrivate.initializeDownload = function(url, info) {
   for (var key in params) {
     storedStatements.addDownload.params[key] = params[key];
   }
-  /* lastInsertRowID is not reliable in asynchorous execution, so do it synchrously */
+  /* lastInsertRowID is not reliable in asynchronous execution, so do it synchronously */
   storedStatements.addDownload.execute();
   storedStatements.addDownload.reset();
   var lastInsertRowID = DownloadManagerPrivate.dbConnection.lastInsertRowID;
@@ -525,7 +525,7 @@ DownloadManager.fetchThumbnails = function() {
   statement.executeAsync(callback);
 };
 
-/* Asynchorouslly get all items in the download manager */
+/* Asynchronously get all items in the download manager */
 DownloadManager.getDownloads = function(thisObj, successCallback, failCallback) {
   if (!working) {
     Components.utils.reportError("DownloadManager is not working. This should not be happened.");

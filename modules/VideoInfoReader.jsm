@@ -164,7 +164,7 @@ function parseVideoInfo(url, nicoData, otherData, thisObj, callbackFuncName) {
   }
 }
 
-/* Inner reader to make asynchorous request to the video page, and response after read */
+/* Inner reader to make asynchronous request to the video page, and response after read */
 function innerFetcher(url, thisObj, successCallback, failCallback) {
   this.callbackThisObj = thisObj;
   this.successCallback = successCallback;
@@ -215,7 +215,7 @@ innerFetcher.prototype.fetchError = function() {
   this.callbackThisObj[this.failCallback].call(this.callbackThisObj);
 };
 
-/* Inner reader to make asynchorous request to the /getthumbinfo/ XML, and response after read "simple info"*/
+/* Inner reader to make asynchronous request to the /getthumbinfo/ XML, and response after read "simple info"*/
 function innerSimpleFetcher(url, thisObj, successCallback, failCallback) {
   this.callbackThisObj = thisObj;
   this.successCallback = successCallback;
