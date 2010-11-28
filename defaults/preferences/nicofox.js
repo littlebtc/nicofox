@@ -27,7 +27,6 @@ pref("extensions.nicofox.external_swf_player_path", '');
 pref("extensions.nicofox.economy_notice", true);
 
 // New in 0.6
-pref("extensions.nicofox.preload_info_before_download", true);
 pref("extensions.nicofox.thumbnail_check", false);
 
 /////////////////////////////////////////// NicoMonkey

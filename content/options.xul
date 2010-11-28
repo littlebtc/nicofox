@@ -44,9 +44,6 @@
   <script type="application/x-javascript" src="chrome://nicofox/content/options_panel2.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
-      <preference id="pref-confirm_before_download" name="extensions.nicofox.confirm_before_download" type="bool" />
-      <preference id="pref-preload_info_before_download" name="extensions.nicofox.preload_info_before_download" type="bool" />
-<!--      <preference id="pref-bar_autoopen" name="extensions.nicofox.bar_autoopen" type="bool" />-->
       <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
       <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
       <preference id="pref-download_thumbnail" name="extensions.nicofox.download_thumbnail" type="bool" />
@@ -59,10 +56,6 @@
       <preference id="pref-nicoplayer_txt" name="extensions.nicofox.nicoplayer_txt" type="bool" />
       <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="wstring" />
     </preferences>
-    <checkbox id="confirm_before_download" preference="pref-confirm_before_download" label="&downloader.confirm_before_download.label;" accesskey="&downloader.confirm_before_download.accesskey;" />
-    <!--<checkbox id="preload_info_before_download" preference="pref-preload_info_before_download" label="在新增下載後即預讀影片資訊"/>--><!-- label="&downloader.preload_info_before_download.label;" accesskey="&downloader.preload_info_before_download.accesskey;" />-->
-   <!-- <label>關閉此功能會減少對影片頁面的讀取，降低下載失敗的發生次數。</label>-->
-<!--    <checkbox id="bar_autoopen" preference="pref-bar_autoopen" label="&downloader.bar_autoopen.label;" accesskey="&downloader.bar_autoopen.accesskey;" />-->
     <groupbox align="start">
      <caption label="&downloader.options;" />
      <grid>
