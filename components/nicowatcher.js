@@ -25,7 +25,9 @@ NicoWatcher.prototype = {
   /* Implements nsIContentPolicy */
   shouldLoad: function(contentType, contentLocation, requestOrigin, requestingNode, mimeTypeGuess, extra) {
     if (this._nicowaBlocker === null) { this._initPref(); }
-    if (contentType == Ci.nsIContentPolicy.TYPE_DOCUMENT) {
+    /* Sometimes there will be a ?smilefox=get request from the <iframe> of thumbnail */
+    if (contentType == Ci.nsIContentPolicy.TYPE_DOCUMENT ||
+        contentType == Ci.nsIContentPolicy.TYPE_SUBDOCUMENT) {
       var url = contentLocation.spec;
       /* Simplify the filter code to make it faster (don't check Nicovideo URL here) */
       if (/\?smilefox\=get$/.test(url)) {
