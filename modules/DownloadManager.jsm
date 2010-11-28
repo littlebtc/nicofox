@@ -373,6 +373,9 @@ DownloadManagerPrivate.afterRetryDownloadRead = function(resultArray) {
   var item = resultArray[0];
   /* Only allow retrying to failed or canceled item. */
   if (item.status != 2 && item.status != 3) { return; }
+  /* Reset the status. It should work fine even if it is set asynchronously. */
+  DownloadManagerPrivate.updateDownload(item.id, {status: 0});
+
   downloadQueue.push(item);
   downloadQueueRunner.process();
 };
