@@ -37,12 +37,12 @@ Network.fetchUrlAsync = function(url, postQueryString, thisObj, successCallback,
     }
     /* Convert utf-8 input stream. From https://developer.mozilla.org/en/Code_snippets/File_I%2f%2fO */
     var converterInputStream = Cc["@mozilla.org/intl/converter-input-stream;1"].createInstance(Ci.nsIConverterInputStream);
-    converterInputStream.init(aInputStream, "UTF-8", 0, 0);
+    converterInputStream.init(aInputStream, "UTF-8", 1024, Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
     var data = "";
     let (str = {}) {
       let read = 0;
       do { 
-        read = converterInputStream.readString(0xffffffff, str);
+        read = converterInputStream.readString(4096, str);
         data += str.value;
       } while (read != 0);
     }
