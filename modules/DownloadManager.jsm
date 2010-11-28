@@ -385,6 +385,45 @@ DownloadManagerPrivate.failStartup = function() {
 DownloadManagerPrivate.dbFail = function() {
 };
 
+/* Process the result from DownloadManager.addDownload(). */
+DownloadManagerPrivate.failAddingDownloadInfo = function(url, reason) {
+  Components.utils.reportError(reason);
+}
+
+/* Actaully add download item and put it into the queue after the simple info is read.  */
+DownloadManagerPrivate.initializeDownload = function(url, info) {
+  /* Use stored statment if exists, or create a new one. */
+  if (!storedStatements.addDownload) {
+    storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
+  }
+  /* Beware: reset(); won't clear any params. Make sure to reset all params! */
+  var params = {};
+  params.url = url;
+  params.video_title = info.nicoData.title;
+  params.add_time = new Date().getTime();
+  /* XXX: !!! If no preload is required, set the status to -1 (info pending).
+     Otherwise, set it to 0 (queued). */
+  //if (Core.prefs.getBoolPref("preload_info_before_download")) {
+    //params.status = -1;
+  //} else {
+    params.status = 0;
+  //}
+  params.in_private = (inPrivateBrowsing)?1:0;
+  for (var key in params) {
+    storedStatements.addDownload.params[key] = params[key];
+  }
+  /* lastInsertRowID is not reliable in asynchorous execution, so do it synchrously */
+  storedStatements.addDownload.execute();
+  storedStatements.addDownload.reset();
+  var lastInsertRowID = DownloadManagerPrivate.dbConnection.lastInsertRowID;
+  /* Trigger download listeners and push it to the download queue.
+   * Beware: params are just referenced not cloned! Don't try to modify anything on it. */
+  params.id = lastInsertRowID;
+  triggerDownloadListeners("downloadAdded", lastInsertRowID, params);
+  downloadQueue.push(params);
+  downloadQueueRunner.process();
+};
+
 /* Update download item with given parameters
  * XXX: will it better to split it out to several cases and cache statements, like what we do in 0.3.x?
  */ 
@@ -515,42 +554,15 @@ DownloadManager.getDownload = function(id, thisObj, successCallback, failCallbac
   storedStatements.getDownload.executeAsync(callback);
 };
 
-/* Add a download entry to be proceed by download manager.
+/* Add a download entry, check it, then be proceed by download manager.
  * Note that video info will be read AFTER the entry was added.
  */
 DownloadManager.addDownload = function(url, info) {
   /* XXX: URL Checker should not be here. */
   if (!/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
-  /* Use stored statment if exists, or create a new one. */
-  if (!storedStatements.addDownload) {
-    storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
-  }
-  /* Beware: reset(); won't clear any params. Make sure to reset all params! */
-  var params = {};
-  params.url = url;
-  params.video_title = url.slice(url.lastIndexOf("/") + 1);
-  params.add_time = new Date().getTime();
-  /* XXX: !!! If no preload is required, set the status to -1 (info pending).
-     Otherwise, set it to 0 (queued). */
-  //if (Core.prefs.getBoolPref("preload_info_before_download")) {
-    //params.status = -1;
-  //} else {
-    params.status = 0;
-  //}
-  params.in_private = (inPrivateBrowsing)?1:0;
-  for (var key in params) {
-    storedStatements.addDownload.params[key] = params[key];
-  }
-  /* lastInsertRowID is not reliable in asynchorous execution, so do it synchrously */
-  storedStatements.addDownload.execute();
-  storedStatements.addDownload.reset();
-  var lastInsertRowID = DownloadManagerPrivate.dbConnection.lastInsertRowID;
-  /* Trigger download listeners and push it to the download queue.
-   * Beware: params are just referenced not cloned! Don't try to modify anything on it. */
-  params.id = lastInsertRowID;
-  triggerDownloadListeners("downloadAdded", lastInsertRowID, params);
-  downloadQueue.push(params);
-  downloadQueueRunner.process();
+  /* Ask the "Simple info" of the video. FIXME: Does this require an extra query? */
+  Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
+  VideoInfoReader.readByUrl(url, true, DownloadManagerPrivate, "initializeDownload", "failAddingDownloadInfo");
 };
 
 /* If the download is running, cancel the download. */

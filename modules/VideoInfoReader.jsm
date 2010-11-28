@@ -231,18 +231,36 @@ function innerSimpleFetcher(url, thisObj, successCallback, failCallback) {
 innerSimpleFetcher.prototype.readVideoXML = function(url, content) {
   content = content.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
   var infoXML = new XML(content);
-  /* Report failed for not correct response. */
+  var info = {};
   if (infoXML.@status != "ok") {
-    this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "xmlerr");
-    return;
-  }
-  /* Try to match the info type similar as innerFetcher. */
-  var info = {
-    nicoData: {
+    var reason = "";
+    /* Read the error message */
+    if (infoXML.error.code.toString() == "COMMUNITY") {
+      reason = "community";
+    } else if (infoXML.error.code.toString() == "NOT_FOUND") {
+      reason = "notfound";
+    } else if (infoXML.error.code.toString() == "DELETED") {
+      reason = "deleted";
+    } else {
+      reason = "xmlerr";
+    }
+    /* Community thread cannot be read from getthumbinfo, which should not be considered as an error. */
+    if (reason != "community") {
+      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, url, reason);
+      return;
+    } else {
+      /* Use the thread ID as title */
+      info.nicoData = {
+        title: url.slice(url.lastIndexOf("/") + 1) 
+      };
+    }
+  } else {
+    /* Try to match the info type similar as innerFetcher. */
+    info.nicoData = {
       title: infoXML.thumb.title.toString(),
       thumbnail: infoXML.thumb.thumbnail_url.toString()
-    }
-  };
+    };
+  }
   /* If there is callback, call the callback */
   if (this.callbackThisObj && this.successCallback) {
     this.callbackThisObj[this.successCallback].call(this.callbackThisObj, this.originalUrl, info);
