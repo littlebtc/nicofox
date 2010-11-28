@@ -149,6 +149,28 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
 nicofox.panel.dbFail = function() {
   alert("dbFail!");
 };
+
+/* A very simple "Search" feature implemented by hidding elements. */
+nicofox.panel.search = function(value) {
+  var list = document.getElementById("smilefoxList");
+  var items = list.children;
+  /* Split search terms. From chrome/toolkit/content/mozapps/downloads/downloads.js on mozilla-central. */
+  var terms = value.replace(/^\s+|\s+$/g, "").toLowerCase().split(/\s+/);
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var lowerCaseTitle = item.getAttribute("sfvideotitle").toLowerCase();
+    /* Check whether all keywords matched */
+    let match = true;
+    for (var j = 0; j < terms.length; j++) {
+      if (lowerCaseTitle.indexOf(terms[j]) == -1) {
+        match = false;
+      }
+    }
+    item.hidden = !match;
+  }
+};
+
 /* When popup menu is showing, check the selected item and generate correct menu items 
  * Like /toolkit/mozapps/downloads/content/downloads.js on mozilla-central
  */
