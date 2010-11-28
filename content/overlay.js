@@ -35,8 +35,13 @@ nicofox.overlay = {
   },
   /* On View -> NicoFox */
   onMenuItemCommand: function(e) {
-    document.getElementById('nicofox-library').hidden = false;
-    document.getElementById('nicofox-library').openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
+    /* Temp workaround for Firefox 4: expand addon bar so that the panel can be shown */
+    var addonBar = document.getElementById("addon-bar");
+    if (addonBar) {
+      addonBar.collapsed = false;
+    }
+    document.getElementById("nicofox-library").hidden = false;
+    document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
   },
   /* Based on Greasemonkey. Is the URL nicomonkeyable? */
   isNicomonkeyable: function(url) {
