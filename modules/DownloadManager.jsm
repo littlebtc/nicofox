@@ -83,8 +83,7 @@ var downloadObserver = {
       break;
       
       case "quit-application":
-      working = false;
-      download_runner.cancelAll();
+      DownloadManager.cancelAllDownloads();
       this.unregisterGra();
       prefObserver.unregister();
       break;
@@ -93,12 +92,10 @@ var downloadObserver = {
       if (data == 'enter') {
         inPrivateBrowsing = true;
       } else if (data == 'exit') {
-        working = false;
-        download_runner.cancelAll();
+        DownloadManager.cancelAllDownloads();
         inPrivateBrowsing = false;
       	DownloadManagerPrivate.exitPrivateBrowsing();
         triggerDownloadListeners('rebuild', null, null); 
-        working = true;
       }
       break;
     }
@@ -574,6 +571,14 @@ DownloadManager.cancelDownload = function(id) {
     activeDownloads[id].downloader.cancel();
   }
 };
+/* Cancel all downloads. */
+DownloadManager.cancelAllDownloads = function() {
+  for (var id in activeDownloads) {
+    if (activeDownloads[id].downloader) {
+      activeDownloads[id].downloader.cancel();
+    }
+  }
+};
 /* Retry download: Read video download first, then call DownloadManagerPrivate. */
 DownloadManager.retryDownload = function(id) {
   DownloadManager.getDownload(id, DownloadManagerPrivate, "afterRetryDownloadRead", "dbFail");
@@ -623,29 +628,6 @@ DownloadManager.__defineGetter__("DBConnection", function() {
   return DownloadManagerPrivate.dbConnection;
 }
 );
-
-/* 
-   Providing communication between download manager interface and core
-*/
-nicofox.download_manager = {
-   moveFile: function(id, video_file, comment_file) {
-     var info = smilefox_sqlite.updatePath(id, {video_file: video_file, comment_file: comment_file});
-     triggerDownloadListeners('update', id, info);
-   },
-   cancelAll: function()
-   {
-     download_runner.cancelAll();
-   },
-   retry: function(id)
-   {
-     download_runner.retry(id);
-   },
-   go: function()
-   {
-     download_runner.start();
-     download_runner.prepare();
-   }
-};
 
 /* Download Queue to store the waiting downloads */
 var downloadQueue = [];
@@ -840,56 +822,6 @@ function handleDownloaderEvent(type, content) {
     break;
   }
 }
-        /* Economy is on, so something is not downloaded */
-/*        if (Core.prefs.getBoolPref('economy_notice')) {
-          var check = {value: false};
-          Services.prompt.alertCheck(null, Core.strings.getString('economyNoticeTitle'), Core.strings.getString('economyNoticeMessage'), Core.strings.getString('economyNoticeNeverAsk') , check);
-	  if (check.value) {
-            Core.prefs.setBoolPref('economy_notice', false);
-	  }
-	}
-        download_runner.hitEconomy = false;
-      }
-      this.download_triggered = 0;
-      this.download_canceled = 0;
-      this.stopped = true;
-      triggerDownloadListeners('stop', null, null); 
-    }
-  },
-  cancel: function(id)
-  {
-    for (var i = 0; i < this.query.length; i++)
-    {
-      if (this.query[i].id == id && this.query[i].downloader)
-      {
-        this.query[i].downloader.cancel();
-      }
-    }
-  },
-  cancelAll: function()
-  {
-    for (var i = 0; i < this.query.length; i++)
-    {
-      if (this.query[i].downloader)
-      {
-        this.query[i].downloader.cancel();
-      }
-    }
-  },
-  retry: function(id)
-  {
-    var row = smilefox_sqlite.selectId(id);  
-    /* Reset, then retry query */
-  /*  if (row.status >= 2 || row.status <= 4)
-    {
-      smilefox_sqlite.updateStatus(id, 0);
-      triggerDownloadListeners('update', id, {status: 0});
-      
-      download_runner.start();
-      download_runner.prepare();
-    }
-  },
-};*/
 
 /* Economy mode timer */
 var economyTimerCallback = {
