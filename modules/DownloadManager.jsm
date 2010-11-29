@@ -445,15 +445,10 @@ DownloadManagerPrivate.updateDownload = function(id, params) {
     statement.params[key] = params[key];
   }
   statement.params.id = id;
-  var callback = generateStatementCallback("DownloadManagerPrivate.updateDownload", this, "notifyUpdatedDownload", "dbFail", null, id, params);
-  statement.executeAsync(callback);
-};
-
-/* Notify updated downloads */
-DownloadManagerPrivate.notifyUpdatedDownload = function(id, params) {
-    Components.utils.reportError("Notifying..");
+  statement.execute();
   triggerDownloadListeners('downloadUpdated', id, params);
 };
+
 /* Notify deleted downloads */
 DownloadManagerPrivate.notifyRemovedDownload = function(id) {
   triggerDownloadListeners('downloadRemoved', id);
