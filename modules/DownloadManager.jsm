@@ -772,8 +772,6 @@ function handleDownloaderEvent(type, content) {
     break;
 
     case "video_done":
-    DownloadManagerPrivate.updateDownload(id, {"currentBytes": this._videoCurrentBytes, "maxBytes": this._videoMaxBytes});
-    //DownloadManagerPrivate.updateDownload(id, {"status": 6});
     triggerDownloadListeners("downloadVideoCompleted", id, content);
     break;
     
@@ -797,7 +795,8 @@ function handleDownloaderEvent(type, content) {
     delete(activeDownloads[id]);
     activeDownloadCount--;
     
-    DownloadManagerPrivate.updateDownload(id, {"status": 1, "end_time": new Date().getTime()});
+    DownloadManagerPrivate.updateDownload(id, 
+    {"status": 1, "end_time": new Date().getTime(), "current_bytes": content.videoBytes, "max_bytes": content.videoBytes});
  	  downloadQueueRunner.process(); 
     break;
 

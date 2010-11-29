@@ -430,7 +430,7 @@ DownloadUtils.nico.prototype = {
   },
 
   completeAll: function() {
-    this.callback("completed", {});
+    this.callback("completed", {"videoBytes":  this._videoMaxBytes});
   },
   failParse: function(reason) {
     /* In VideoInfoReader callback, it will contains a reason. */
