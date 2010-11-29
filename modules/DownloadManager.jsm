@@ -703,7 +703,7 @@ downloadQueueRunner.process = function() {
     downloadQueueRunner.initDownloader(item.id, item.video_economy);
 
     /* Change the status to "downloading" in the database asynchrously */
-    //DownloadManagerPrivate.updateDownload(item.id, {status: 7});
+    DownloadManagerPrivate.updateDownload(item.id, {status: 7});
   }
   /* Call the listeners that queue had changed */
   triggerDownloadListeners("queueChanged", null, {});
@@ -768,7 +768,7 @@ function handleDownloaderEvent(type, content) {
 
     /* Video download is started */
     case "start":
-    DownloadManagerPrivate.updateDownload(id, {"status": 7});
+    //DownloadManagerPrivate.updateDownload(id, {"status": 7});
     break;
 
     case "progress_change":
