@@ -259,7 +259,8 @@ thumbnailFetcher.writeDb = function() {
 thumbnailFetcher.finishWrite = function() {
   Components.utils.reportError("Done " + this.runningItem.id);
   triggerDownloadListeners('thumbnailFetcherProgress', null, this.itemCount - this.undoneItems.length);
-  if (this.undoneItems.length == 0) { 
+  if (this.undoneItems.length == 0) {
+    Core.prefs.setBoolPref("thumbnail_check", true);
     allDone(); // XXX
   }
   else { 

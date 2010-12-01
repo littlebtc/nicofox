@@ -73,7 +73,6 @@ nicofox.panel.responseThumbnailCheck = function(resultArray) {
 
 /* Do when user agreed to use the thumbnail download function... */
 nicofox.panel.enableThumbnail = function() {
-  nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
   document.getElementById("smilefoxThumbNotice").hidden = true;
   document.getElementById("smilefoxThumbProgress").hidden = false;
   /* Ask download manager to fetch thumbnails */
