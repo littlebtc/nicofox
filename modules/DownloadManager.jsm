@@ -370,7 +370,7 @@ DownloadManagerPrivate.afterRetryDownloadRead = function(resultArray) {
   var item = resultArray[0];
   /* Only allow retrying to failed or canceled item. */
   if (item.status != 2 && item.status != 3) { return; }
-  /* Reset the status. It should work fine even if it is set asynchronously. */
+  /* Reset the status. */
   DownloadManagerPrivate.updateDownload(item.id, {status: 0});
 
   downloadQueue.push(item);
@@ -697,8 +697,8 @@ downloadQueueRunner.process = function() {
     /* Start the download */
     downloadQueueRunner.initDownloader(item.id, item.video_economy);
 
-    /* Change the status to "downloading" in the database asynchrously */
-    DownloadManagerPrivate.updateDownload(item.id, {status: 7});
+    /* Change the status to "downloading" in the database */
+    DownloadManagerPrivate.updateDownload(item.id, {"status": 7, "start_time": new Date().getTime()});
   }
   /* Call the listeners that queue had changed */
   triggerDownloadListeners("queueChanged", null, {});
@@ -763,7 +763,6 @@ function handleDownloaderEvent(type, content) {
 
     /* Video download is started */
     case "start":
-    //DownloadManagerPrivate.updateDownload(id, {"status": 7});
     break;
 
     case "progress_change":
