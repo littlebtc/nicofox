@@ -4,10 +4,9 @@ NicoFox - A better Nico Nico Douga on Firefox, featuring video download
 
 Latest release
 -------------
-Latest release of the addon will be always on the Mozilla Addons site:
-https://addons.mozilla.org/firefox/addon/8888
+Latest release of the addon will be always on the [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/8888).
 
-Test the latest version on repository
+Test the development snapshot on repository
 -------------
 The simplest way: Click the "Downloads" on the github page, download the source in zip format, rename the file with the .xpi extension, then drop the file into the addon manager in Firefox.  (The `player-develop` folder is a FlashDevelop project with the original source code for NicoFox Player, which can be remove from the ZIP archive to save the file size.)
 
