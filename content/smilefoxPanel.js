@@ -347,6 +347,28 @@ nicofox.panel.openOptionsWindow = function() {
   document.getElementById("nicofox-library").hidden = true;
 };
 
+/* Use NicoFox Player to play a video stored in the disk */
+nicofox.panel.openFileInPlayer = function() {
+  var filePicker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+  filePicker.init(window, nicofox.Core.strings.getString("chooseVideoFile"), null);
+  if (nicofox.Core.prefs.getComplexValue("save_path", Ci.nsISupportsString).data) {
+    filePicker.displayDirectory = nicofox.Core.prefs.getComplexValue("save_path", Ci.nsILocalFile);
+  }
+  filePicker.appendFilter(nicofox.Core.strings.getString("supportedType"), "*.flv; *.mp4; *.swf");
+  /* Try to find XML files then play them all */
+  if (filePicker.show() == Ci.nsIFilePicker.returnOK) {
+      /* XXX: Find a better way to make a function */
+      var file = filePicker.file;
+      var videoUriSpec = nicofox.Services.io.newFileURI(file).spec;
+      var commentUriSpec = "";
+
+      var commentFile = new nicofox.panel._fileInstance(file.path.replace(/(flv|mp4|swf)$/, "xml"));
+      if (commentFile.exists()) {
+        commentUriSpec = nicofox.Services.io.newFileURI(commentFile).spec; 
+      }    
+    window.openDialog("chrome://nicofox/content/nicofox_player.xul", "nicofox_swf", "width=512,height=424, dialog=no, resizable=yes", {video: videoUriSpec, comment: commentUriSpec, title: file.leafName});  
+    }
+};
 /* A download listener to DownloadManager */
 nicofox.panel.listener = {
 

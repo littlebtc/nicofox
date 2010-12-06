@@ -29,6 +29,7 @@
         <hbox height="20" align="center">
           <label value="&window.title;" />
           <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
+          <label value="Player" class="text-link" onclick="nicofox.panel.openFileInPlayer();"/>
         </hbox>
         <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox.panel.search(this.value);"/>
         <vbox id="smilefoxThumbNotice" hidden="true">
