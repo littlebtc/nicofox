@@ -1,6 +1,0 @@
-<!ENTITY window.title "NicoFoxダウンローダー">
-<!ENTITY msg "この動画とコメントをダウンロードする？">
-<!ENTITY dontAsk.label "次回からは確認せず実行する">
-<!ENTITY dontAsk.accesskey "N">
-<!ENTITY download "はい">
-<!ENTITY cancel "いいえ">
