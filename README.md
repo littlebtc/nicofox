@@ -1,6 +1,5 @@
 NicoFox - A better Nico Nico Douga on Firefox, featuring video download
 =============
-** I'm now finailizing the 0.6 version with Harajuku(原宿) support, new download manager UI and lots of improvements. There will be a beta in early December, and the final release of 0.6 is scheduled on December 24. **
 
 Latest release
 -------------
