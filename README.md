@@ -1,9 +1,7 @@
 NicoFox - A better Nico Nico Douga on Firefox, featuring video download
 =============
 
-Latest release
--------------
-Latest release of the addon will be always on the [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/8888).
+AMO entry is currently disabled due to the review process changes on the site :(. I'm trying to fix all the problem and upload new version ASAP.
 
 Test the development snapshot on repository
 -------------
