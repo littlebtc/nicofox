@@ -41,8 +41,7 @@ if(/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\//.test(document.location.h
     && document.getElementById("flvplayer_container") /* Logged in */
   ) {
   
-  /* Stringify unsafeWindow.Video using JSON then parse it in the Video object, 
-     so Video can be considered as a very safe object */
+  /* Lazy sanitizer: Stringify unsafeWindow.Video using JSON then re-parse it. */
   if ((typeof unsafeWindow.Video) != "object") { return; }
   var VideoJSON = "";
   try {

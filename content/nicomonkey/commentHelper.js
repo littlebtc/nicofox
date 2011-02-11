@@ -75,9 +75,21 @@ function addCommentHelper() {
   {
     helper_links[i].addEventListener('click', commentHelperSelect, false);
   }
+  /* Lazy sanitizer: Stringify unsafeWindow.User using JSON then re-parse it */
+  if ((typeof unsafeWindow.User) != "object") { return; }
+  var nicoUserJSON = "";
+  var nicoUser = {};
+  try {
+    nicoUserJSON = JSON.stringify(unsafeWindow.User);
+    nicoUser = JSON.parse(nicoUserJSON);
+  } catch(e) {
+    throw new Error("Cannot convert User parameter into JSON!");
+    return;
+  }
   /* If user is in premium, it can use extra scripts */
-  var js = "if (User.isPremium) {$('comment_helper_premium').show() }"; 
-  document.location.href = 'javascript: void(eval(\''+js.replace(/\'/g,'\\\'')+'\'));';
+  if (nicoUser.isPremium) {
+    document.getElementById("comment_helper_premium").style.display = "inline";
+  }
 }
 
 var ch_position = 'naka';
