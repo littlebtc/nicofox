@@ -17,8 +17,9 @@ function load() {
   /* Prepare flashvars */
   var flashVars = "videoFile=" + encodeURIComponent(window.arguments[0].video) + 
                   "&commentFile=" + encodeURIComponent(window.arguments[0].comment);
-  /* Add a html:object to embed the NicoFox Player SWF:
-     <html:object type="application/x-shockwave-flash" data="chrome://nicofox/content/nicofoxPlayer.swf" width="..." height="...">
+  /* Add a html:object to embed the NicoFox Player SWF.
+     It seems that the element will follow XUL Layout, so use flex="1" for auto-sizing.
+     <html:object type="application/x-shockwave-flash" data="chrome://nicofox/content/nicofoxPlayer.swf" flex="1">
        <param name="quality" value="high" />
        <param name="bgcolor" value="#000000" />
        <param name="allowFullScreen" value="true" />
@@ -28,8 +29,7 @@ function load() {
   var objectElement = document.createElementNS("http://www.w3.org/1999/xhtml", "html:object");
   objectElement.setAttribute("type", "application/x-shockwave-flash");
   objectElement.setAttribute("data", "chrome://nicofox/content/nicofoxPlayer.swf");
-  objectElement.setAttribute("width", window.innerWidth);
-  objectElement.setAttribute("height", window.innerHeight);
+  objectElement.setAttribute("flex", "1");
   objectElement.appendChild(generateParamDOM("quality", "high"));
   objectElement.appendChild(generateParamDOM("bgcolor", "#000000"));
   objectElement.appendChild(generateParamDOM("allowFullScreen", "true"));
