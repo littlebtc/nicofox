@@ -1,4 +1,5 @@
 NicoFox, the Mozilla Extension for Video Sharing Websites
+-------------
 Copyright (C) 2008 - 2011 Littlebtc and others
 
 NicoFox is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
@@ -8,21 +9,20 @@ NicoFox is distributed in the hope that it will be useful, but WITHOUT ANY WARRA
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA or read it online:
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
+The source code of NicoFox is located at GitHub: <https://github.com/littlebtc/nicofox/>
+
 Some part of the extension is not done by Littlebtc, below is a list of them with their licenses:
 
-    * Logo and Icon designed by FeAm in ptt.cc (CC-by-sa-3.0)
-    * Source code from Greasemonkey (MIT License)
-    * Greasemonkey compiler by Anthony Lieuallen (GPLv2)
-    * IWinProcess component by dafi (GPLv2)
-    * Silk Icons 1.3 by Mark James (CC-by-2.5)
-    * Flag Icons by Mark James (Public Domain)
-    * SWFObject 2.1 by Geoff Stearns, Michael Williams, and Bobby van der Sluis (MIT License)
-    * ObjectPool 1.1 by Michael Baczynski (MIT License) 
-
-Check http://code.google.com/p/nicofox/wiki/License for details.
+ * Logo and Icon designed by tdk4 at [ptt.cc](http://ptt.cc/) 
+ * Source code from [Greasemonkey](http://www.greasespot.net/) (MIT License)
+ * [Silk Icons](http://www.famfamfam.com/lab/icons/silk/) 1.3 by Mark James (CC-by-2.5)
+ * [Flag Icons](http://www.famfamfam.com/lab/icons/flags/) by Mark James (Public Domain)
+ * [ForcibleLoader](http://www.libspark.org/wiki/yossy/ForcibleLoader) by BeInteractive! and Spark project (MIT License)
 
 -------------------------------------------------------------------------------------------------
+
 GNU GENERAL PUBLIC LICENSE
+-------------
 
 Version 2, June 1991
 
@@ -32,7 +32,7 @@ Copyright (C) 1989, 1991 Free Software Foundation, Inc.
 Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
 
-Preamble
+### Preamble
 
 The licenses for most software are designed to take away your freedom to share and change it. By contrast, the GNU General Public License is intended to guarantee your freedom to share and change free software--to make sure the software is free for all its users. This General Public License applies to most of the Free Software Foundation's software and to any other program whose authors commit to using it. (Some other Free Software Foundation software is covered by the GNU Lesser General Public License instead.) You can apply it to your programs, too.
 
@@ -49,7 +49,8 @@ Also, for each author's protection and ours, we want to make certain that everyo
 Finally, any free program is threatened constantly by software patents. We wish to avoid the danger that redistributors of a free program will individually obtain patent licenses, in effect making the program proprietary. To prevent this, we have made it clear that any patent must be licensed for everyone's free use or not licensed at all.
 
 The precise terms and conditions for copying, distribution and modification follow.
-TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+### TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
 0. This License applies to any program or other work which contains a notice placed by the copyright holder saying it may be distributed under the terms of this General Public License. The "Program", below, refers to any such program or work, and a "work based on the Program" means either the Program or any derivative work under copyright law: that is to say, a work containing the Program or a portion of it, either verbatim or with modifications and/or translated into another language. (Hereinafter, translation is included without limitation in the term "modification".) Each licensee is addressed as "you".
 
@@ -103,55 +104,57 @@ Each version is given a distinguishing version number. If the Program specifies 
 
 10. If you wish to incorporate parts of the Program into other free programs whose distribution conditions are different, write to the author to ask for permission. For software which is copyrighted by the Free Software Foundation, write to the Free Software Foundation; we sometimes make exceptions for this. Our decision will be guided by the two goals of preserving the free status of all derivatives of our free software and of promoting the sharing and reuse of software generally.
 
-NO WARRANTY
+### NO WARRANTY
 
 11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
 
 12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-END OF TERMS AND CONDITIONS
-How to Apply These Terms to Your New Programs
+
+### END OF TERMS AND CONDITIONS
+
+### How to Apply These Terms to Your New Programs
 
 If you develop a new program, and you want it to be of the greatest possible use to the public, the best way to achieve this is to make it free software which everyone can redistribute and change under these terms.
 
 To do so, attach the following notices to the program. It is safest to attach them to the start of each source file to most effectively convey the exclusion of warranty; and each file should have at least the "copyright" line and a pointer to where the full notice is found.
 
-one line to give the program's name and an idea of what it does.
-Copyright (C) yyyy  name of author
+  one line to give the program's name and an idea of what it does.
+  Copyright (C) yyyy  name of author
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 Also add information on how to contact you by electronic and paper mail.
 
 If the program is interactive, make it output a short notice like this when it starts in an interactive mode:
 
-Gnomovision version 69, Copyright (C) year name of author
-Gnomovision comes with ABSOLUTELY NO WARRANTY; for details
-type `show w'.  This is free software, and you are welcome
-to redistribute it under certain conditions; type `show c' 
-for details.
+  Gnomovision version 69, Copyright (C) year name of author
+  Gnomovision comes with ABSOLUTELY NO WARRANTY; for details
+  type `show w'.  This is free software, and you are welcome
+  to redistribute it under certain conditions; type `show c' 
+  for details.
 
 The hypothetical commands `show w' and `show c' should show the appropriate parts of the General Public License. Of course, the commands you use may be called something other than `show w' and `show c'; they could even be mouse-clicks or menu items--whatever suits your program.
 
 You should also get your employer (if you work as a programmer) or your school, if any, to sign a "copyright disclaimer" for the program, if necessary. Here is a sample; alter the names:
 
-Yoyodyne, Inc., hereby disclaims all copyright
-interest in the program `Gnomovision'
-(which makes passes at compilers) written 
-by James Hacker.
-
-signature of Ty Coon, 1 April 1989
-Ty Coon, President of Vice
+  Yoyodyne, Inc., hereby disclaims all copyright
+  interest in the program `Gnomovision'
+  (which makes passes at compilers) written 
+  by James Hacker.
+  
+  signature of Ty Coon, 1 April 1989
+  Ty Coon, President of Vice
 
 This General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. 
