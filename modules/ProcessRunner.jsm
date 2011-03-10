@@ -1,6 +1,7 @@
 /* vim: sw=2 ts=2 sts=2 et filetype=javascript  
  *
- * A simple implementation to open application with specific file
+ * A simple implementation to open an application with specific file.
+ * For Windows, nsIProcess has lots of problem with Unicode, so js-ctypes approach is used.
  */
 const Cc = Components.classes;
 const Ci = Components.interfaces;
@@ -24,7 +25,7 @@ processRunner.openFileWithProcess = function(process, file, safeString) {
   Components.utils.import("resource://nicofox/Services.jsm"); 
   var os_string = Services.appinfo.OS;
  
-  /* Win32 Codes. JS-ctype is used to call ShellExecuteW in shell32.dll */ 
+  /* Windows Codes. JS-ctype is used to call ShellExecuteW in shell32.dll */ 
   if (os_string == 'WINNT') {
     /* Assemble Command Line for Win32 */
     var argument = file.path;    
@@ -41,9 +42,22 @@ processRunner.openFileWithProcess = function(process, file, safeString) {
     var SW_SHOW = 5;
     /* For 3.6 (1.9.2) compatiblity, though js-ctype is not suggested to use on 1.9.2. */
     var strType = (ctypes.jschar)?ctypes.jschar.ptr:ctypes.ustring;
-    
+    /* Try to find the working ABI
+       http://forums.mozillazine.org/viewtopic.php?f=23&t=2059667
+       Before Bug 585175 landed: use ctypes.stdcall_abi
+       After Bug 585175 landed: ctypes.default_abi for 64-bit, ctypes.winapi_abi for 32-bit
+     */
+    var winAbi = ctypes.stdcall_abi;
+    if (ctypes.winapi_abi) {
+      if (ctypes.size_t.size == 8) {
+        winAbi = ctypes.default_abi;
+      } else {
+        winAbi = ctypes.winapi_abi;
+      }
+    }
+
     var shellExecute = lib.declare("ShellExecuteW",
-                                  ctypes.stdcall_abi,
+                                  winAbi,
                                   ctypes.int32_t, /* HINSTANCE (return) */
                                   ctypes.int32_t, /* HWND hwnd */
                                   strType, /* LPCTSTR lpOperation */
