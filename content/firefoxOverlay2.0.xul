@@ -16,21 +16,12 @@
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
     <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
   </stringbundleset>
-  <menupopup id="menu_viewPopup">
-    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;" type="checkbox" checked="false" autocheck="false"
-             oncommand="nicofox.overlay.onMenuItemCommand(event);"
-   position="2" />
-  </menupopup>
   
-  <statusbar id="status-bar">
-    <hbox id="nicofox-panel-container">
-      <panel id="nicofox-library" hidden="true" level="top" stlye="display: none;">
+  <toolbarpalette id="BrowserToolbarPalette">
+    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu" 
+                   label="NicoFox" tooltiptext="NicoFox" style="-moz-box-orient: horizontal; list-style-image: url('chrome://nicofox/skin/logo_16.png');" >
+      <panel id="nicofox-library" level="top">
       </panel>
-    </hbox>
-    <statusbarpanel id="nicofoxStatusbarContainer" onclick="event.stopPropagation();  document.getElementById('nicofox-library').hidden = false; document.getElementById('nicofox-library').openPopup(this, 'before_end', 0, 0, false, false);">
-       <!-- For rein skin compatibility -->
-       <image id="nicofox-icon" src="chrome://nicofox/skin/logo_16.png"/> 
-       <label id="nicofoxStatusbarLabel" hidden="true" />
-    </statusbarpanel>
-  </statusbar>
+    </toolbarbutton>
+  </toolbarpalette>
 </overlay>

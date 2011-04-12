@@ -41,7 +41,11 @@ nicofox.overlay = {
       addonBar.collapsed = false;
     }
     document.getElementById("nicofox-library").hidden = false;
-    document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
+    if (document.getElementById("nicofoxToolbarButton")) {
+      document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxToolbarButton"), 'before_end', 0, 0, false, false);
+    } else {
+      document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
+    }
   },
   /* Based on Greasemonkey. Is the URL nicomonkeyable? */
   isNicomonkeyable: function(url) {
@@ -67,6 +71,7 @@ nicofox.overlay = {
 /* Refresh statusbar download notification */
 nicofox.refreshIcon = function() {
   var nicofoxLabel = document.getElementById("nicofoxStatusbarLabel");
+  if (!nicofoxLabel) { return; }
   var downloadCount = nicofox.DownloadManager.activeDownloadCount;
   var waitingCount = nicofox.DownloadManager.queuedDownloadCount;
   if (downloadCount > 0) {
