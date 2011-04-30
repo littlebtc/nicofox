@@ -19,13 +19,15 @@ AboutNicoFox.prototype = {
   
   newChannel: function(aURI) {
     let ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-    let channel = ios.newChannel("chrome://nicofox/content/inpage/index.xhtml",
+    let channel = ios.newChannel("chrome://nicofox/content/nicofoxPlayer.xul",
                                  null, null);
     channel.originalURI = aURI;
     return channel;
   }
 };
 
-function NSGetModule(compMgr, fileSpec)
-  XPCOMUtils.generateModule([AboutNicoFox]);
-
+if (XPCOMUtils.generateNSGetFactory) {
+  var NSGetFactory = XPCOMUtils.generateNSGetFactory([AboutNicoFox]);
+} else {
+  var NSGetModule = XPCOMUtils.generateNSGetModule([AboutNicoFox]);
+}

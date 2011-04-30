@@ -12,9 +12,13 @@ overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOve
 component {62ca6b17-975f-4c70-b497-33146a16c797} components/nicowatcher.js
 contract @littleb.tc/nicowatcher;1 {62ca6b17-975f-4c70-b497-33146a16c797}
 category content-policy NicoWatcher @littleb.tc/nicowatcher;1
+
 component {74361378-6c72-4bad-baa7-07abba57f9a2} components/bootstrap.js
 contract @littleb.tc/nicofox-bootstrap;1 {74361378-6c72-4bad-baa7-07abba57f9a2}
 category profile-after-change NicoFoxBootstrap @littleb.tc/nicofox-bootstrap;1
+
+component {af1db570-70a8-11de-8a39-0800200c9a66} components/aboutNicofox.js
+contract @mozilla.org/network/protocol/about;1?what=nicofox {af1db570-70a8-11de-8a39-0800200c9a66}
 
 # Under construction...
 # overlay	chrome://browser/content/sanitize.xul	chrome://nicofox/content/sanitize_overlay.xul
