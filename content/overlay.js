@@ -47,7 +47,7 @@ nicofox.overlay = {
     }
     document.getElementById("nicofox-library").hidden = false;
     if (document.getElementById("nicofoxToolbarButton")) {
-      document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxToolbarButton"), 'before_end', 0, 0, false, false);
+      document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxToolbarButton"), 'after_end', 0, 0, false, false);
     } else {
       document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
     }

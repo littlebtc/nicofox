@@ -18,9 +18,9 @@
   </stringbundleset>
   
   <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu" 
-                   label="NicoFox" tooltiptext="NicoFox" style="-moz-box-orient: horizontal; list-style-image: url('chrome://nicofox/skin/logo_16.png');" >
-      <panel id="nicofox-library" level="top">
+    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu"
+    label="NicoFox" tooltiptext="NicoFox" style="-moz-box-orient: horizontal; list-style-image: url('chrome://nicofox/skin/logo_16_mono.png');" >
+      <panel id="nicofox-library" level="top" position="after_end">
       </panel>
     </toolbarbutton>
   </toolbarpalette>
