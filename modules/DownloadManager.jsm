@@ -589,6 +589,10 @@ DownloadManager.removeDownload = function(id) {
     thisObj[failCallback].call(thisObj);
     return;
   }
+  /* If the item is in the queue, remove it. */
+  downloadQueue = downloadQueue.filter(function(item) {
+    return (item.id != id);
+  });
   /* Use stored statment if exists, or create a new one.
    * executeAsync will reset the statement, so no need to reset. */
   if (!storedStatements.removeDownload) {
