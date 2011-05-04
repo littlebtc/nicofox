@@ -3,7 +3,7 @@
 APP_NAME="nicofox"
 CHROME_PROVIDERS="content locale skin"
 CLEAN_UP=1
-ROOT_FILES=license.txt
+ROOT_FILES=LICENSE.md
 ROOT_DIRS="defaults components modules"
 BEFORE_BUILD=
 AFTER_BUILD=
