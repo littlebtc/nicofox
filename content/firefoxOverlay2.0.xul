@@ -16,7 +16,7 @@
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
     <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
   </stringbundleset>
-  
+  <!-- Toolbar button -->
   <toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu"
     label="NicoFox" tooltiptext="NicoFox" style="-moz-box-orient: horizontal; list-style-image: url('chrome://nicofox/skin/logo_16_mono.png');" >
@@ -24,4 +24,11 @@
       </panel>
     </toolbarbutton>
   </toolbarpalette>
+  <!-- Context Menu for Hyperlink -->
+  <menupopup id="contentAreaContextMenu">
+    <menuseparator id="nicofox-context-seprator" />
+    <menuitem id="nicofox-context-download" class="menuitem-iconic"
+              label="Download Linked Video with NicoFox" image="chrome://nicofox/skin/logo_16.png"
+              oncommand="nicofox.overlay.downloadLink();"/>
+  </menupopup>
 </overlay>

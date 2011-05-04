@@ -22,6 +22,12 @@ nicofox.overlay = {
     document.getElementById("nicofox-library").addEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").addEventListener("popupshown", nicofox.panel.onPopupShown, false);
 
+    /* Register context menu showing listener */
+    var contextMenu = document.getElementById("contentAreaContextMenu");
+    if (contextMenu) {
+      contextMenu.addEventListener("popupshowing", nicofox.overlay.onContextMenuShowing, false);
+    }
+
     Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
     /* Update download manager statusbar, then register for changes */
     nicofox.refreshIcon();
@@ -39,6 +45,10 @@ nicofox.overlay = {
     document.getElementById("nicofox-library").removeEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").removeEventListener("popupshown", nicofox.panel.onPopupShown, false);
     nicofox.DownloadManager.removeListener(nicofox.listener);
+    var contextMenu = document.getElementById("contentAreaContextMenu");
+    if (contextMenu) {
+      contextMenu.removeEventListener("popupshowing", nicofox.overlay.onContextMenuShowing, false);
+    }
   },
   /* On View -> NicoFox */
   onMenuItemCommand: function(e) {
@@ -52,6 +62,29 @@ nicofox.overlay = {
       document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxToolbarButton"), 'after_end', 0, 0, false, false);
     } else {
       document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
+    }
+  },
+  /* On context menu showing, check the link URL, provide download menuitem if necessary */
+  onContextMenuShowing: function(aEvent) {
+    var hidden = true;
+    if (gContextMenu.onLink) {
+      var url = gContextMenu.linkURL;
+      if (url && /^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(url)) {
+        hidden = false;
+      }
+    }
+    document.getElementById("nicofox-context-seprator").hidden = hidden;
+    document.getElementById("nicofox-context-download").hidden = hidden;
+  },
+  /* When the context menu item is clicked. */
+  downloadLink: function() {
+    var url = gContextMenu.linkURL;
+    if (url && /^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(url)) {
+      if (url.indexOf("?") >= 0) {
+        url = url.substring(0, url.indexOf("?"))
+      }
+      Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
+      nicofox.DownloadManager.addDownload(url);
     }
   },
   /* Based on Greasemonkey. Is the URL nicomonkeyable? */
