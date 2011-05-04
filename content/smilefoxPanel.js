@@ -19,10 +19,10 @@ nicofox.panel.resultArray = [];
 
 /* On popup showing, check whether the panel is loaded */
 nicofox.panel.onPopupShowing = function() {
-  if (this.loaded) {
+  if (nicofox.panel.loaded) {
     return;
   }
-  this.load();
+  nicofox.panel.load();
 };
 nicofox.panel.onPopupShown = function() {
   document.getElementById("smilefoxList").focus();

@@ -19,8 +19,8 @@ nicofox.overlay = {
     }
 
     /* Register panel initializer */
-    document.getElementById("nicofox-library").addEventListener("popupshowing", function() { nicofox.panel.onPopupShowing(); }, false);
-    document.getElementById("nicofox-library").addEventListener("popupshown", function() { nicofox.panel.onPopupShown(); }, false);
+    document.getElementById("nicofox-library").addEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
+    document.getElementById("nicofox-library").addEventListener("popupshown", nicofox.panel.onPopupShown, false);
 
     Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
     /* Update download manager statusbar, then register for changes */
@@ -36,6 +36,8 @@ nicofox.overlay = {
   /* On browser window unloading */
   onUnload: function() {
     window.removeEventListener("unload", nicofox.overlay.onUnload, false);
+    document.getElementById("nicofox-library").removeEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
+    document.getElementById("nicofox-library").removeEventListener("popupshown", nicofox.panel.onPopupShown, false);
     nicofox.DownloadManager.removeListener(nicofox.listener);
   },
   /* On View -> NicoFox */
