@@ -9,7 +9,8 @@
  * (3) We want to make download manager be fast to display simple video infos.
  * 
  * What is NicoFox's approach to solve the problems? 
- * - If user loaded a video page, the info (from NicoMonkey) will be automatically cached for a short time.
+ * - If user loads a video page, in the DOMContentLoaded event, DOM tree will be sent to here.
+ *   Video info will be parsed here then be cached for a short time.
  * - When user want to download a video, if the info is cached, use the cached info, 
  *   Otherwise, call /getthumbinfo/ to get "simple" info which will not be cached.
  * - When we actully start downloading, VideoInfoReader will be called again, to make sure video stream access won't be blocked:
@@ -97,8 +98,13 @@ pageReadTimerCallback.notify = function(timer) {
 };
 
 /* Parse the video info, and write it into cache. 
- * @param url The URL of the video.
- * @param nicoData the Video variable on Nico Nico Douga page.
+ * @param target           The URL of the video or the DOM of the video page, depending on where the info from.
+ * @param nicoData         The Video variable on Nico Nico Douga page.
+ * @param otherData        Other video information read from readByUrl/innerFetcher or readFromPageDOM.
+ * @param writeToCache     Whether to write the read video info to the cache.
+ * @param thisObj          this object for the callback
+ * @param successCallback  Name of callback function in thisObj, called if the info is read successfully.
+ * @param failCallback     Name of callback function in thisObj, called if the info cannot be read.
  * == Type Definitions for the video URL ==
  * In Nico Nico Douga, a video may have different URL, correspoding to different version of comments on video. 
  * It will be written in the "comment" field in VideoInfoReader as a string:
@@ -122,7 +128,15 @@ pageReadTimerCallback.notify = function(timer) {
  *   "mymemory": My-memory comments.
  *   "comment123456789012": Others which is hard to distinguish.
  */
-function parseVideoInfo(url, nicoData, otherData, thisObj, callbackFuncName) {
+function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, successCallback, failCallback) {
+  var url = "";
+  /* Parse the URL. */
+  if (target instanceof Ci.nsIDOMHTMLDocument) {
+    url = target.location.href;
+  } else if (typeof target == "string") {
+    url = target;
+  }
+
   /* Put otherData into a info object */
   var info = otherData;
   info.nicoData = nicoData;
@@ -153,15 +167,15 @@ function parseVideoInfo(url, nicoData, otherData, thisObj, callbackFuncName) {
     }
   } else {
     Components.utils.reportError("NicoFox VideoInfoReader Error: Not a valid Nico Nico Douga URL");
+    thisObj[failCallback].call(thisObj, "notvalidurl");
     return;
   }
-  /* Write the data into cache */
-  writeCache(url, info);
-  
-  /* If there is callback, call the callback */
-  if (thisObj && callbackFuncName) {
-    thisObj[callbackFuncName].call(thisObj, url, info);
+  /* Write the data into cache, if needed */
+  if (writeToCache) {
+    writeCache(url, info);
   }
+  /* Execute the callback */
+  thisObj[successCallback].call(thisObj, target, info);
 }
 
 /* Inner reader to make asynchronous request to the video page, and response after read */
@@ -207,7 +221,7 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
   otherData.hasOwnerThread = (content.search(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/) != -1);
   
   /* Parse the data and store the video info */
-  parseVideoInfo(url, nicoData, otherData, this.callbackThisObj, this.successCallback);
+  parseVideoInfo(url, nicoData, otherData, true, this.callbackThisObj, this.successCallback, this.failCallback);
 };
 /* When fetchUrlAsync cannot read the page, throw an error. */
 innerFetcher.prototype.fetchError = function() {
@@ -272,24 +286,61 @@ innerSimpleFetcher.prototype.fetchError = function() {
   this.callbackThisObj[thhis.failCallback].call(this.callbackThisObj);
 };
 
+/* Lazy sanitizer: Stringify unsafe object using JSON then re-parse it. Just return empty object when failed. 
+ * Used by VideoInfoReader.readFromPageDOM
+ */
+function lazySanitize(unsafeObject) {
+  if ((typeof unsafeObject) != "object") { return {}; }
+  var parsedJSON = "";
+  var safeObject = {};
+  try {
+    parsedJSON = JSON.stringify(unsafeObject);
+    safeObject = JSON.parse(parsedJSON);
+  } catch(e) {
+    safeObject = {};
+  }
+  return safeObject;
+}
+
 /* Public Methods. */
 
-/* Called when NicoMonkey had read the data on a loaded web page and sent it as JSON string */
-VideoInfoReader.readFromNicoMonkey = function(url, nicoDataJSON, otherDataJSON) {
-  var nicoData = {};
-  var otherData = {};
-  try {
-    nicoData = JSON.parse(nicoDataJSON);
-    otherData = JSON.parse(otherDataJSON);
-  } catch(e) {
-    Components.utils.reportError("NicoFox VideoReader down: Cannot read video data from video page via NicoMonkey");
-    return;
+/* Read video info from window/document DOM object in the video page. Called from browser overlays.
+ * @param contentWin Safe window DOM object for the page.
+ * @param contentDoc Safe document DOM object for the page.
+ * @param firstRead  Whether the info is read for the first time.
+ *                   If not (e.g. after dragging the tab and re-read), don't write the info into cache.
+ * @param thisObj          this object for the callback
+ * @param successCallback  Name of callback function in thisObj, called if the info is read successfully.
+ * @param failCallback     Name of callback function in thisObj, called if the info cannot be read.
+ */
+VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, thisObj, successCallback, failCallback) {
+  /* URL should be filtered in overlay.js */
+  var url = contentWin.location.href;
+
+  /* Use lazy sanitizer to parse Video object from UNSAFE wrappedJSObject window in the video page.
+     Check if we can fetch the data correctly; don't do autologin or antiflood check here */
+  var nicoData = lazySanitize(contentWin.wrappedJSObject.Video);
+  if (!nicoData.v) {
+    thisObj[failCallback].call(thisObj, "novideoobject");
   }
-  /* Parse the data and store the video info */
-  parseVideoInfo(url, nicoData, otherData);
+  var otherData = {};
+  otherData.hasOwnerThread = false;
+  /* Check whether the uploader comments (thread) exists on this video */
+  var flashvars = contentDoc.getElementById("flvplayer").getAttribute("flashvars");
+  if (flashvars) {
+    otherData.hasOwnerThread = (/\&has_owner_thread=1\&/.test(flashvars));
+  }
+  /* Parse the data and store the video info; only cached for first read */
+  parseVideoInfo(contentDoc, nicoData, otherData, Boolean(firstRead), thisObj, successCallback, failCallback);
 };
 
-/* Called by Download Manager, to request video info for a specific URL */
+/* Read the video URL and parse the video info from the resulting HTML source. Called from download manager.
+ * @param url               The video URL.
+ * @param simpleInfoAllowed Whether simple info, which can be retrived from /getthumbinfo/ XML with less restriction, is allowed.
+ * @param thisObj           this object for the callback
+ * @param successCallback   Name of callback function in thisObj, called if the info is read successfully.
+ * @param failCallback      Name of callback function in thisObj, called if the info cannot be read.
+ */
 VideoInfoReader.readByUrl = function(url, simpleInfoAllowed, thisObj, successCallback, failCallback) {
   if (!thisObj || typeof thisObj[successCallback] != "function" || typeof thisObj[failCallback] != "function") {
     throw new Error('Wrong parameter in readByUrl');

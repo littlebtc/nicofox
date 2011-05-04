@@ -19,6 +19,26 @@ nicofox.panel.resultArray = [];
 
 /* On popup showing, check whether the panel is loaded */
 nicofox.panel.onPopupShowing = function() {
+  /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
+  var browser = gBrowser.selectedBrowser;
+  if (!browser || !browser.contentWindow) { return; }
+
+  if (/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
+    Components.utils.reportError("Re-read!!");
+    contentWin = browser.contentWindow;
+    contentDoc = browser.contentDocument;
+    /* Do nothing if the page load is not completed */
+    if (!contentDoc || contentDoc.readyState != "complete") { return; }
+    var info = { 'reading': true };
+    browser.nicofoxVideoInfo = info;
+    nicofox.panel.updateVideoInfo(info);
+
+    /* No need to write to cache at this time. */
+    Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
+    VideoInfoReader.readFromPageDOM(contentWin, contentDoc, false, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+  }
+
+  /* Load download items from database for the first time. */
   if (nicofox.panel.loaded) {
     return;
   }
@@ -61,8 +81,105 @@ nicofox.panel.init = function() {
   
   /* Get all download items. */
   nicofox.DownloadManager.getDownloads(this, "displayDownloads", "dbFail");
-  
 };
+
+/* Update video info on the panel. */
+nicofox.panel.updateVideoInfo = function(info) {
+  /* Hidden all box first. */
+  document.getElementById("nicofox-not-watching").hidden = true;
+  document.getElementById("nicofox-watching-loading").hidden = true;
+  document.getElementById("nicofox-watching-failed").hidden = true;
+  document.getElementById("nicofox-watching").hidden = true;
+
+  if (info) {
+    /* If info presented, change the box for specific state. */
+    if (info.reading) {
+      document.getElementById("nicofox-watching-loading").hidden = false;
+    } else if (info.error) {
+      document.getElementById("nicofox-watching-failed").hidden = false;
+    } else {
+      document.getElementById("nicofox-watching").hidden = false;
+      document.getElementById("nicofox-watching-download").disabled = false;
+      if (info.nicoData) {
+        document.getElementById("nicofox-watching-title").value = info.nicoData.title;
+        if (/http\:\/\//.test(info.nicoData.thumbnail)) {
+          document.getElementById("nicofox-watching-thumb").src = info.nicoData.thumbnail;
+        }
+        /* NicoNico Farm only supports original Japanese site thread, we need to check it */
+        document.getElementById("nicofox-watching-comment-tool").visible = /^[a-z]/.test(info.nicoData.v);
+      }
+    }
+  } else {
+    /* No info presented. */
+    document.getElementById("nicofox-not-watching").hidden = false;
+  }
+}
+
+/* Video Tools on the panel. */
+nicofox.panel.videoTools = {};
+
+/* Call the DownloadManager to add the video to the download query.
+   To avoid multiple times of adding, disable the button after queued. */
+nicofox.panel.videoTools.download = function() {
+  var browser = gBrowser.selectedBrowser;
+  if (!browser || !browser.nicofoxVideoInfo) { return; }
+  
+  var url = browser.contentWindow.location.href;
+  if (url.indexOf("?") >= 0) {
+    url = url.substring(0, url.indexOf("?"))
+  }
+  Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
+  nicofox.DownloadManager.addDownload(url);
+  document.getElementById("nicofox-watching-download").disabled = true;
+};
+/* Go to the Nico Nico Nico website in different region. */
+nicofox.panel.videoTools.goSite = function(event, region) {
+  /* checkMiddleClick() will not check the left click,
+     but oncommand will not be fired on left click for <image>.
+     So ignore right click at onclick as an alternate. */
+  if (event.button == 2) { return; }
+  var url = "";
+  var browser = gBrowser.selectedBrowser;
+  if (!browser || !browser.nicofoxVideoInfo) {
+    /* Go to homepage if no video is opened */
+    url = "http://" + region + ".nicovideo.jp/";
+  } else {
+    /* Go to the video page in different region */
+    url = "http://" + region + ".nicovideo.jp/watch/" + browser.nicofoxVideoInfo.nicoData.id;
+  }
+  openUILink(url, event, false, true);
+}
+/* Go to third-party tool sites */
+nicofox.panel.videoTools.goThridPartyToolSite = function(event, tool) {
+  /* checkMiddleClick() will not check the left click,
+     but oncommand will not be fired on left click for <image>.
+     So ignore right click at onclick as an alternate. */
+  if (event.button == 2) { return; }
+  var url = "";
+  var browser = gBrowser.selectedBrowser;
+  if (!browser || !browser.nicofoxVideoInfo) {
+    return;
+  }
+  var info = browser.nicofoxVideoInfo;
+  /* Fill the URL address for each type of tool. */
+  switch(tool) {
+    case "sound":
+    url = nicofox.Core.prefs.getComplexValue("nicomonkey.sound_converter", Ci.nsISupportsString).data;
+    url = url.replace("%1", info.nicoData.id);
+    break;
+    case "chart":
+    url = "http://www.nicochart.jp/watch/" + info.nicoData.id;
+    break;
+    case "comment":
+    /* NicoNico Farm only supports original Japanese site thread, we need to check it */
+    if (/!^[a-z]/.test(info.nicoData.v)) { return; }
+    url = "http://nico.xii.jp/comment/?url=" + info.nicoData.id;
+    break;
+  }
+
+  openUILink(url, event, false, true);
+}
+
 /* If there is not thumbnail file data stored in database, prompt user to download for all old records. */
 nicofox.panel.responseThumbnailCheck = function(resultArray) {
   if (resultArray[0].count == 0) {

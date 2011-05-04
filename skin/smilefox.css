@@ -28,6 +28,28 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   list-style-image: none;
 }
 
+.nicofoxVideoInfoBox {
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid #AAAAAA;
+  border-radius: 5px;
+  background: #F9F9F9;
+}
+
+#nicofox-watching-thumb { 
+  width: 64px;
+  height: 48px;
+}
+
+#nicofox-watching-title {
+  font-size: 125%; font-weight: bold;
+}
+
+.smilefoxToolItem {
+  margin: 3px;
+  cursor: pointer;
+}
+
 .smilefoxDownloadThumbnail {
   width: 64px;
   height: 48px;

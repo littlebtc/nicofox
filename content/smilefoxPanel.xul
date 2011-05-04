@@ -15,11 +15,80 @@
 
     <panel id="nicofox-library">
       <vbox id="smilefox-main" height="450" width="450">
+        <!--
         <hbox height="20" align="center">
           <label value="&window.title;" />
           <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
           <label value="Player" class="text-link" onclick="nicofox.panel.openFileInPlayer();"/>
-        </hbox>
+        </hbox>-->
+        <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
+          <label value="Welcome to NicoFox！" style="font-weight: bold; font-size: 125%;" />
+          <description flex="1">When you enter the video page, download button, global sites and third-party tools will be displayed here.</description>
+          <label value="Go to Nico Nico Douga in the specific region:" />
+          <hbox id="nicofox-not-watching-toolbar">
+            <image src="chrome://nicofox/skin/tools/jp.png" class="smilefoxToolItem"
+                   onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
+            <image src="chrome://nicofox/skin/tools/tw.png" class="smilefoxToolItem"
+                   onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
+            <image src="chrome://nicofox/skin/tools/es.png" class="smilefoxToolItem"
+                   onclick="nicofox.panel.videoTools.goSite(event, 'es');" />
+            <image src="chrome://nicofox/skin/tools/de.png" class="smilefoxToolItem"
+                   onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
+          </hbox>
+          <description>Below is your recently download items.</description>
+        </vbox>
+        <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" height="120" hidden="true">
+          <label value="Video info is reading..." />
+        </vbox>
+        <vbox id="nicofox-watching-failed" class="nicofoxVideoInfoBox" height="120" hidden="true">
+          <label value="Video info cannot be read :(..." />
+        </vbox>
+        <vbox id="nicofox-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
+          <hbox align="top">
+            <image id="nicofox-watching-thumb" />
+            <vbox flex="1">
+              <label id="nicofox-watching-title" crop="end" />
+              <hbox>
+                <button id="nicofox-watching-download" label="Download" image="chrome://nicofox/skin/tools/download.png"
+                        oncommand="nicofox.panel.videoTools.download();"/>
+                <!--<button id="nicofox-watching-add-tags" label="Add tags..." />-->
+              </hbox>
+              <grid id="nicofox-watching-toolbar">
+                <columns>
+                  <column align="center"/>
+                  <column flex="1" align="center"/>
+                </columns>
+                <rows>
+                  <row>
+                    <label value="This Video Worldwide:" />
+                    <hbox>
+                      <image src="chrome://nicofox/skin/tools/jp.png" class="smilefoxToolItem"
+                             onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
+                      <image src="chrome://nicofox/skin/tools/tw.png" class="smilefoxToolItem"
+                             onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
+                      <image src="chrome://nicofox/skin/tools/es.png" class="smilefoxToolItem"
+                             onclick="nicofox.panel.videoTools.goSite(event, 'es');" />
+                      <image src="chrome://nicofox/skin/tools/de.png" class="smilefoxToolItem"
+                             onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
+                   </hbox>
+                  </row>
+                  <row>
+                    <label value="Third-party Tools:" />
+                    <hbox>
+                     <image src="chrome://nicofox/skin/tools/music.png" class="smilefoxToolItem"
+                            onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'sound');" />
+                     <image src="chrome://nicofox/skin/tools/chart.png" class="smilefoxToolItem"
+                            onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'chart');" />
+                     <image src="chrome://nicofox/skin/tools/comment.png" class="smilefoxToolItem" id="nicofox-watching-comment-tool"
+                            onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'comment');" />
+                   </hbox>
+                 </row>
+               </rows>
+              </grid>
+            </vbox>
+          </hbox>
+        </vbox>
+        <label value="Downloads" />
         <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox.panel.search(this.value);"/>
         <vbox id="smilefoxThumbNotice" hidden="true">
           <description>NicoFox can download the thumbnail, and display it in the download manager now.</description>
