@@ -4,5 +4,5 @@
 
 #nicofoxToolbarButton {
   -moz-box-orient: horizontal;
- list-style-image: url("chrome://nicofox/skin/logo_16_mac.png");
+  list-style-image: url("chrome://nicofox/skin/logo_16_mac.png");
 }
