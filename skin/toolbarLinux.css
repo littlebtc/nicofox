@@ -1,0 +1,12 @@
+/* Toolbar item styles for Linux (24x24 or 16x16) on Firefox 4. */
+
+#nicofox-toolbar-button {
+  -moz-box-orient: horizontal;
+  list-style-image: url("chrome://nicofox/skin/logo_24.png");
+}
+
+toolbar[iconsize="small"] #nicofox-toolbar-button {
+  -moz-box-orient: horizontal;
+  list-style-image: url("chrome://nicofox/skin/logo_16.png");
+}
+

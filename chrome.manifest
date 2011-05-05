@@ -10,6 +10,7 @@ skin	nicofox		classic/1.0	skin/
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay2.0.xul application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>=4.0
 overlay chrome://global/content/customizeToolbar.xul chrome://nicofox/content/customizeToolbarOverlay.xul application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>=4.0
 override chrome://nicofox/skin/toolbar.css chrome://nicofox/skin/toolbarMac.css os=Darwin application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>=4.0
+override chrome://nicofox/skin/toolbar.css chrome://nicofox/skin/toolbarLinux.css os=Linux application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion>=4.0
 
 # Firefox 3.6 Themes related
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay1.9.xul application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion<4.0
