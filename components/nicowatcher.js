@@ -46,7 +46,8 @@ NicoWatcher.prototype = {
     /* Block NicoWa if needed */
     } else if (this._nicowaBlocker && contentType == Ci.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST) {
       var url = contentLocation.spec;
-      if(url.indexOf('http://flapi.nicovideo.jp/api/getmarqueev3') == 0 ) {
+      if(url.indexOf('http://flapi.nicovideo.jp/api/getmarqueev3') == 0 ||
+         url.indexOf('http://res.nimg.jp/swf/player/marqueeplayer.swf') == 0) {
         return Ci.nsIContentPolicy.REJECT_REQUEST;
       }
     }
