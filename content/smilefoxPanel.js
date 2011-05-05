@@ -33,8 +33,8 @@ nicofox.panel.onPopupShowing = function() {
       nicofox.panel.updateVideoInfo(info);
 
       /* No need to write to cache at this time. */
-      Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-      VideoInfoReader.readFromPageDOM(contentWin, contentDoc, false, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+      Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
+      nicofox.VideoInfoReader.readFromPageDOM(contentWin, contentDoc, true, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
     }
   }
   /* Change the toolbutton state. */
@@ -399,8 +399,8 @@ nicofox.panel.commands = {
     }
     if (externalApplication) {
       /* Use ProcessRunner to run the external application */
-      Components.utils.import("resource://nicofox/ProcessRunner.jsm");
-      processRunner.openFileWithProcess(externalApplication, videoFile, "nsIProcess");
+      Components.utils.import("resource://nicofox/ProcessRunner.jsm", nicofox);
+      nicofox.processRunner.openFileWithProcess(externalApplication, videoFile, "nsIProcess");
     } else {
       /* Try to do the default action */
       try {

@@ -124,8 +124,8 @@ nicofox.overlay = {
         browser.nicofoxVideoInfo = info;
         nicofox.panel.updateVideoInfo(info);
       }
-      Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-      VideoInfoReader.readFromPageDOM(contentWin, contentDoc, true, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+      Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
+      nicofox.VideoInfoReader.readFromPageDOM(contentWin, contentDoc, true, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
     }
   },
   /* After video info is read, write data to specific browser, update the panel if necessary */
