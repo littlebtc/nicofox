@@ -17,13 +17,22 @@
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
     <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
   </stringbundleset>
+  <!-- View Menu -->
+  <menupopup id="menu_viewPopup">
+    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;" type="checkbox" checked="false" autocheck="false"
+             oncommand="nicofox.overlay.onMenuItemCommand(event);"
+   position="2" />
+  </menupopup>
   <!-- Toolbar button -->
   <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu" label="NicoFox" tooltiptext="NicoFox">
-      <panel id="nicofox-library" level="top" position="after_end">
-      </panel>
+    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu" label="NicoFox" tooltiptext="NicoFox" popup="nicofox-library">
     </toolbarbutton>
   </toolbarpalette>
+  <!-- Panel -->
+  <popupset id="mainPopupSet">
+    <panel id="nicofox-library" level="top" position="after_end">
+    </panel>
+  </popupset>
   <!-- Context Menu for Hyperlink -->
   <menupopup id="contentAreaContextMenu">
     <menuseparator id="nicofox-context-seprator" />

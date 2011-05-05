@@ -37,6 +37,11 @@ nicofox.panel.onPopupShowing = function() {
       VideoInfoReader.readFromPageDOM(contentWin, contentDoc, false, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
     }
   }
+  /* Change the toolbutton state. */
+  var nicofoxToolbarButton = document.getElementById("nicofoxToolbarButton");
+  if (nicofoxToolbarButton) {
+    nicofoxToolbarButton.setAttribute("open", true);
+  }
 
   /* Load download items from database for the first time. */
   if (nicofox.panel.loaded) {
@@ -46,6 +51,13 @@ nicofox.panel.onPopupShowing = function() {
 };
 nicofox.panel.onPopupShown = function() {
   document.getElementById("smilefoxList").focus();
+};
+nicofox.panel.onPopupHidden = function() {
+  /* Change the toolbutton state. */
+  var nicofoxToolbarButton = document.getElementById("nicofoxToolbarButton");
+  if (nicofoxToolbarButton) {
+    nicofoxToolbarButton.setAttribute("open", false);
+  }
 };
 /* Load Panel */
 nicofox.panel.load = function() {

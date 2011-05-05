@@ -21,6 +21,7 @@ nicofox.overlay = {
     /* Register panel initializer */
     document.getElementById("nicofox-library").addEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").addEventListener("popupshown", nicofox.panel.onPopupShown, false);
+    document.getElementById("nicofox-library").addEventListener("popuphidden", nicofox.panel.onPopupHidden, false);
 
     /* Register context menu showing listener */
     var contextMenu = document.getElementById("contentAreaContextMenu");
@@ -46,6 +47,7 @@ nicofox.overlay = {
 
     document.getElementById("nicofox-library").removeEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").removeEventListener("popupshown", nicofox.panel.onPopupShown, false);
+    document.getElementById("nicofox-library").removeEventListener("popuphidden", nicofox.panel.onPopupHidden, false);
 
     nicofox.DownloadManager.removeListener(nicofox.listener);
     var contextMenu = document.getElementById("contentAreaContextMenu");
