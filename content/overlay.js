@@ -17,7 +17,25 @@ nicofox.overlay = {
     if (XULBrowserWindow.inContentWhitelist) {
       XULBrowserWindow.inContentWhitelist.push("about:nicofox");
     }
-
+    /* For Firefox 4, append the toolbar button for the first time.
+     * Modified from https://developer.mozilla.org/en/Code_snippets/Toolbar
+     */
+    if (!nicofox.Core.prefs.getBoolPref("toolbar_check") && !document.getElementById("nicofox-panel-container")) {
+      var toolbarId    = "nicofox-toolbar-button";
+      var navBar  = document.getElementById("nav-bar");
+      var curSet  = navBar.currentSet.split(",");
+      if (curSet.indexOf(toolbarId) == -1) {
+        /* Just append to the end. */
+        curSet.push(toolbarId);
+        navBar.setAttribute("currentset", curSet.join(","));
+        navBar.currentSet = curSet.join(",");
+        document.persist(navBar.id, "currentset");
+        try {
+           BrowserToolboxCustomizeDone(true);
+        } catch (e) {}
+      }
+      nicofox.Core.prefs.setBoolPref("toolbar_check", true);
+    }
     /* Register panel initializer */
     document.getElementById("nicofox-library").addEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").addEventListener("popupshown", nicofox.panel.onPopupShown, false);

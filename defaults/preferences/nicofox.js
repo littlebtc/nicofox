@@ -29,6 +29,9 @@ pref("extensions.nicofox.economy_notice", true);
 // New in 0.6
 pref("extensions.nicofox.thumbnail_check", false);
 
+// New in 0.7a
+pref("extensions.nicofox.toolbar_check", false);
+
 /////////////////////////////////////////// NicoMonkey
 // pref("extensions.nicofox.nicomonkey.enable", true); // Removed in 0.7a
 // pref("extensions.nicofox.nicomonkey.toolbar", true); // Removed in 0.7a
