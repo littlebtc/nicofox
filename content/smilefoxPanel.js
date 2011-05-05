@@ -558,4 +558,3 @@ nicofox.panel.unload = function() {
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);
 }
-window.addEventListener("unload", function() { nicofox.panel.unload(); }, false);

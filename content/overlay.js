@@ -47,6 +47,7 @@ nicofox.overlay = {
   /* On browser window unloading */
   onUnload: function() {
     window.removeEventListener("unload", nicofox.overlay.onUnload, false);
+    nicofox.panel.unload();
 
     document.getElementById("nicofox-library").removeEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").removeEventListener("popupshown", nicofox.panel.onPopupShown, false);
