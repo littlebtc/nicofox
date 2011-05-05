@@ -2,11 +2,18 @@
  * For Mac, check toolbarMac.css.
  */
 
-#nicofox-toolbar-button {
+toolbar[iconsize="large"] #nicofox-toolbar-button {
   -moz-box-orient: horizontal;
   list-style-image: url("chrome://nicofox/skin/logo_24.png");
 }
 
 toolbar[iconsize="small"] #nicofox-toolbar-button {
- list-style-image: url("chrome://nicofox/skin/logo_16_win.png");
+  -moz-box-orient: horizontal;
+  list-style-image: url("chrome://nicofox/skin/logo_16_win.png");
+}
+
+/* Customize toolbar problem workaround, see comments on the following page:
+   http://blog.mozilla.com/addons/2011/02/16/toolbar-buttons-firefox-4-revisited/ */
+#nicofox-toolbar-button {
+  list-style-image: url("chrome://nicofox/skin/logo_16_win.png");
 }
