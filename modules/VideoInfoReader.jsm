@@ -317,11 +317,20 @@ VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, th
   /* URL should be filtered in overlay.js */
   var url = contentWin.location.href;
 
+  /* Consider as failed if cannot find #flvplayer on the page */
+  if(!contentDoc.getElementById("flvplayer")) {
+    thisObj[failCallback].call(thisObj, contentDoc, "noflvplayer");
+    contentWin = null;
+    return;
+  }
+
   /* Use lazy sanitizer to parse Video object from UNSAFE wrappedJSObject window in the video page.
      Check if we can fetch the data correctly; don't do autologin or antiflood check here */
   var nicoData = lazySanitize(contentWin.wrappedJSObject.Video);
   if (!nicoData.v) {
-    thisObj[failCallback].call(thisObj, "novideoobject");
+    thisObj[failCallback].call(thisObj, contentDoc, "novideoobject");
+    contentWin = null;
+    return;
   }
   var otherData = {};
   otherData.hasOwnerThread = false;

@@ -168,6 +168,7 @@ nicofox.overlay = {
     if(!contentDoc) { return; }
     var browser =  gBrowser.getBrowserForDocument(contentDoc);
     if (!browser) { return; }
+    browser.nicofoxVideoInfo = info;
     if (browser == gBrowser.selectedBrowser) {
       nicofox.panel.updateVideoInfo(info);
     }
