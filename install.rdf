@@ -4,17 +4,16 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.7a</em:version>
+    <em:version>0.7</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your video watching experience!</em:description>
-    <em:unpack>true</em:unpack>
     <em:creator>Littlebtc</em:creator>
     <em:contributor>Logo and Icon designed by tdk4 in ptt.cc</em:contributor>
     <em:contributor>NicoFox contains some source codes by others that are licensed under various licenses.</em:contributor>
-    <em:contributor>See http://code.google.com/p/nicofox/wiki/License for details.</em:contributor>
+    <em:contributor>See https://github.com/littlebtc/nicofox/blob/master/LICENSE.md for details.</em:contributor>
     <em:translator>alexsh (ja)</em:translator>
     <em:translator>imfafa (ja)</em:translator>
     <em:translator>hzhbest (zh-CN)</em:translator>
-    <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
+    <em:homepageURL>https://github.com/littlebtc/nicofox</em:homepageURL>
     <em:optionsURL>chrome://nicofox/content/options.xul</em:optionsURL>
     <em:iconURL>chrome://nicofox/skin/logo.png</em:iconURL>
     <em:targetApplication>
@@ -33,11 +32,11 @@
         <em:creator>Littlebtc</em:creator>
         <em:contributor>Logo 和 Icon 由 ptt.cc 的 tdk4 設計</em:contributor>
         <em:contributor>NicoFox包含了許多由他人撰寫且以不同授權方式釋出的原始碼。</em:contributor>
-        <em:contributor>詳情請參考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
+        <em:contributor>詳情請參考 https://github.com/littlebtc/nicofox/blob/master/LICENSE.md 。</em:contributor>
 	<em:translator>alexsh (ja)</em:translator>
 	<em:translator>imfafa (ja)</em:translator>
 	<em:translator>hzhbest (zh-CN)</em:translator>
-        <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
+        <em:homepageURL>https://github.com/littlebtc/nicofox</em:homepageURL>
       </Description>
      </em:localized>
     <em:localized>
@@ -48,11 +47,11 @@
         <em:creator>Littlebtc</em:creator>
         <em:contributor>Logo 和 Icon 由 ptt.cc 的 tdk4 设计</em:contributor>
         <em:contributor>NicoFox包含了许多由他人撰写且以不同授权方式释出的源代码。</em:contributor>
-        <em:contributor>详情请参考 http://code.google.com/p/nicofox/wiki/License 。</em:contributor>
+        <em:contributor>详情请参考 https://github.com/littlebtc/nicofox/blob/master/LICENSE.md 。</em:contributor>
 	<em:translator>alexsh (ja)</em:translator>
 	<em:translator>imfafa (ja)</em:translator>
 	<em:translator>hzhbest (zh-CN)</em:translator>
-        <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
+        <em:homepageURL>https://github.com/littlebtc/nicofox</em:homepageURL>
       </Description>
      </em:localized>
     <em:localized>
@@ -63,11 +62,11 @@
         <em:creator>Littlebtc</em:creator>
         <em:contributor>ロゴ、アイコンはptt.ccのtdk4さんが提供してくれました。</em:contributor>
         <em:contributor>NicoFoxは、色々なライセンスでリリースされたソースコードを使わせていただいてます。</em:contributor>
-        <em:contributor>詳しくはhttp://code.google.com/p/nicofox/wiki/License 。</em:contributor>
+        <em:contributor>詳しくはhttps://github.com/littlebtc/nicofox/blob/master/LICENSE.md 。</em:contributor>
 	<em:translator>alexsh (ja)</em:translator>
 	<em:translator>imfafa (ja)</em:translator>
 	<em:translator>hzhbest (zh-CN)</em:translator>
-        <em:homepageURL>http://code.google.com/p/nicofox</em:homepageURL>
+        <em:homepageURL>https://github.com/littlebtc/nicofox</em:homepageURL>
       </Description>
      </em:localized>
   </Description>
