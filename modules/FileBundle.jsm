@@ -152,8 +152,21 @@ FileBundle.setDefaultPath = function() {
       var CSIDL_MYVIDEO = 0x000E;
       var MAX_PATH = 1024;
       var pathArray = new (ctypes.jschar.array(MAX_PATH));
+      /* Try to find the working ABI
+         http://forums.mozillazine.org/viewtopic.php?f=23&t=2059667
+         Before Bug 585175 landed: use ctypes.stdcall_abi
+         After Bug 585175 landed: ctypes.default_abi for 64-bit, ctypes.winapi_abi for 32-bit
+       */
+      var winAbi = ctypes.stdcall_abi;
+      if (ctypes.winapi_abi) {
+        if (ctypes.size_t.size == 8) {
+          winAbi = ctypes.default_abi;
+        } else {
+          winAbi = ctypes.winapi_abi;
+        }
+      }
       var SHGetSpecialFolderPath = lib.declare("SHGetSpecialFolderPathW",
-                                               ctypes.stdcall_abi,
+                                               winAbi,
                                                ctypes.bool, /* bool(return) */
                                                ctypes.int32_t, /* HWND hwnd */
                                                ctypes.jschar.ptr, /* LPTSTR lpszPath */
