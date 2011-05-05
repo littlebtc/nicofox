@@ -133,6 +133,9 @@ function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, succ
   /* Parse the URL. */
   if (target instanceof Ci.nsIDOMHTMLDocument) {
     url = target.location.href;
+    if (url.indexOf("?") >= 0) {
+      url = url.substring(0, url.indexOf("?"));
+    }
   } else if (typeof target == "string") {
     url = target;
   }
