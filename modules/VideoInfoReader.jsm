@@ -330,6 +330,8 @@ VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, th
   if (flashvars) {
     otherData.hasOwnerThread = (/\&has_owner_thread=1\&/.test(flashvars));
   }
+  // Prevent leak
+  contentWin = null;
   /* Parse the data and store the video info; only cached for first read */
   parseVideoInfo(contentDoc, nicoData, otherData, Boolean(firstRead), thisObj, successCallback, failCallback);
 };

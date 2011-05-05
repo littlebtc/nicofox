@@ -137,6 +137,7 @@ nicofox.overlay = {
     if (browser == gBrowser.selectedBrowser) {
       nicofox.panel.updateVideoInfo(info);
     }
+    contentDoc = null;
   },
   videoInfoFailed: function(reason) {
     var info = { 'error': reason };
@@ -146,6 +147,7 @@ nicofox.overlay = {
     if (browser == gBrowser.selectedBrowser) {
       nicofox.panel.updateVideoInfo(info);
     }
+    contentDoc = null;
   }
 };
 /* Refresh statusbar download notification */
