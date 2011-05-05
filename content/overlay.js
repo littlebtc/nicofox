@@ -121,13 +121,6 @@ nicofox.overlay = {
       nicofox.DownloadManager.addDownload(url);
     }
   },
-  /* Based on Greasemonkey. Is the URL nicomonkeyable? */
-  isNicomonkeyable: function(url) {
-    var scheme = nicofox.Services.io.extractScheme(url);
-    return (
-      (scheme == "http") && /nicovideo\.jp\//.test(url)
-    );
-  },
   /* When DOM Loaded, read video info if necessary. */
   onDOMContentLoaded: function(aEvent) {
     /* Don't cope with <iframe> and non-webpage loading. */
