@@ -35,7 +35,7 @@
             <image src="chrome://nicofox/skin/tools/de.png" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
           </hbox>
-          <description>Below is your recently download items.</description>
+          <description>Below are your recently download items.</description>
         </vbox>
         <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" height="120" hidden="true">
           <label value="Video info is reading..." />
