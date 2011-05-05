@@ -21,21 +21,21 @@ nicofox.panel.resultArray = [];
 nicofox.panel.onPopupShowing = function() {
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
-  if (!browser || !browser.contentWindow) { return; }
+  if (browser && browser.contentWindow) {
+    if (/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
+      Components.utils.reportError("Re-read!!");
+      contentWin = browser.contentWindow;
+      contentDoc = browser.contentDocument;
+      /* Do nothing if the page load is not completed */
+      if (!contentDoc || contentDoc.readyState != "complete") { return; }
+      var info = { 'reading': true };
+      browser.nicofoxVideoInfo = info;
+      nicofox.panel.updateVideoInfo(info);
 
-  if (/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
-    Components.utils.reportError("Re-read!!");
-    contentWin = browser.contentWindow;
-    contentDoc = browser.contentDocument;
-    /* Do nothing if the page load is not completed */
-    if (!contentDoc || contentDoc.readyState != "complete") { return; }
-    var info = { 'reading': true };
-    browser.nicofoxVideoInfo = info;
-    nicofox.panel.updateVideoInfo(info);
-
-    /* No need to write to cache at this time. */
-    Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-    VideoInfoReader.readFromPageDOM(contentWin, contentDoc, false, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+      /* No need to write to cache at this time. */
+      Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
+      VideoInfoReader.readFromPageDOM(contentWin, contentDoc, false, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+    }
   }
 
   /* Load download items from database for the first time. */
