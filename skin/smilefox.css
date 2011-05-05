@@ -26,6 +26,7 @@ richlistitem[type="smilefox"][sfstatus="7"] {
 }
 #nicofox-library {
   list-style-image: none;
+  background: white;
 }
 
 .nicofoxVideoInfoBox {
