@@ -175,8 +175,8 @@ FileBundle.setDefaultPath = function() {
       var result = SHGetSpecialFolderPath(0, pathArray, CSIDL_MYVIDEO, true);
       /* Read path and parse it into nsILocalFile for successful execution. */
       if (result) {
-        downloadDir = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile)
-                                                     .initWithPath(pathArray.readString());
+        downloadDir = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+        downloadDir.initWithPath(pathArray.readString());
       }
     }
     /* Fallback to My Documents if we cannot find Videos folder. */
