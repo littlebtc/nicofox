@@ -473,7 +473,7 @@ nicofox.panel.openOptionsWindow = function() {
   }
   window.openDialog(optionsURL, "", features);
   /* In some OS (linux for example), the panel will not be autohide :( */
-  document.getElementById("nicofox-library").hidden = true;
+  document.getElementById("nicofox-library").hidePopup();
 };
 
 /* Use NicoFox Player to play a video stored in the disk */

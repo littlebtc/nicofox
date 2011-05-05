@@ -15,12 +15,6 @@
 
     <panel id="nicofox-library">
       <vbox id="smilefox-main" height="450" width="450">
-        <!--
-        <hbox height="20" align="center">
-          <label value="&window.title;" />
-          <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
-          <label value="Player" class="text-link" onclick="nicofox.panel.openFileInPlayer();"/>
-        </hbox>-->
         <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
           <label value="Welcome to NicoFox！" style="font-weight: bold; font-size: 125%;" />
           <description flex="1">When you enter the video page, download button, global sites and third-party tools will be displayed here.</description>
@@ -106,6 +100,10 @@
                      onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"
                      flex="1">
         </richlistbox>
+        <hbox height="20" align="center">
+          <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
+          <label value="&openPlayer.tooltiptext;" class="text-link" onclick="nicofox.panel.openFileInPlayer();"/>
+        </hbox>
         <popupset id="smilefoxPopupset">
           <menupopup id="smilefoxPopup" onpopupshowing="return nicofox.panel.generateContextMenu(event);" onpopuphiding="">
             <menuitem label="&popup.missing.label;" accesskey="" id="smilefoxPopupMissing" disabled="true" />
