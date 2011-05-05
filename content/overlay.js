@@ -40,6 +40,9 @@ nicofox.overlay = {
       appcontent.addEventListener("DOMContentLoaded", nicofox.overlay.onDOMContentLoaded, false);
     }
     gBrowser.addProgressListener(nicofox.progressListener, Ci.nsIWebProgress.NOTIFY_LOCATION);
+
+    var container = gBrowser.tabContainer;
+    container.addEventListener("TabClose", nicofox.overlay.tabRemoved, false);
   },
   /* On browser window unloading */
   onUnload: function() {
@@ -58,7 +61,9 @@ nicofox.overlay = {
     if (appcontent) {
       appcontent.removeEventListener("DOMContentLoaded", nicofox.overlay.onDOMContentLoaded, false);
     }
-    gBrowser.removeProgressListener(this.progressListener);
+    gBrowser.removeProgressListener(nicofox.progressListener);
+    var container = gBrowser.tabContainer;
+    container.removeEventListener("TabClose", nicofox.overlay.tabRemoved, false);
   },
   /* On View -> NicoFox */
   onMenuItemCommand: function(aEvent) {
@@ -139,7 +144,7 @@ nicofox.overlay = {
     }
     contentDoc = null;
   },
-  videoInfoFailed: function(reason) {
+  videoInfoFailed: function(contentDoc, reason) {
     var info = { 'error': reason };
     if(!contentDoc) { return; }
     var browser =  gBrowser.getBrowserForDocument(contentDoc);
@@ -148,6 +153,11 @@ nicofox.overlay = {
       nicofox.panel.updateVideoInfo(info);
     }
     contentDoc = null;
+  },
+  /* Clean up for the nicoVideoInfo to prevent memory leak */
+  tabRemoved: function(event) {
+    var browser = gBrowser.getBrowserForTab(event.target);
+    browser.nicofoxVideoInfo = null;
   }
 };
 /* Refresh statusbar download notification */
