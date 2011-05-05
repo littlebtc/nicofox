@@ -2,7 +2,7 @@
  * For others, check toolbar.css.
  */
 
-#nicofoxToolbarButton {
+#nicofox-toolbar-button {
   -moz-box-orient: horizontal;
   list-style-image: url("chrome://nicofox/skin/logo_16_mac.png");
 }

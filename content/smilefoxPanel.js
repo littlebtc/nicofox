@@ -38,7 +38,7 @@ nicofox.panel.onPopupShowing = function() {
     }
   }
   /* Change the toolbutton state. */
-  var nicofoxToolbarButton = document.getElementById("nicofoxToolbarButton");
+  var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
   if (nicofoxToolbarButton) {
     nicofoxToolbarButton.setAttribute("open", true);
   }
@@ -54,7 +54,7 @@ nicofox.panel.onPopupShown = function() {
 };
 nicofox.panel.onPopupHidden = function() {
   /* Change the toolbutton state. */
-  var nicofoxToolbarButton = document.getElementById("nicofoxToolbarButton");
+  var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
   if (nicofoxToolbarButton) {
     nicofoxToolbarButton.setAttribute("open", false);
   }

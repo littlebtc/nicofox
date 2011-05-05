@@ -68,8 +68,8 @@ nicofox.overlay = {
       addonBar.collapsed = false;
     }
     document.getElementById("nicofox-library").hidden = false;
-    if (document.getElementById("nicofoxToolbarButton")) {
-      document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxToolbarButton"), 'after_end', 0, 0, false, false);
+    if (document.getElementById("nicofox-toolbar-button")) {
+      document.getElementById("nicofox-library").openPopup(document.getElementById("nicofox-toolbar-button"), 'after_end', 0, 0, false, false);
     } else {
       document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
     }
