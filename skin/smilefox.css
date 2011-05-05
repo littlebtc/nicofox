@@ -32,9 +32,10 @@ richlistitem[type="smilefox"][sfstatus="7"] {
 .nicofoxVideoInfoBox {
   margin: 5px;
   padding: 5px;
-  border: 1px solid #AAAAAA;
+  border: 1px solid ThreeDShadow;
   border-radius: 5px;
-  background: #F9F9F9;
+  background: ThreeDFace;
+  opacity: 0.8;
 }
 
 #nicofox-watching-thumb { 
