@@ -1,0 +1,12 @@
+/* Toolbar item styles for Windows (16x16) and Linux (24x24) on Firefox 4.  
+ * For Mac, check toolbarMac.css.
+ */
+
+#nicofoxToolbarButton {
+  -moz-box-orient: horizontal;
+  list-style-image: url("chrome://nicofox/skin/logo_24.png");
+}
+
+toolbar[iconsize="small"] #nicofoxToolbarButton {
+ list-style-image: url("chrome://nicofox/skin/logo_16_win.png");
+}

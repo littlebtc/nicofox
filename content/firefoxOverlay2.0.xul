@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
 <?xml-stylesheet href="chrome://nicofox/skin/smilefox.css" type="text/css"?>
+<?xml-stylesheet href="chrome://nicofox/skin/toolbar.css" type="text/css"?>
 <?xul-overlay href="chrome://nicofox/content/smilefoxPanel.xul"?>
 <!DOCTYPE overlay [
 <!ENTITY % nicofoxDTD SYSTEM "chrome://nicofox/locale/nicofox.dtd">
@@ -18,8 +19,7 @@
   </stringbundleset>
   <!-- Toolbar button -->
   <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu"
-    label="NicoFox" tooltiptext="NicoFox" style="-moz-box-orient: horizontal; list-style-image: url('chrome://nicofox/skin/logo_16_mono.png');" >
+    <toolbarbutton id="nicofoxToolbarButton" class="toolbarbutton-1" type="menu" label="NicoFox" tooltiptext="NicoFox">
       <panel id="nicofox-library" level="top" position="after_end">
       </panel>
     </toolbarbutton>
