@@ -138,7 +138,7 @@ nicofox.panel.videoTools.download = function() {
   
   var url = browser.contentWindow.location.href;
   if (url.indexOf("?") >= 0) {
-    url = url.substring(0, url.indexOf("?"))
+    url = url.substring(0, url.indexOf("?"));
   }
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   nicofox.DownloadManager.addDownload(url);
