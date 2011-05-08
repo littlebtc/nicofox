@@ -604,11 +604,15 @@ DownloadManager.removeDownload = function(id) {
   storedStatements.removeDownload.executeAsync(callback);
 };
 
+/* Add listener */
 DownloadManager.addListener = function(listener) {
  downloadListeners.push(listener);
 };
+/* Remove the listener in the list */
 DownloadManager.removeListener = function(listener) {
-  downloadListeners.splice(downloadListeners.indexOf(listener), 1);
+  var listenerPos = downloadListeners.indexOf(listener);
+  if (listenerPos < 0) { return; }
+  downloadListeners.splice(listenerPos, 1);
 };
 
 /* Readonly */
