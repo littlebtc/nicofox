@@ -1,11 +1,10 @@
 NicoFox - A better Nico Nico Douga on Firefox, featuring video download
 =============
 
-AMO entry is currently disabled due to the review process changes on the site :(. I'm trying to fix all the problem and upload new version ASAP.
+Latest release on AMO: [https://addons.mozilla.org/firefox/addon/nicofox/]
 
 Test the development snapshot on repository
 -------------
-The simplest way: Click the "Downloads" on the github page, download the source in zip format, rename the file with the .xpi extension, then drop the file into the addon manager in Firefox.  (The `player-develop` folder is a FlashDevelop project with the original source code for NicoFox Player, which can be remove from the ZIP archive to save the file size.)
-
-If you use Git to synchronize the latest source code, the following is a very simple `zip` command to grab the XPI files from the directory:
-    zip -r nicofox.xpi install.rdf chrome.manifest content/ locale/ skin/ components/ modules/ defaults/ player/
+Two ways to do it:
+* Download and extract the source code, rename the folder to `nicofox@littlebtc` then move it to `[your profile directory]/extensions/`.
+* On Mac OS X, Linux, or on Windows with MinGW or Cygwin, install Git, clone this repository, then run `./build.sh` to generate XPI file.
