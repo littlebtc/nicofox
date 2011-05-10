@@ -1,7 +1,7 @@
 NicoFox - A better Nico Nico Douga on Firefox, featuring video download
 =============
 
-Latest release on AMO: [https://addons.mozilla.org/firefox/addon/nicofox/]
+Install latest release on AMO: <https://addons.mozilla.org/firefox/addon/nicofox/>
 
 Test the development snapshot on repository
 -------------
