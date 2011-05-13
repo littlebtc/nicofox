@@ -146,9 +146,11 @@ var storedStatements = { /* ... */ };
  * @param successCallback  Name of callback function in thisObj, called if the statement finished successfully
  * @param failCallback     Name of callback function in thisObj, called if the statement failed.
  * @param selectFields     Array, if assigned, it will generate handleResult() implementation, read fields assigned in this array.
+ * @param resultCallback   Name of callback function in thisObj, called when the (part of) result from the statement is available.
+                           If not assigned, results will be combined into one array and sent to successCallback.
  * If there is more parameter present, they will be appended into successCallback.
  */
-function generateStatementCallback(callerName, thisObj, successCallback, failCallback, selectFields) {
+function generateStatementCallback(callerName, thisObj, successCallback, failCallback, selectFields, resultCallback) {
   /* Prepare a callback storage */
   var callback = {};
   var functionArguments = Array.prototype.slice.call(arguments);
@@ -163,6 +165,10 @@ function generateStatementCallback(callerName, thisObj, successCallback, failCal
             rowObj[selectFields[i]] = row.getResultByName(selectFields[i]); 
           }
           this.resultArray.push(rowObj);
+        }
+        if (resultCallback) {
+          thisObj[resultCallback].apply(thisObj, [this.resultArray]);
+          this.resultArray = [];
         }
       };
     }
@@ -182,8 +188,8 @@ function generateStatementCallback(callerName, thisObj, successCallback, failCal
     if (this.resultArray) {
       argsArray.push(this.resultArray);
     }
-    if (functionArguments.length > 5) {
-      for (var i = 5; i < functionArguments.length; i++) {
+    if (functionArguments.length > 6) {
+      for (var i = 6; i < functionArguments.length; i++) {
       argsArray.push(functionArguments[i]);
       }
     }
@@ -519,7 +525,7 @@ DownloadManager.fetchThumbnails = function() {
 };
 
 /* Asynchronously get all items in the download manager */
-DownloadManager.getDownloads = function(thisObj, successCallback, failCallback) {
+DownloadManager.getDownloads = function(thisObj, resultCallback, successCallback, failCallback) {
   if (!working) {
     Components.utils.reportError("DownloadManager is not working. This should not be happened.");
     thisObj[failCallback].call(thisObj);
@@ -530,7 +536,7 @@ DownloadManager.getDownloads = function(thisObj, successCallback, failCallback) 
   if (!storedStatements.getDownloads) {
     storedStatements.getDownloads = DownloadManagerPrivate.dbConnection.createStatement("SELECT * FROM `smilefox` ORDER BY `id` DESC");
   }
-  var callback = generateStatementCallback("getDownloads", thisObj, successCallback, failCallback, dbFields);
+  var callback = generateStatementCallback("getDownloads", thisObj, successCallback, failCallback, dbFields, resultCallback);
   storedStatements.getDownloads.executeAsync(callback);
 };
 /* Get single download. XXX: Why return array instead of object? */
@@ -600,7 +606,7 @@ DownloadManager.removeDownload = function(id) {
     storedStatements.removeDownload = DownloadManagerPrivate.dbConnection.createStatement("DELETE FROM `smilefox` WHERE `id` = :id AND `status` NOT IN (5,6,7)");
   }
   storedStatements.removeDownload.params.id = id;
-  var callback = generateStatementCallback("removeDownload", DownloadManagerPrivate, "notifyRemovedDownload", "dbFail", null, id);
+  var callback = generateStatementCallback("removeDownload", DownloadManagerPrivate, "notifyRemovedDownload", "dbFail", null, null, id);
   storedStatements.removeDownload.executeAsync(callback);
 };
 

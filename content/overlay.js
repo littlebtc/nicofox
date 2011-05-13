@@ -37,7 +37,6 @@ nicofox.overlay = {
       nicofox.Core.prefs.setBoolPref("toolbar_check", true);
     }
     /* Register panel initializer */
-    document.getElementById("nicofox-library").addEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").addEventListener("popupshown", nicofox.panel.onPopupShown, false);
     document.getElementById("nicofox-library").addEventListener("popuphidden", nicofox.panel.onPopupHidden, false);
 
@@ -67,7 +66,6 @@ nicofox.overlay = {
     window.removeEventListener("unload", nicofox.overlay.onUnload, false);
     nicofox.panel.unload();
 
-    document.getElementById("nicofox-library").removeEventListener("popupshowing", nicofox.panel.onPopupShowing, false);
     document.getElementById("nicofox-library").removeEventListener("popupshown", nicofox.panel.onPopupShown, false);
     document.getElementById("nicofox-library").removeEventListener("popuphidden", nicofox.panel.onPopupHidden, false);
 

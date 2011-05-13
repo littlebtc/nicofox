@@ -11,14 +11,14 @@ nicofox.panel.activeDownloadInstances = {
 
 };
 
-/* The panel should be loaded only when the first time of popupshowing event. This boolean will record this. */
+/* The panel should be loaded only when the first time of popupshown event. This boolean will record this. */
 nicofox.panel.loaded = false;
 
 /* Storage for array */
 nicofox.panel.resultArray = [];
 
-/* On popup showing, check whether the panel is loaded */
-nicofox.panel.onPopupShowing = function() {
+/* When popup shown, check whether the panel is loaded */
+nicofox.panel.onPopupShown = function() {
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
   if (browser && browser.contentWindow) {
@@ -48,9 +48,8 @@ nicofox.panel.onPopupShowing = function() {
     return;
   }
   nicofox.panel.load();
-};
-nicofox.panel.onPopupShown = function() {
   document.getElementById("smilefoxList").focus();
+  
 };
 nicofox.panel.onPopupHidden = function() {
   /* Change the toolbutton state. */
@@ -92,7 +91,7 @@ nicofox.panel.init = function() {
   nicofox.DownloadManager.addListener(this.listener);
   
   /* Get all download items. */
-  nicofox.DownloadManager.getDownloads(this, "displayDownloads", "dbFail");
+  nicofox.DownloadManager.getDownloads(this, "displayDownloads", "doneGetDownloads", "dbFail");
 };
 
 /* Update video info on the panel. */
@@ -214,7 +213,11 @@ nicofox.panel.disableThumbnail = function() {
   document.getElementById("smilefoxThumbNotice").hidden = true;
 };
 
-/* Display all downloaded item after the asynchorous request. */
+/* Called when all download items are retrived. Currently do nothing. */
+nicofox.panel.doneGetDownloads = function() {
+};
+
+/* Display downloaded items when available. */
 nicofox.panel.displayDownloads = function(resultArray) {
   /* Check whether to prompt user to download thumbnail */ 
   if (resultArray.length > 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check") && nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
