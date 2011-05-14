@@ -27,6 +27,11 @@ let DownloadManagerPrivate = {};
 Components.utils.import("resource://nicofox/Services.jsm");
 Components.utils.import("resource://nicofox/Core.jsm");
 
+/* Load the "DownloadUtils" from the toolkit to the toolkit.DownloadUtils.
+   Note that is is NOT the DownloadUtils in NicoFox! */
+let gre = {};
+Components.utils.import("resource://gre/modules/DownloadUtils.jsm", gre);
+
 /* Is the download manager (database and other components) currently up? */
 var working = false;
 
@@ -780,8 +785,15 @@ function handleDownloaderEvent(type, content) {
     break;
 
     case "progress_change":
-    /* Do not update the progress, performance will be bad */
+    /* Modified from toolkit/mozapps/downloads/content/downloads.js */
+    /* Get the download status from gre.DownloadUtils */
+    var downloadStatus = "";
+    var newLast = Infinity;
+    [downloadStatus, newLast] = gre.DownloadUtils.getDownloadStatus(content.currentBytes, content.maxBytes, this.speed, this.lastSec);
+
+    content.downloadStatus = downloadStatus;
     triggerDownloadListeners("downloadProgressUpdated", id, content);
+    this.lastSec = newLast;
     break;
 
     case "video_done":

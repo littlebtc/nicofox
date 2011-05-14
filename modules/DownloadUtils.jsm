@@ -158,6 +158,8 @@ DownloadUtils.nico.prototype = {
   _getUploaderComment: false,
   _getThumbnail: false,
   /* Store video download progress */
+  _progressUpdatedAt: 0,
+  _videoProgressUpdatedBytes: 0,
   _videoCurrentBytes: 0,
   _videoMaxBytes: 0,
   _extraItemsDownloader: null,
@@ -173,7 +175,11 @@ DownloadUtils.nico.prototype = {
   dbId: null,
   /* Is the video previous in the economy mode? Should be assigned from the outside. */
   previousAtEconomy: null,
-  
+  /* The download speed. */
+  speed: 0,
+  /* Last time remaining, calculated from DownloadManger */
+  lastSec: Infinity,
+
   /* Initialize download for specific URL. */
   init: function(url) {
     Components.utils.reportError("Downloader Init!");
@@ -369,13 +375,33 @@ DownloadUtils.nico.prototype = {
                                  aCurTotalProgress, aMaxTotalProgress) {
         this._parentInstance._videoCurrentBytes = aCurSelfProgress;
         this._parentInstance._videoMaxBytes = aMaxSelfProgress;
+
+        /* The following is modified from toolkit/components/downloads/nsDownloadManager.cpp: */
+        /* Don't send the notification too frequently */
+        var now = new Date().getTime();
+        var delta = now - this._progressUpdatedAt;
+        if (delta < 400) {
+          return;
+        }
+        this._progressUpdatedAt = now;
+        /* Calculate "smoothed average" speed. */
+        if (delta > 0) {
+          var newSpeed = (aCurSelfProgress - this._parentInstance._videoProgressUpdatedBytes) / delta * 1000;
+          if (this._parentInstance._videoProgressUpdatedBytes == 0) {
+            this._parentInstance.speed = newSpeed;
+          } else {
+            this._parentInstance.speed = this._parentInstance.speed * 0.9 + newSpeed * 0.1;
+          }
+        }
+        /* Update the bytes when "Progres updated", then send the callback. */
+        this._parentInstance._videoProgressUpdatedBytes = aCurSelfProgress;
         this._parentInstance.callback('progress_change', {currentBytes: aCurSelfProgress, maxBytes: aMaxSelfProgress});
       },
       onLocationChange: function (aWebProgress, aRequest, aLocation) {},
       onStatusChange  : function (aWebProgress, aRequest, aStatus, aMessage) {},
       onSecurityChange: function (aWebProgress, aRequest, aState) {},
     };
-
+    this._progressUpdatedAt = new Date().getTime();
     this._persist.progressListener = listener;
     this._persist.saveURI(videoUri, null, null, null, null, this._fileBundle.files.videoTemp);
 

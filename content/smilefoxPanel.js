@@ -539,6 +539,7 @@ nicofox.panel.listener.downloadProgressUpdated = function(id, content) {
   var listItem = document.getElementById("smileFoxListItem"+ id);
   if (!listItem) { return; }
   listItem.setAttribute("progresstype", "determined");
+  listItem.setAttribute("sfdownloadstatus", content.downloadStatus);
   listItem.setAttribute("currentbytes", content.currentBytes);
   listItem.setAttribute("maxbytes", content.maxBytes);
 };

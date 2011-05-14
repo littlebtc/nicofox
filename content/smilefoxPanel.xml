@@ -69,6 +69,7 @@
           <xul:hbox flex="1">
             <xul:progressmeter xbl:inherits="mode=progresstype,value=currentbytes,max=maxbytes" flex="1" />
           </xul:hbox>
+          <xul:label xbl:inherits="value=sfdownloadstatus" crop="end" flex="1" />
         </xul:vbox>
       </xul:hbox>
     </content>
