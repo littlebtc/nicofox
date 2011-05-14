@@ -24,7 +24,6 @@ let DownloadManager = {};
 /* Store private objects of the download manager */
 let DownloadManagerPrivate = {};
 
-if (!nicofox) { var nicofox = {}; }
 Components.utils.import("resource://nicofox/Services.jsm");
 Components.utils.import("resource://nicofox/Core.jsm");
 
