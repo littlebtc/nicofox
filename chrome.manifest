@@ -15,7 +15,7 @@ override chrome://nicofox/skin/toolbar.css chrome://nicofox/skin/toolbarLinux.cs
 # Firefox 3.6 Themes related
 overlay	chrome://browser/content/browser.xul	chrome://nicofox/content/firefoxOverlay1.9.xul application={ec8030f7-c20a-464f-9b0e-13a3a9e97384} appversion<4.0
 
-# Gecko 2.0 Compartibility
+# Components Registration for Firefox 4
 component {62ca6b17-975f-4c70-b497-33146a16c797} components/nicowatcher.js
 contract @littleb.tc/nicowatcher;1 {62ca6b17-975f-4c70-b497-33146a16c797}
 category content-policy NicoWatcher @littleb.tc/nicowatcher;1
@@ -26,6 +26,10 @@ category profile-after-change NicoFoxBootstrap @littleb.tc/nicofox-bootstrap;1
 
 component {af1db570-70a8-11de-8a39-0800200c9a66} components/aboutNicofox.js
 contract @mozilla.org/network/protocol/about;1?what=nicofox {af1db570-70a8-11de-8a39-0800200c9a66}
+
+component {c4468b7d-b273-4f0a-a729-3397022ab9c8} components/vacuumParticipant.js
+contract @littleb.tc/nicofox-vacuum-participant;1 {c4468b7d-b273-4f0a-a729-3397022ab9c8}
+category vacuum-participant NicoFoxVacuumParticipant @littleb.tc/nicofox-vacuum-participant;1
 
 # Under construction...
 # overlay	chrome://browser/content/sanitize.xul	chrome://nicofox/content/sanitize_overlay.xul
