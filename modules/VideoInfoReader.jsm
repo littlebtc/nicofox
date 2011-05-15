@@ -320,17 +320,18 @@ VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, th
   /* URL should be filtered in overlay.js */
   var url = contentWin.location.href;
 
-  /* Consider as failed if cannot find #flvplayer on the page */
-  if(!contentDoc.getElementById("flvplayer")) {
-    thisObj[failCallback].call(thisObj, contentDoc, "noflvplayer");
+  /* Consider as failed if cannot find #WATCHHEADER and wrappedJSObject.so on the page */
+  if(!contentDoc.getElementById("WATCHHEADER") || !contentWin.wrappedJSObject.so) {
+    thisObj[failCallback].call(thisObj, contentDoc, "noplayer");
     contentWin = null;
     return;
   }
 
-  /* Use lazy sanitizer to parse Video object from UNSAFE wrappedJSObject window in the video page.
+  /* Use lazy sanitizer to parse Video and so.variables object from UNSAFE wrappedJSObject window in the video page.
      Check if we can fetch the data correctly; don't do autologin or antiflood check here */
   var nicoData = lazySanitize(contentWin.wrappedJSObject.Video);
-  if (!nicoData.v) {
+  var swfVariables = lazySanitize(contentWin.wrappedJSObject.so.variables);
+  if (!nicoData.v || !swfVariables.v) {
     thisObj[failCallback].call(thisObj, contentDoc, "novideoobject");
     contentWin = null;
     return;
@@ -338,9 +339,8 @@ VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, th
   var otherData = {};
   otherData.hasOwnerThread = false;
   /* Check whether the uploader comments (thread) exists on this video */
-  var flashvars = contentDoc.getElementById("flvplayer").getAttribute("flashvars");
-  if (flashvars) {
-    otherData.hasOwnerThread = (/\&has_owner_thread=1\&/.test(flashvars));
+  if (swfVariables["has_owner_thread"]) {
+    otherData.hasOwnerThread = true;
   }
   // Prevent leak
   contentWin = null;
