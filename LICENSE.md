@@ -15,6 +15,7 @@ Some part of the extension is not done by Littlebtc, below is a list of them wit
 
  * Logo and Icon designed by tdk4 at [ptt.cc](http://ptt.cc/) 
  * Source code from [Greasemonkey](http://www.greasespot.net/) (MIT License)
+ * Source code from [mozilla-central](http://hg.mozilla.org/mozilla-central/) (GPL/LGPL/MPL tri-licensed)
  * [Silk Icons](http://www.famfamfam.com/lab/icons/silk/) 1.3 by Mark James (CC-by-2.5)
  * [Flag Icons](http://www.famfamfam.com/lab/icons/flags/) by Mark James (Public Domain)
  * [ForcibleLoader](http://www.libspark.org/wiki/yossy/ForcibleLoader) by BeInteractive! and Spark project (MIT License)
