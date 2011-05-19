@@ -37,7 +37,7 @@
     </hbox>
     <statusbarpanel id="nicofoxStatusbarContainer" onclick="event.stopPropagation();  document.getElementById('nicofox-library').hidden = false; document.getElementById('nicofox-library').openPopup(this, 'before_end', 0, 0, false, false);">
        <!-- For rein skin compatibility -->
-       <image id="nicofox-icon" src="chrome://nicofox/skin/logo_16.png"/> 
+       <image id="nicofox-icon" /> 
        <label id="nicofoxStatusbarLabel" hidden="true" />
     </statusbarpanel>
   </statusbar>

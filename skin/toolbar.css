@@ -2,5 +2,6 @@
 
 #nicofox-toolbar-button {
   -moz-box-orient: horizontal;
-  list-style-image: url("chrome://nicofox/skin/logo_16_win.png");
+  list-style-image: url("chrome://nicofox/skin/logo_16_sprite.png");
+  -moz-image-region: rect(0px 48px 16px 32px);
 }

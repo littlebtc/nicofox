@@ -2,6 +2,7 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
 <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
+<?xml-stylesheet href="chrome://nicofox/skin/smilefox.css" type="text/css"?>
 <!DOCTYPE prefwindow [
 <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
 %brandDTD;
@@ -11,7 +12,7 @@
 <prefwindow id="nicofoxPreferences" xmlns:html="http://www.w3.org/1999/xhtml"
  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
  title="&prefwindow.title;" width="600" style="height: 45em;">
-  <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();" image="chrome://nicofox/skin/nicofox_content.png">
+  <prefpane id="pane1" label="&nicomonkey;" onpaneload="updatePanel1();">
   <script type="application/x-javascript" src="chrome://nicofox/content/options_panel1.js" />
     <preferences>
       <preference id="pref-nicomonkey.sound_converter" name="extensions.nicofox.nicomonkey.sound_converter" type="string"/>
@@ -29,7 +30,7 @@
       </menulist>
     </hbox>
   </prefpane>
-  <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();" image="chrome://nicofox/skin/nicofox_downloader.png">
+  <prefpane id="pane2" label="&downloader;" onpaneload="updatePanel2();">
   <script type="application/x-javascript" src="chrome://nicofox/content/options_panel2.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
@@ -121,7 +122,7 @@
      </hbox>
      </groupbox>
   </prefpane>
-  <prefpane id="pane3" label="&video_player;" onpaneload="updatePanel3();" image="chrome://nicofox/skin/nicofox_player.png">
+  <prefpane id="pane3" label="&video_player;" onpaneload="updatePanel3();">
   <script type="application/x-javascript" src="chrome://nicofox/content/options_panel3.js" />
     <preferences>
       <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" onchange="updateVideoPlayer();"/>

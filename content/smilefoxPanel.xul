@@ -20,13 +20,13 @@
           <description flex="1">When you enter the video page, download button, global sites and third-party tools will be displayed here.</description>
           <label value="Go to Nico Nico Douga in the specific region:" />
           <hbox id="nicofox-not-watching-toolbar">
-            <image src="chrome://nicofox/skin/tools/jp.png" class="smilefoxToolItem"
+            <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
-            <image src="chrome://nicofox/skin/tools/tw.png" class="smilefoxToolItem"
+            <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-            <image src="chrome://nicofox/skin/tools/es.png" class="smilefoxToolItem"
+            <image style="-moz-image-region: rect(0px 48px 11px 32px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'es');" />
-            <image src="chrome://nicofox/skin/tools/de.png" class="smilefoxToolItem"
+            <image style="-moz-image-region: rect(0px 64px 11px 48px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
           </hbox>
           <description>Below are your recently download items.</description>
@@ -43,7 +43,7 @@
             <vbox flex="1">
               <label id="nicofox-watching-title" crop="end" />
               <hbox>
-                <button id="nicofox-watching-download" label="Download" image="chrome://nicofox/skin/tools/download.png"
+                <button id="nicofox-watching-download" label="Download" style="list-style-image: url('chrome://nicofox/skin/toolbar_sprite.png'); -moz-image-region: rect(11px 60px 23px 48px);"
                         oncommand="nicofox.panel.videoTools.download();"/>
                 <!--<button id="nicofox-watching-add-tags" label="Add tags..." />-->
               </hbox>
@@ -55,25 +55,25 @@
                 <rows>
                   <row>
                     <label value="This Video Worldwide:" />
-                    <hbox>
-                      <image src="chrome://nicofox/skin/tools/jp.png" class="smilefoxToolItem"
+                    <hbox align="center">
+                      <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="smilefoxToolItem"
                              onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
-                      <image src="chrome://nicofox/skin/tools/tw.png" class="smilefoxToolItem"
+                      <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="smilefoxToolItem"
                              onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-                      <image src="chrome://nicofox/skin/tools/es.png" class="smilefoxToolItem"
+                      <image style="-moz-image-region: rect(0px 48px 11px 32px);" class="smilefoxToolItem"
                              onclick="nicofox.panel.videoTools.goSite(event, 'es');" />
-                      <image src="chrome://nicofox/skin/tools/de.png" class="smilefoxToolItem"
+                      <image style="-moz-image-region: rect(0px 64px 11px 48px);" class="smilefoxToolItem"
                              onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
                    </hbox>
                   </row>
                   <row>
                     <label value="Third-party Tools:" />
                     <hbox>
-                     <image src="chrome://nicofox/skin/tools/music.png" class="smilefoxToolItem"
+                     <image style="-moz-image-region: rect(11px 16px 27px 0px);" class="smilefoxToolItem"
                             onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'sound');" />
-                     <image src="chrome://nicofox/skin/tools/chart.png" class="smilefoxToolItem"
+                     <image style="-moz-image-region: rect(11px 32px 27px 16px);" class="smilefoxToolItem"
                             onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'chart');" />
-                     <image src="chrome://nicofox/skin/tools/comment.png" class="smilefoxToolItem" id="nicofox-watching-comment-tool"
+                     <image style="-moz-image-region: rect(11px 48px 27px 32px);" class="smilefoxToolItem" id="nicofox-watching-comment-tool"
                             onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'comment');" />
                    </hbox>
                  </row>

@@ -9,7 +9,6 @@ echo "Generating directories..."
 mkdir build
 mkdir build/content
 mkdir build/skin
-mkdir build/skin/tools
 mkdir build/components
 mkdir build/modules
 mkdir build/defaults
@@ -22,7 +21,6 @@ echo "Copy files..."
 cp install.rdf chrome.manifest LICENSE.md build/
 cp content/*.js content/*.xul content/*.xml content/*.swf build/content/
 cp skin/*.css skin/*.png build/skin/
-cp skin/tools/*.png build/skin/tools/
 cp components/*.js build/components/
 cp modules/*.jsm build/modules/
 cp defaults/preferences/*.js build/defaults/preferences/
