@@ -41,7 +41,7 @@ Network.fetchUrlAsync = function(url, postQueryString, thisObj, successCallback,
   /* Assign the callback */
   var callback = function(aInputStream, aResult, aRequest) {
     if (!Components.isSuccessCode(aResult)) {
-      thisObj[failCallback].call(thisObj, url, str);
+      thisObj[failCallback].call(thisObj, url, str, aRequest);
       return;
     }
     /* Convert utf-8 input stream. From https://developer.mozilla.org/en/Code_snippets/File_I%2f%2fO */
@@ -57,7 +57,7 @@ Network.fetchUrlAsync = function(url, postQueryString, thisObj, successCallback,
     }
     converterInputStream.close();
     aInputStream.close();
-    thisObj[successCallback].call(thisObj, url, data);
+    thisObj[successCallback].call(thisObj, url, data, aRequest);
   };
 
   /* The following is modified from NetUtil.asyncFetch from netwerk/base/src/NetUtil.jsm in mozilla-central,
