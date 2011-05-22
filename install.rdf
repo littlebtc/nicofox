@@ -14,7 +14,7 @@
     <em:translator>imfafa (ja)</em:translator>
     <em:translator>hzhbest (zh-CN)</em:translator>
     <em:homepageURL>https://github.com/littlebtc/nicofox</em:homepageURL>
-    <em:optionsURL>chrome://nicofox/content/options.xul</em:optionsURL>
+    <em:optionsURL>chrome://nicofox/content/prefs.xul</em:optionsURL>
     <em:iconURL>chrome://nicofox/skin/logo.png</em:iconURL>
     <em:targetApplication>
       <Description>

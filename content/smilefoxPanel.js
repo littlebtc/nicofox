@@ -458,7 +458,7 @@ nicofox.panel.commands = {
 /* Open "NicoFox Option" */
 /* Modified from: toolkit/mozapps/extensions/content/extensions.js */
 nicofox.panel.openOptionsWindow = function() {
-  var optionsURL = "chrome://nicofox/content/options.xul"
+  var optionsURL = "chrome://nicofox/content/prefs.xul"
   var windows = nicofox.Services.wm.getEnumerator(null);
   while (windows.hasMoreElements()) {
     var win = windows.getNext();
