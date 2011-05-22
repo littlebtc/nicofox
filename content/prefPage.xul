@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
+<overlay id="overlayPage" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <prefpane id="panePage">
+    <preferences>
+      <preference id="pref-nicomonkey.sound_converter" name="extensions.nicofox.nicomonkey.sound_converter" type="string"/>
+      <preference id="pref-nicowa_blocker" name="extensions.nicofox.nicowa_blocker" type="bool"/>
+    </preferences>
+    <checkbox id="nicowa_blocker" preference="pref-nicowa_blocker" label="&nicowa_blocker.label;" accesskey="&nicowa_blocker.accesskey;" />
+    <hbox>
+      <label value="&nicomonkey.sound_converter.label;" accesskey="&nicomonkey.sound_converter.accesskey;" control="nicomonkey.sound_converter"/>
+      <menulist id="nicomonkey.sound_converter" preference="pref-nicomonkey.sound_converter" >
+        <menupopup>
+          <menuitem value="http://nicosound.anyap.info/sound/%1" label="にこ☆さうんど＃" />
+          <menuitem value="http://www.nicomimi.net/play/%1" label="nicomimi-にこみみ-" />
+          <menuitem value="http://tunes.labolo.net/mp3/%1" label="NicoTunes" />
+        </menupopup>
+      </menulist>
+    </hbox>
+  </prefpane>
+</overlay>

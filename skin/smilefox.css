@@ -80,12 +80,12 @@ radio[pane] {
   list-style-image: url(chrome://nicofox/skin/options_sprite.png);
 }
 
-radio[pane=pane1] {
+radio[pane=panePage] {
   -moz-image-region: rect(0px 32px 32px 0px);
 }
-radio[pane=pane2] {
+radio[pane=paneDownload] {
   -moz-image-region: rect(0px 64px 32px 32px);
 }
-radio[pane=pane3] {
+radio[pane=panePlayer] {
   -moz-image-region: rect(0px 96px 32px 64px);
 }

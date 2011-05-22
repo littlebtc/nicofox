@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
+<overlay id="overlayDownload" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <prefpane id="paneDownload" onpaneload="updatePanel2();">
+    <script type="application/x-javascript" src="chrome://nicofox/content/options_panel2.js" />
+    <preferences>
+      <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
+      <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
+      <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
+      <preference id="pref-download_thumbnail" name="extensions.nicofox.download_thumbnail" type="bool" />
+      <preference id="pref-download_max" name="extensions.nicofox.download_max" type="int" />
+      <preference id="pref-video_bypass_cache" name="extensions.nicofox.video_bypass_cache" type="bool" />
+      <preference id="pref-economy" name="extensions.nicofox.economy" type="int" />
+      <preference id="pref-uploader_comment" name="extensions.nicofox.uploader_comment" type="bool" />
+      <preference id="pref-boon_comment" name="extensions.nicofox.boon_comment" type="bool" />
+      <preference id="pref-replace_filters" name="extensions.nicofox.replace_filters" type="bool" />
+      <preference id="pref-nicoplayer_txt" name="extensions.nicofox.nicoplayer_txt" type="bool" />
+      <preference id="pref-autologin_username" name="extensions.nicofox.autologin_username" type="wstring" />
+    </preferences>
+    <groupbox align="start">
+      <caption label="&downloader.options;" />
+      <grid>
+        <columns>
+          <column flex="1"/>
+          <column flex="2"/>
+          <column flex="1"/>
+        </columns>
+        <rows>
+          <row>
+            <label value="&downloader.save_path.label;" accesskey="&downloader.save_path.accesskey;" control="save_path" />
+            <filefield id="save_path" preference="pref-save_path" width="200"/>
+            <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectDir();" />
+          </row>
+          <row>
+            <label value="&downloader.filename_scheme.label;" accesskey="&downloader.filename_scheme.accesskey;" control="filename_scheme" />
+            <textbox width="200" id="filename_scheme" preference="pref-filename_scheme" />
+          </row>
+          <row>
+            <label value="&downloader.also_download;" />
+            <vbox>
+              <checkbox id="download_comment" preference="pref-download_comment" label="&downloader.download_comment.label;" accesskey="&downloader.download_comment.accesskey;" />
+              <checkbox id="download_thumbnail" preference="pref-download_thumbnail" label="Thumbnail" accesskey="T" />
+              <checkbox id="uploader_comment" preference="pref-uploader_comment" label="&downloader.uploader_comment.label;" accesskey="&downloader.uploader_comment.accesskey;" />
+            </vbox>
+          </row>  
+        </rows>
+      </grid>
+      <checkbox id="video_bypass_cache" preference="pref-video_bypass_cache" label="&downloader.video_bypass_cache.label;" accesskey="&downloader.video_bypass_cache.accesskey;" />
+      <hbox>
+        <label value="&downloader.download_max.label;" accesskey="&downloader.download_max.accesskey;" control="download_max"/>
+        <textbox type="number" min="1" max="3" style="width:5em" id="download_max" preference="pref-download_max" />
+      </hbox>
+    </groupbox>
+    <groupbox align="start">
+      <caption label="&downloader.nico_only;" />
+      <label value="&downloader.economy.label;" accesskey="&downloader.economy.accesskey;" control="economy"/>
+      <menulist id="economy" preference="pref-economy" >
+        <menupopup>
+          <menuitem value="0" label="&downloader.economy.1;" />
+          <menuitem value="1" label="&downloader.economy.2;" />
+        </menupopup>
+      </menulist>
+      <checkbox id="replace_filters" preference="pref-replace_filters" label="&downloader.replace_filters.label;" accesskey="&downloader.replace_filters.accesskey;" />
+      <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
+      <label value="&downloader.autologin_username.label;" accesskey="&downloader.autologin_username.accesskey;" control="autologin_username" />
+
+      <hbox>
+        <menulist id="autologin_username" disabled="true" preference="pref-autologin_username" height="25" >
+          <menupopup>
+          </menupopup>
+        </menulist>
+
+        <button image="chrome://nicofox/skin/lock_break.png" id="autologin_select" oncommand="readUsernames();" />
+        <button image="chrome://nicofox/skin/cross.png" id="autologin_remove" oncommand="removeUsername();" />
+      </hbox>
+    </groupbox>
+  </prefpane>
+</overlay>
