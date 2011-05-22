@@ -5,7 +5,7 @@
 ]>
 <overlay id="overlayPlayer" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <prefpane id="panePlayer" onpaneload="updatePanel3();">
-    <script type="application/x-javascript" src="chrome://nicofox/content/options_panel3.js" />
+    <script type="application/x-javascript" src="chrome://nicofox/content/panePlayer.js" />
     <preferences>
       <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" onchange="updateVideoPlayer();"/>
       <preference id="pref-external_video_player_path" name="extensions.nicofox.external_video_player_path" type="file" />
