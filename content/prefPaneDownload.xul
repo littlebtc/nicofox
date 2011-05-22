@@ -2,7 +2,7 @@
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <overlay id="overlayDownload" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <prefpane id="paneDownload" onpaneload="updatePanel2();">
-    <script type="application/x-javascript" src="chrome://nicofox/content/prefDownload.js" />
+    <script type="application/x-javascript" src="chrome://nicofox/content/prefPaneDownload.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
