@@ -7,9 +7,9 @@
 
 <prefwindow id="nicofoxPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
  title="&prefwindow.title;" style="width: 45em; min-height: 45em;">
-  <prefpane id="panePage" label="&nicomonkey;" src="chrome://nicofox/content/prefPage.xul" />
-  <prefpane id="paneDownload" label="&downloader;" src="chrome://nicofox/content/prefDownload.xul" />
-  <prefpane id="panePlayer" label="&video_player;" src="chrome://nicofox/content/prefPlayer.xul" />
+  <prefpane id="panePage" label="&nicomonkey;" src="chrome://nicofox/content/prefPanePage.xul" />
+  <prefpane id="paneDownload" label="&downloader;" src="chrome://nicofox/content/prefPaneDownload.xul" />
+  <prefpane id="panePlayer" label="&video_player;" src="chrome://nicofox/content/prefPanePlayer.xul" />
   <stringbundleset id="stringbundleset">
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
   </stringbundleset>
