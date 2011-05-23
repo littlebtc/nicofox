@@ -3,21 +3,8 @@
 <!ENTITY nicowa_blocker.label "ニコ割をブロックする（時報とか情報局とか。でもユーザーニコ割は除く）">
 <!ENTITY nicowa_blocker.accesskey "W">
 <!ENTITY nicomonkey "ページ表示">
-<!ENTITY nicomonkey.enable.label "ページにNicoFox独自機能を追加する">
-<!ENTITY nicomonkey.enable.accesskey "E">
-<!ENTITY nicomonkey.options "追加機能のカスタマイズ">
-<!ENTITY nicomonkey.toolbar.label "ツールバーを追加">
-<!ENTITY nicomonkey.toolbar.accesskey "T">
 <!ENTITY nicomonkey.sound_converter.label "音声抽出（変換）サイト">
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
-<!ENTITY nicomonkey.comment_helper.label "コメント入力支援ツール">
-<!ENTITY nicomonkey.comment_helper.accesskey "C">
-<!ENTITY nicomonkey.player_killer.label "再生しようとした動画が削除されていたら、プレイヤーを読み込みしない">
-<!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "「ブックマークにこのタグを追加」ボタンを追加する">
-<!ENTITY nicomonkey.supertag.accesskey "G">
-<!ENTITY nicomonkey.superlist.label "マイリストに追加するとき、ブックマークにも追加する">
-<!ENTITY nicomonkey.superlist.accesskey "M">
 <!ENTITY downloader "ダウンロードマネージャー">
 <!ENTITY downloader.options "ダウンロードオプション">
 <!ENTITY downloader.confirm_before_download.label "ダウンロードをするとき、確認ダイアローグを表示する（今見てるのは除く）">
@@ -33,6 +20,10 @@
 <!ENTITY downloader.also_download "以下のも一緒に落とす:">
 <!ENTITY downloader.download_comment.label "コメント">
 <!ENTITY downloader.download_comment.accesskey "C">
+<!ENTITY downloader.uploader_comment.label "投稿者コメント">
+<!ENTITY downloader.uploader_comment.accesskey "U">
+<!ENTITY downloader.download_thumbnail.label "サムネイル">
+<!ENTITY downloader.download_thumbnail.accesskey "T">
 <!ENTITY downloader.download_max.label "最大同時ダウンロード数:">
 <!ENTITY downloader.download_max.accesskey "M">
 <!ENTITY downloader.video_bypass_cache.label "動画ファイルを保存するとき、ブラウザのキャッシュを使わない">
@@ -42,8 +33,6 @@
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "そのまま低画質の動画ファイルをダウンロードする">
 <!ENTITY downloader.economy.2 "エコノミー時間帯が終わってからまたダウンロードする">
-<!ENTITY downloader.uploader_comment.label "投稿者コメントも保存する">
-<!ENTITY downloader.uploader_comment.accesskey "U">
 <!ENTITY downloader.replace_filters.label "コメントのフィルタを置換">
 <!ENTITY downloader.replace_filters.accesskey "F">
 <!ENTITY downloader.boon_comment.label "BOON Player 互換のコメントを生成する">

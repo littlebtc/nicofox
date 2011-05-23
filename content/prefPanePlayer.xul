@@ -4,22 +4,30 @@
 %prefDTD;
 ]>
 <overlay id="overlayPlayer" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <prefpane id="panePlayer" onpaneload="updatePanel3();">
+  <prefpane id="panePlayer">
     <script type="application/x-javascript" src="chrome://nicofox/content/prefPanePlayer.js" />
     <preferences>
-      <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" onchange="updateVideoPlayer();"/>
+      <preference id="pref-external_video_player" name="extensions.nicofox.external_video_player" type="bool" />
       <preference id="pref-external_video_player_path" name="extensions.nicofox.external_video_player_path" type="file" />
-      <preference id="pref-external_swf_player" name="extensions.nicofox.external_swf_player" type="bool" onchange="updateSwfPlayer();"/>
+      <preference id="pref-external_swf_player" name="extensions.nicofox.external_swf_player" type="bool" />
       <preference id="pref-external_swf_player_path" name="extensions.nicofox.external_swf_player_path" type="file" />
     </preferences>
     <groupbox>
       <caption label="&video_player.external;" />
-      <checkbox id="external_video_player" preference="pref-external_video_player" label="&video_player.external_video_player.label;" accesskey="&video_player.external_video_player.accesskey;" />
-      <hbox><filefield id="external_video_player_path" preference="pref-external_video_player_path" />
-        <button label="&video_player.external_video_player_path.browse.label;" accesskey="&video_player.external_video_player_path.browse.accesskey;" oncommand="selectVideoPlayer();" /></hbox>
-      <checkbox id="external_swf_player" preference="pref-external_swf_player" label="&video_player.external_swf_player.label;" accesskey="&video_player.external_swf_player.accesskey;" />
-      <hbox><filefield id="external_swf_player_path" preference="pref-external_swf_player_path" />
-        <button label="&video_player.external_swf_player_path.browse.label;" accesskey="&video_player.external_swf_player_path.browse.accesskey;" oncommand="selectSwfPlayer();" /></hbox>
+      <checkbox id="external_video_player" preference="pref-external_video_player" label="&video_player.external_video_player.label;" accesskey="&video_player.external_video_player.accesskey;" 
+                onsyncfrompreference="return prefPanePlayer.displayPlayer('video');"/>
+      <hbox>
+        <filefield id="external_video_player_path" preference="pref-external_video_player_path" preference-editable="true"
+                   onsyncfrompreference="return prefPanePlayer.displayPlayer('video');"/>
+        <button label="&video_player.external_video_player_path.browse.label;" accesskey="&video_player.external_video_player_path.browse.accesskey;" oncommand="prefPanePlayer.choosePlayer('video');" />
+      </hbox>
+      <checkbox id="external_swf_player" preference="pref-external_swf_player" label="&video_player.external_swf_player.label;" accesskey="&video_player.external_swf_player.accesskey;"
+                onsyncfrompreference="return prefPanePlayer.displayPlayer('swf');"/>
+      <hbox>
+        <filefield id="external_swf_player_path" preference="pref-external_swf_player_path" preference-editable="true"
+                   onsyncfrompreference="return prefPanePlayer.displayPlayer('swf');"/>
+        <button label="&video_player.external_swf_player_path.browse.label;" accesskey="&video_player.external_swf_player_path.browse.accesskey;" oncommand="prefPanePlayer.choosePlayer('swf');" />
+      </hbox>
     </groupbox>
   </prefpane>
 </overlay>

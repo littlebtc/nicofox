@@ -1,88 +1,90 @@
 var Cc = Components.classes;
 var Ci = Components.interfaces;
 
-
-function updatePanel2()
-{
-  var save_path = document.getElementById("pref-save_path").value;
-  if (save_path)
-  {
-    var save_path_element = document.getElementById("save_path");
-    save_path_element.file = save_path;
-    save_path_element.label = save_path.leafName;
+var prefPaneDownload = {
+  /* When sync save_path from preference, fill the path to the filefield */
+  displaySavePath: function() {
+    var savePathPref = document.getElementById("pref-save_path");
+    var savePath = document.getElementById("save_path");
+    if (savePathPref.value) {
+      savePath.file = savePathPref.value;
+      savePath.label = savePathPref.value.leafName;
+    } else {
+      savePath.file = null;
+    }
+    return undefined;
+  },
+  /* Show the file picker to choose the save path. */
+  chooseSavePath: function() {
+    var savePathPref = document.getElementById("pref-save_path");
+    var filePicker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
+    filePicker.init(window, document.getElementById('nicofox-strings').getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
+    if (savePathPref.value) {
+      filePicker.displayDirectory = savePathPref.value;
+    }
+    if (filePicker.show() == Ci.nsIFilePicker.returnOK) {
+      savePathPref.value = filePicker.file;
+      /* Real update on UI will happend in displaySavePath */
+    }
+  },
+  /* When sync autologin_username from preference,
+   * check if the <menulist> is "Locked", then append the username. */
+  displayAutologinUsername: function() {
+    var autologinUsernamePref = document.getElementById("pref-autologin_username");
+    var autologinUsername = document.getElementById('autologin_username');
+    if (autologinUsername.disabled) {
+      /* If it is "Locked", just append a new disabled item on the menulist. */
+      autologinUsername.removeAllItems();
+      if (autologinUsernamePref.value) {
+        autologinUsername.appendItem(autologinUsernamePref.value, autologinUsernamePref.value, null);
+      } else {
+        autologinUsername.appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
+      }
+      autologinUsername.selectedIndex = 0;
+    } else {
+      /* If it is not "Locked", check whether the item is in the list */
+      autologinUsername.selectedIndex = 0;
+      for (var i = 0; i < autologinUsername.itemCount; i++) {
+        var item = autologinUsername.getItemAtIndex(i);
+        if (autologinUsernamePref.value == item.value) {
+          autologinUsername.selectedIndex = i;
+        }
+      }
+    }
+    return (autologinUsernamePref.value)? autologinUsernamePref.value : '';
+  },
+  /* "Unlock" the autologin username option. */
+  unlockAutologin: function() {
+    var autologinUsernamePref = document.getElementById("pref-autologin_username");
+    var autologinUsername = document.getElementById('autologin_username');
+   /* Get account infos from the password manager (may require master password),
+      exception may be happened if master password is not presented. */
+    try {
+      var loginManager = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+      var logins = loginManager.findLogins({}, 'https://secure.nicovideo.jp', 'https://secure.nicovideo.jp', null);
+    } catch(ex) {
+      alert(ex);
+      return;
+    }
+    /* Construct the <menulist> */
+    autologinUsername.removeAllItems();
+    autologinUsername.appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
+    if (!autologinUsernamePref.value) autologinUsername.selectedIndex = 0;
+    for (var i = 0; i < logins.length; i++) {
+      autologinUsername.appendItem(logins[i].username, logins[i].username, null);
+      if (autologinUsernamePref.value == logins[i].username) {
+        autologinUsername.selectedIndex = i + 1;
+      }
+    }
+    /* Enable the <menulist> and hide unlock and remove button. */
+    autologinUsername.disabled = false;
+    document.getElementById('autologin_select').hidden = true;
+    document.getElementById('autologin_remove').hidden = true;
+    document.getElementById('autologin_username').focus();
+  },
+  /* Remove the autologin username setting, regardless of password manager security */
+  removeAutologin: function() {
+    document.getElementById('pref-autologin_username').value = '';
+    document.getElementById('autologin_remove').hidden = true;
   }
-
-  /* Update the username for menulist */
-  if (document.getElementById('pref-autologin_username').value)
-  {
-    document.getElementById('autologin_username').appendItem(document.getElementById('pref-autologin_username').value, document.getElementById('pref-autologin_username').value, null);
-    document.getElementById('autologin_username').selectedIndex = 0 ;
-  }
-  else
-  {
-    document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
-    document.getElementById('autologin_username').selectedIndex = 0 ;
-                document.getElementById('autologin_remove').hidden = true;
-  }
-
-}
-function selectDir(title)
-{
-  var file_picker = Cc["@mozilla.org/filepicker;1"]
-                    .createInstance(Ci.nsIFilePicker);
-  file_picker.init(window, document.getElementById('nicofox-strings').getString('chooseFolder'), Ci.nsIFilePicker.modeGetFolder);
-  /* Set saved path to default */
-  file_picker.displayDirectory = document.getElementById("pref-save_path").value;
-
-  if (file_picker.show() == Ci.nsIFilePicker.returnOK)
-  {
-    document.getElementById("pref-save_path").value = file_picker.file;
-  updatePanel2();
-  }
-}
-
-
-function readUsernames()
-{ 
-   try {
-     /* Remove the default setting */
-     document.getElementById('autologin_username'). removeAllItems();
-
-     var login_manager = Cc["@mozilla.org/login-manager;1"]
-                         .getService(Ci.nsILoginManager);
-     /* Nico uses secure.nicovideo.jp for login */
-     var logins = login_manager.findLogins({}, 'https://secure.nicovideo.jp', 'https://secure.nicovideo.jp', null);
-     document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
-     document.getElementById('autologin_username').selectedIndex = 0;
-     for (var i = 0; i < logins.length; i++)
-     {
-  document.getElementById('autologin_username').appendItem(logins[i].username, logins[i].username, null);
-        /* Select the username in preferences */
-        if (document.getElementById('pref-autologin_username').value == logins[i].username)
-          document.getElementById('autologin_username').selectedIndex = i+1;
-     }
-     /* Let's begin! */
-     document.getElementById('autologin_username').disabled = false;
-     document.getElementById('autologin_select').hidden = true;
-     document.getElementById('autologin_remove').hidden = true;
-     document.getElementById('autologin_username').focus();
-
-   }
-   catch(ex) {
-     alert(ex);
-     
-   }
-
-}
-
-/* Remove the username setting, regardless of password manager security */
-function removeUsername()
-{
-     document.getElementById('autologin_username'). removeAllItems();
-     document.getElementById('autologin_username').appendItem(document.getElementById('nicofox-strings').getString('noAutoLogin'), '', null);
-     document.getElementById('autologin_username').selectedIndex = 0;
-
-     /* Value will not auto updated :( */
-     document.getElementById('pref-autologin_username').value = '';
-     document.getElementById('autologin_remove').hidden = true;
-}
+};

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://nicofox/locale/prefwindow.dtd">
 <overlay id="overlayDownload" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <prefpane id="paneDownload" onpaneload="updatePanel2();">
+  <prefpane id="paneDownload">
     <script type="application/x-javascript" src="chrome://nicofox/content/prefPaneDownload.js" />
     <preferences>
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
@@ -28,8 +28,9 @@
         <rows>
           <row>
             <label value="&downloader.save_path.label;" accesskey="&downloader.save_path.accesskey;" control="save_path" />
-            <filefield id="save_path" preference="pref-save_path" width="200"/>
-            <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="selectDir();" />
+            <filefield id="save_path" preference="pref-save_path" preference-editable="true"
+                       onsyncfrompreference="return prefPaneDownload.displaySavePath();" />
+            <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="prefPaneDownload.chooseSavePath();" />
           </row>
           <row>
             <label value="&downloader.filename_scheme.label;" accesskey="&downloader.filename_scheme.accesskey;" control="filename_scheme" />
@@ -39,8 +40,8 @@
             <label value="&downloader.also_download;" />
             <vbox>
               <checkbox id="download_comment" preference="pref-download_comment" label="&downloader.download_comment.label;" accesskey="&downloader.download_comment.accesskey;" />
-              <checkbox id="download_thumbnail" preference="pref-download_thumbnail" label="Thumbnail" accesskey="T" />
               <checkbox id="uploader_comment" preference="pref-uploader_comment" label="&downloader.uploader_comment.label;" accesskey="&downloader.uploader_comment.accesskey;" />
+              <checkbox id="download_thumbnail" preference="pref-download_thumbnail" label="&downloader.download_thumbnail.label;" accesskey="&downloader.download_thumbnail.accesskey;" />
             </vbox>
           </row>  
         </rows>
@@ -63,15 +64,17 @@
       <checkbox id="replace_filters" preference="pref-replace_filters" label="&downloader.replace_filters.label;" accesskey="&downloader.replace_filters.accesskey;" />
       <checkbox id="boon_comment" preference="pref-boon_comment" label="&downloader.boon_comment.label;" accesskey="&downloader.boon_comment.accesskey;" />
       <label value="&downloader.autologin_username.label;" accesskey="&downloader.autologin_username.accesskey;" control="autologin_username" />
-
+      <!-- We need to "Lock" the username <menulist>,
+           because master password may be required to access the accounts in the password manager.  -->
       <hbox>
-        <menulist id="autologin_username" disabled="true" preference="pref-autologin_username" height="25" >
+        <menulist id="autologin_username" disabled="true" preference="pref-autologin_username" height="25"
+                  onsyncfrompreference="return prefPaneDownload.displayAutologinUsername();">
           <menupopup>
           </menupopup>
         </menulist>
 
-        <button image="chrome://nicofox/skin/lock_break.png" id="autologin_select" oncommand="readUsernames();" />
-        <button image="chrome://nicofox/skin/cross.png" id="autologin_remove" oncommand="removeUsername();" />
+        <button image="chrome://nicofox/skin/lock_break.png" id="autologin_select" oncommand="prefPaneDownload.unlockAutologin();" />
+        <button image="chrome://nicofox/skin/cross.png" id="autologin_remove" oncommand="prefPaneDownload.removeAutologin();" />
       </hbox>
     </groupbox>
   </prefpane>

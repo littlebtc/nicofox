@@ -3,21 +3,8 @@
 <!ENTITY nicowa_blocker.label "攔截 NICO 割（時報、情報局...等；用戶自訂 NICO 割除外）">
 <!ENTITY nicowa_blocker.accesskey "W">
 <!ENTITY nicomonkey "頁面顯示">
-<!ENTITY nicomonkey.enable.label "在頁面中加入 NicoFox 新增的功能">
-<!ENTITY nicomonkey.enable.accesskey "E">
-<!ENTITY nicomonkey.options "自定追加功能">
-<!ENTITY nicomonkey.toolbar.label "加上工具列">
-<!ENTITY nicomonkey.toolbar.accesskey "T">
 <!ENTITY nicomonkey.sound_converter.label "偏好的音軌轉換網站:">
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
-<!ENTITY nicomonkey.comment_helper.label "評論輸入輔助工具">
-<!ENTITY nicomonkey.comment_helper.accesskey "C">
-<!ENTITY nicomonkey.player_killer.label "隱藏被刪除影片的播放器">
-<!ENTITY nicomonkey.player_killer.accesskey "H">
-<!ENTITY nicomonkey.supertag.label "顯示「加入此標籤到書籤」按鈕">
-<!ENTITY nicomonkey.supertag.accesskey "G">
-<!ENTITY nicomonkey.superlist.label "當加入影片到我的清單時，將影片網址加入到書籤">
-<!ENTITY nicomonkey.superlist.accesskey "M">
 <!ENTITY downloader "下載管理員">
 <!ENTITY downloader.options "下載選項">
 <!ENTITY downloader.confirm_before_download.label "下載前顯示確認對話框（除了正在觀賞的影片）">
@@ -33,6 +20,10 @@
 <!ENTITY downloader.also_download "一併下載:">
 <!ENTITY downloader.download_comment.label "評論">
 <!ENTITY downloader.download_comment.accesskey "C">
+<!ENTITY downloader.uploader_comment.label "投稿者專用評論">
+<!ENTITY downloader.uploader_comment.accesskey "U">
+<!ENTITY downloader.download_thumbnail.label "縮圖">
+<!ENTITY downloader.download_thumbnail.accesskey "T">
 <!ENTITY downloader.download_max.label "同時最多影片下載數目:">
 <!ENTITY downloader.download_max.accesskey "M">
 <!ENTITY downloader.video_bypass_cache.label "在下載影片時不使用快取">
@@ -42,8 +33,6 @@
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "仍下載低畫質影片">
 <!ENTITY downloader.economy.2 "預約並在經濟模式解除後才進行下載">
-<!ENTITY downloader.uploader_comment.label "下載投稿者專用評論">
-<!ENTITY downloader.uploader_comment.accesskey "U">
 <!ENTITY downloader.replace_filters.label "取代評論中的變換字句 (Filter)">
 <!ENTITY downloader.replace_filters.accesskey "F">
 <!ENTITY downloader.boon_comment.label "讓評論檔案與 BOON Player 相容">
