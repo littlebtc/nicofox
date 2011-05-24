@@ -551,6 +551,7 @@ nicofox.panel.listener.downloadVideoCompleted = function(id, content) {
   var listItem = document.getElementById("smileFoxListItem"+ id);
   if (!listItem) { return; }
   listItem.setAttribute("progresstype", "undetermined");
+  listItem.setAttribute("sfdownloadstatus", nicofox.Core.strings.getString("progressRelatedDownloading"));
 };
 nicofox.panel.listener.downloadRemoved = function(id) {
   var list = document.getElementById("smilefoxList");
