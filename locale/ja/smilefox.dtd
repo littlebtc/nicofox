@@ -10,13 +10,11 @@
 <!ENTITY search.label "検索">
 <!ENTITY openPlayer.tooltiptext "Nicofox Playerで動画ファイルを再生する">
 <!ENTITY close.tooltiptext "NicoFoxダウンロードマネージャーを閉じる">
-<!ENTITY tree.videoTitle "動画タイトル">
-<!ENTITY tree.comment "コメント">
-<!ENTITY tree.economy "エコノミー">
-<!ENTITY tree.progress "進行状況">
-<!ENTITY tree.status "状態">
-<!ENTITY tree.size "サイズ">
-<!ENTITY tree.speed "転送速度">
+<!ENTITY status.queued.label "ダウンロード待ち">
+<!ENTITY status.canceled.label "キャンセル">
+<!ENTITY status.failed.label "失敗">
+<!ENTITY status.scheduled.label "スケジュール中">
+<!ENTITY status.lowQuality.label "低画質">
 <!ENTITY popup.missing.label "ファイルが見つからなかった">
 <!ENTITY popup.cancel.label "キャンセル">
 <!ENTITY popup.cancel.accesskey "C">

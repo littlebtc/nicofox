@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!DOCTYPE bindings [
+<!ENTITY % smilefoxDTD SYSTEM "chrome://nicofox/locale/smilefox.dtd">
+%smilefoxDTD;
+]>
 <!-- Binding for Download Manager items -->
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -9,18 +13,20 @@
         <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" />
-          <xul:label xbl:inherits="value=sftextstatus" flex="1" />
+          <xul:label value="&status.queued.label;" flex="1" />
         </xul:vbox>
       </xul:hbox>
     </content>
   </binding>
   <binding id="smilefox-download-completed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
-      <xul:hbox flex="1">      
+      <xul:hbox flex="1" align="start">
         <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
-        <xul:vbox flex="1">
+        <xul:vbox flex="1" align="start">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" />
-          <xul:label xbl:inherits="value=sftextstatus" flex="1" />
+          <xul:hbox flex="1">
+            <xul:label xbl:inherits="hidden=sfhidelowquality" class="smilefoxLowQuality" value="&status.lowQuality.label;" />
+          </xul:hbox>
         </xul:vbox>
       </xul:hbox>
     </content>
@@ -31,7 +37,7 @@
         <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="smilefoxInactiveItem" />
-          <xul:label value="Canceled" flex="1" class="smilefoxInactiveItem"/>
+          <xul:label value="&status.canceled.label;" flex="1" class="smilefoxInactiveItem"/>
         </xul:vbox>
       </xul:hbox>
     </content>
@@ -42,7 +48,7 @@
         <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="smilefoxInactiveItem" />
-          <xul:label value="Failed" flex="1" class="smilefoxInactiveItem"/>
+          <xul:label value="&status.failed.label;" flex="1" class="smilefoxInactiveItem"/>
         </xul:vbox>
       </xul:hbox>
     </content>
@@ -54,7 +60,7 @@
         <xul:vbox flex="1">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" />
           <xul:hbox flex="1">
-            <xul:label value="Scheduled" flex="1"/>
+            <xul:label value="&status.scheduled.label;" flex="1"/>
           </xul:hbox>
         </xul:vbox>
       </xul:hbox>

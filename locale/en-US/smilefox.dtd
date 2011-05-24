@@ -10,13 +10,11 @@
 <!ENTITY search.label "Search">
 <!ENTITY openPlayer.tooltiptext "Open Video File in Player">
 <!ENTITY close.tooltiptext "Dismiss the manager">
-<!ENTITY tree.videoTitle "Video Title">
-<!ENTITY tree.comment "Comment">
-<!ENTITY tree.economy "Economy">
-<!ENTITY tree.progress "Progress">
-<!ENTITY tree.status "Status">
-<!ENTITY tree.size "Size">
-<!ENTITY tree.speed "Speed">
+<!ENTITY status.queued.label "Waiting">
+<!ENTITY status.canceled.label "Canceled">
+<!ENTITY status.failed.label "Failed">
+<!ENTITY status.scheduled.label "Scheduled">
+<!ENTITY status.lowQuality.label "Low Quality">
 <!ENTITY popup.missing.label "File missing!">
 <!ENTITY popup.cancel.label "Cancel">
 <!ENTITY popup.cancel.accesskey "C">

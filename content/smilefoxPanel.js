@@ -260,7 +260,9 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   }
   if (result.video_economy == 1) {
     listItem.setAttribute("sfeconomy", result.video_economy);
-    listItem.setAttribute("sftextstatus", "Low Quality");
+    listItem.setAttribute("sfhidelowquality", false);
+  } else {
+    listItem.setAttribute("sfhidelowquality", true);
   }
   if (result.video_file) {
     listItem.setAttribute("sfvideofile", result.video_file);
@@ -533,6 +535,8 @@ nicofox.panel.listener.downloadUpdated = function(id, content) {
   /* If the status is "downloading", update the progress type */
   if (content.status == 7) {
     listItem.setAttribute("progresstype", "undetermined");
+    listItem.setAttribute("sfdownloadstatus", nicofox.Core.strings.getString("progressLoading"));
+  } else {
   }
 };
 nicofox.panel.listener.downloadProgressUpdated = function(id, content) {
