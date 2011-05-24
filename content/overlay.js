@@ -21,9 +21,9 @@ nicofox.overlay = {
      * Modified from https://developer.mozilla.org/en/Code_snippets/Toolbar
      */
     if (!nicofox.Core.prefs.getBoolPref("toolbar_check") && !document.getElementById("nicofox-panel-container")) {
-      var toolbarId    = "nicofox-toolbar-button";
-      var navBar  = document.getElementById("nav-bar");
-      var curSet  = navBar.currentSet.split(",");
+      var toolbarId = "nicofox-toolbar-button";
+      var navBar = document.getElementById("nav-bar");
+      var curSet = navBar.currentSet.split(",");
       if (curSet.indexOf(toolbarId) == -1) {
         /* Just append to the end. */
         curSet.push(toolbarId);
@@ -125,7 +125,7 @@ nicofox.overlay = {
     var contentDoc = aEvent.originalTarget;
     if (!contentDoc instanceof HTMLDocument) { return; }
     var contentWin = contentDoc.defaultView;
-    var browser =  gBrowser.getBrowserForDocument(contentDoc);
+    var browser = gBrowser.getBrowserForDocument(contentDoc);
     if (contentWin.frameElement || !browser) { return; }
 
     /* Check if we are at nicovideo.jp */
