@@ -29,10 +29,10 @@
 <!ENTITY downloader.video_bypass_cache.label "動画ファイルを保存するとき、ブラウザのキャッシュを使わない">
 <!ENTITY downloader.video_bypass_cache.accesskey "P">
 <!ENTITY downloader.nico_only "ニコニコ動画オンリー機能">
-<!ENTITY downloader.economy.label "動画はエコノミー（低画質）モードだったら（エコノミー保存回避機能）:">
+<!ENTITY downloader.economy.label "低画質モードに対する動作（低画質ファイル保存回避機能）:">
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "そのまま低画質の動画ファイルをダウンロードする">
-<!ENTITY downloader.economy.2 "エコノミー時間帯が終わってからまたダウンロードする">
+<!ENTITY downloader.economy.2 "低画質モードが終わってからまたダウンロードする">
 <!ENTITY downloader.replace_filters.label "コメントのフィルタを置換">
 <!ENTITY downloader.replace_filters.accesskey "F">
 <!ENTITY downloader.boon_comment.label "BOON Player 互換のコメントを生成する">

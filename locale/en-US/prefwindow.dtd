@@ -29,10 +29,10 @@
 <!ENTITY downloader.video_bypass_cache.label "Bypass Cache When Downloading Video File">
 <!ENTITY downloader.video_bypass_cache.accesskey "P">
 <!ENTITY downloader.nico_only "Nico Nico Douga specific functions">
-<!ENTITY downloader.economy.label "When Economy Mode (Low-quality Video Mode) is on:">
+<!ENTITY downloader.economy.label "When Low-quality mode is on:">
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "Download Low-quality Videos Anyway">
-<!ENTITY downloader.economy.2 "Schedule and Process Video Download after the Economy Mode is Off">
+<!ENTITY downloader.economy.2 "Schedule and Process Video Download after the Low-quality mode is off">
 <!ENTITY downloader.replace_filters.label "Replace Filters for Comments">
 <!ENTITY downloader.replace_filters.accesskey "F">
 <!ENTITY downloader.boon_comment.label "Make comment files compatible with BOON Player">

@@ -29,10 +29,10 @@
 <!ENTITY downloader.video_bypass_cache.label "在下載影片時不使用快取">
 <!ENTITY downloader.video_bypass_cache.accesskey "P">
 <!ENTITY downloader.nico_only "NICONICO 動畫特定功能">
-<!ENTITY downloader.economy.label "當遭遇經濟模式（低畫質模式）時段時:">
+<!ENTITY downloader.economy.label "當遭遇低畫質模式時段時:">
 <!ENTITY downloader.economy.accesskey "E">
 <!ENTITY downloader.economy.1 "仍下載低畫質影片">
-<!ENTITY downloader.economy.2 "預約並在經濟模式解除後才進行下載">
+<!ENTITY downloader.economy.2 "預約並在低畫質模式解除後才進行下載">
 <!ENTITY downloader.replace_filters.label "取代評論中的變換字句 (Filter)">
 <!ENTITY downloader.replace_filters.accesskey "F">
 <!ENTITY downloader.boon_comment.label "讓評論檔案與 BOON Player 相容">
