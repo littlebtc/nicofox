@@ -10,6 +10,15 @@
 <!ENTITY search.label "Search">
 <!ENTITY openPlayer.tooltiptext "Open Video File in Player">
 <!ENTITY close.tooltiptext "Dismiss the manager">
+<!ENTITY info.notWatching.welcome.title "Welcome to NicoFox!">
+<!ENTITY info.notWatching.welcome.description "When you enter the video page, download button and tool sites will be displayed here.">
+<!ENTITY info.notWatching.welcome.goNicoSite "Go to Nico Nico Douga in the specific languages:">
+<!ENTITY info.loading.title "Video Information Loading...">
+<!ENTITY info.failed.title "Cannot Load Video Information">
+<!ENTITY info.failed.description "To load the information, you need to log in to the Nico Nico Douga and enable JavaScript.">
+<!ENTITY info.failed.tryDownload "Video download may be still available if you had logged in:">
+<!ENTITY info.watching.tools.languages "Languages">
+<!ENTITY info.watching.tools.sites "Utilities">
 <!ENTITY status.queued.label "Waiting">
 <!ENTITY status.canceled.label "Canceled">
 <!ENTITY status.failed.label "Failed">

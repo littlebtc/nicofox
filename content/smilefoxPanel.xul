@@ -16,9 +16,9 @@
     <panel id="nicofox-library">
       <vbox id="smilefox-main" height="450" width="450">
         <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
-          <label value="Welcome to NicoFox！" style="font-weight: bold; font-size: 125%;" />
-          <description flex="1">When you enter the video page, download button, global sites and third-party tools will be displayed here.</description>
-          <label value="Go to Nico Nico Douga in the specific region:" />
+          <label class="nicofoxVideoInfoBoxTitle" value="&info.notWatching.welcome.title;" />
+          <description>&info.notWatching.welcome.description;</description>
+          <description>&info.notWatching.welcome.goNicoSite;</description>
           <hbox id="nicofox-not-watching-toolbar">
             <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
@@ -29,21 +29,24 @@
             <image style="-moz-image-region: rect(0px 64px 11px 48px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
           </hbox>
-          <description>Below are your recently download items.</description>
         </vbox>
         <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" height="120" hidden="true">
-          <label value="Video info is reading..." />
+          <label value="&info.loading.title;" />
         </vbox>
-        <vbox id="nicofox-watching-failed" class="nicofoxVideoInfoBox" height="120" hidden="true">
-          <label value="Video info cannot be read :(..." />
+        <vbox id="nicofox-watching-failed" class="nicofoxVideoInfoBox" height="120" hidden="true" align="start">
+          <label class="nicofoxVideoInfoBoxTitle" value="&info.failed.title;" />
+          <description>&info.failed.description;</description>
+          <description>&info.failed.tryDownload;</description>
+          <button id="nicofox-watching-failed-download" label="&download.label;" style="list-style-image: url('chrome://nicofox/skin/toolbar_sprite.png'); -moz-image-region: rect(11px 60px 23px 48px);"
+                        oncommand="nicofox.panel.videoTools.download();"/>
         </vbox>
         <vbox id="nicofox-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
           <hbox align="top">
             <image id="nicofox-watching-thumb" />
             <vbox flex="1">
-              <label id="nicofox-watching-title" crop="end" />
+              <label id="nicofox-watching-title" class="nicofoxVideoInfoBoxTitle" crop="end" />
               <hbox>
-                <button id="nicofox-watching-download" label="Download" style="list-style-image: url('chrome://nicofox/skin/toolbar_sprite.png'); -moz-image-region: rect(11px 60px 23px 48px);"
+                <button id="nicofox-watching-download" label="&download.label;" style="list-style-image: url('chrome://nicofox/skin/toolbar_sprite.png'); -moz-image-region: rect(11px 60px 23px 48px);"
                         oncommand="nicofox.panel.videoTools.download();"/>
                 <!--<button id="nicofox-watching-add-tags" label="Add tags..." />-->
               </hbox>
@@ -54,7 +57,7 @@
                 </columns>
                 <rows>
                   <row>
-                    <label value="This Video Worldwide:" />
+                    <label value="&info.watching.tools.languages;" />
                     <hbox align="center">
                       <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="smilefoxToolItem"
                              onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
@@ -67,7 +70,7 @@
                    </hbox>
                   </row>
                   <row>
-                    <label value="Third-party Tools:" />
+                    <label value="&info.watching.tools.sites;" />
                     <hbox>
                      <image style="-moz-image-region: rect(11px 16px 27px 0px);" class="smilefoxToolItem"
                             onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'sound');" />
