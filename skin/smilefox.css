@@ -44,13 +44,18 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   opacity: 0.8;
 }
 
+.nicofoxVideoInfoBox description {
+  margin: 0.2em 0.3em;
+}
+
 #nicofox-watching-thumb { 
   width: 64px;
   height: 48px;
 }
 
-#nicofox-watching-title {
-  font-size: 125%; font-weight: bold;
+.nicofoxVideoInfoBoxTitle {
+  font-size: 125%;
+  font-weight: bold;
 }
 
 .smilefoxToolItem {
@@ -77,7 +82,7 @@ richlistitem[type="smilefox"][sfstatus="7"] {
 }
 
 radio[pane] {
-  list-style-image: url(chrome://nicofox/skin/options_sprite.png);
+  list-style-image: url("chrome://nicofox/skin/options_sprite.png");
 }
 
 radio[pane=panePage] {
