@@ -224,7 +224,7 @@ DownloadUtils.nico.prototype = {
     /* When encountering SWF vidoes, request &as3=1 on Japan site:
      * Maybe &as3=1 will hack the AVM1 SWF so that it can be loaded on new AS3-based player on Japan site.
      * Requesting &as3=1 on non-Japan sites (which are using AS2-based player) will trigger a 403 error. :( */
-    if (this.videoId.indexOf("nm") == 0 && nonJapanMatch) {
+    if (this.videoId.indexOf("nm") == 0 && !nonJapanMatch) {
       postQueryString += "&as3=1";
     }
     /* Send request */
