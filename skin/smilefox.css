@@ -1,29 +1,4 @@
-/* Referenced from: toolkit/themes/pinstripe/mozapps/downloads/downloads.css */
-richlistitem[type="smilefox"] {
-  overflow-x: hidden;
-  padding: 3px;
-}
-richlistitem[type="smilefox"][sfstatus="0"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-queued");
-}
-richlistitem[type="smilefox"][sfstatus="1"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-completed");
-}
-richlistitem[type="smilefox"][sfstatus="2"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-canceled");
-}
-richlistitem[type="smilefox"][sfstatus="3"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-failed");
-}
-richlistitem[type="smilefox"][sfstatus="4"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-scheduled");
-}
-richlistitem[type="smilefox"]:not([selected="true"]):nth-child(odd) {
-  background-color: -moz-oddtreerow;
-}
-richlistitem[type="smilefox"][sfstatus="7"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-downloading");
-}
+/* Panel UI: Video Info */
 #nicofox-icon {
   list-style-image: url("chrome://nicofox/skin/logo_16_sprite.png");
   -moz-image-region: rect(0px 16px 16px 0px);
@@ -64,13 +39,40 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   list-style-image: url("chrome://nicofox/skin/toolbar_sprite.png");
 }
 
+/* Panel UI: Downloads */
+/* Referenced from: toolkit/themes/pinstripe/mozapps/downloads/downloads.css */
+richlistitem[type="smilefox"] {
+  overflow-x: hidden;
+  padding: 3px;
+}
+richlistitem[type="smilefox"][sfstatus="0"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-queued");
+}
+richlistitem[type="smilefox"][sfstatus="1"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-completed");
+}
+richlistitem[type="smilefox"][sfstatus="2"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-canceled");
+}
+richlistitem[type="smilefox"][sfstatus="3"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-failed");
+}
+richlistitem[type="smilefox"][sfstatus="4"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-scheduled");
+}
+richlistitem[type="smilefox"]:not([selected="true"]):nth-child(odd) {
+  background-color: -moz-oddtreerow;
+}
+richlistitem[type="smilefox"][sfstatus="7"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-downloading");
+}
+
 .smilefoxDownloadThumbnail {
   width: 64px;
   height: 48px;
   background: url("chrome://nicofox/skin/thumb_missing.png") black;
 }
 
-/* For failure or canceled downloads */
 .smilefoxInactiveItem {
   color: GrayText;
 }
@@ -81,6 +83,23 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   color: InfoText;
 }
 
+/* Toolbar UI for Firefox 4 in add-on bar. Use color icon and don't display the arrow.
+ * Other Toolbar CSS are in toolbar.css (Win), toolbarMac.css (Mac) and toolbarLinux.css (Linux). */
+#addon-bar #nicofox-toolbar-button {
+  list-style-image: url("chrome://nicofox/skin/logo_16_sprite.png");
+  -moz-image-region: rect(0px 16px 16px 0px);
+}
+#addon-bar #nicofox-toolbar-button dropmarker {
+  display: none; 
+}
+
+/* Context Menu */
+#nicofox-context-download {
+  list-style-image: url("chrome://nicofox/skin/logo_16_sprite.png");
+  -moz-image-region: rect(0px 16px 16px 0px);
+}
+
+/* Perferences */
 radio[pane] {
   list-style-image: url("chrome://nicofox/skin/options_sprite.png");
 }

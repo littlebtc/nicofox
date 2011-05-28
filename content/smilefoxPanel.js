@@ -55,7 +55,7 @@ nicofox.panel.onPopupHidden = function() {
   /* Change the toolbutton state. */
   var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
   if (nicofoxToolbarButton) {
-    nicofoxToolbarButton.setAttribute("open", false);
+    nicofoxToolbarButton.removeAttribute("open");
   }
 };
 /* Load Panel */

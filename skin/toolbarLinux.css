@@ -7,6 +7,6 @@
 
 toolbar[iconsize="small"] #nicofox-toolbar-button {
   -moz-box-orient: horizontal;
-  list-style-image: url("chrome://nicofox/skin/logo_16.png");
+  list-style-image: url("chrome://nicofox/skin/logo_16_sprite.png");
+  -moz-image-region: rect(0px 16px 16px 0px);
 }
-
