@@ -214,11 +214,17 @@ DownloadUtils.nico.prototype = {
     }
     this.commentId = info.nicoData.v;
     this.videoId = info.nicoData.id;
-    /* Prepare request URL */
+    /* Prepare request URL. Use flapi for Japan site, per-site API for tw/de/es */
+    var nonJapanMatch = /^http:\/\/(tw|de|es)/.exec(url);
     var requestUrl = "http://flapi.nicovideo.jp/api/getflv";
+    if (nonJapanMatch) {
+      requestUrl = "http://" + nonJapanMatch[1] + ".nicovideo.jp/api/getflv";
+    }
     var postQueryString = "ts=" + new Date().getTime() + "&v=" + this.commentId;
-    /* When encountering NMM vidoes, request as3=1 to get the right AS3-compatible SWF */
-    if (this.videoId.indexOf("nm") == 0) {
+    /* When encountering SWF vidoes, request &as3=1 on Japan site:
+     * Maybe &as3=1 will hack the AVM1 SWF so that it can be loaded on new AS3-based player on Japan site.
+     * Requesting &as3=1 on non-Japan sites (which are using AS2-based player) will trigger a 403 error. :( */
+    if (this.videoId.indexOf("nm") == 0 && nonJapanMatch) {
       postQueryString += "&as3=1";
     }
     /* Send request */
