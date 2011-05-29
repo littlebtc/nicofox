@@ -417,7 +417,7 @@ nicofox.panel.commands = {
         commentUrl = nicofox.Services.io.newFileURI(commentFile).spec;
       }
     }
-    window.openDialog('chrome://nicofox/content/nicofoxPlayer.xul', 'nicofox_swf', 'width=512,height=424, dialog=no, resizable=yes', {video: videoUrl, comment: commentUrl, title: selectedItem.getAttribute("sfvideotitle")});
+    window.openDialog('chrome://nicofox/content/nicofoxPlayer.xul', 'nicofox_swf', 'width=672, height=424, dialog=no, resizable=yes, centerscreen', {video: videoUrl, comment: commentUrl, title: selectedItem.getAttribute("sfvideotitle")});
   },
   /* Cancel */
   cancel: function(selectedItem) {
@@ -555,7 +555,7 @@ nicofox.panel.openFileInPlayer = function() {
       if (commentFile.exists()) {
         commentUriSpec = nicofox.Services.io.newFileURI(commentFile).spec; 
       }    
-    window.openDialog("chrome://nicofox/content/nicofoxPlayer.xul", "nicofox_swf", "width=512,height=424, dialog=no, resizable=yes", {video: videoUriSpec, comment: commentUriSpec, title: file.leafName});  
+    window.openDialog("chrome://nicofox/content/nicofoxPlayer.xul", "nicofox_swf", "width=672, height=424, dialog=no, resizable=yes, centerscreen", {video: videoUriSpec, comment: commentUriSpec, title: file.leafName});
     }
 };
 /* A download listener to DownloadManager */
