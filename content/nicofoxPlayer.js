@@ -29,7 +29,7 @@ function load() {
   var objectElement = document.createElementNS("http://www.w3.org/1999/xhtml", "html:object");
   objectElement.setAttribute("type", "application/x-shockwave-flash");
   objectElement.setAttribute("data", "chrome://nicofox/content/nicofoxPlayer.swf");
-  objectElement.setAttribute("flex", "1");
+  objectElement.style.MozBoxFlex = 1;
   objectElement.appendChild(generateParamDOM("quality", "high"));
   objectElement.appendChild(generateParamDOM("bgcolor", "#000000"));
   objectElement.appendChild(generateParamDOM("allowFullScreen", "true"));
