@@ -85,7 +85,18 @@
             </vbox>
           </hbox>
         </vbox>
-        <label value="Downloads" />
+        <hbox align="center">
+          <label value="Downloads" />
+          <spacer flex="1" />
+          <label value="Thumbnail display:" accesskey="T"  id="nicofoxThumbnailDisplayLabel"/>
+          <menulist id="nicofoxThumbnailDisplay" aria-labelledby="nicofoxThumbnailDisplayLabel" persist="value" oncommand="nicofox.panel.setThumbnailDisplay(this.value);">
+            <menupopup>
+              <menuitem label="Larger" value="larger" />
+              <menuitem label="Smaller" value="smaller" />
+              <menuitem label="No thumbnail" value="none" />
+            </menupopup>
+          </menulist>
+        </hbox>
         <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox.panel.search(this.value);"/>
         <vbox id="smilefoxThumbNotice" hidden="true">
           <description>NicoFox can download the thumbnail, and display it in the download manager now.</description>

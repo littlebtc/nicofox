@@ -11,6 +11,12 @@ nicofox.panel.activeDownloadInstances = {
 
 };
 
+/* Timer, used to loading the items */
+nicofox.panel.loadTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+
+/* Cache the video items that is not loaded yet */
+nicofox.panel.itemsToLoad = [];
+
 /* The panel should be loaded only when the first time of popupshown event. This boolean will record this. */
 nicofox.panel.loaded = false;
 
@@ -23,6 +29,10 @@ nicofox.panel.onPopupShown = function(event) {
   if (!event.target.hasAttribute("id") || event.target.id != "nicofox-library") {
     return;
   }
+  /* Set the thumbnail display type. */
+  var thumbnailDisplayType = document.getElementById("nicofoxThumbnailDisplay").value;
+  document.getElementById('smilefoxList').setAttribute('sfthumbdisplay', thumbnailDisplayType);
+
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
   if (browser && browser.contentWindow) {
@@ -99,7 +109,7 @@ nicofox.panel.init = function() {
   nicofox.DownloadManager.addListener(this.listener);
   
   /* Get all download items. */
-  nicofox.DownloadManager.getDownloads(this, "displayDownloads", "doneGetDownloads", "dbFail");
+  nicofox.DownloadManager.getDownloads(this, "fetchDownloads", "doneGetDownloads", "dbFail");
 };
 
 /* Update video info on the panel. */
@@ -225,22 +235,18 @@ nicofox.panel.disableThumbnail = function() {
 nicofox.panel.doneGetDownloads = function() {
 };
 
-/* Display downloaded items when available. */
-nicofox.panel.displayDownloads = function(resultArray) {
+/* Fetch downloaded items when available, append them to the "to load" list. */
+nicofox.panel.fetchDownloads = function(resultArray) {
   /* Check whether to prompt user to download thumbnail */ 
   if (resultArray.length > 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check") && nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
     nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
   } else if (resultArray.length == 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check")) {
     nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
   }
-
-  var list = document.getElementById("smilefoxList");
-  /* XXX: Don't do it at once */
-  for (var i = 0; i < resultArray.length; i++) {
-    var result = resultArray[i];
-    var listItem = document.createElement("richlistitem");
-    nicofox.panel.updateDownloadItem(listItem, result);
-    list.appendChild(listItem);
+  this.itemsToLoad = this.itemsToLoad.concat(resultArray);
+  /* Run the timer to initiate loading, if the timer is stopped. */
+  if (!this.loadTimer.callback) {
+    this.loadTimer.initWithCallback(this.timerEvent, 5, Ci.nsITimer.TYPE_REPEATING_SLACK);
   }
 };
 /* Update the <listitem> when new download were added or the status had changed. */
@@ -285,11 +291,43 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   if (typeof result.status == "number") {
     listItem.setAttribute("sfstatus", result.status);
   }
+  /* If the status is "downloading", update the progress type */
+  if (result.status == 7) {
+    listItem.setAttribute("progresstype", "undetermined");
+    listItem.setAttribute("sfdownloadstatus", nicofox.Core.strings.getString("progressLoading"));
+  }
 };
 
 nicofox.panel.dbFail = function() {
   alert("dbFail!");
 };
+
+/* Timer event: used to load the UI. */
+nicofox.panel.timerEvent = {};
+nicofox.panel.timerEvent.loadIndex = 0;
+nicofox.panel.timerEvent.notify = function(timer) {
+  /* Avoid possible leaking */
+  if(!document) {
+    timer.cancel();
+    return;
+  }
+  /* When there is no new items available, stop the imter. */
+  var list = document.getElementById("smilefoxList");
+  var result = nicofox.panel.itemsToLoad[nicofox.panel.timerEvent.loadIndex];
+  if (!result) {
+    timer.cancel();
+    return;
+  }
+  var listItem = document.createElement("richlistitem");
+  nicofox.panel.updateDownloadItem(listItem, result);
+  list.appendChild(listItem);
+  nicofox.panel.timerEvent.loadIndex += 1;
+};
+
+/* Set the thumbnail display type and set the value to the preference. */
+nicofox.panel.setThumbnailDisplay = function(value) {
+  document.getElementById('smilefoxList').setAttribute('sfthumbdisplay', value);
+}
 
 /* A very simple "Search" feature implemented by hidding elements. */
 nicofox.panel.search = function(value) {
@@ -549,12 +587,6 @@ nicofox.panel.listener.downloadUpdated = function(id, content) {
   Components.utils.reportError("Panel: download updated!" + id + JSON.stringify(content));
   var listItem = document.getElementById("smileFoxListItem"+ id);
   nicofox.panel.updateDownloadItem(listItem, content);
-  /* If the status is "downloading", update the progress type */
-  if (content.status == 7) {
-    listItem.setAttribute("progresstype", "undetermined");
-    listItem.setAttribute("sfdownloadstatus", nicofox.Core.strings.getString("progressLoading"));
-  } else {
-  }
 };
 nicofox.panel.listener.downloadProgressUpdated = function(id, content) {
   var listItem = document.getElementById("smileFoxListItem"+ id);
@@ -581,6 +613,9 @@ nicofox.panel.listener.downloadRemoved = function(id) {
 nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1", "nsILocalFile", "initWithPath");
 /* XXX: Remove listener used only */
 nicofox.panel.unload = function() {
+  if (nicofox.panel.timerEvent.callback) {
+    nicofox.panel.timerEvent.cancel();
+  }
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
   nicofox.DownloadManager.removeListener(nicofox.panel.listener);
 }
