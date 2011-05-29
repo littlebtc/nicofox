@@ -390,8 +390,17 @@ nicofox.panel.commands = {
   retry: function(selectedItem) {
     var id = parseInt(selectedItem.getAttribute("sfid"), 10);
     var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
-    if (sfStatus == 2 || sfStatus == 3) { /* Canceled or Failed */
+    if (sfStatus == 2 || sfStatus == 3) { 
+      /* Retry when canceled or failed */
       nicofox.DownloadManager.retryDownload(id);
+    } else {
+      /* Retry when video file does not exist. */
+      if (selectedItem.hasAttribute("sfvideofile")) {
+        var file = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
+        if (sfStatus == 1 && !file.exists()) {
+          nicofox.DownloadManager.retryDownload(id);
+        }
+      }
     }
   },
   /* Open with External Player */
