@@ -18,7 +18,11 @@ nicofox.panel.loaded = false;
 nicofox.panel.resultArray = [];
 
 /* When popup shown, check whether the panel is loaded */
-nicofox.panel.onPopupShown = function() {
+nicofox.panel.onPopupShown = function(event) {
+  /* Ignore bubbling from children, like context menu */
+  if (!event.target.hasAttribute("id") || event.target.id != "nicofox-library") {
+    return;
+  }
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
   if (browser && browser.contentWindow) {
@@ -51,7 +55,11 @@ nicofox.panel.onPopupShown = function() {
   document.getElementById("smilefoxList").focus();
   
 };
-nicofox.panel.onPopupHidden = function() {
+nicofox.panel.onPopupHidden = function(event) {
+  /* Ignore bubbling from children, like context menu */
+  if (!event.target.hasAttribute("id") || event.target.id != "nicofox-library") {
+    return;
+  }
   /* Change the toolbutton state. */
   var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
   if (nicofoxToolbarButton) {
