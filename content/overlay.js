@@ -56,7 +56,7 @@ nicofox.overlay = {
     if (appcontent) {
       appcontent.addEventListener("DOMContentLoaded", nicofox.overlay.onDOMContentLoaded, false);
     }
-    gBrowser.addProgressListener(nicofox.progressListener, Ci.nsIWebProgress.NOTIFY_LOCATION);
+    gBrowser.addProgressListener(nicofox.progressListener);
 
     var container = gBrowser.tabContainer;
     container.addEventListener("TabClose", nicofox.overlay.tabRemoved, false);
