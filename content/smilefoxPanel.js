@@ -311,17 +311,22 @@ nicofox.panel.timerEvent.notify = function(timer) {
     timer.cancel();
     return;
   }
-  /* When there is no new items available, stop the imter. */
+  /* Load 5 items once and use document fragment to speed up */
+  var fragment = document.createDocumentFragment();
   var list = document.getElementById("smilefoxList");
-  var result = nicofox.panel.itemsToLoad[nicofox.panel.timerEvent.loadIndex];
-  if (!result) {
-    timer.cancel();
-    return;
+  for (var j = 1; j <= 5; j++) {
+    /* When there is no new items available, stop the imter. */
+    var result = nicofox.panel.itemsToLoad[nicofox.panel.timerEvent.loadIndex];
+    if (!result) {
+      timer.cancel();
+      return;
+    }
+    var listItem = document.createElement("richlistitem");
+    nicofox.panel.updateDownloadItem(listItem, result);
+    fragment.appendChild(listItem);
+    nicofox.panel.timerEvent.loadIndex += 1;
   }
-  var listItem = document.createElement("richlistitem");
-  nicofox.panel.updateDownloadItem(listItem, result);
-  list.appendChild(listItem);
-  nicofox.panel.timerEvent.loadIndex += 1;
+  list.appendChild(fragment);
 };
 
 /* Set the thumbnail display type and set the value to the preference. */
