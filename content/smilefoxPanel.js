@@ -433,8 +433,8 @@ nicofox.panel.commands = {
   retry: function(selectedItem) {
     var id = parseInt(selectedItem.getAttribute("sfid"), 10);
     var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
-    if (sfStatus == 2 || sfStatus == 3) { 
-      /* Retry when canceled or failed */
+    if (sfStatus == 2 || sfStatus == 3 || sfStatus == 4) {
+      /* Retry when canceled, failed or scheduled */
       nicofox.DownloadManager.retryDownload(id);
     } else {
       /* Retry when video file does not exist. */
