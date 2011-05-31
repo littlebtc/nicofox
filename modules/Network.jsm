@@ -33,10 +33,15 @@ Network.fetchUrlAsync = function(url, postQueryString, thisObj, successCallback,
   if (postQueryString) {
     var inputStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);  
     inputStream.setData(postQueryString, postQueryString.length); 
-    var uploadChannel = channel.QueryInterface(Ci.nsIUploadChannel);  
-    uploadChannel.setUploadStream(inputStream, "application/x-www-form-urlencoded", -1);
+    if (channel instanceof Ci.nsIUploadChannel) {
+      channel.setUploadStream(inputStream, "application/x-www-form-urlencoded", -1);
+    }
     /* setUploadStream resets to PUT, modify it */
     channel.requestMethod = "POST";
+  }
+  /* Force allow 3rd party cookies, to make NicoFox work when 3rd party cookies are disabled. (Bug 437174) */
+  if (channel instanceof Ci.nsIHttpChannelInternal) {
+    channel.forceAllowThirdPartyCookie = true;
   }
   /* Assign the callback */
   var callback = function(aInputStream, aResult, aRequest) {

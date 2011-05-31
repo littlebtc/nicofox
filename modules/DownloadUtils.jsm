@@ -63,9 +63,11 @@ DownloadUtils.multipleHelper.prototype = {
       postData.setData(postStream);
     }
     /* Create nsIWebBrowserPersist and set flags */
+    /* Force allow 3rd party cookies, to make NicoFox work when 3rd party cookies are disabled. (Bug 437174) */
     var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
     var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
                  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
+                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_FORCE_ALLOW_COOKIES |
                  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_CLEANUP_ON_FAILURE;
     if (bypassCache) {
       flags = flags | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
@@ -328,8 +330,10 @@ DownloadUtils.nico.prototype = {
     this._persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
                     createInstance(Ci.nsIWebBrowserPersist);
 
+    /* Force allow 3rd party cookies, to make NicoFox work when 3rd party cookies are disabled. (Bug 437174) */
     var flags =  this._persist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
                  this._persist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
+                 this._persist.PERSIST_FLAGS_FORCE_ALLOW_COOKIES |
                  this._persist.PERSIST_FLAGS_CLEANUP_ON_FAILURE;
     if (Core.prefs.getBoolPref("video_bypass_cache")) {
       flags = flags | this._persist.PERSIST_FLAGS_BYPASS_CACHE; 
