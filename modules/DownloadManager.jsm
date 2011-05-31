@@ -43,7 +43,7 @@ var atEconomyMode = false;
 /* Is there any video downloads economy mode, so that we can prompt it to the user? */
 var hitEconomy = false;
 /* A timer instance to check the status of the economy mode. */
-var economyModeCheckTimer;
+var economyModeCheckTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
 
 /* Number of videos downloading */
@@ -678,6 +678,14 @@ downloadQueueRunner.rescheduleEconomyItem = function() {
     thisObj[failCallback].call(thisObj);
     return;
   }
+  /* Stop the economy mode blocker, and stop the waiting timer */
+  if (!atEconomyMode) {
+    return;
+  }
+  atEconomyMode = false;
+  if (economyModeCheckTimer.callback) {
+    economyModeCheckTimer.cancel();
+  }
   var statement = DownloadManagerPrivate.dbConnection.createStatement("SELECT * FROM `smilefox` WHERE `status` = 4 ORDER BY `id` ASC");
   var callback = generateStatementCallback("downloadQueueRunner.rescheduleEconomyItem", this, "prepareEconomyQueue", "dbFail", dbFields);
   statement.executeAsync(callback);
@@ -763,8 +771,7 @@ function handleDownloaderEvent(type, content) {
 	  hitEconomy = true;
 
     /* Run the economy timer */
-	  if (!economyModeCheckTimer) {
-      economyModeCheckTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+	  if (!economyModeCheckTimer.callback) {
       economyModeCheckTimer.initWithCallback( economyTimerCallback, 600000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 	  }
     /* Update Download Manager Record */
@@ -773,9 +780,9 @@ function handleDownloaderEvent(type, content) {
  	  downloadQueueRunner.process();
     break;
 
-    /* Downloader found the economy mode is off for any "High-quality" video */
+    /* Previously in economy mode, but the high quality video is available */
     case "economy_off":
-    /* Do nothing recently. :P */
+    downloadQueueRunner.rescheduleEconomyItem();
 	  break;
 
     /* Video download is started */
@@ -847,8 +854,6 @@ var economyTimerCallback = {
 
     /* Economy mode is fired when 19-2 in Japan time (UTC+9) => 10-17 in UTC time */
     if (now.getUTCHours() >= 17 || now.getUTCHours() < 10) {
-      atEconomyMode = false;
-      timer.cancel();
       downloadQueueRunner.rescheduleEconomyItem();
     } 
     else
