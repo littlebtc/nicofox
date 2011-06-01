@@ -231,10 +231,6 @@ nicofox.panel.disableThumbnail = function() {
   document.getElementById("smilefoxThumbNotice").hidden = true;
 };
 
-/* Called when all download items are retrived. Currently do nothing. */
-nicofox.panel.doneGetDownloads = function() {
-};
-
 /* Fetch downloaded items when available, append them to the "to load" list. */
 nicofox.panel.fetchDownloads = function(resultArray) {
   /* Check whether to prompt user to download thumbnail */ 
@@ -249,6 +245,13 @@ nicofox.panel.fetchDownloads = function(resultArray) {
     this.loadTimer.initWithCallback(this.timerEvent, 5, Ci.nsITimer.TYPE_REPEATING_SLACK);
   }
 };
+
+/* Called when all download items are retrived.
+ * Append a "end mark" to tell the timer event where the items ends. */
+nicofox.panel.doneGetDownloads = function() {
+  this.itemsToLoad.push({'end': true});
+};
+
 /* Update the <listitem> when new download were added or the status had changed. */
 nicofox.panel.updateDownloadItem = function(listItem, result) {
   listItem.setAttribute("type", "smilefox");
@@ -315,11 +318,15 @@ nicofox.panel.timerEvent.notify = function(timer) {
   var fragment = document.createDocumentFragment();
   var list = document.getElementById("smilefoxList");
   for (var j = 1; j <= 5; j++) {
-    /* When there is no new items available, stop the imter. */
     var result = nicofox.panel.itemsToLoad[nicofox.panel.timerEvent.loadIndex];
+    /* When there is no new items available, break. */
     if (!result) {
+      break;
+    }
+    /* When end of the list is reached, stop the timer. */
+    if (result.end) {
       timer.cancel();
-      return;
+      break;
     }
     var listItem = document.createElement("richlistitem");
     nicofox.panel.updateDownloadItem(listItem, result);
