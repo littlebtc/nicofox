@@ -89,10 +89,11 @@
           <label value="Downloads" />
           <spacer flex="1" />
           <label value="Thumbnail display:" accesskey="T"  id="nicofoxThumbnailDisplayLabel"/>
-          <menulist id="nicofoxThumbnailDisplay" aria-labelledby="nicofoxThumbnailDisplayLabel" persist="value" oncommand="nicofox.panel.setThumbnailDisplay(this.value);">
+          <menulist id="nicofoxThumbnailDisplay" aria-labelledby="nicofoxThumbnailDisplayLabel" persist="value" value="medium" oncommand="nicofox.panel.setThumbnailDisplay(this.value);">
             <menupopup>
               <menuitem label="Larger" value="larger" />
-              <menuitem label="Smaller" value="smaller" />
+              <menuitem label="Medium" value="medium" />
+              <menuitem label="Smaller" value="smaller"/>
               <menuitem label="No thumbnail" value="none" />
             </menupopup>
           </menulist>

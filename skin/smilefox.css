@@ -75,6 +75,10 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   width: 64px;
   height: 48px;
 }
+#smilefoxList[sfthumbdisplay="medium"] .smilefoxDownloadThumbnail {
+  width: 48px;
+  height: 36px;
+}
 #smilefoxList[sfthumbdisplay="smaller"] .smilefoxDownloadThumbnail {
   width: 32px;
   height: 24px;
@@ -83,8 +87,20 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   display: none;
 }
 
+.smilefoxVideoInfo {
+  font-size: 90%;
+}
+
 .smilefoxInactiveItem {
   color: GrayText;
+}
+
+.smilefoxLowQuality {
+  color: GrayText;
+  font-size: 90%;
+  border: 1px solid GrayText;
+  padding: 0em 0.3em;
+  border-radius: 0.3em;
 }
 
 #smilefoxThumbNotice, #smilefoxThumbProgress {
