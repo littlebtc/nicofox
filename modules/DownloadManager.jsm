@@ -26,6 +26,9 @@ let DownloadManagerPrivate = {};
 
 Components.utils.import("resource://nicofox/Services.jsm");
 Components.utils.import("resource://nicofox/Core.jsm");
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyServiceGetter(DownloadManagerPrivate, "dts", "@mozilla.org/intl/scriptabledateformat;1", "nsIScriptableDateFormat");
 
 /* Load the "DownloadUtils" from the toolkit to the toolkit.DownloadUtils.
    Note that is is NOT the DownloadUtils in NicoFox! */
@@ -640,6 +643,76 @@ DownloadManager.__defineGetter__("DBConnection", function() {
   return DownloadManagerPrivate.dbConnection;
 }
 );
+
+/* Cache some highly-used strings in the UI. */
+DownloadManager.cachedStrings = {};
+
+XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "doneSize", function() {
+  return Core.mozDownloadStrings.getString("doneSize");
+}
+);
+XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "monthDate", function() {
+  return Core.mozDownloadStrings.getString("monthDate");
+}
+);
+XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "yesterday", function() {
+  return Core.mozDownloadStrings.getString("yesterday");
+}
+);
+XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "progressLoading", function() {
+  return Core.strings.getString("progressLoading");
+}
+);
+XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "progressRelatedDownloading", function() {
+  return Core.strings.getString("progressRelatedDownloading");
+}
+);
+
+/* Convert Date object to a formatted string, used by the UI.
+ * Modified from updateTime() on mozapps/downloads/content/downloads.js
+ * XXX: Dash and the info text should be able to localized */
+DownloadManager.getInfoString = function(maxBytes, commentType, endTime) {
+  /* Read the file size. */
+  let [size, unit] = gre.DownloadUtils.convertByteUnits(maxBytes);
+  let sizeText = DownloadManager.cachedStrings.doneSize;
+  sizeText = sizeText.replace("#1", size);
+  sizeText = sizeText.replace("#2", unit);
+
+  let infoText = sizeText;
+
+  /* Read the comment type. */
+  if (commentType != 'www') {
+    infoText += " \u2014 " + commentType;
+  }
+
+  /* Figure out when today begins */
+  let now = new Date();
+  let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  /* Figure out if the end time is from today, yesterday, this week, etc. */
+  let dateTime;
+  if (endTime >= today) {
+    /* Download finished after today started, show the time */
+    dateTime = DownloadManagerPrivate.dts.FormatTime("", DownloadManagerPrivate.dts.timeFormatNoSeconds,
+                                                     endTime.getHours(), endTime.getMinutes(), 0);
+  } else if (today - endTime < (24 * 60 * 60 * 1000)) {
+    /* Download finished after yesterday started, show yesterday */
+    dateTime = DownloadManager.cachedStrings.yesterday;
+  } else if (today - endTime < (6 * 24 * 60 * 60 * 1000)) {
+    /* Download finished after last week started, show day of week */
+    dateTime = endTime.toLocaleFormat("%A");
+  } else {
+    /* Download must have been from some time ago.. show month/day */
+    let month = endTime.toLocaleFormat("%B");
+    /* Remove leading 0 by converting the date string to a number */
+    let date = Number(endTime.toLocaleFormat("%d"));
+    dateTime = DownloadManager.cachedStrings.monthDate;
+    dateTime = dateTime.replace("#1", month);
+    dateTime = dateTime.replace("#2", date);
+  }
+  infoText += " \u2014 " + dateTime;
+  return infoText;
+};
 
 /* Download Queue to store the waiting downloads */
 var downloadQueue = [];

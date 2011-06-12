@@ -290,14 +290,23 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   if (result.uploader_comment_file) {
     listItem.setAttribute("sfuploadercommentfile", result.uploader_commment_file);
   }
+  if (result.comment_type) {
+    listItem.setAttribute("sfcommenttype", result.comment_type);
+  }
   /* Avoid 0 to be considered as false */
   if (typeof result.status == "number") {
     listItem.setAttribute("sfstatus", result.status);
   }
+  /* For completed items, show more info. */
+  if (result.max_bytes > 0 && result.status == 1) {
+    var endTime = new Date(result.end_time);
+    var commentType = (result.comment_type)? result.comment_type: listItem.getAttribute("sfcommenttype");
+    listItem.setAttribute("sfvideoinfo", nicofox.DownloadManager.getInfoString(result.max_bytes, commentType, endTime));
+  }
   /* If the status is "downloading", update the progress type */
   if (result.status == 7) {
     listItem.setAttribute("progresstype", "undetermined");
-    listItem.setAttribute("sfdownloadstatus", nicofox.Core.strings.getString("progressLoading"));
+    listItem.setAttribute("sfdownloadstatus", nicofox.DownloadManager.cachedStrings.progressLoading);
   }
 };
 
@@ -612,7 +621,7 @@ nicofox.panel.listener.downloadVideoCompleted = function(id, content) {
   var listItem = document.getElementById("smileFoxListItem"+ id);
   if (!listItem) { return; }
   listItem.setAttribute("progresstype", "undetermined");
-  listItem.setAttribute("sfdownloadstatus", nicofox.Core.strings.getString("progressRelatedDownloading"));
+  listItem.setAttribute("sfdownloadstatus", nicofox.DownloadManager.cachedStrings.progressRelatedDownloading);
 };
 nicofox.panel.listener.downloadRemoved = function(id) {
   var list = document.getElementById("smilefoxList");
