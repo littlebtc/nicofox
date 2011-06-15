@@ -156,14 +156,14 @@ function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, succ
     /* XXX: soxxxxx will redirect to comment id URL, but can we dectect it?*/ 
     info.commentType = "ch" + nicoData.channelId;
   } else if (commentIdUrlMatch) {
-    info.commentId = commentIdUrlMatch[1];
+    info.commentId = commentIdUrlMatch[2];
     Components.utils.reportError("Match Comment ID!");
     /* Carefully distinguish (c) type URLs */
     if (nicoData.isMymemory) {
       info.commentType = "mymemory" + info.commentId;
     } else if (nicoData.mainCommunityId && nicoData.channelId) {
       info.commentType = "ch" + nicoData.channelId;
-    } else if (nicoData.mainCommunityId) {
+    } else if (nicoData.communityId) {
       info.commentType = "co" + nicoData.communityId;
     } else {
       info.commentType = "comment" + info.commentId;
@@ -286,7 +286,7 @@ innerSimpleFetcher.prototype.readVideoXML = function(url, content) {
 /* When fetchUrlAsync cannot read the page, throw an error. */
 innerSimpleFetcher.prototype.fetchError = function() {
   Components.utils.reportError("NicoFox VideoReader down: Cannot read video XML on Nico Nico Douga.");
-  this.callbackThisObj[thhis.failCallback].call(this.callbackThisObj);
+  this.callbackThisObj[this.failCallback].call(this.callbackThisObj);
 };
 
 /* Lazy sanitizer: Stringify unsafe object using JSON then re-parse it. Just return empty object when failed. 
