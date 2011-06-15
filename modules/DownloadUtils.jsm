@@ -434,14 +434,9 @@ DownloadUtils.nico.prototype = {
       return;
     }
     /* Fill the query string per thread key needed or not needed case */
-    if (this._getFlvParams.needs_key && this._info.nicoData.channelId) {
+    if (this._getFlvParams.needs_key) {
       var commentQueryString = 
       '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20090904" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'"/><thread_leaves thread="'+ this._getFlvParams.thread_id +'" user_id="'+this._getFlvParams.user_id+'"  threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'">0-'+ Math.ceil(this._info.nicoData.length / 60) +':100</thread_leaves></packet>';
-      var uploaderCommentQueryString =
-      '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
-    } else if (this._getFlvParams.needs_key) {
-      var commentQueryString = 
-      '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20061206" res_from="-1000" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams._threadKey+'" force_184="'+this._getThreadKeyParams.force_184+'"></packet>';
       var uploaderCommentQueryString =
       '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     } else {
