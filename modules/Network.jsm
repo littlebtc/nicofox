@@ -46,7 +46,7 @@ Network.fetchUrlAsync = function(url, postQueryString, thisObj, successCallback,
   /* Assign the callback */
   var callback = function(aInputStream, aResult, aRequest) {
     if (!Components.isSuccessCode(aResult)) {
-      thisObj[failCallback].call(thisObj, url, str, aRequest);
+      thisObj[failCallback].call(thisObj, url);
       return;
     }
     /* Convert utf-8 input stream. From https://developer.mozilla.org/en/Code_snippets/File_I%2f%2fO */
