@@ -87,7 +87,12 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   display: none;
 }
 
-.smilefoxVideoInfo {
+#smilefoxList[sfthumbdisplay="smaller"] .smilefoxVideoStatus,
+#smilefoxList[sfthumbdisplay="none"]  .smilefoxVideoStatus {
+  display: none;
+}
+
+.smilefoxVideoStatus {
   font-size: 90%;
 }
 
