@@ -14,7 +14,7 @@
   <script type="application/x-javascript" src="chrome://nicofox/content/smilefoxPanel.js"/>
 
     <panel id="nicofox-library">
-      <vbox id="smilefox-main" height="485" width="450">
+      <vbox id="smilefox-main" height="485" style="width: 42em;">
         <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" hidden="true">
           <label class="nicofoxVideoInfoBoxTitle" value="&info.notWatching.welcome.title;" />
           <description>&info.notWatching.welcome.description;</description>
