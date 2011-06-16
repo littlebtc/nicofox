@@ -14,8 +14,8 @@
   <script type="application/x-javascript" src="chrome://nicofox/content/smilefoxPanel.js"/>
 
     <panel id="nicofox-library">
-      <vbox id="smilefox-main" height="450" width="450">
-        <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
+      <vbox id="smilefox-main" height="485" width="450">
+        <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" hidden="true">
           <label class="nicofoxVideoInfoBoxTitle" value="&info.notWatching.welcome.title;" />
           <description>&info.notWatching.welcome.description;</description>
           <description>&info.notWatching.welcome.goNicoSite;</description>
@@ -30,17 +30,17 @@
                    onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
           </hbox>
         </vbox>
-        <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" height="120" hidden="true">
+        <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" hidden="true">
           <label value="&info.loading.title;" />
         </vbox>
-        <vbox id="nicofox-watching-failed" class="nicofoxVideoInfoBox" height="120" hidden="true" align="start">
+        <vbox id="nicofox-watching-failed" class="nicofoxVideoInfoBox" hidden="true" align="start">
           <label class="nicofoxVideoInfoBoxTitle" value="&info.failed.title;" />
           <description>&info.failed.description;</description>
           <description>&info.failed.tryDownload;</description>
           <button id="nicofox-watching-failed-download" label="&download.label;" style="list-style-image: url('chrome://nicofox/skin/toolbar_sprite.png'); -moz-image-region: rect(11px 60px 23px 48px);"
                         oncommand="nicofox.panel.videoTools.download();"/>
         </vbox>
-        <vbox id="nicofox-watching" class="nicofoxVideoInfoBox" height="120" hidden="true">
+        <vbox id="nicofox-watching" class="nicofoxVideoInfoBox" hidden="true">
           <hbox align="top">
             <image id="nicofox-watching-thumb" />
             <vbox flex="1">
