@@ -26,6 +26,8 @@
 <!ENTITY thumbnail.display.none "不显示">
 <!ENTITY thumbnail.refetch.label "下载未取得的缩略图">
 <!ENTITY thumbnail.refetching.label "缩图下载中...">
+<!ENTITY paused.description "下载因网站连线问题而暂停。">
+<!ENTITY paused.retry.label "重试">
 <!ENTITY status.queued.label "等待中">
 <!ENTITY status.canceled.label "已取消">
 <!ENTITY status.failed.label "失败">

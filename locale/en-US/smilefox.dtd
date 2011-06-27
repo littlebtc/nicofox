@@ -26,6 +26,8 @@
 <!ENTITY thumbnail.display.none "None">
 <!ENTITY thumbnail.refetch.label "Download vacant video thumbnails">
 <!ENTITY thumbnail.refetching.label "Thumbnails downloading...">
+<!ENTITY paused.description "Download paused due to site connection problem.">
+<!ENTITY paused.retry.label "Retry">
 <!ENTITY status.queued.label "Waiting">
 <!ENTITY status.canceled.label "Canceled">
 <!ENTITY status.failed.label "Failed">

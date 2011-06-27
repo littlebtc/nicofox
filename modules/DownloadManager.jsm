@@ -38,8 +38,8 @@ Components.utils.import("resource://gre/modules/DownloadUtils.jsm", gre);
 /* Is the download manager (database and other components) currently up? */
 var working = false;
 
-/* Is the download progress stopped? */
-var stopped = false;
+/* Is the download progress paused? */
+var paused = false;
 
 /* Is the Nico Nico Douga currently in the economy (low quality) mode? */
 var atEconomyMode = false;
@@ -48,6 +48,8 @@ var hitEconomy = false;
 /* A timer instance to check the status of the economy mode. */
 var economyModeCheckTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
+/* Is there any download started after queue runner is executed? */
+var downloadTriggered = false;
 
 /* Number of videos downloading */
 var activeDownloadCount = 0;
@@ -90,7 +92,7 @@ var downloadObserver = {
       break;
       
       case "quit-application":
-      DownloadManager.cancelAllDownloads();
+      DownloadManager.pauseAllDownloads();
       this.unregisterGra();
       prefObserver.unregister();
       break;
@@ -99,7 +101,7 @@ var downloadObserver = {
       if (data == 'enter') {
         inPrivateBrowsing = true;
       } else if (data == 'exit') {
-        DownloadManager.cancelAllDownloads();
+        DownloadManager.pauseAllDownloads();
         inPrivateBrowsing = false;
       	DownloadManagerPrivate.exitPrivateBrowsing();
         triggerDownloadListeners('rebuild', null, null); 
@@ -606,11 +608,11 @@ DownloadManager.cancelDownload = function(id) {
     activeDownloads[id].downloader.cancel();
   }
 };
-/* Cancel all downloads. */
-DownloadManager.cancelAllDownloads = function() {
+/* Pause all downloads. */
+DownloadManager.pauseAllDownloads = function() {
   for (var id in activeDownloads) {
     if (activeDownloads[id].downloader) {
-      activeDownloads[id].downloader.cancel();
+      activeDownloads[id].downloader.pause();
     }
   }
 };
@@ -643,6 +645,14 @@ DownloadManager.removeDownload = function(id) {
   storedStatements.removeDownload.executeAsync(callback);
 };
 
+/* Resume downloads after paused. */
+DownloadManager.resumeDownloads = function() {
+  downloadQueue = [];
+  paused = false;
+  triggerDownloadListeners('downloadResumed');
+  downloadQueueRunner.startup();
+}
+
 /* Add listener */
 DownloadManager.addListener = function(listener) {
  downloadListeners.push(listener);
@@ -657,6 +667,10 @@ DownloadManager.removeListener = function(listener) {
 /* Readonly */
 DownloadManager.__defineGetter__("working", function() {
   return working;
+}
+);
+DownloadManager.__defineGetter__("paused", function() {
+  return paused;
 }
 );
 DownloadManager.__defineGetter__("thumbFetching", function() {
@@ -774,6 +788,7 @@ downloadQueueRunner.startup = function() {
 downloadQueueRunner.prepareQueue = function(resultArray) {
   /* Directly points the result to the downloadQueue */
   downloadQueue = resultArray;
+  downloadQueueRunner.process();
 };
 
 /* When economy timer off, add status = 4 (hi-quality pending) items */
@@ -813,7 +828,7 @@ downloadQueueRunner.removeEconomyItems = function() {
 };
 /* Check and (re-)process some items enter/exit the queue. */
 downloadQueueRunner.process = function() {
-  if (stopped) { return; }
+  if (paused) { return; }
   Components.utils.reportError(JSON.stringify(downloadQueue));
   while(downloadQueue.length > 0 && activeDownloadCount < downloadMax) {
     var item = downloadQueue.shift();
@@ -821,6 +836,7 @@ downloadQueueRunner.process = function() {
     if (item.status == 4 && atEconomyMode) {
       continue;
     }
+    downloadTriggered = true;
     /* Initialize object */
     activeDownloads[item.id] = { url: item.url };
     activeDownloadCount++;
@@ -833,7 +849,8 @@ downloadQueueRunner.process = function() {
   /* Call the listeners that queue had changed */
   triggerDownloadListeners("queueChanged", null, {});
   
-  if (downloadQueue.length == 0 && activeDownloadCount == 0) {
+  if (downloadTriggered && downloadQueue.length == 0 && activeDownloadCount == 0 && !paused) {
+    downloadTriggered = false;
     allDone();
   }
 };
@@ -949,6 +966,17 @@ function handleDownloaderEvent(type, content) {
     DownloadManagerPrivate.updateDownload(id, {"status": 2, "end_time": new Date().getTime()});
  	  downloadQueueRunner.process(); 
     break;
+
+    /* Pause all downloads after some item is paused, used for antiflood or autologin or quit application cases. */
+    case "pause":
+    delete(activeDownloads[id]);
+    activeDownloadCount--;
+    DownloadManagerPrivate.updateDownload(id, {"status": 0});
+    if (!paused) {
+      paused = true;
+      triggerDownloadListeners('downloadPaused');
+    }
+    break;
   }
 }
 
@@ -975,7 +1003,7 @@ function allDone() {
   /* XXX: WIP */
   if (hitEconomy) {
     alertsService.showAlertNotification("chrome://nicofox/skin/logo.png", 
-                                    Core.strings.getString('alertCompleteTitle'), "...But some video is in low quality and will be downloaded later.", 
+                                    Core.strings.getString('economyNoticeTitle'), Core.strings.getString('economyNoticeMessage'),
                                     false, "", null);
     hitEconomy = false;
   } else {

@@ -108,7 +108,7 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   border-radius: 0.3em;
 }
 
-#smilefoxThumbNotice, #smilefoxThumbProgress {
+#smilefoxThumbNotice, #smilefoxThumbProgress, #smilefoxDownloadPaused {
   padding: 0.2em;
   background: InfoBackground;
   color: InfoText;

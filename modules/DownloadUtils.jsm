@@ -161,7 +161,7 @@ function decodeQueryString(queryString) {
 DownloadUtils.nico = function() { };
 DownloadUtils.nico.prototype = {
   ms_lock: false,
-  login_trial: false,
+  _loginTried: false,
   /* Is the download canceled? */
   _canceled: false,
   
@@ -206,7 +206,7 @@ DownloadUtils.nico.prototype = {
     this.url = url;
     /* Read video info again: The expiration of VideoInfoReader may match the expiration of video access on the site */
     Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-    VideoInfoReader.readByUrl(this.url, false, this, "goParse", "failParse");
+    VideoInfoReader.readByUrl(this.url, false, this, "goParse", "failReadInfo");
   },
   /* After reading the video info, call getflv API to get necessary info like video URL and comment thread id.  */
   goParse: function(url, info) {
@@ -219,7 +219,7 @@ DownloadUtils.nico.prototype = {
     Components.utils.import("resource://nicofox/FileBundle.jsm");
     this._fileBundle = new FileBundle.nico(info);
     if (this._fileBundle.occupied()) {
-      Services.prompt.alert(null, Core.strings.getString("errorTitle"), Core.strings.getString("errorFileExisted"));
+      showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorFileExisted"));
       this.callback("fail", {});
       return;
     }
@@ -247,17 +247,23 @@ DownloadUtils.nico.prototype = {
     Network.fetchUrlAsync(requestUrl, postQueryString, this, "parseGetFlv", "failParse");
   },
 
-  /* XXX: autologin */
-  retry: function(req) {
-    /* Retry after autologin */
-    VideoInfoReader.readByUrl(this.url, false, this, "goParse", "failParse");
-  },
-  
   /* Response for getflv request */
   parseGetFlv: function(url, responseText) {
     Components.utils.reportError("Downloader /getflv done!");
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
+
+    /* Due to the VideoInfoReader cache, we may find out we are not logged in here. */
+    if (responseText.indexOf("closed=1") == 0) {
+      if (!this._loginTried) {
+        this._loginTried = true;
+        Components.utils.import("resource://nicofox/NicoLogin.jsm");
+        NicoLogin.perform(this, "retryAfterLogin", "failAutoLogin");
+      } else {
+        this.pause();
+      }
+      return;
+    }
 
     /* Store getflv parameters for future use. */
     this._getFlvParams = decodeQueryString(responseText);
@@ -304,7 +310,7 @@ DownloadUtils.nico.prototype = {
     } else { this.videoType = "flv"; }
     this._fileBundle.setVideoType(this.videoType); 
     if (!this._fileBundle.createVideoTemp()) {
-      Services.prompt.alert(null, Core.strings.getString('errorTitle'), 'Cannot create the temp video file');
+      showUtilsAlert(Core.strings.getString('errorTitle'), 'Cannot create the temp video file');
       this.callback('fail',{});
       return;
     }
@@ -477,13 +483,52 @@ DownloadUtils.nico.prototype = {
   completeAll: function() {
     this.callback("completed", {"videoBytes":  this._videoMaxBytes});
   },
-  failParse: function(reason) {
+  failReadInfo: function(reason) {
     /* In VideoInfoReader callback, it will contains a reason. */
-    if (reason == "notloggedin") { /**/ }
-    Services.prompt.alert(null, 'Download failed', 'Cannot render the API/page to get the download location.');
+    if (reason == "notloggedin" && !this._loginTried) {
+      this._loginTried = true;
+      Components.utils.import("resource://nicofox/NicoLogin.jsm");
+      NicoLogin.perform(this, "retryAfterLogin", "failAutoLogin");
+    } else if (reason == "notloggedin") {
+      showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorParseFailed"));
+      this.pause();
+    } else if (reason == "antiflood") {
+      showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorAntiFlood"));
+      this.pause();
+    } else if (reason == "unavailable") {
+      this.pause();
+    } else {
+      showUtilsAlert('Download failed', 'Cannot render the API/page to get the download location.');
+      this.callback("fail", {});
+    }
+  },
+  /* XXX: autologin */
+  retryAfterLogin: function() {
+    /* Retry after autologin */
+    VideoInfoReader.readByUrl(this.url, false, this, "goParse", "failReadInfo");
+  },
+  failAutoLogin: function() {
+    showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorParseFailed"));
+    this.pause();
+  },
+  failParse: function(reason) {
+    showUtilsAlert('Download failed', 'Cannot render the API/page to get the download location.');
     this.callback("fail", {});
   },
- 
+  /* Cancel this download, then notify the callback to pause all downloads due to site connection problem */
+  pause: function() {
+    this._canceled = true;
+
+    if(this._persist != undefined) {
+      this._persist.cancelSave();
+    }
+    if (this._extraItemsDownloader) {
+      this._extraItemsDownloader.cancelAll();
+      this.removeFiles();
+    }
+
+    this.callback("pause",{});
+  },
   /* Cancel by download manager action */
   cancel: function() {
     this._canceled = true;
@@ -610,4 +655,12 @@ DownloadUtils.nico.prototype = {
     this.ms_lock = false;
   },
 
+};
+
+/* A simple wrapper to nsIAlertsService */
+function showUtilsAlert(title, msg) {
+  var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+  alertsService.showAlertNotification("chrome://nicofox/skin/logo.png",
+                                      title, msg,
+                                      false, "", null);
 };

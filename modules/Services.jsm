@@ -96,3 +96,6 @@ XPCOMUtils.defineLazyServiceGetter(Services, "strings",
                                    "@mozilla.org/intl/stringbundle;1",
                                    "nsIStringBundleService");
 
+XPCOMUtils.defineLazyServiceGetter(Services, "logins",
+                                   "@mozilla.org/login-manager;1",
+                                   "nsILoginManager");

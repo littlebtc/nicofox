@@ -108,6 +108,11 @@
           <label value="&thumbnail.refetching.label;" />
           <progressmeter flex="1" id="smilefoxThumbProgressMeter" />
         </hbox>
+        <hbox id="smilefoxDownloadPaused" align="center" hidden="true">
+          <label value="&paused.description;" />
+          <spacer flex="1" />
+          <button label="&paused.retry.label;" oncommand="nicofox.panel.resume();" />
+        </hbox>
         <richlistbox id="smilefoxList" context="smilefoxPopup"
                      onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox.panel.commands.open(this.selectedItem); }"
                      onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"

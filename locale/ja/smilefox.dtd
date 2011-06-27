@@ -26,6 +26,8 @@
 <!ENTITY thumbnail.display.none "非表示">
 <!ENTITY thumbnail.refetch.label "保存されないサムネを再ロードします">
 <!ENTITY thumbnail.refetching.label "サムネを再ロードします…">
+<!ENTITY paused.description "サイトへの接続に問題があるからダウンロードが中止した。">
+<!ENTITY paused.retry.label "リトライ">
 <!ENTITY status.queued.label "ダウンロード待ち">
 <!ENTITY status.canceled.label "キャンセル">
 <!ENTITY status.failed.label "失敗">

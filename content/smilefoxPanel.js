@@ -108,6 +108,10 @@ nicofox.panel.waitForDb = function(waitCount) {
 };
 /* Initialize after we know the manager is working. */
 nicofox.panel.init = function() {
+  /* Check whether DownloadManager is paused. */
+  if (nicofox.DownloadManager.paused) {
+    document.getElementById("smilefoxDownloadPaused").hidden = false;
+  }
   /* Listen to download events. */
   nicofox.DownloadManager.addListener(this.listener);
   
@@ -381,6 +385,11 @@ nicofox.panel.search = function(value) {
   }
 };
 
+/* Resume download */
+nicofox.panel.resume = function() {
+  nicofox.DownloadManager.resumeDownloads();
+}
+
 /* When popup menu is showing, check the selected item and generate correct menu items 
  * Like /toolkit/mozapps/downloads/content/downloads.js on mozilla-central
  */
@@ -644,7 +653,12 @@ nicofox.panel.listener.downloadRemoved = function(id) {
   if (!listItem) { return; }
   list.removeChild(listItem);
 };
-
+nicofox.panel.listener.downloadPaused = function(id) {
+  document.getElementById("smilefoxDownloadPaused").hidden = false;
+};
+nicofox.panel.listener.downloadResumed = function(id) {
+  document.getElementById("smilefoxDownloadPaused").hidden = true;
+};
 /* Helper: Get a nsILocalFile instance from a path */
 nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1", "nsILocalFile", "initWithPath");
 /* XXX: Remove listener used only */

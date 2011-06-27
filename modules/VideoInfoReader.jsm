@@ -197,8 +197,13 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
     /* Two cases if Video is not present: (1) had User variable: error, anti-flood (2) has no User variable: not logged in */
     var reason = "";
     if (/var User = \{ id\: [0-9]+/.test(content)) {
-      Components.utils.reportError("NicoFox VideoReader down: Cannot fetch Video parameter. Antiflood is on, or the video had been deleted.");
-      reason = "error";
+      if (/<h1>(?:\u77ed|\u8acb|Bitte|Solicitamos)/.test(content)) {
+        Components.utils.reportError("NicoFox VideoReader down: antiflood is on.");
+        reason = "antiflood";
+      } else {
+        Components.utils.reportError("NicoFox VideoReader down: Cannot fetch Video parameter.");
+        reason = "error";
+      }
     } else {
       /* XXX: Autologin */
       Components.utils.reportError("NicoFox VideoReader down: User is not logged in.");
@@ -229,7 +234,7 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
 /* When fetchUrlAsync cannot read the page, throw an error. */
 innerFetcher.prototype.fetchError = function() {
   Components.utils.reportError("NicoFox VideoReader down: Cannot read video page on Nico Nico Douga.");
-  this.callbackThisObj[this.failCallback].call(this.callbackThisObj);
+  this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "unavailable");
 };
 
 /* Inner reader to make asynchronous request to the /getthumbinfo/ XML, and response after read "simple info"*/
