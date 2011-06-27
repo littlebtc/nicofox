@@ -273,7 +273,7 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   if (result.video_economy == 1) {
     listItem.setAttribute("sfeconomy", result.video_economy);
     listItem.setAttribute("sfhidelowquality", false);
-  } else {
+  } else if (result.video_economy == 0) {
     listItem.setAttribute("sfhidelowquality", true);
   }
   if (result.video_file) {
@@ -374,7 +374,7 @@ nicofox.panel.displayContextMenuItems = [
 [ "Open", "OpenExternal", "OpenFolder", /*"MoveFolder",*/ "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 1 Completed */ 
 [ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 2 Canceled */ 
 [ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 3 Failed */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 4 Scheduled */ 
+[ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 4 Scheduled */ 
 [ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 5 Downloading */ 
 [ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 6 Downloading */ 
 [ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 7 Downloading */ 
