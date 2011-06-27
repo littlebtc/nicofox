@@ -109,7 +109,7 @@ richlistitem[type="smilefox"][sfstatus="7"] {
 }
 
 #smilefoxThumbNotice, #smilefoxThumbProgress {
-  padding: 0.5em;
+  padding: 0.2em;
   background: InfoBackground;
   color: InfoText;
 }

@@ -24,6 +24,8 @@
 <!ENTITY thumbnail.display.medium "中">
 <!ENTITY thumbnail.display.smaller "小">
 <!ENTITY thumbnail.display.none "不顯示">
+<!ENTITY thumbnail.refetch.label "下載未取得的縮圖">
+<!ENTITY thumbnail.refetching.label "縮圖下載中...">
 <!ENTITY status.queued.label "等待中">
 <!ENTITY status.canceled.label "已取消">
 <!ENTITY status.failed.label "失敗">

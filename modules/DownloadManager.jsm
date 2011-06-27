@@ -226,6 +226,7 @@ thumbnailFetcher.start = function(resultArray) {
   /* Prepare SQLite statement model to clone */
   this.statementModel = DownloadManagerPrivate.dbConnection.createStatement("UPDATE `smilefox` SET `thumbnail_file` = :thumbnail_file WHERE `id` = :id");
   triggerDownloadListeners('thumbnailFetcherCount', null, this.itemCount);
+  this._timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
   this.processItem();
 };
 /* Proccess a specific number of items at a time. (XXX: more to decrease the number of SQLite I/O fetches?)
@@ -242,7 +243,7 @@ thumbnailFetcher.processItem = function() {
   videoFile.initWithPath(videoFilePath);
   if(!videoFile.exists()) {
     Components.utils.reportError("notexist!");
-    this.finishWrite();
+    this.writeEmptyToDb();
     return;
   }
   var thumbFilePath = videoFilePath.replace(/\.[0-9a-z]{3}$/i, "[ThumbImg].jpeg"); // XXX: NicoPlayer compatibility? FileBundle?
@@ -251,36 +252,63 @@ thumbnailFetcher.processItem = function() {
   /* XXX: is there exception? */
   var videoIdNum = parseInt(this.runningItem.video_id.substring(2), 10);
   var serverChooser = Math.ceil(Math.random() * 4);
-  var dlHelper = new DownloadUtils.multipleHelper(this, "writeDb");
-  dlHelper.addDownload("http://tn-skr" + serverChooser +".smilevideo.jp/smile?i=" + videoIdNum, "", null, thumbFile, false);
+  var dlHelper = new DownloadUtils.multipleHelper(this, "helperDone");
+  dlHelper.addDownload("http://tn-skr" + serverChooser +".smilevideo.jp/smile?i=" + videoIdNum, "", null, thumbFile, false, this, "thumbDone");
   this.runningItem.thumbnail_file = thumbFilePath;
   this.runningItem.thumbnail_url = Services.io.newFileURI(thumbFile).spec;
   dlHelper.doneAdding(); 
 };
-/* Write data into database */
-thumbnailFetcher.writeDb = function() {
+/* When thumbnail download is finished, write data into database, or append the item to retry when failed */
+thumbnailFetcher.thumbDone = function(failed) {
+  Components.utils.reportError("Running " + this.runningItem.id);
+  if (!failed) {
+    triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
+    var statement = this.statementModel.clone();
+    statement.params.thumbnail_file = this.runningItem.thumbnail_file;
+    statement.params.id = this.runningItem.id;
+    var callback = generateStatementCallback("thumbnailFetcher.writeDb", this, "finishWrite", "dbFail")
+    statement.executeAsync(callback);
+  } else {
+    /* Only retry for one time */
+    if (!this.runningItem.retriedThumb) {
+      this.runningItem.retriedThumb = true;
+      this.itemCount++;
+      this.undoneItems.push(this.runningItem);
+      triggerDownloadListeners('thumbnailFetcherCount', null, this.itemCount);
+    }
+    this.finishWrite();
+  }
+};
+
+/* For items that video file is missing, fill empty string into the thumbnail field.  */
+thumbnailFetcher.writeEmptyToDb = function() {
   Components.utils.reportError("Running " + this.runningItem.id);
   triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
   var statement = this.statementModel.clone();
-  statement.params.thumbnail_file = this.runningItem.thumbnail_file;
+  statement.params.thumbnail_file = '';
   statement.params.id = this.runningItem.id;
   var callback = generateStatementCallback("thumbnailFetcher.writeDb", this, "finishWrite", "dbFail")
   statement.executeAsync(callback);
 };
+thumbnailFetcher.helperDone = function() {}
 
 /* After database written, update progress, schedule for next process */
 thumbnailFetcher.finishWrite = function() {
   Components.utils.reportError("Done " + this.runningItem.id);
   triggerDownloadListeners('thumbnailFetcherProgress', null, this.itemCount - this.undoneItems.length);
   if (this.undoneItems.length == 0) {
-    Core.prefs.setBoolPref("thumbnail_check", true);
-    allDone(); // XXX
-  }
-  else { 
-    var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-    timer.initWithCallback( { notify: function() { thumbnailFetcher.processItem(); } }, 500, Ci.nsITimer.TYPE_ONE_SHOT);
+    this.running = false;
+    triggerDownloadListeners('thumbnailFetcherDone', null, null);
+  } else {
+    this._timer.cancel();
+    this._timer.initWithCallback(this, 1000, Ci.nsITimer.TYPE_ONE_SHOT);
   }
 }
+
+/* Used by timer */
+thumbnailFetcher.notify = function() {
+  thumbnailFetcher.processItem();
+};
 
 /* Respond for DownloadManager.fetchThumbnail error */
 thumbnailFetcher.dbFail = function() {
@@ -515,7 +543,7 @@ DownloadManager.startup = function() {
  */
 DownloadManager.checkThumbnail = function(thisObj, successCallback, failCallback) {
   /* This won't need to store; we expect to use this at once only. */
-  var statement = DownloadManagerPrivate.dbConnection.createStatement("SELECT COUNT(`thumbnail_file`) AS count FROM `smilefox` WHERE `thumbnail_file` IS NOT NULL");
+  var statement = DownloadManagerPrivate.dbConnection.createStatement("SELECT COUNT(id) AS count FROM `smilefox` WHERE `thumbnail_file` IS NULL AND `status` = 1");
   var callback = generateStatementCallback("checkThumbnail", thisObj, successCallback, failCallback, ["count"]);
   statement.executeAsync(callback);
 };
@@ -629,6 +657,10 @@ DownloadManager.removeListener = function(listener) {
 /* Readonly */
 DownloadManager.__defineGetter__("working", function() {
   return working;
+}
+);
+DownloadManager.__defineGetter__("thumbFetching", function() {
+  return thumbnailFetcher.running;
 }
 );
 DownloadManager.__defineGetter__("activeDownloadCount", function() {

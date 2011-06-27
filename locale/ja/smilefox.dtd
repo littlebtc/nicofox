@@ -24,6 +24,8 @@
 <!ENTITY thumbnail.display.medium "中">
 <!ENTITY thumbnail.display.smaller "小">
 <!ENTITY thumbnail.display.none "非表示">
+<!ENTITY thumbnail.refetch.label "保存されないサムネを再ロードします">
+<!ENTITY thumbnail.refetching.label "サムネを再ロードします…">
 <!ENTITY status.queued.label "ダウンロード待ち">
 <!ENTITY status.canceled.label "キャンセル">
 <!ENTITY status.failed.label "失敗">

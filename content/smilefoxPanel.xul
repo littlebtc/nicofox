@@ -100,16 +100,14 @@
         </hbox>
         <textbox value="" emptytext="&search.label;" id="smilefox-search" type="search" timeout="500" oncommand="nicofox.panel.search(this.value);"/>
         <vbox id="smilefoxThumbNotice" hidden="true">
-          <description>NicoFox can download the thumbnail, and display it in the download manager now.</description>
-          <description>Do you want to enable thumbnail download and download thumbnail for previous video downloads now?</description>
           <hbox>
-            <button label="Yes" oncommand="nicofox.panel.enableThumbnail();" /> <button label="No" oncommand="nicofox.panel.disableThumbnail();" />
+            <label value="&thumbnail.refetch.label;" class="text-link" onclick="if (event.button == 0) nicofox.panel.enableThumbnail();" />
           </hbox>
         </vbox>
-        <vbox id="smilefoxThumbProgress" hidden="true">
-          <label value="Download thumbnails for previous video downloads..." />
-          <progressmeter id="smilefoxThumbProgressMeter" />
-        </vbox>
+        <hbox id="smilefoxThumbProgress" flex="1" align="start" hidden="true">
+          <label value="&thumbnail.refetching.label;" />
+          <progressmeter flex="1" id="smilefoxThumbProgressMeter" />
+        </hbox>
         <richlistbox id="smilefoxList" context="smilefoxPopup"
                      onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox.panel.commands.open(this.selectedItem); }"
                      onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"

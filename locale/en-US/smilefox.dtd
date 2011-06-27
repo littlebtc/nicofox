@@ -24,6 +24,8 @@
 <!ENTITY thumbnail.display.medium "Medium">
 <!ENTITY thumbnail.display.smaller "Smaller">
 <!ENTITY thumbnail.display.none "None">
+<!ENTITY thumbnail.refetch.label "Download vacant video thumbnails">
+<!ENTITY thumbnail.refetching.label "Thumbnails downloading...">
 <!ENTITY status.queued.label "Waiting">
 <!ENTITY status.canceled.label "Canceled">
 <!ENTITY status.failed.label "Failed">

@@ -211,7 +211,7 @@ nicofox.panel.videoTools.goThridPartyToolSite = function(event, tool) {
 
 /* If there is not thumbnail file data stored in database, prompt user to download for all old records. */
 nicofox.panel.responseThumbnailCheck = function(resultArray) {
-  if (resultArray[0].count == 0) {
+  if (resultArray[0].count > 0) {
     document.getElementById("smilefoxThumbNotice").hidden = false;
   } else {
   }
@@ -224,21 +224,9 @@ nicofox.panel.enableThumbnail = function() {
   /* Ask download manager to fetch thumbnails */
   nicofox.DownloadManager.fetchThumbnails();
 };
-/* When user don't want to download thumbnail... */
-nicofox.panel.disableThumbnail = function() {
-  nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
-  nicofox.Core.prefs.setBoolPref("download_thumbnail", false);
-  document.getElementById("smilefoxThumbNotice").hidden = true;
-};
 
 /* Fetch downloaded items when available, append them to the "to load" list. */
 nicofox.panel.fetchDownloads = function(resultArray) {
-  /* Check whether to prompt user to download thumbnail */ 
-  if (resultArray.length > 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check") && nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
-    nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
-  } else if (resultArray.length == 0 && !nicofox.Core.prefs.getBoolPref("thumbnail_check")) {
-    nicofox.Core.prefs.setBoolPref("thumbnail_check", true);
-  }
   this.itemsToLoad = this.itemsToLoad.concat(resultArray);
   /* Run the timer to initiate loading, if the timer is stopped. */
   if (!this.loadTimer.callback) {
@@ -250,6 +238,13 @@ nicofox.panel.fetchDownloads = function(resultArray) {
  * Append a "end mark" to tell the timer event where the items ends. */
 nicofox.panel.doneGetDownloads = function() {
   this.itemsToLoad.push({'end': true});
+  /* Check whether to prompt user to download thumbnail */
+  if (nicofox.DownloadManager.thumbFetching) {
+    document.getElementById("smilefoxThumbNotice").hidden = true;
+    document.getElementById("smilefoxThumbProgress").hidden = false;
+  } else if (nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
+    nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
+  }
 };
 
 /* Update the <listitem> when new download were added or the status had changed. */
@@ -589,7 +584,10 @@ nicofox.panel.listener.thumbnailFetcherCount = function(id, content) {
 };
 nicofox.panel.listener.thumbnailFetcherProgress = function(id, content) {
   document.getElementById("smilefoxThumbProgressMeter").setAttribute("value", content);
-
+};
+nicofox.panel.listener.thumbnailFetcherDone = function(id, content) {
+  document.getElementById("smilefoxThumbNotice").hidden = true;
+  document.getElementById("smilefoxThumbProgress").hidden = true;
 };
 nicofox.panel.listener.thumbnailAvailable = function(id, content) {
   var listItem = document.getElementById("smileFoxListItem" + id);

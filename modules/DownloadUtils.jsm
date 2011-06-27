@@ -75,16 +75,30 @@ DownloadUtils.multipleHelper.prototype = {
     persist.persistFlags = flags;
     var _innerCallback = null;
     if (thisObj && callback) {
-      _innerCallback = function() { thisObj[callback].call(thisObj); }
+      _innerCallback = function(result) { thisObj[callback].call(thisObj, result); }
     }
     /* Prepare progressListener and its callback */ 
     persist.progressListener = {
       _parentInstance: this,
+      _unsuccessfulStart: false,
       callback: _innerCallback,
       onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
+        if (aStateFlags & 1) {
+         /* Process HTTP Errors
+	        * nsIChannel will throw NS_ERROR_NOT_AVAILABLE when there is no connection
+          * (even for requestSucceeded), so use the try-catch way  */
+          var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
+          try {
+            if (channel.responseStatus != 200) {
+              throw new Error();
+            }
+          } catch(e) {
+            this._unsuccessfulStart = true;
+          }
+        }
         if (aStateFlags & 16) { /* STATE_STOP = 16 */
       	  if (this.callback) {
-            this.callback();
+            this.callback(this._unsuccessfulStart);
           }
       	  this._parentInstance.completeDownload.call(this._parentInstance);
         }
