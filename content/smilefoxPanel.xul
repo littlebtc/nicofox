@@ -86,7 +86,7 @@
           </hbox>
         </vbox>
         <hbox align="center">
-          <label value="Downloads" />
+          <label value="&window.title;" />
           <spacer flex="1" />
           <label value="&thumbnail.display.label;" id="nicofoxThumbnailDisplayLabel"/>
           <menulist id="nicofoxThumbnailDisplay" aria-labelledby="nicofoxThumbnailDisplayLabel" persist="value" value="medium" oncommand="nicofox.panel.setThumbnailDisplay(this.value);">
