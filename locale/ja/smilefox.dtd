@@ -19,6 +19,11 @@
 <!ENTITY info.failed.tryDownload "すでにログインしてる場合は、動画の保存ができる場合もあります。">
 <!ENTITY info.watching.tools.languages "言語切り替え">
 <!ENTITY info.watching.tools.sites "ツールサイト">
+<!ENTITY thumbnail.display.label "サムネの表示:">
+<!ENTITY thumbnail.display.larger "大">
+<!ENTITY thumbnail.display.medium "中">
+<!ENTITY thumbnail.display.smaller "小">
+<!ENTITY thumbnail.display.none "非表示">
 <!ENTITY status.queued.label "ダウンロード待ち">
 <!ENTITY status.canceled.label "キャンセル">
 <!ENTITY status.failed.label "失敗">

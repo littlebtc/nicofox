@@ -19,6 +19,11 @@
 <!ENTITY info.failed.tryDownload "Video download may be still available if you had logged in:">
 <!ENTITY info.watching.tools.languages "Languages">
 <!ENTITY info.watching.tools.sites "Utilities">
+<!ENTITY thumbnail.display.label "Thumbnail:">
+<!ENTITY thumbnail.display.larger "Larger">
+<!ENTITY thumbnail.display.medium "Medium">
+<!ENTITY thumbnail.display.smaller "Smaller">
+<!ENTITY thumbnail.display.none "None">
 <!ENTITY status.queued.label "Waiting">
 <!ENTITY status.canceled.label "Canceled">
 <!ENTITY status.failed.label "Failed">

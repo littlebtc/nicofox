@@ -19,6 +19,11 @@
 <!ENTITY info.failed.tryDownload "如果您已經登入，仍然可以嘗試下載影片：">
 <!ENTITY info.watching.tools.languages "語言選擇">
 <!ENTITY info.watching.tools.sites "工具網站">
+<!ENTITY thumbnail.display.label "縮圖顯示:">
+<!ENTITY thumbnail.display.larger "大">
+<!ENTITY thumbnail.display.medium "中">
+<!ENTITY thumbnail.display.smaller "小">
+<!ENTITY thumbnail.display.none "不顯示">
 <!ENTITY status.queued.label "等待中">
 <!ENTITY status.canceled.label "已取消">
 <!ENTITY status.failed.label "失敗">

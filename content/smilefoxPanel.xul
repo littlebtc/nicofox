@@ -88,13 +88,13 @@
         <hbox align="center">
           <label value="Downloads" />
           <spacer flex="1" />
-          <label value="Thumbnail display:" accesskey="T"  id="nicofoxThumbnailDisplayLabel"/>
+          <label value="&thumbnail.display.label;" id="nicofoxThumbnailDisplayLabel"/>
           <menulist id="nicofoxThumbnailDisplay" aria-labelledby="nicofoxThumbnailDisplayLabel" persist="value" value="medium" oncommand="nicofox.panel.setThumbnailDisplay(this.value);">
             <menupopup>
-              <menuitem label="Larger" value="larger" />
-              <menuitem label="Medium" value="medium" />
-              <menuitem label="Smaller" value="smaller"/>
-              <menuitem label="No thumbnail" value="none" />
+              <menuitem label="&thumbnail.display.larger;" value="larger" />
+              <menuitem label="&thumbnail.display.medium;" value="medium" />
+              <menuitem label="&thumbnail.display.smaller;" value="smaller"/>
+              <menuitem label="&thumbnail.display.none;" value="none" />
             </menupopup>
           </menulist>
         </hbox>
