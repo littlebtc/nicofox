@@ -114,8 +114,8 @@
                      flex="1">
         </richlistbox>
         <hbox height="20" align="center">
-          <label value="&options.label;" class="text-link" onclick="nicofox.panel.openOptionsWindow();"/>
-          <label value="&openPlayer.tooltiptext;" class="text-link" onclick="nicofox.panel.openFileInPlayer();"/>
+          <label value="&options.label;" class="text-link" onclick="if (event.button == 0) nicofox.panel.openOptionsWindow();"/>
+          <label value="&openPlayer.tooltiptext;" class="text-link" onclick="if (event.button == 0) nicofox.panel.openFileInPlayer();"/>
         </hbox>
         <popupset id="smilefoxPopupset">
           <menupopup id="smilefoxPopup" onpopupshowing="return nicofox.panel.generateContextMenu(event);" onpopuphiding="">

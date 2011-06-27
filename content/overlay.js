@@ -84,13 +84,12 @@ nicofox.overlay = {
   },
   /* On View -> NicoFox */
   onMenuItemCommand: function(aEvent) {
-    /* Temp workaround for Firefox 4: expand addon bar so that the panel can be shown */
-    var addonBar = document.getElementById("addon-bar");
-    if (addonBar) {
-      addonBar.collapsed = false;
-    }
-    document.getElementById("nicofox-library").hidden = false;
-    if (document.getElementById("nicofox-toolbar-button")) {
+    var toolbarButton = document.getElementById("nicofox-toolbar-button");
+    if (toolbarButton) {
+      var addonBar = document.getElementById("addon-bar");
+      if (toolbarButton.parentNode == addonBar && addonBar.collapsed) {
+        toggleAddonBar();
+      }
       document.getElementById("nicofox-library").openPopup(document.getElementById("nicofox-toolbar-button"), 'after_end', 0, 0, false, false);
     } else {
       document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
@@ -117,6 +116,17 @@ nicofox.overlay = {
       }
       Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
       nicofox.DownloadManager.addDownload(url);
+      /* Display the panel UI. */
+      var toolbarButton = document.getElementById("nicofox-toolbar-button");
+      if (toolbarButton) {
+        var addonBar = document.getElementById("addon-bar");
+        if (toolbarButton.parentNode == addonBar && addonBar.collapsed) {
+          toggleAddonBar();
+        }
+        document.getElementById("nicofox-library").openPopup(document.getElementById("nicofox-toolbar-button"), 'after_end', 0, 0, false, false);
+      } else {
+        document.getElementById("nicofox-library").openPopup(document.getElementById("nicofoxStatusbarContainer"), 'before_end', 0, 0, false, false);
+      }
     }
   },
   /* When DOM Loaded, read video info if necessary. */

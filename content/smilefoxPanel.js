@@ -598,6 +598,8 @@ nicofox.panel.listener.downloadAdded = function(id, content) {
   Components.utils.reportError("Panel: download added!" + id + JSON.stringify(content));
   var list = document.getElementById("smilefoxList");
   var listItem = document.createElement("richlistitem");
+  /* Workaround: not to display the quality status at the first time */
+  content.video_economy = 0;
   nicofox.panel.updateDownloadItem(listItem, content);
   listItem.setAttribute("progresstype", "undetermined");
   list.insertBefore(listItem, list.firstChild);
