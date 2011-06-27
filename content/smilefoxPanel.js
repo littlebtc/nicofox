@@ -23,6 +23,9 @@ nicofox.panel.loaded = false;
 /* Storage for array */
 nicofox.panel.resultArray = [];
 
+/* Search terms */
+nicofox.panel._searchTerms = [];
+
 /* When popup shown, check whether the panel is loaded */
 nicofox.panel.onPopupShown = function(event) {
   /* Ignore bubbling from children, like context menu */
@@ -334,6 +337,18 @@ nicofox.panel.timerEvent.notify = function(timer) {
     }
     var listItem = document.createElement("richlistitem");
     nicofox.panel.updateDownloadItem(listItem, result);
+    if (nicofox.panel._searchTerms.length > 0) {
+      /* Search workaround: check the search terms when adding the items */
+      var lowerCaseTitle = listItem.getAttribute("sfvideotitle").toLowerCase();
+      /* Check whether all keywords matched */
+      let match = true;
+      for (var j = 0; j < nicofox.panel._searchTerms.length; j++) {
+        if (lowerCaseTitle.indexOf(nicofox.panel._searchTerms[j]) == -1) {
+          match = false;
+        }
+      }
+      listItem.hidden = !match;
+    }
     fragment.appendChild(listItem);
     nicofox.panel.timerEvent.loadIndex += 1;
   }
@@ -350,15 +365,15 @@ nicofox.panel.search = function(value) {
   var list = document.getElementById("smilefoxList");
   var items = list.children;
   /* Split search terms. From chrome/toolkit/content/mozapps/downloads/downloads.js on mozilla-central. */
-  var terms = value.replace(/^\s+|\s+$/g, "").toLowerCase().split(/\s+/);
+  this._searchTerms = value.replace(/^\s+|\s+$/g, "").toLowerCase().split(/\s+/);
 
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
     var lowerCaseTitle = item.getAttribute("sfvideotitle").toLowerCase();
     /* Check whether all keywords matched */
     let match = true;
-    for (var j = 0; j < terms.length; j++) {
-      if (lowerCaseTitle.indexOf(terms[j]) == -1) {
+    for (var j = 0; j < this._searchTerms.length; j++) {
+      if (lowerCaseTitle.indexOf(this._searchTerms[j]) == -1) {
         match = false;
       }
     }
