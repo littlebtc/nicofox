@@ -37,7 +37,7 @@
   <menupopup id="contentAreaContextMenu">
     <menuseparator id="nicofox-context-seprator" />
     <menuitem id="nicofox-context-download" class="menuitem-iconic"
-              label="Download Linked Video with NicoFox"
+              label="&downloadLink.label;" accesskey="&downloadLink.accesskey;"
               oncommand="nicofox.overlay.downloadLink();"/>
   </menupopup>
 </overlay>

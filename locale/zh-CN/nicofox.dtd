@@ -1,2 +1,4 @@
 <!ENTITY smilefox.label "NicoFox 下载管理器">
 <!ENTITY smilefox.accesskey "N">
+<!ENTITY downloadLink.label "以 NicoFox 下载链接视频">
+<!ENTITY downloadLink.accesskey "N">

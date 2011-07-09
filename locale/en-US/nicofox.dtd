@@ -1,2 +1,4 @@
 <!ENTITY smilefox.label "NicoFox Download Manager">
 <!ENTITY smilefox.accesskey "N">
+<!ENTITY downloadLink.label "Download Link with NicoFox">
+<!ENTITY downloadLink.accesskey "N">
