@@ -5,7 +5,7 @@
 <!ENTITY nicomonkey "頁面顯示">
 <!ENTITY nicomonkey.sound_converter.label "偏好的音軌轉換網站:">
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
-<!ENTITY downloader "下載管理員">
+<!ENTITY downloader "下載">
 <!ENTITY downloader.options "下載選項">
 <!ENTITY downloader.confirm_before_download.label "下載前顯示確認對話框（除了正在觀賞的影片）">
 <!ENTITY downloader.confirm_before_download.accesskey "D">

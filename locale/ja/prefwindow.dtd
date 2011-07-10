@@ -5,7 +5,7 @@
 <!ENTITY nicomonkey "ページ表示">
 <!ENTITY nicomonkey.sound_converter.label "音声抽出（変換）サイト">
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
-<!ENTITY downloader "ダウンロードマネージャー">
+<!ENTITY downloader "ダウンロード">
 <!ENTITY downloader.options "ダウンロードオプション">
 <!ENTITY downloader.confirm_before_download.label "ダウンロードをするとき、確認ダイアローグを表示する（今見てるのは除く）">
 <!ENTITY downloader.confirm_before_download.accesskey "C">

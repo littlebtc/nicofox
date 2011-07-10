@@ -31,7 +31,7 @@
 <!ENTITY status.queued.label "ダウンロード待ち">
 <!ENTITY status.canceled.label "キャンセル">
 <!ENTITY status.failed.label "失敗">
-<!ENTITY status.scheduled.label "高画質のを待つ">
+<!ENTITY status.scheduled.label "元画質のを待つ">
 <!ENTITY status.lowQuality.label "低画質">
 <!ENTITY popup.missing.label "ファイルが見つからなかった">
 <!ENTITY popup.cancel.label "キャンセル">

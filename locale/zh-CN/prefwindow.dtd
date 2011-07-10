@@ -5,7 +5,7 @@
 <!ENTITY nicomonkey "页面显示">
 <!ENTITY nicomonkey.sound_converter.label "偏好的音频转换网站:">
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
-<!ENTITY downloader "下载管理器">
+<!ENTITY downloader "下载">
 <!ENTITY downloader.options "下载选项">
 <!ENTITY downloader.confirm_before_download.label "下载前显示确认对话框（除了正在观赏的视频）">
 <!ENTITY downloader.confirm_before_download.accesskey "D">

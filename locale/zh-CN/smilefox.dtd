@@ -31,7 +31,7 @@
 <!ENTITY status.queued.label "等待中">
 <!ENTITY status.canceled.label "已取消">
 <!ENTITY status.failed.label "失败">
-<!ENTITY status.scheduled.label "等待高画质版中">
+<!ENTITY status.scheduled.label "等待正常画质版中">
 <!ENTITY status.lowQuality.label "低画质">
 <!ENTITY popup.missing.label "找不到文件！">
 <!ENTITY popup.cancel.label "取消">

@@ -5,7 +5,7 @@
 <!ENTITY nicomonkey "Page content">
 <!ENTITY nicomonkey.sound_converter.label "Preferred Sound Converter Website:">
 <!ENTITY nicomonkey.sound_converter.accesskey "S">
-<!ENTITY downloader "Download Manager">
+<!ENTITY downloader "Downloads">
 <!ENTITY downloader.options "Download Options">
 <!ENTITY downloader.confirm_before_download.label "Display confirm dialog before download (except watching video)">
 <!ENTITY downloader.confirm_before_download.accesskey "D">

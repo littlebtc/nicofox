@@ -31,7 +31,7 @@
 <!ENTITY status.queued.label "Waiting">
 <!ENTITY status.canceled.label "Canceled">
 <!ENTITY status.failed.label "Failed">
-<!ENTITY status.scheduled.label "Waiting for High-quality video">
+<!ENTITY status.scheduled.label "Waiting for Normal-quality video">
 <!ENTITY status.lowQuality.label "LQ">
 <!ENTITY popup.missing.label "File missing!">
 <!ENTITY popup.cancel.label "Cancel">
