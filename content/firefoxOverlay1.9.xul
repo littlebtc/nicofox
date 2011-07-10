@@ -14,7 +14,6 @@
   <script type="application/x-javascript" src="chrome://nicofox/content/overlay.js"/>
   <stringbundleset id="stringbundleset">
     <stringbundle id="nicofox-strings" src="chrome://nicofox/locale/nicofox.properties"/>
-    <stringbundle id="nicomonkey-strings" src="chrome://nicofox/locale/nicomonkey.properties"/>
   </stringbundleset>
   <!-- View Menu -->
   <menupopup id="menu_viewPopup">

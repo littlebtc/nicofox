@@ -32,5 +32,4 @@ Core.prefs = Services.prefs.getBranch("extensions.nicofox.")
 
 /* Use the generator to create strings helper */
 Core.strings = new stringsHelperGenerator("chrome://nicofox/locale/nicofox.properties");
-Core.monkeyStrings = new stringsHelperGenerator("chrome://nicofox/locale/nicomonkey.properties");
 Core.mozDownloadStrings = new stringsHelperGenerator("chrome://mozapps/locale/downloads/downloads.properties");
