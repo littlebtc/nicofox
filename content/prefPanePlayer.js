@@ -24,6 +24,7 @@ var prefPanePlayer = {
    * @param  type  Type of the preference to read: 'video' or 'swf'. */
   choosePlayer: function(type) {
     if (type !== "video" && type !== "swf") { return; }
+    var playerPref = document.getElementById("pref-external_" + type + "_player");
     var playerPathPref = document.getElementById("pref-external_" + type + "_player_path");
     var filePicker = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
     filePicker.init(window, document.getElementById('nicofox-strings').getString('chooseExecutable'), null);
@@ -33,6 +34,10 @@ var prefPanePlayer = {
     }
     if (filePicker.show() == Ci.nsIFilePicker.returnOK) {
       playerPathPref.value = filePicker.file;
+      /* Enable external player if does not */
+      if (!playerPref.value) {
+        playerPref.value = true;
+      }
       /* Real update on UI will happend in displayPlayer */
     }
   }
