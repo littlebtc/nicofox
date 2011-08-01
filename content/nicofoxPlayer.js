@@ -34,6 +34,8 @@ function load() {
   objectElement.appendChild(generateParamDOM("bgcolor", "#000000"));
   objectElement.appendChild(generateParamDOM("allowFullScreen", "true"));
   objectElement.appendChild(generateParamDOM("flashvars", flashVars));
+  /* Listen to flashblockCheckLoad event, to prevent Flashblock from blocking Player SWF */
+  objectElement.addEventListener("flashblockCheckLoad", flashblockEventHandler, false);
   document.getElementById("player-box").appendChild(objectElement);
 }
 
@@ -43,4 +45,12 @@ function generateParamDOM(name, value) {
   paramElement.setAttribute("name", name);
   paramElement.setAttribute("value", value);
   return paramElement;
+}
+
+/* flashblockCheckLoad event handler. We need to handle this manually since our flash is not under the browser UI.
+ * When the default is prevented, Flashblock will not block the flash object.
+ * XXX: It should check the Flashblock preferences to determine whether the SWF should be blocked. */
+function flashblockEventHandler(event) {
+  event.target.removeEventListener("flashblockCheckLoad", flashblockEventHandler, false);
+  event.preventDefault();
 }
