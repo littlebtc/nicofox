@@ -1,6 +1,6 @@
 /* vim: sw=2 ts=2 sts=2 et filetype=javascript 
  *
- * Use Content Policy to watch the download manager URL (?smilefox=get) or Nicowa (Used for Nicowa blocker)
+ * Use Content Policy to watch and block URL for Nicowa (Used for Nicowa blocker)
  * Code originally referenced from IE tab & Greasemonkey
  */
 const Cc = Components.classes;
@@ -25,26 +25,8 @@ NicoWatcher.prototype = {
   /* Implements nsIContentPolicy */
   shouldLoad: function(contentType, contentLocation, requestOrigin, requestingNode, mimeTypeGuess, extra) {
     if (this._nicowaBlocker === null) { this._initPref(); }
-    /* Sometimes there will be a ?smilefox=get request from the <iframe> of thumbnail */
-    if (contentType == Ci.nsIContentPolicy.TYPE_DOCUMENT ||
-        contentType == Ci.nsIContentPolicy.TYPE_SUBDOCUMENT) {
-      var url = contentLocation.spec;
-      /* Simplify the filter code to make it faster (don't check Nicovideo URL here) */
-      if (/\?smilefox\=get$/.test(url)) {
-        /* We have no setTimeout(), so... */
-        var timerEvent = {
-          notify: function () {
-            Components.utils.import("resource://nicofox/DownloadManager.jsm");
-            DownloadManager.addDownload(url.substring(0, url.indexOf("?")));
-          } 
-        }
-        var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-        timer.initWithCallback(timerEvent, 10, Ci.nsITimer.TYPE_ONE_SHOT);
-        
-        return Ci.nsIContentPolicy.REJECT_REQUEST;
-      }
     /* Block NicoWa if needed */
-    } else if (this._nicowaBlocker && contentType == Ci.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST) {
+    if (this._nicowaBlocker && contentType == Ci.nsIContentPolicy.TYPE_OBJECT_SUBREQUEST) {
       var url = contentLocation.spec;
       if(url.indexOf('http://flapi.nicovideo.jp/api/getmarqueev3') == 0 ||
          url.indexOf('http://res.nimg.jp/swf/player/marqueeplayer.swf') == 0) {
