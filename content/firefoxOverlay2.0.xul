@@ -24,7 +24,8 @@
   </menupopup>
   <!-- Toolbar button -->
   <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="nicofox-toolbar-button" class="toolbarbutton-1" type="menu" label="NicoFox" tooltiptext="NicoFox" popup="nicofox-library">
+    <toolbarbutton id="nicofox-toolbar-button" class="toolbarbutton-1 chromeclass-toolbar-additional" type="menu"
+     label="NicoFox" tooltiptext="NicoFox" popup="nicofox-library">
     </toolbarbutton>
   </toolbarpalette>
   <!-- Panel -->
