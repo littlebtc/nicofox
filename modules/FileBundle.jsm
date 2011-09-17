@@ -59,7 +59,7 @@ FileBundle.nico = function(info) {
   /* Files contained in bundles (if fileName is fileTitle):
    * CONSTANT (won't change at any tine)
    * 1. Video (fileTitle.flv or fileTitle.mp4 or fileTitle.swf)
-   *    When original quality video is downloading, [LQ] postfix will be added to the leaf name.
+   *    When original quality video is downloading, [HQ] postfix will be added to the leaf name.
    * 2. Thumbnail (fileTitle.jpg)
    * VARIANT (will change with time)
    * 3. Comment (fileTitle.xml)
@@ -70,8 +70,8 @@ FileBundle.nico = function(info) {
   /* We are unsure with file format this time, so just give it a try */
   this.files.videoFlv = createFileInstanceWithPath(savePath, this.fileTitle + ".flv");
   this.files.videoMp4 = createFileInstanceWithPath(savePath, this.fileTitle + ".mp4");
-  this.files.videoFlvLQ = createFileInstanceWithPath(savePath, this.fileTitle + "[LQ].flv");
-  this.files.videoMp4LQ = createFileInstanceWithPath(savePath, this.fileTitle + "[LQ].mp4");
+  this.files.videoFlvHQ = createFileInstanceWithPath(savePath, this.fileTitle + "[HQ].flv");
+  this.files.videoMp4HQ = createFileInstanceWithPath(savePath, this.fileTitle + "[HQ].mp4");
   this.files.videoSwf = createFileInstanceWithPath(savePath, this.fileTitle + ".swf");
   this.files.thumbnail = createFileInstanceWithPath(savePath, this.fileTitle + "[ThumbImg].jpeg");
   
@@ -85,7 +85,7 @@ FileBundle.nico.prototype.occupied = function() {
   var constExists = false;
   /* XXX: Why check every format? */
   if (this.files.videoFlv.exists() || this.files.videoMp4.exists() || this.files.videoSwf.exists() ||
-      this.files.videoFlvLQ.exists() || this.files.videoMp4LQ.exists() ||
+      this.files.videoFlvHQ.exists() || this.files.videoMp4HQ.exists() ||
      this.files.thumbnail.exists()) {
     constExists = true;
   }
