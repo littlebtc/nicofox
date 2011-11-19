@@ -752,9 +752,14 @@ DownloadManager.getInfoString = function(maxBytes, commentType, endTime) {
     let month = endTime.toLocaleFormat("%B");
     /* Remove leading 0 by converting the date string to a number */
     let date = Number(endTime.toLocaleFormat("%d"));
-    dateTime = DownloadManager.cachedStrings.monthDate;
-    dateTime = dateTime.replace("#1", month);
-    dateTime = dateTime.replace("#2", date);
+    /* Use monthDate before Bug 397424; monthDate2 after it */
+    if (DownloadManager.cachedStrings.monthDate) {
+      dateTime = DownloadManager.cachedStrings.monthDate;
+      dateTime = dateTime.replace("#1", month);
+      dateTime = dateTime.replace("#2", date);
+    } else {
+      dateTime = Core.mozDownloadStrings.getFormattedString('monthDate2', [month, date]);
+    }
   }
   infoText += " \u2014 " + dateTime;
   return infoText;
