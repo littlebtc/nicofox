@@ -698,7 +698,11 @@ XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "doneSize", function(
 }
 );
 XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "monthDate", function() {
-  return Core.mozDownloadStrings.getString("monthDate");
+  try {
+    return Core.mozDownloadStrings.getString("monthDate");
+  } catch (e) {
+    return null;
+  }
 }
 );
 XPCOMUtils.defineLazyGetter(DownloadManager.cachedStrings, "yesterday", function() {
