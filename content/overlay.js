@@ -13,10 +13,6 @@ nicofox.overlay = {
     /* initialization code */
     nicofox.overlay.initialized = true;
 
-    /* Apply in-content UI whitelist to about:collection on Firefox 4. http://bugzil.la/571970 */
-    if (XULBrowserWindow.inContentWhitelist) {
-      XULBrowserWindow.inContentWhitelist.push("about:nicofox");
-    }
     /* For Firefox 4, append the toolbar button for the first time.
      * Modified from https://developer.mozilla.org/en/Code_snippets/Toolbar
      */
