@@ -24,9 +24,6 @@ component {74361378-6c72-4bad-baa7-07abba57f9a2} components/bootstrap.js
 contract @littleb.tc/nicofox-bootstrap;1 {74361378-6c72-4bad-baa7-07abba57f9a2}
 category profile-after-change NicoFoxBootstrap @littleb.tc/nicofox-bootstrap;1
 
-component {af1db570-70a8-11de-8a39-0800200c9a66} components/aboutNicofox.js
-contract @mozilla.org/network/protocol/about;1?what=nicofox {af1db570-70a8-11de-8a39-0800200c9a66}
-
 component {c4468b7d-b273-4f0a-a729-3397022ab9c8} components/vacuumParticipant.js
 contract @littleb.tc/nicofox-vacuum-participant;1 {c4468b7d-b273-4f0a-a729-3397022ab9c8}
 category vacuum-participant NicoFoxVacuumParticipant @littleb.tc/nicofox-vacuum-participant;1
