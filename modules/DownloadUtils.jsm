@@ -484,7 +484,7 @@ DownloadUtils.nico.prototype = {
     this.callback("completed", {"videoBytes":  this._videoMaxBytes});
   },
   failReadInfo: function(reason) {
-    /* In VideoInfoReader callback, it will contains a reason. */
+    /* VideoInfoReader will report a reason. */
     if (reason == "notloggedin" && !this._loginTried) {
       this._loginTried = true;
       Components.utils.import("resource://nicofox/NicoLogin.jsm");
