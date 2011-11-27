@@ -427,9 +427,20 @@ DownloadManagerPrivate.failStartup = function() {
 DownloadManagerPrivate.dbFail = function() {
 };
 
-/* Process the result from DownloadManager.addDownload(). */
-DownloadManagerPrivate.failAddingDownloadInfo = function(url, reason) {
+/* Process the simple video info result from DownloadManager.addDownload(). */
+DownloadManagerPrivate.failAddingDownloadInfo = function(reason) {
   Components.utils.reportError(reason);
+  if (reason == "unavailable") {
+    /* Pause all new downloads when connection is not available. */
+    if (!paused) {
+      paused = true;
+      triggerDownloadListeners('downloadPaused');
+    }
+  } else if (reason == "deleted") {
+    showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorDeleted"));
+  } else {
+    showUtilsAlert('Download failed', 'Cannot render the XML Video info :(');
+  }
 }
 
 /* Actaully add download item and put it into the queue after the simple info is read.  */
@@ -1008,16 +1019,17 @@ var economyTimerCallback = {
 
 /* All done message */
 function allDone() {
-  var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
-  /* XXX: WIP */
   if (hitEconomy) {
-    alertsService.showAlertNotification("chrome://nicofox/skin/logo.png", 
-                                    Core.strings.getString('economyNoticeTitle'), Core.strings.getString('economyNoticeMessage'),
-                                    false, "", null);
+    showUtilsAlert(Core.strings.getString('economyNoticeTitle'), Core.strings.getString('economyNoticeMessage'));
     hitEconomy = false;
   } else {
-    alertsService.showAlertNotification("chrome://nicofox/skin/logo.png", 
-                                    Core.strings.getString('alertCompleteTitle'), Core.strings.getString('alertCompleteText'), 
-                                    false, "", null);
+    showUtilsAlert(Core.strings.getString('alertCompleteTitle'), Core.strings.getString('alertCompleteText'));
   }
 }
+/* A simple wrapper to nsIAlertsService */
+function showUtilsAlert(title, msg) {
+  var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+  alertsService.showAlertNotification("chrome://nicofox/skin/logo.png",
+                                      title, msg,
+                                      false, "", null);
+};

@@ -268,7 +268,7 @@ innerSimpleFetcher.prototype.readVideoXML = function(url, content) {
     }
     /* Community thread cannot be read from getthumbinfo, which should not be considered as an error. */
     if (reason != "community") {
-      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, url, reason);
+      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, reason);
       return;
     } else {
       /* Use the thread ID as title */
@@ -291,7 +291,7 @@ innerSimpleFetcher.prototype.readVideoXML = function(url, content) {
 /* When fetchUrlAsync cannot read the page, throw an error. */
 innerSimpleFetcher.prototype.fetchError = function() {
   Components.utils.reportError("NicoFox VideoReader down: Cannot read video XML on Nico Nico Douga.");
-  this.callbackThisObj[this.failCallback].call(this.callbackThisObj);
+  this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "unavailable");
 };
 
 /* Lazy sanitizer: Stringify unsafe object using JSON then re-parse it. Just return empty object when failed. 
