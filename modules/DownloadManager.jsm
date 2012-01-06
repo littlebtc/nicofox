@@ -607,7 +607,7 @@ DownloadManager.getDownload = function(id, thisObj, successCallback, failCallbac
  */
 DownloadManager.addDownload = function(url, info) {
   /* XXX: URL Checker should not be here. */
-  if (!/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
+  if (!/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
   /* Ask the "Simple info" of the video. FIXME: Does this require an extra query? */
   Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
   VideoInfoReader.readByUrl(url, true, DownloadManagerPrivate, "initializeDownload", "failAddingDownloadInfo");

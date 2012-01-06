@@ -96,7 +96,7 @@ nicofox.overlay = {
     var hidden = true;
     if (gContextMenu.onLink) {
       var url = gContextMenu.linkURL;
-      if (url && /^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(url)) {
+      if (url && /^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(url)) {
         hidden = false;
       }
     }
@@ -106,7 +106,7 @@ nicofox.overlay = {
   /* When the context menu item is clicked. */
   downloadLink: function() {
     var url = gContextMenu.linkURL;
-    if (url && /^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(url)) {
+    if (url && /^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(url)) {
       if (url.indexOf("?") >= 0) {
         url = url.substring(0, url.indexOf("?"))
       }
@@ -139,7 +139,7 @@ nicofox.overlay = {
       return;
     }
     /* For video page, read the video info, */
-    if (/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(contentWin.location.href)) {
+    if (/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(contentWin.location.href)) {
       if (browser == gBrowser.selectedBrowser) {
         var info = { 'reading': true }
         browser.nicofoxVideoInfo = info;

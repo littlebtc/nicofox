@@ -25,7 +25,7 @@ function loginRunner(postQueryString, thisObj, successCallback, failCallback) {
 }
 /* Check the login result. */
 loginRunner.prototype.checkResult = function(url, content, request) {
-  /* If the user is logged in successfully, a 302 redirect to http://www|tw|de|es.nicovideo.jp/ will be sent.
+  /* If the user is logged in successfully, a 302 redirect to http://www|tw.nicovideo.jp/ will be sent.
    * So, check the original request for result */
   var channel = request.QueryInterface(Ci.nsIHttpChannel);
   if (channel.URI.spec.indexOf("https://secure.nicovideo.jp/") == 0) {

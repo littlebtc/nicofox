@@ -24,10 +24,6 @@
                    onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
             <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="smilefoxToolItem"
                    onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-            <image style="-moz-image-region: rect(0px 48px 11px 32px);" class="smilefoxToolItem"
-                   onclick="nicofox.panel.videoTools.goSite(event, 'es');" />
-            <image style="-moz-image-region: rect(0px 64px 11px 48px);" class="smilefoxToolItem"
-                   onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
           </hbox>
         </vbox>
         <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" hidden="true">
@@ -63,10 +59,6 @@
                              onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
                       <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="smilefoxToolItem"
                              onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-                      <image style="-moz-image-region: rect(0px 48px 11px 32px);" class="smilefoxToolItem"
-                             onclick="nicofox.panel.videoTools.goSite(event, 'es');" />
-                      <image style="-moz-image-region: rect(0px 64px 11px 48px);" class="smilefoxToolItem"
-                             onclick="nicofox.panel.videoTools.goSite(event, 'de');" />
                    </hbox>
                   </row>
                   <row>

@@ -147,8 +147,8 @@ function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, succ
   info.loadTime = new Date().getTime();
   
   /* Idendity (a),(b) type URLs */
-  var videoIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/.exec(url);
-  var commentIdUrlMatch = /^http:\/\/(www|tw|de|es)\.nicovideo\.jp\/watch\/([0-9]+)$/.exec(url);
+  var videoIdUrlMatch = /^http:\/\/(www|tw)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/.exec(url);
+  var commentIdUrlMatch = /^http:\/\/(www|tw)\.nicovideo\.jp\/watch\/([0-9]+)$/.exec(url);
   if (videoIdUrlMatch && !nicoData.channelId) {
     info.commentType = videoIdUrlMatch[1];
     Components.utils.reportError("Match Video ID!");

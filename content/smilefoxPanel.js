@@ -39,7 +39,7 @@ nicofox.panel.onPopupShown = function(event) {
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
   if (browser && browser.contentWindow) {
-    if (/^http:\/\/(?:www|tw|de|es)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
+    if (/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
       Components.utils.reportError("Re-read!!");
       contentWin = browser.contentWindow;
       contentDoc = browser.contentDocument;
