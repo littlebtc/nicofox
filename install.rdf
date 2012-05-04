@@ -4,7 +4,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>0.10a</em:version>
+    <em:version>1.0a</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your video watching experience!</em:description>
     <em:creator>Littlebtc</em:creator>
     <em:contributor>Logo and Icon designed by tdk4 in ptt.cc</em:contributor>
@@ -19,8 +19,8 @@
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox / Iceweasel ... -->
-        <em:minVersion>3.6</em:minVersion>
-        <em:maxVersion>10.0a2</em:maxVersion>
+        <em:minVersion>10</em:minVersion>
+        <em:maxVersion>15.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>
 
