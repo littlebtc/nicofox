@@ -191,9 +191,11 @@ function innerFetcher(url, thisObj, successCallback, failCallback) {
 }
 /* The responser to the video page. */
 innerFetcher.prototype.readVideoPage = function(url, content) {
-  /* Find the Video parameter on the page */
+  /* For Zero edition: Find watchAPIDataContainer */
+  var regexMatchZero = content.match(/<div id\=\"watchAPIDataContainer\" style=\"display:none\">([^<]+)<\/div>/);
+  /* For Harajuku & Taiwan edition: Find the Video parameter on the page */
   var regexMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*)\}\;\s+(-->)?\s?<\/script>/);
-  if (!regexMatch) {
+  if (!regexMatchZero && !regexMatch) {
     /* Two cases if Video is not present: (1) had User variable: error, anti-flood (2) has no User variable: not logged in */
     var reason = "";
     if (/var User = \{ id\: [0-9]+/.test(content)) {
@@ -212,22 +214,38 @@ innerFetcher.prototype.readVideoPage = function(url, content) {
     this.callbackThisObj[this.failCallback].call(this.callbackThisObj, reason);
     return;
   }
-  
-  /* Convert it from toSource() type to JSON, and safely using it by JSON.parse */
-  var videoString = regexMatch[2];
-  videoString = videoString.replace(/^\s+([0-9a-z]+)\:\s+/img, "\'$1\':").replace(/\'/g, '"');
-  var nicoData = {};
-  try {
-    nicoData = JSON.parse('{'+videoString+'}');
-  } catch(e) {
-    Components.utils.reportError("NicoFox VideoReader down: Cannot convert Video parameter into JSON");
-    this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "jsonfail");
-    return;
+  if (regexMatchZero) {
+    /* For zero edition, unescape HTML then use JSON.parse */
+    /* Dependency: nsIScriptableUnescapeHTML deprecated on Firefox 14 */
+    var scriptableUnescapeHTML = Cc["@mozilla.org/feed-unescapehtml;1"].getService(Ci.nsIScriptableUnescapeHTML);
+    try {
+      var videoString = scriptableUnescapeHTML.unescape(regexMatchZero[1]);
+      var nicoData = {};
+      nicoData = JSON.parse(videoString).videoDetail;
+    } catch(e) {
+      Components.utils.reportError("NicoFox VideoReader down: Cannot convert Video parameter into JSON");
+      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "jsonfail");
+      return;
+    }
+    var otherData = {};
+    otherData.hasOwnerThread = Boolean(nicoData.has_owner_thread);
+  } else {
+    /* For Harajuku & Taiwan edition */
+    /* Convert it from toSource() type to JSON, and safely using it by JSON.parse */
+    var videoString = regexMatch[2];
+    videoString = videoString.replace(/^\s+([0-9a-z]+)\:\s+/img, "\'$1\':").replace(/\'/g, '"');
+    var nicoData = {};
+    try {
+      nicoData = JSON.parse('{'+videoString+'}');
+    } catch(e) {
+      Components.utils.reportError("NicoFox VideoReader down: Cannot convert Video parameter into JSON");
+      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "jsonfail");
+      return;
+    }
+    var otherData = {};
+    /* Check whether the uploader comments (thread) exists on this video */
+    otherData.hasOwnerThread = (content.search(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/) != -1);
   }
-  var otherData = {};
-  /* Check whether the uploader comments (thread) exists on this video */
-  otherData.hasOwnerThread = (content.search(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/) != -1);
-  
   /* Parse the data and store the video info */
   parseVideoInfo(url, nicoData, otherData, true, this.callbackThisObj, this.successCallback, this.failCallback);
 };
@@ -325,27 +343,41 @@ VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, th
   /* URL should be filtered in overlay.js */
   var url = contentWin.location.href;
 
-  /* Consider as failed if cannot find #WATCHHEADER and wrappedJSObject.so on the page */
-  if(!contentDoc.getElementById("WATCHHEADER") || !contentWin.wrappedJSObject.so) {
+  /* Consider as failed if cannot find #watchAPIDataContainer or #WATCHHEADER and wrappedJSObject.so on the page */
+  if(!contentDoc.getElementById("watchAPIDataContainer") && (!contentDoc.getElementById("WATCHHEADER") || !contentWin.wrappedJSObject.so)) {
     thisObj[failCallback].call(thisObj, contentDoc, "noplayer");
     contentWin = null;
     return;
   }
 
-  /* Use lazy sanitizer to parse Video and so.variables object from UNSAFE wrappedJSObject window in the video page.
-     Check if we can fetch the data correctly; don't do autologin or antiflood check here */
-  var nicoData = lazySanitize(contentWin.wrappedJSObject.Video);
-  var swfVariables = lazySanitize(contentWin.wrappedJSObject.so.variables);
-  if (!nicoData.v || !swfVariables.v) {
-    thisObj[failCallback].call(thisObj, contentDoc, "novideoobject");
-    contentWin = null;
-    return;
-  }
   var otherData = {};
   otherData.hasOwnerThread = false;
-  /* Check whether the uploader comments (thread) exists on this video */
-  if (swfVariables["has_owner_thread"]) {
-    otherData.hasOwnerThread = true;
+  var zeroDataContainer = contentDoc.getElementById("watchAPIDataContainer");
+  if (zeroDataContainer) {
+    /* For Zero edition: Read data from DOM-stored JSON string on #watchAPIDataContainer. */
+    try {
+      var nicoData = JSON.parse(zeroDataContainer.textContent).videoDetail;
+    } catch(e) {
+      thisObj[failCallback].call(thisObj, contentDoc, "novideoobject");
+      contentWin = null;
+      return;
+    }
+    otherData.hasOwnerThread = Boolean(nicoData.has_owner_thread);
+  } else {
+    /* For Harajuku and Taiwan edition: read data from window object.
+       Use lazy sanitizer to parse Video and so.variables object from UNSAFE wrappedJSObject window in the video page.
+       Check if we can fetch the data correctly; don't do autologin or antiflood check here */
+    var nicoData = lazySanitize(contentWin.wrappedJSObject.Video);
+    var swfVariables = lazySanitize(contentWin.wrappedJSObject.so.variables);
+    if (!nicoData.v || !swfVariables.v) {
+      thisObj[failCallback].call(thisObj, contentDoc, "novideoobject");
+      contentWin = null;
+      return;
+    }
+    /* Check whether the uploader comments (thread) exists on this video */
+    if (swfVariables["has_owner_thread"]) {
+      otherData.hasOwnerThread = true;
+    }
   }
   // Prevent leak
   contentWin = null;
