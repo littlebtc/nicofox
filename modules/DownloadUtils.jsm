@@ -244,17 +244,20 @@ DownloadUtils.nico.prototype = {
       postQueryString += "&as3=1";
     }
     /* Send request */
-    Network.fetchUrlAsync(requestUrl, postQueryString, this, "parseGetFlv", "failParse");
+    Network.fetchUrlAsync(requestUrl, postQueryString).then(this.parseGetFlv.bind(this), this.failParse.bind(this));
   },
 
   /* Response for getflv request */
-  parseGetFlv: function(url, responseText) {
+  parseGetFlv: function(result) {
+    var url = result.url;
+    var content = result.data;
     Components.utils.reportError("Downloader /getflv done!");
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
 
+    Components.utils.reportError("???");
     /* Due to the VideoInfoReader cache, we may find out we are not logged in here. */
-    if (responseText.indexOf("closed=1") == 0) {
+    if (content.indexOf("closed=1") == 0) {
       if (!this._loginTried) {
         this._loginTried = true;
         Components.utils.import("resource://nicofox/NicoLogin.jsm");
@@ -265,24 +268,29 @@ DownloadUtils.nico.prototype = {
       return;
     }
 
+    Components.utils.reportError("???");
     /* Store getflv parameters for future use. */
-    this._getFlvParams = decodeQueryString(responseText);
+    this._getFlvParams = decodeQueryString(content);
     /* :( for channel videos, we need to get the thread key */
     if (this._getFlvParams.needs_key) {
-      Network.fetchUrlAsync("http://flapi.nicovideo.jp/api/getthreadkey?thread="+ this._getFlvParams.thread_id, null, this, "parseThreadKey", "failParse");
+      Network.fetchUrlAsync("http://flapi.nicovideo.jp/api/getthreadkey?thread="+ this._getFlvParams.thread_id, null).then(this.parseThreadKey.bind(this), this.failParse.bind(this));
     } else {
       this.prepareDownload();
     }
   },
   /* Store the thread key after request. */
-  parseThreadKey: function(url, responseText) {
+  parseThreadKey: function(result) {
+    var url = result.url;
+    var content = result.data;
+
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
-    this._getThreadKeyParams = decodeQueryString(responseText);
+    this._getThreadKeyParams = decodeQueryString(content);
     this.prepareDownload();
   },
   /* After API parsing is fine, read info from API, prepare files, then start the download. */
   prepareDownload: function() {
+    Components.utils.reportError('preparing');
     Components.utils.reportError(JSON.stringify(this._getFlvParams));
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }

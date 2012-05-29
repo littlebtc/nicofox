@@ -20,11 +20,14 @@ function loginRunner(postQueryString, thisObj, successCallback, failCallback) {
   this.successCallback = successCallback;
   this.failCallback = failCallback;
   Components.utils.import("resource://nicofox/Network.jsm");
-  Network.fetchUrlAsync("https://secure.nicovideo.jp/secure/login?site=niconico", postQueryString, this, "checkResult", "fetchError");
+  Network.fetchUrlAsync("https://secure.nicovideo.jp/secure/login?site=niconico", postQueryString).then(this.checkResult.bind(this), this.fetchError.bind(this));
   postData = {};
 }
 /* Check the login result. */
-loginRunner.prototype.checkResult = function(url, content, request) {
+loginRunner.prototype.checkResult = function(result) {
+  var url = result.url;
+  var content = result.data;
+  var request = result.request;
   /* If the user is logged in successfully, a 302 redirect to http://www|tw.nicovideo.jp/ will be sent.
    * So, check the original request for result */
   var channel = request.QueryInterface(Ci.nsIHttpChannel);

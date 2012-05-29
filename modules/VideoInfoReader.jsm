@@ -187,10 +187,12 @@ function innerFetcher(url, thisObj, successCallback, failCallback) {
   this.successCallback = successCallback;
   this.failCallback = failCallback;
   Components.utils.import("resource://nicofox/Network.jsm");
-  Network.fetchUrlAsync(url, "", this, "readVideoPage", "fetchError");
+  Network.fetchUrlAsync(url, "").then(this.readVideoPage.bind(this), this.fetchError.bind(this));
 }
 /* The responser to the video page. */
-innerFetcher.prototype.readVideoPage = function(url, content) {
+innerFetcher.prototype.readVideoPage = function(result) {
+  var url = result.url;
+  var content = result.data;
   /* For Zero edition: Find watchAPIDataContainer */
   var regexMatchZero = content.match(/<div id\=\"watchAPIDataContainer\" style=\"display:none\">([^<]+)<\/div>/);
   /* For Harajuku & Taiwan edition: Find the Video parameter on the page */
@@ -265,10 +267,12 @@ function innerSimpleFetcher(url, thisObj, successCallback, failCallback) {
   url = url.replace(/^http:\/\/www\./, "http://ext.");
   url = url.replace(/\/watch\//, "/api/getthumbinfo/");
   Components.utils.import("resource://nicofox/Network.jsm");
-  Network.fetchUrlAsync(url, "", this, "readVideoXML", "fetchError");
+  Network.fetchUrlAsync(url, "").then(this.readVideoXML.bind(), this.fetchError.bind());
 }
 /* The responser to /getthumbinfo/ XML. (Using E4X) */
-innerSimpleFetcher.prototype.readVideoXML = function(url, content) {
+innerSimpleFetcher.prototype.readVideoXML = function(result) {
+  var url = result.url;
+  var content = result.data;
   content = content.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
   var infoXML = new XML(content);
   var info = {};
