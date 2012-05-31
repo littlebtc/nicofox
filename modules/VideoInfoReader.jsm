@@ -51,7 +51,10 @@ expirationTimerCallback.notify = function(timer) {
 };
 
 /* Expiraiton time for every info, in milliseconds */
-const EXPIRATION_DELAY = 60000; /* 60 sec */
+const EXPIRATION_DELAY = 60000; /* 60 secs */
+
+/* The interval for video page reading, in milliseconds */
+const PAGE_READ_INTERVAL = 10000; /* 10 secs */
 
 /* Wrtie info into cache */
 function writeCache(url, info) {
@@ -75,36 +78,12 @@ function writeCache(url, info) {
   Components.utils.reportError(JSON.stringify(cachedQueue));
 }
 
-/* To control the total rate limit for video page reading from Nico Nico Douga,
- * A timer and a queue is created to do so.
- */
-const PAGE_READ_INTERVAL = 10000; /* The interval for video page reading, in milliseconds */
-var pageReadTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-var pageReadTimerCallback = {};
-var pageReadQueue = [];
-var lastPageReadTime = new Date().getTime(); /* Make sure interval won't broken after timer stopped . XXX: Should we initialize this later? */
-
-pageReadTimerCallback.notify = function(timer) {
-  /* Process the oldest item */
-  var item = pageReadQueue.shift();
-  var innerFetcherInstance = new innerFetcher(item.url, item.thisObj, item.successCallback, item.failCallback);
-  
-  if (pageReadQueue.length == 0) {
-    timer.cancel();
-    lastPageReadTime = new Date().getTime();
-  } else {
-    timer.delay = PAGE_READ_INTERVAL;
-  }
-};
 
 /* Parse the video info, and write it into cache. 
  * @param target           The URL of the video or the DOM of the video page, depending on where the info from.
  * @param nicoData         The Video variable on Nico Nico Douga page.
- * @param otherData        Other video information read from readByUrl/innerFetcher or readFromPageDOM.
+ * @param otherData        Other video information read from infoFetcher/simpleInfoFetcher or readFromPageDOM.
  * @param writeToCache     Whether to write the read video info to the cache.
- * @param thisObj          this object for the callback
- * @param successCallback  Name of callback function in thisObj, called if the info is read successfully.
- * @param failCallback     Name of callback function in thisObj, called if the info cannot be read.
  * == Type Definitions for the video URL ==
  * In Nico Nico Douga, a video may have different URL, correspoding to different version of comments on video. 
  * It will be written in the "comment" field in VideoInfoReader as a string:
@@ -128,8 +107,10 @@ pageReadTimerCallback.notify = function(timer) {
  *   "mymemory": My-memory comments.
  *   "comment123456789012": Others which is hard to distinguish.
  */
-function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, successCallback, failCallback) {
+function parseVideoInfo(result) {
   var url = "";
+  var target = result.target;
+  var nicoData = result.nicoData;
   /* Parse the URL. */
   if (target instanceof Ci.nsIDOMHTMLDocument) {
     url = target.location.href;
@@ -141,7 +122,7 @@ function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, succ
   }
 
   /* Put otherData into a info object */
-  var info = otherData;
+  var info = result.otherData;
   info.nicoData = nicoData;
   /* Add the timestamp */
   info.loadTime = new Date().getTime();
@@ -169,28 +150,60 @@ function parseVideoInfo(target, nicoData, otherData, writeToCache, thisObj, succ
       info.commentType = "comment" + info.commentId;
     }
   } else {
-    Components.utils.reportError("NicoFox VideoInfoReader Error: Not a valid Nico Nico Douga URL");
-    thisObj[failCallback].call(thisObj, "notvalidurl");
-    return;
+    throw "notvalidurl";
   }
   /* Write the data into cache, if needed */
-  if (writeToCache) {
+  if (result.writeToCache) {
     writeCache(url, info);
   }
-  /* Execute the callback */
-  thisObj[successCallback].call(thisObj, target, info);
+  return { target: target, info: info };
 }
 
-/* Inner reader to make asynchronous request to the video page, and response after read */
-function innerFetcher(url, thisObj, successCallback, failCallback) {
-  this.callbackThisObj = thisObj;
-  this.successCallback = successCallback;
-  this.failCallback = failCallback;
+/* Inner reader to make asynchronous request to the video page, and response after read.
+ * To control the total rate limit for video page reading from Nico Nico Douga,
+ * A timer and a queue is created to do so.
+ */
+var infoFetcher = {};
+infoFetcher.timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+infoFetcher.queue = [];
+infoFetcher.lastPageReadTime = new Date().getTime(); /* Make sure interval won't broken after timer stopped . XXX: Should we initialize this later? */
+
+/* Enqueue a info reading request. */
+infoFetcher.enqueue = function(url) {
+  /* Add a deferred object */
+  Components.utils.import("resource://nicofox/When.jsm");
+  var deferred = When.defer();
+  /* Assign jobs to do when it is dequeued and prepare to return the promise. */
   Components.utils.import("resource://nicofox/Network.jsm");
-  Network.fetchUrlAsync(url, "").then(this.readVideoPage.bind(this), this.fetchError.bind(this));
-}
+  var returnedPromise = deferred.then(function() { return Network.fetchUrlAsync(url, ''); }).then(this.readVideoPage.bind(this)).then(parseVideoInfo);
+
+  /* Push it into queue */
+  this.queue.push(deferred);
+
+  /* If the timer is not running, make it run in a specific delay */
+  if (!this.timer.callback) {
+    var delay = 50;
+    this.timer.initWithCallback(this, delay, Ci.nsITimer.TYPE_REPEATING_SLACK);
+  }
+  return returnedPromise;
+};
+
+/* Called when timer is fired. Dequeue and execute a video reading request.  */
+infoFetcher.notify = function(timer) {
+  /* Resolve the oldest item */
+  var item = this.queue.shift();
+  item.resolve();
+
+  /* Check if there are remaining jobs to run */
+  if (this.queue.length == 0) {
+    timer.cancel();
+    this.lastPageReadTime = new Date().getTime();
+  } else {
+    timer.delay = PAGE_READ_INTERVAL;
+  }
+};
 /* The responser to the video page. */
-innerFetcher.prototype.readVideoPage = function(result) {
+infoFetcher.readVideoPage = function(result) {
   var url = result.url;
   var content = result.data;
   /* For Zero edition: Find watchAPIDataContainer */
@@ -202,7 +215,6 @@ innerFetcher.prototype.readVideoPage = function(result) {
     var reason = "";
     if (/var User = \{ id\: [0-9]+/.test(content)) {
       if (/<h1>(?:\u77ed|\u8acb|Bitte|Solicitamos)/.test(content)) {
-        Components.utils.reportError("NicoFox VideoReader down: antiflood is on.");
         reason = "antiflood";
       } else {
         Components.utils.reportError("NicoFox VideoReader down: Cannot fetch Video parameter.");
@@ -210,11 +222,9 @@ innerFetcher.prototype.readVideoPage = function(result) {
       }
     } else {
       /* XXX: Autologin */
-      Components.utils.reportError("NicoFox VideoReader down: User is not logged in.");
       reason = "notloggedin";
     }
-    this.callbackThisObj[this.failCallback].call(this.callbackThisObj, reason);
-    return;
+    throw reason;
   }
   if (regexMatchZero) {
     /* For zero edition, unescape HTML then use JSON.parse */
@@ -226,8 +236,7 @@ innerFetcher.prototype.readVideoPage = function(result) {
       nicoData = JSON.parse(videoString).videoDetail;
     } catch(e) {
       Components.utils.reportError("NicoFox VideoReader down: Cannot convert Video parameter into JSON");
-      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "jsonfail");
-      return;
+      throw "jsonfail";
     }
     var otherData = {};
     otherData.hasOwnerThread = Boolean(nicoData.has_owner_thread);
@@ -240,37 +249,27 @@ innerFetcher.prototype.readVideoPage = function(result) {
     try {
       nicoData = JSON.parse('{'+videoString+'}');
     } catch(e) {
-      Components.utils.reportError("NicoFox VideoReader down: Cannot convert Video parameter into JSON");
-      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "jsonfail");
-      return;
+      throw "jsonfail";
     }
     var otherData = {};
     /* Check whether the uploader comments (thread) exists on this video */
     otherData.hasOwnerThread = (content.search(/<script type=\"text\/javascript\"><!--[^<]*so\.addVariable\(\"has_owner_thread\"\, \"1\"\)\;[^<]*<\/script>*/) != -1);
   }
-  /* Parse the data and store the video info */
-  parseVideoInfo(url, nicoData, otherData, true, this.callbackThisObj, this.successCallback, this.failCallback);
-};
-/* When fetchUrlAsync cannot read the page, throw an error. */
-innerFetcher.prototype.fetchError = function() {
-  Components.utils.reportError("NicoFox VideoReader down: Cannot read video page on Nico Nico Douga.");
-  this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "unavailable");
+  return { target: url, nicoData: nicoData, otherData: otherData, writeToCache: true };
 };
 
 /* Inner reader to make asynchronous request to the /getthumbinfo/ XML, and response after read "simple info"*/
-function innerSimpleFetcher(url, thisObj, successCallback, failCallback) {
-  this.callbackThisObj = thisObj;
-  this.successCallback = successCallback;
-  this.failCallback = failCallback;
-  this.originalUrl = url;
+var simpleInfoFetcher = {};
+
+/* Enqueue a info reading request. */
+simpleInfoFetcher.enqueue = function(url) {
   /* Replace /getthumbinfo/ URL, change www.nicovideo.jp to ext.nicovideo.jp to avoid redirect. */
-  url = url.replace(/^http:\/\/www\./, "http://ext.");
-  url = url.replace(/\/watch\//, "/api/getthumbinfo/");
+  var apiUrl = url.replace(/^http:\/\/www\./, "http://ext.").replace(/\/watch\//, "/api/getthumbinfo/");
   Components.utils.import("resource://nicofox/Network.jsm");
-  Network.fetchUrlAsync(url, "").then(this.readVideoXML.bind(), this.fetchError.bind());
+  return Network.fetchUrlAsync(apiUrl, "").then(this.readVideoXML.bind(this, url));
 }
 /* The responser to /getthumbinfo/ XML. (Using E4X) */
-innerSimpleFetcher.prototype.readVideoXML = function(result) {
+simpleInfoFetcher.readVideoXML = function(originalUrl, result) {
   var url = result.url;
   var content = result.data;
   content = content.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
@@ -290,8 +289,7 @@ innerSimpleFetcher.prototype.readVideoXML = function(result) {
     }
     /* Community thread cannot be read from getthumbinfo, which should not be considered as an error. */
     if (reason != "community") {
-      this.callbackThisObj[this.failCallback].call(this.callbackThisObj, reason);
-      return;
+      throw 'reason'
     } else {
       /* Use the thread ID as title */
       info.nicoData = {
@@ -299,21 +297,15 @@ innerSimpleFetcher.prototype.readVideoXML = function(result) {
       };
     }
   } else {
-    /* Try to match the info type similar as innerFetcher. */
+    /* Try to match the info type similar as infoFetcher. */
     info.nicoData = {
       title: infoXML.thumb.title.toString(),
       thumbnail: infoXML.thumb.thumbnail_url.toString()
     };
   }
-  /* If there is callback, call the callback */
-  if (this.callbackThisObj && this.successCallback) {
-    this.callbackThisObj[this.successCallback].call(this.callbackThisObj, this.originalUrl, info);
-  }
-};
-/* When fetchUrlAsync cannot read the page, throw an error. */
-innerSimpleFetcher.prototype.fetchError = function() {
-  Components.utils.reportError("NicoFox VideoReader down: Cannot read video XML on Nico Nico Douga.");
-  this.callbackThisObj[this.failCallback].call(this.callbackThisObj, "unavailable");
+  Components.utils.reportError(originalUrl);
+  Components.utils.reportError(info);
+  return { target: originalUrl, info: info };
 };
 
 /* Lazy sanitizer: Stringify unsafe object using JSON then re-parse it. Just return empty object when failed. 
@@ -386,41 +378,27 @@ VideoInfoReader.readFromPageDOM = function(contentWin, contentDoc, firstRead, th
   // Prevent leak
   contentWin = null;
   /* Parse the data and store the video info; only cached for first read */
-  parseVideoInfo(contentDoc, nicoData, otherData, Boolean(firstRead), thisObj, successCallback, failCallback);
+  Components.utils.import("resource://nicofox/When.jsm");
+  When(parseVideoInfo({target: contentDoc, nicoData: nicoData, otherData: otherData, writeToCache: Boolean(firstRead)}))
+      .then(thisObj[successCallback].bind(thisObj), thisObj[failCallback].bind(thisObj));
 };
 
 /* Read the video URL and parse the video info from the resulting HTML source. Called from download manager.
  * @param url               The video URL.
  * @param simpleInfoAllowed Whether simple info, which can be retrived from /getthumbinfo/ XML with less restriction, is allowed.
- * @param thisObj           this object for the callback
- * @param successCallback   Name of callback function in thisObj, called if the info is read successfully.
- * @param failCallback      Name of callback function in thisObj, called if the info cannot be read.
+ * @return the promise of the fetcher or the resolved promise with cached infomation.
  */
-VideoInfoReader.readByUrl = function(url, simpleInfoAllowed, thisObj, successCallback, failCallback) {
-  if (!thisObj || typeof thisObj[successCallback] != "function" || typeof thisObj[failCallback] != "function") {
-    throw new Error('Wrong parameter in readByUrl');
-    return;
-  }
+VideoInfoReader.readByUrl = function(url, simpleInfoAllowed) {
   if (cachedInfo[url]) {
-    /* If there is cache, use the cache */
-    thisObj[successCallback].call(thisObj, url, cachedInfo[url]);
+    Components.utils.import("resource://nicofox/When.jsm");
+    return When({ target: url, info: cachedInfo[url]});
   } else {
     /* For simple info: get it from /getthumbinfo/ XML, and don't use cache and queue */
     if (simpleInfoAllowed) {
-      var innerSimpleFetcherInstance = new innerSimpleFetcher(url, thisObj, successCallback, failCallback);
+      return simpleInfoFetcher.enqueue(url);
     } else {
-      /* Push it into queue */
-      pageReadQueue.push({
-        url: url,
-        thisObj: thisObj,
-        successCallback: successCallback,
-        failCallback: failCallback,
-      });
-      /* If the timer is not running, make it run in a specific delay */
-      if (!pageReadTimer.callback) {
-        var delay = 50;
-        pageReadTimer.initWithCallback(pageReadTimerCallback, delay, Ci.nsITimer.TYPE_REPEATING_SLACK);
-      }
+      /* Enqueue into the infoFetcher and return the promise. */
+      return infoFetcher.enqueue(url);
     }
   }
 };

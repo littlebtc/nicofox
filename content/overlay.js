@@ -150,7 +150,9 @@ nicofox.overlay = {
     }
   },
   /* After video info is read, write data to specific browser, update the panel if necessary */
-  videoInfoRetrived: function(contentDoc, info) {
+  videoInfoRetrived: function(result) {
+    var contentDoc = result.target;
+    var info = result.info;
     if(!contentDoc) { return; }
     var browser =  gBrowser.getBrowserForDocument(contentDoc);
     if (!browser) { return; }

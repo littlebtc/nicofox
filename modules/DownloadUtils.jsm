@@ -206,10 +206,12 @@ DownloadUtils.nico.prototype = {
     this.url = url;
     /* Read video info again: The expiration of VideoInfoReader may match the expiration of video access on the site */
     Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-    VideoInfoReader.readByUrl(this.url, false, this, "goParse", "failReadInfo");
+    VideoInfoReader.readByUrl(this.url, false).then(this.goParse.bind(this), this.failReadInfo.bind(this));
   },
   /* After reading the video info, call getflv API to get necessary info like video URL and comment thread id.  */
-  goParse: function(url, info) {
+  goParse: function(result) {
+    var url = result.url;
+    var info = result.info;
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
     /* Record the thumbnail URL */
@@ -492,6 +494,7 @@ DownloadUtils.nico.prototype = {
     this.callback("completed", {"videoBytes":  this._videoMaxBytes});
   },
   failReadInfo: function(reason) {
+    Components.utils.reportError(reason);
     /* VideoInfoReader will report a reason. */
     if (reason == "notloggedin" && !this._loginTried) {
       this._loginTried = true;
@@ -513,7 +516,7 @@ DownloadUtils.nico.prototype = {
   /* XXX: autologin */
   retryAfterLogin: function() {
     /* Retry after autologin */
-    VideoInfoReader.readByUrl(this.url, false, this, "goParse", "failReadInfo");
+    VideoInfoReader.readByUrl(this.url, false).then(this.goParse.bind(this), this.failReadInfo.bind(this));
   },
   failAutoLogin: function() {
     showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorParseFailed"));

@@ -444,7 +444,9 @@ DownloadManagerPrivate.failAddingDownloadInfo = function(reason) {
 }
 
 /* Actaully add download item and put it into the queue after the simple info is read.  */
-DownloadManagerPrivate.initializeDownload = function(url, info) {
+DownloadManagerPrivate.initializeDownload = function(result) {
+  var url = result.target;
+  var info = result.info;
   /* Use stored statment if exists, or create a new one. */
   if (!storedStatements.addDownload) {
     storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
@@ -610,7 +612,7 @@ DownloadManager.addDownload = function(url, info) {
   if (!/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
   /* Ask the "Simple info" of the video. FIXME: Does this require an extra query? */
   Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-  VideoInfoReader.readByUrl(url, true, DownloadManagerPrivate, "initializeDownload", "failAddingDownloadInfo");
+  VideoInfoReader.readByUrl(url, true).then(DownloadManagerPrivate.initializeDownload.bind(DownloadManagerPrivate) , DownloadManagerPrivate.failAddingDownloadInfo.bind(DownloadManagerPrivate));
 };
 
 /* If the download is running, cancel the download. */
