@@ -12,7 +12,7 @@ var EXPORTED_SYMBOLS = [ "FileBundle" ];
 
 let FileBundle = {};
 
-Components.utils.import("resource://nicofox/Services.jsm");
+Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://nicofox/Core.jsm");
 
 /* Fix common reserved characters in filesystems by converting to full-width */

@@ -49,7 +49,7 @@ NicoWatcher.prototype = {
       break;
       
       case "quit-application":
-      Components.utils.import("resource://nicofox/Services.jsm");
+      Components.utils.import("resource://gre/modules/Services.jsm");
       Services.obs.removeObserver(this, "quit-application")
       Core.prefs.removeObserver("nicowa_blocker", this);
       break;
@@ -57,7 +57,7 @@ NicoWatcher.prototype = {
   },
   _initPref: function() {
     Components.utils.import("resource://nicofox/Core.jsm");
-    Components.utils.import("resource://nicofox/Services.jsm");
+    Components.utils.import("resource://gre/modules/Services.jsm");
     Services.obs.addObserver(this, "quit-application", false);
     Core.prefs.addObserver("nicowa_blocker", this, false);
     this._nicowaBlocker = Core.prefs.getBoolPref("nicowa_blocker");

@@ -10,7 +10,7 @@ const Ci = Components.interfaces;
 var EXPORTED_SYMBOLS = [ "NicoLogin" ];
 let NicoLogin = {};
 
-Components.utils.import("resource://nicofox/Services.jsm");
+Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://nicofox/Core.jsm");
 Components.utils.import("resource://nicofox/Network.jsm");
 

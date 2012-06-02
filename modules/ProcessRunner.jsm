@@ -18,7 +18,7 @@ let processRunner = {};
  */
 
 processRunner.openFileWithProcess = function(process, file, safeString) {
-  Components.utils.import("resource://nicofox/Services.jsm"); 
+  Components.utils.import("resource://gre/modules/Services.jsm"); 
   var os_string = Services.appinfo.OS;
  
   /* OSX code. Use launchWithDoc from nsILocalFileMac */

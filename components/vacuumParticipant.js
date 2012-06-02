@@ -14,7 +14,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 /* Contstructor. Assign smilefox.sqlite as the database to vacuum. */
 function NicoFoxVacuumParticipant()
 {
-  Components.utils.import("resource://nicofox/Services.jsm");
+  Components.utils.import("resource://gre/modules/Services.jsm");
   var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
   file.append("smilefox.sqlite");
   this._dbConn = Services.storage.openDatabase(file);

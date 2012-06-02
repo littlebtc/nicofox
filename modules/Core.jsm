@@ -7,7 +7,7 @@ var EXPORTED_SYMBOLS = ['Core'];
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-Components.utils.import("resource://nicofox/Services.jsm"); 
+Components.utils.import("resource://gre/modules/Services.jsm");
 
 var Core = {}
 

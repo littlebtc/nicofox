@@ -2,7 +2,7 @@
  * vim: sw=2 ts=2 sts=2 et filetype=javascript
  */
 
-Components.utils.import("resource://nicofox/Services.jsm", nicofox);
+Components.utils.import("resource://gre/modules/Services.jsm", nicofox);
 
 nicofox.panel = {};
 

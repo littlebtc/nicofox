@@ -4,7 +4,7 @@
 
 if (!nicofox) {var nicofox = {};}
 Components.utils.import("resource://nicofox/Core.jsm", nicofox);
-Components.utils.import("resource://nicofox/Services.jsm", nicofox);
+Components.utils.import("resource://gre/modules/Services.jsm", nicofox);
 
 nicofox.overlay = {
   /* On browser window loading */

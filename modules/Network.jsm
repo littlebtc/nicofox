@@ -15,7 +15,7 @@ Components.utils.import("resource://nicofox/When.jsm");
 
 /* Asynchrously fetch content of one URL */
 Network.fetchUrlAsync = function(url, postQueryString) {
-  Components.utils.import("resource://nicofox/Services.jsm");
+  Components.utils.import("resource://gre/modules/Services.jsm");
   Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
   /* Add deferred */
