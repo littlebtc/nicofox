@@ -74,56 +74,6 @@ var prefObserver = {
   },
 };
 
-/* Make a observer to check the private mode (for Fx 3.1b2+) and the quitting of the browser */
-var downloadObserver = {
-  observe: function(subject, topic, data) {
-    switch(topic) {
-      case "quit-application-requested":
-      if (activeDownloadCount > 0) {
-        if (!Services.prompt.confirm(null, 
-                                     Core.strings.getString('closeSmileFoxTitle'),
-                                     Core.strings.getString('closeSmileFoxMsg'))){
-          subject.QueryInterface(Ci.nsISupportsPRBool);
-          subject.data = true;
-          return;
-        }
-       this.unregisterReq();
-      }
-      break;
-      
-      case "quit-application":
-      DownloadManager.pauseAllDownloads();
-      this.unregisterGra();
-      prefObserver.unregister();
-      break;
-      
-      case "private-browsing":
-      if (data == 'enter') {
-        inPrivateBrowsing = true;
-      } else if (data == 'exit') {
-        DownloadManager.pauseAllDownloads();
-        inPrivateBrowsing = false;
-      	DownloadManagerPrivate.exitPrivateBrowsing();
-        triggerDownloadListeners('rebuild', null, null); 
-      }
-      break;
-    }
-  },
-  register: function() {
-    Services.obs.addObserver(this, "quit-application-requested", false);
-    Services.obs.addObserver(this, "quit-application", false);
-    Services.obs.addObserver(this, "private-browsing", false);
-  },
-  unregisterReq: function() {
-    Services.obs.removeObserver(this, "quit-application-requested");
-  },
-  unregisterGra: function() {
-    Services.obs.removeObserver(this, "quit-application");
-    Services.obs.removeObserver(this, "private-browsing", false);
-  }
-}
-
-
 /* Space to store all download listeners */
 var downloadListeners = [];
 
@@ -401,13 +351,6 @@ DownloadManagerPrivate.finishStartup = function() {
   downloadQueueRunner.startup();
 };
 
-/* When exiting the private browsing mode, clear all items with in_private = 1 */
-DownloadManagerPrivate.exitPrivateBrowsing = function() {
-  var statement = this.dbConnection.createStatement("DELETE FROM `smilefox` WHERE `in_private` = 1");
-  /* XXX: Except for avoiding conflict, why still makes this statement run in the main thread??? */
-  statement.execute();
-  statement.reset();
-};
 
 /* After receiving record for the download that needs to retry, call downloadQueueRunner to run it. */
 DownloadManagerPrivate.afterRetryDownloadRead = function(resultArray) {
@@ -516,7 +459,6 @@ DownloadManagerPrivate.notifyRemovedDownload = function(id) {
 DownloadManager.startup = function() {
   /* Load the observer */
   prefObserver.register();
-  downloadObserver.register();
   
   /* Private Browsing checking XXX: 1.9.1b2- compatibility */
   var privateSvc = Cc["@mozilla.org/privatebrowsing;1"].getService(Ci.nsIPrivateBrowsingService);
@@ -551,6 +493,42 @@ DownloadManager.startup = function() {
     }
   }
 }
+
+/* Execute when private browsing is toggled
+ * @param data New status for private browsing mode. Might be 'enter' or 'exit'. */
+DownloadManager.togglePrivateBrowsing = function(data) {
+  inPrivateBrowsing = (data != 'exit');
+  Components.utils.reportError(inPrivateBrowsing);
+  /* Pause all downloads. */
+  DownloadManager.pauseAllDownloads();
+  /* When exiting the private browsing mode, clear all items with in_private = 1 */
+  if (data == 'exit') {
+    var statement = DownloadManagerPrivate.dbConnection.createStatement("DELETE FROM `smilefox` WHERE `in_private` = 1");
+    /* Execute synchrounsly to ensure consistency */
+    statement.execute();
+    statement.reset();
+    triggerDownloadListeners('rebuild', null, null);
+  }
+};
+
+/* If there is any active downloads, confirm whether to quit.
+ * @param subject Subject from quit-application-requested topic */
+DownloadManager.confirmQuit = function(subject) {
+  if (activeDownloadCount > 0) {
+    if (!Services.prompt.confirm(null, Core.strings.getString('closeSmileFoxTitle'), Core.strings.getString('closeSmileFoxMsg'))){
+      subject.QueryInterface(Ci.nsISupportsPRBool);
+      subject.data = true;
+    }
+  }
+};
+
+/* Cleanup things during browser quit. */
+DownloadManager.shutdown = function() {
+  DownloadManager.pauseAllDownloads();
+  prefObserver.unregister();
+  thumbnailFetcher._timer.cancel();
+  economyModeCheckTimer.cancel();
+};
 
 /* Check if user upgraded from a old version that don't support thumbnail download,
  * by checking if the thumbnail_file in database is filled.

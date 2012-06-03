@@ -22,10 +22,32 @@ NicoFoxBootstrap.prototype = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIContentPolicy, Ci.nsIObserver, Ci.nsIWeakReference]),
   /* Implements nsIObserver */
   observe: function(subject, topic, data) {
-    /* XXX: Observe the impact on the startup */
-    if (topic == "profile-after-change") {
+    switch(topic) {
+      /* Add observers and initialize download manager */
+      /* XXX: Observe the impact on the startup */
+      case "profile-after-change":
+      Components.utils.import("resource://gre/modules/Services.jsm");
       Components.utils.import("resource://nicofox/DownloadManager.jsm");
       DownloadManager.startup();
+      Services.obs.addObserver(this, "quit-application-requested", false);
+      Services.obs.addObserver(this, "quit-application", false);
+      Services.obs.addObserver(this, "private-browsing", false);
+      break;
+      /* Tell the Download Manager when enter/exit private browsing mode. */
+      case "private-browsing":
+      DownloadManager.togglePrivateBrowsing(data);
+      break;
+      /* Confirm whether to cancel all downloads before quit */
+      case "quit-application-requested":
+      DownloadManager.confirmQuit(subject);
+      break;
+      /* Cleanup on shutdown */
+      case "quit-application":
+      DownloadManager.shutdown();
+      Services.obs.removeObserver(this, "quit-application-requested", false);
+      Services.obs.removeObserver(this, "quit-application", false);
+      Services.obs.removeObserver(this, "private-browsing", false);
+      break;
     }
   }
 }
