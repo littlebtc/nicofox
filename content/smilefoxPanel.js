@@ -41,8 +41,8 @@ nicofox.panel.onPopupShown = function(event) {
   if (browser && browser.contentWindow) {
     if (/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
       Components.utils.reportError("Re-read!!");
-      contentWin = browser.contentWindow;
-      contentDoc = browser.contentDocument;
+      var contentWin = browser.contentWindow;
+      var contentDoc = browser.contentDocument;
       /* Do nothing if the page load is not completed */
       if (!contentDoc || contentDoc.readyState != "complete") { return; }
       var info = { 'reading': true };
