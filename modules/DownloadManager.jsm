@@ -53,7 +53,6 @@ var downloadTriggered = false;
 
 /* Number of videos downloading */
 var activeDownloadCount = 0;
-var waiting_count = 0;
 var downloadMax = 0;
 
 /* Are we in private browsing mode? */
