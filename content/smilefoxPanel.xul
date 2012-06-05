@@ -46,34 +46,24 @@
                         oncommand="nicofox.panel.videoTools.download();"/>
                 <!--<button id="nicofox-watching-add-tags" label="Add tags..." />-->
               </hbox>
-              <grid id="nicofox-watching-toolbar">
-                <columns>
-                  <column align="center"/>
-                  <column flex="1" align="center"/>
-                </columns>
-                <rows>
-                  <row>
-                    <label value="&info.watching.tools.languages;" />
-                    <hbox align="center">
-                      <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="smilefoxToolItem"
-                             onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
-                      <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="smilefoxToolItem"
-                             onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-                   </hbox>
-                  </row>
-                  <row>
-                    <label value="&info.watching.tools.sites;" />
-                    <hbox>
-                     <image style="-moz-image-region: rect(11px 16px 27px 0px);" class="smilefoxToolItem"
-                            onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'sound');" />
-                     <image style="-moz-image-region: rect(11px 32px 27px 16px);" class="smilefoxToolItem"
-                            onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'chart');" />
-                     <image style="-moz-image-region: rect(11px 48px 27px 32px);" class="smilefoxToolItem" id="nicofox-watching-comment-tool"
-                            onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'comment');" />
-                   </hbox>
-                 </row>
-               </rows>
-              </grid>
+              <hbox id="nicofox-watching-toolbar">
+                <label value="&info.watching.tools.languages;" />
+                <hbox align="center">
+                  <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="smilefoxToolItem"
+                         onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
+                  <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="smilefoxToolItem"
+                         onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
+                </hbox>
+                <label value="&info.watching.tools.sites;" />
+                <hbox>
+                  <image style="-moz-image-region: rect(11px 16px 27px 0px);" class="smilefoxToolItem"
+                         onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'sound');" />
+                  <image style="-moz-image-region: rect(11px 32px 27px 16px);" class="smilefoxToolItem"
+                         onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'chart');" />
+                  <image style="-moz-image-region: rect(11px 48px 27px 32px);" class="smilefoxToolItem" id="nicofox-watching-comment-tool"
+                         onclick="nicofox.panel.videoTools.goThridPartyToolSite(event, 'comment');" />
+                </hbox>
+              </hbox>
             </vbox>
           </hbox>
         </vbox>
