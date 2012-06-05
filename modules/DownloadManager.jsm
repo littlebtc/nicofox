@@ -386,9 +386,8 @@ DownloadManagerPrivate.failAddingDownloadInfo = function(reason) {
 }
 
 /* Actaully add download item and put it into the queue after the simple info is read.  */
-DownloadManagerPrivate.initializeDownload = function(result) {
-  var url = result.target;
-  var info = result.info;
+DownloadManagerPrivate.initializeDownload = function(info) {
+  var url = info.url;
   /* Use stored statment if exists, or create a new one. */
   if (!storedStatements.addDownload) {
     storedStatements.addDownload = DownloadManagerPrivate.dbConnection.createStatement("INSERT INTO `smilefox` (`url`, `video_title`, `add_time`, `status`, `in_private`) VALUES (:url, :video_title, :add_time, :status, :in_private)");
@@ -398,13 +397,7 @@ DownloadManagerPrivate.initializeDownload = function(result) {
   params.url = url;
   params.video_title = info.nicoData.title;
   params.add_time = new Date().getTime();
-  /* XXX: !!! If no preload is required, set the status to -1 (info pending).
-     Otherwise, set it to 0 (queued). */
-  //if (Core.prefs.getBoolPref("preload_info_before_download")) {
-    //params.status = -1;
-  //} else {
-    params.status = 0;
-  //}
+  params.status = 0;
   params.in_private = (inPrivateBrowsing)?1:0;
   for (var key in params) {
     storedStatements.addDownload.params[key] = params[key];
@@ -413,9 +406,12 @@ DownloadManagerPrivate.initializeDownload = function(result) {
   storedStatements.addDownload.execute();
   storedStatements.addDownload.reset();
   var lastInsertRowID = DownloadManagerPrivate.dbConnection.lastInsertRowID;
-  /* Trigger download listeners and push it to the download queue.
-   * Beware: params are just referenced not cloned! Don't try to modify anything on it. */
+  /* Trigger download listeners and push it to the download queue. 
+   * Remember the info if it is not a simple one. */
   params.id = lastInsertRowID;
+  if (!info.simple) {
+    params.info = info;
+  }
   triggerDownloadListeners("downloadAdded", lastInsertRowID, params);
   downloadQueue.push(params);
   downloadQueueRunner.process();
@@ -584,12 +580,18 @@ DownloadManager.getDownload = function(id, thisObj, successCallback, failCallbac
 /* Add a download entry, check it, then be proceed by download manager.
  * Note that video info will be read AFTER the entry was added.
  */
-DownloadManager.addDownload = function(url, info) {
+DownloadManager.addDownload = function(url, cachedInfo) {
   /* XXX: URL Checker should not be here. */
   if (!/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
-  /* Ask the "Simple info" of the video. FIXME: Does this require an extra query? */
-  Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-  VideoInfoReader.readByUrl(url, true).then(DownloadManagerPrivate.initializeDownload.bind(DownloadManagerPrivate) , DownloadManagerPrivate.failAddingDownloadInfo.bind(DownloadManagerPrivate));
+  /* Use cached info if exists. */
+  if (cachedInfo) {
+    Components.utils.import("resource://nicofox/When.jsm");
+    var promise = When(cachedInfo);
+  } else {
+    Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
+    var promise = VideoInfoReader.readByUrl(url, true);
+  }
+  promise.then(DownloadManagerPrivate.initializeDownload.bind(DownloadManagerPrivate) , DownloadManagerPrivate.failAddingDownloadInfo.bind(DownloadManagerPrivate));
 };
 
 /* If the download is running, cancel the download. */
@@ -840,7 +842,7 @@ downloadQueueRunner.process = function() {
     activeDownloads[item.id] = { url: item.url };
     activeDownloadCount++;
     /* Start the download */
-    downloadQueueRunner.initDownloader(item.id, item.video_economy);
+    downloadQueueRunner.initDownloader(item.id, item.video_economy, item.info);
 
     /* Change the status to "downloading" in the database */
     DownloadManagerPrivate.updateDownload(item.id, {"status": 7, "start_time": new Date().getTime()});
@@ -855,13 +857,16 @@ downloadQueueRunner.process = function() {
 };
 
 /* Initialize downloader(DownloadUtils.nico) to really start download */
-downloadQueueRunner.initDownloader = function(id, videoEconomy) {
+downloadQueueRunner.initDownloader = function(id, videoEconomy, info) {
   Components.utils.import("resource://nicofox/DownloadUtils.jsm");
   activeDownloads[id].downloader = new DownloadUtils.nico();
   /* Assign callback and database id (for callback) */
   activeDownloads[id].downloader.callback = handleDownloaderEvent;
   activeDownloads[id].downloader.dbId = id;
   activeDownloads[id].downloader.previousAtEconomy = (videoEconomy == 1);
+  if (info) {
+    activeDownloads[id].downloader._cachedInfo = info;
+  }
   activeDownloads[id].downloader.init(activeDownloads[id].url);
 };
 

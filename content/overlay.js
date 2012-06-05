@@ -146,13 +146,14 @@ nicofox.overlay = {
         nicofox.panel.updateVideoInfo(info);
       }
       Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
-      nicofox.VideoInfoReader.readFromPageDOM(contentWin, contentDoc, true, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+      Components.utils.import("resource://nicofox/When.jsm", nicofox);
+      nicofox.VideoInfoReader.readFromPageDOM(contentWin.wrappedJSObject, contentDoc)
+                             .then(nicofox.overlay.videoInfoRetrived.bind(nicofox.overlay), nicofox.overlay.videoInfoFailed.bind(nicofox.overlay, contentDoc));
     }
   },
   /* After video info is read, write data to specific browser, update the panel if necessary */
-  videoInfoRetrived: function(result) {
-    var contentDoc = result.target;
-    var info = result.info;
+  videoInfoRetrived: function(info) {
+    var contentDoc = info.target;
     if(!contentDoc) { return; }
     var browser =  gBrowser.getBrowserForDocument(contentDoc);
     if (!browser) { return; }

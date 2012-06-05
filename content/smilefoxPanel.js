@@ -40,7 +40,6 @@ nicofox.panel.onPopupShown = function(event) {
   var browser = gBrowser.selectedBrowser;
   if (browser && browser.contentWindow) {
     if (/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(browser.contentWindow.location.href) && !browser.nicofoxVideoInfo) {
-      Components.utils.reportError("Re-read!!");
       var contentWin = browser.contentWindow;
       var contentDoc = browser.contentDocument;
       /* Do nothing if the page load is not completed */
@@ -158,14 +157,20 @@ nicofox.panel.videoTools = {};
    To avoid multiple times of adding, disable the button after queued. */
 nicofox.panel.videoTools.download = function() {
   var browser = gBrowser.selectedBrowser;
-  if (!browser || !browser.nicofoxVideoInfo) { return; }
+  var info = browser.nicofoxVideoInfo;
+  if (!browser || !info) { return; }
   
   var url = browser.contentWindow.location.href;
   if (url.indexOf("?") >= 0) {
     url = url.substring(0, url.indexOf("?"));
   }
   Components.utils.import("resource://nicofox/DownloadManager.jsm", nicofox);
-  nicofox.DownloadManager.addDownload(url);
+  /* For info cache, check whether the page is dynamicaly changed */
+  if (url == info.url) {
+    nicofox.DownloadManager.addDownload(url, info);
+  } else {
+    nicofox.DownloadManager.addDownload(url);
+  }
   document.getElementById("nicofox-watching-download").disabled = true;
 };
 /* Go to the Nico Nico Nico website in different region. */

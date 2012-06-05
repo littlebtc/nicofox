@@ -200,18 +200,21 @@ DownloadUtils.nico.prototype = {
   init: function(url) {
     Components.utils.reportError("Downloader Init!");
     this._getComment = Core.prefs.getBoolPref("download_comment");
-    this._getThumbnail= Core.prefs.getBoolPref("download_thumbnail");
+    this._getThumbnail = Core.prefs.getBoolPref("download_thumbnail");
     
     /* Save the URL to the instance */
     this.url = url;
-    /* Read video info again: The expiration of VideoInfoReader may match the expiration of video access on the site */
-    Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
-    VideoInfoReader.readByUrl(this.url, false).then(this.goParse.bind(this), this.failReadInfo.bind(this));
+    /* Read video info again if cache is not expired */
+    if (this._cachedInfo && new Date().getTime() - this._cachedInfo.loadTime < 60000) {
+      this.goParse(this._cachedInfo);
+    } else {
+      Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
+      VideoInfoReader.readByUrl(this.url, false).then(this.goParse.bind(this), this.failReadInfo.bind(this));
+    }
   },
   /* After reading the video info, call getflv API to get necessary info like video URL and comment thread id.  */
-  goParse: function(result) {
-    var url = result.url;
-    var info = result.info;
+  goParse: function(info) {
+    var url = info.url;
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
     /* Record the thumbnail URL */
