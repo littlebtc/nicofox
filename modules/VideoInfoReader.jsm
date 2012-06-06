@@ -313,9 +313,32 @@ VideoInfoReader.readFromPageDOM = function(unsafeWindow, contentDoc) {
     return When.reject(e.toString());
   }
   /* Parse the data and store the video info, wrapped with a promise */
-  return When(parseVideoInfo({target: contentDoc, nicoData: nicoData, otherData: otherData}));
+  return When(parseVideoInfo({target: contentDoc, url: url, nicoData: nicoData, otherData: otherData}));
 };
 
+/* Since Zero uses History API for page transition, and no detailed info is exposed to DOM during that,
+ * Read basic information after the transition. */
+VideoInfoReader.readBasicZeroInfo = function(contentDoc) {
+  var info = { nicoData: {} };
+  var url = contentDoc.location.href;
+  /* Try to find the v and id from URL and DOM */
+  var vMatch = url.match(/\/watch\/([a-z]{0,2}[0-9]+)$/);
+  var cmsWatchLink = contentDoc.querySelector(".cmsWatchLink");
+  if (!vMatch || !cmsWatchLink) { return; }
+  var idMatch = cmsWatchLink.getAttribute("href").match(/\/([a-z]{2}[0-9]+)$/);
+  if (!idMatch) { return; }
+  /* Check if the page is completedly loaded by checking whether the id can be matched */
+  var threadId = contentDoc.querySelector("#videoTitle .nicoru-button").getAttribute("data-thread");
+  if (threadId != vMatch[1] && idMatch[1] != vMatch[1]) { return; }
+  info.nicoData.v = vMatch[1];
+  info.nicoData.id = idMatch[1];
+  info.nicoData.thumbnail = contentDoc.getElementById("videoThumbnailImage").getAttribute("src");
+  info.nicoData.title = contentDoc.querySelector("#videoTitle > .videoTitleText").textContent;
+  info.url = url;
+  info.target = url;
+  info.simple = true;
+  return info;
+};
 /* Read the video URL and parse the video info from the resulting HTML source. Called from download manager.
  * @param url               The video URL.
  * @param simpleInfoAllowed Whether simple info, which can be retrived from /getthumbinfo/ XML with less restriction, is allowed.

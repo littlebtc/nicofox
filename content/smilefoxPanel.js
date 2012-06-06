@@ -76,6 +76,11 @@ nicofox.panel.onPopupHidden = function(event) {
   if (nicofoxToolbarButton) {
     nicofoxToolbarButton.removeAttribute("open");
   }
+  /* Hidden video info box. */
+  document.getElementById("nicofox-not-watching").hidden = true;
+  document.getElementById("nicofox-watching-loading").hidden = true;
+  document.getElementById("nicofox-watching-failed").hidden = true;
+  document.getElementById("nicofox-watching").hidden = true;
 };
 /* Load Panel */
 nicofox.panel.load = function() {
@@ -136,9 +141,17 @@ nicofox.panel.updateVideoInfo = function() {
     } else if (info.error) {
       document.getElementById("nicofox-watching-failed").hidden = false;
     } else {
-      document.getElementById("nicofox-watching").hidden = false;
-      document.getElementById("nicofox-watching-download").disabled = false;
       if (info.nicoData) {
+        /* Hack for Zero: if the URL had been changed, re-read infos */
+        var currentUrl = gBrowser.selectedBrowser.currentURI.spec;
+        if (currentUrl.indexOf(info.url) != 0) {
+          Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
+          info = nicofox.VideoInfoReader.readBasicZeroInfo(gBrowser.selectedBrowser.contentDocument);
+          if (!info) { return; }
+          gBrowser.selectedBrowser.nicofoxVideoInfo = info;
+        }
+        document.getElementById("nicofox-watching").hidden = false;
+        document.getElementById("nicofox-watching-download").disabled = false;
         document.getElementById("nicofox-watching-title").value = info.nicoData.title;
         if (/http\:\/\//.test(info.nicoData.thumbnail)) {
           document.getElementById("nicofox-watching-thumb").src = info.nicoData.thumbnail;
