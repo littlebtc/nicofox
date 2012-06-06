@@ -125,31 +125,34 @@ nicofox.overlay = {
       }
     }
   },
-  /* When DOM Loaded, read video info if necessary. */
+  /* When DOM Loaded, made a info read request if necessary. */
   onDOMContentLoaded: function(aEvent) {
-    /* Don't cope with <iframe> and non-webpage loading. */
+    /* Don't cope with <iframe> and non-webpage loading, and non-nicovideo.jp pages */
     var contentDoc = aEvent.originalTarget;
     if (!contentDoc instanceof HTMLDocument) { return; }
+    if (contentDoc.location.protocol != "http:" || !(/nicovideo\.jp$/.test(contentDoc.location.host))) {
+      return;
+    }
     var contentWin = contentDoc.defaultView;
     var browser = gBrowser.getBrowserForDocument(contentDoc);
     if (contentWin.frameElement || !browser) { return; }
 
-    /* Check if we are at nicovideo.jp */
-    if (contentWin.location.protocol != "http:" || !(/nicovideo\.jp$/.test(contentWin.location.host))) {
-      return;
-    }
     /* For video page, read the video info, */
     if (/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/[a-z]{0,2}[0-9]+/.test(contentWin.location.href)) {
-      if (browser == gBrowser.selectedBrowser) {
-        var info = { 'reading': true }
-        browser.nicofoxVideoInfo = info;
-        nicofox.panel.updateVideoInfo(info);
-      }
-      Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
-      Components.utils.import("resource://nicofox/When.jsm", nicofox);
-      nicofox.VideoInfoReader.readFromPageDOM(contentWin.wrappedJSObject, contentDoc)
-                             .then(nicofox.overlay.videoInfoRetrived.bind(nicofox.overlay), nicofox.overlay.videoInfoFailed.bind(nicofox.overlay, contentDoc));
+      nicofox.overlay.readVideoInfo(browser, contentWin, contentDoc);
     }
+  },
+  /* Read video info from DOM. */
+  readVideoInfo: function(browser, contentWin, contentDoc) {
+    if (browser == gBrowser.selectedBrowser) {
+      var info = { 'reading': true }
+      browser.nicofoxVideoInfo = info;
+      nicofox.panel.updateVideoInfo();
+    }
+    Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
+    Components.utils.import("resource://nicofox/When.jsm", nicofox);
+    nicofox.VideoInfoReader.readFromPageDOM(contentWin.wrappedJSObject, contentDoc)
+                           .then(nicofox.overlay.videoInfoRetrived.bind(nicofox.overlay), nicofox.overlay.videoInfoFailed.bind(nicofox.overlay, contentDoc));
   },
   /* After video info is read, write data to specific browser, update the panel if necessary */
   videoInfoRetrived: function(info) {
@@ -159,7 +162,7 @@ nicofox.overlay = {
     if (!browser) { return; }
     browser.nicofoxVideoInfo = info;
     if (browser == gBrowser.selectedBrowser) {
-      nicofox.panel.updateVideoInfo(info);
+      nicofox.panel.updateVideoInfo();
     }
     contentDoc = null;
   },
@@ -170,7 +173,7 @@ nicofox.overlay = {
     if (!browser) { return; }
     browser.nicofoxVideoInfo = info;
     if (browser == gBrowser.selectedBrowser) {
-      nicofox.panel.updateVideoInfo(info);
+      nicofox.panel.updateVideoInfo();
     }
     contentDoc = null;
   },
@@ -218,12 +221,12 @@ nicofox.progressListener = {
        aStateFlags & Ci.nsIWebProgressListener.STATE_IS_NETWORK &&
        aRequest && aWebProgress.DOMWindow == content) {
       gBrowser.selectedBrowser.nicofoxVideoInfo = null;
-      nicofox.panel.updateVideoInfo(gBrowser.selectedBrowser.nicofoxVideoInfo);
+      nicofox.panel.updateVideoInfo();
     }
   },
-  /* Change panel info when location is changed (e.g. tab swithing) */
+  /* Change panel info when location is changed (e.g. tab swithing or histry API changes in Zero) */
   onLocationChange: function(aProgress, aRequest, aURI) {
-    nicofox.panel.updateVideoInfo(gBrowser.selectedBrowser.nicofoxVideoInfo);
+    nicofox.panel.updateVideoInfo();
   },
 
   // For definitions of the remaining functions see related documentation

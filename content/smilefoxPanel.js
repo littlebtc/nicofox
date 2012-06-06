@@ -19,6 +19,8 @@ nicofox.panel.itemsToLoad = [];
 
 /* The panel should be loaded only when the first time of popupshown event. This boolean will record this. */
 nicofox.panel.loaded = false;
+/* Whether the panel is hidden */
+nicofox.panel.hidden = true;
 
 /* Storage for array */
 nicofox.panel.resultArray = [];
@@ -32,6 +34,7 @@ nicofox.panel.onPopupShown = function(event) {
   if (!event.target.hasAttribute("id") || event.target.id != "nicofox-library") {
     return;
   }
+  nicofox.panel.hidden = false;
   /* Set the thumbnail display type. */
   var thumbnailDisplayType = document.getElementById("nicofoxThumbnailDisplay").value;
   document.getElementById('smilefoxList').setAttribute('sfthumbdisplay', thumbnailDisplayType);
@@ -44,15 +47,10 @@ nicofox.panel.onPopupShown = function(event) {
       var contentDoc = browser.contentDocument;
       /* Do nothing if the page load is not completed */
       if (!contentDoc || contentDoc.readyState != "complete") { return; }
-      var info = { 'reading': true };
-      browser.nicofoxVideoInfo = info;
-      nicofox.panel.updateVideoInfo(info);
-
-      /* No need to write to cache at this time. */
-      Components.utils.import("resource://nicofox/VideoInfoReader.jsm", nicofox);
-      nicofox.VideoInfoReader.readFromPageDOM(contentWin, contentDoc, true, nicofox.overlay, 'videoInfoRetrived', 'videoInfoFailed');
+      nicofox.overlay.readVideoInfo(browser, contentWin, contentDoc);
     }
   }
+  nicofox.panel.updateVideoInfo();
   /* Change the toolbutton state. */
   var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
   if (nicofoxToolbarButton) {
@@ -72,6 +70,7 @@ nicofox.panel.onPopupHidden = function(event) {
   if (!event.target.hasAttribute("id") || event.target.id != "nicofox-library") {
     return;
   }
+  nicofox.panel.hidden = true;
   /* Change the toolbutton state. */
   var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
   if (nicofoxToolbarButton) {
@@ -119,7 +118,11 @@ nicofox.panel.init = function() {
 };
 
 /* Update video info on the panel. */
-nicofox.panel.updateVideoInfo = function(info) {
+nicofox.panel.updateVideoInfo = function() {
+  /* Do nothing if the panel is hidden. */
+  if (this.hidden) { return; }
+  var info = gBrowser.selectedBrowser.nicofoxVideoInfo;
+
   /* Hidden all box first. */
   document.getElementById("nicofox-not-watching").hidden = true;
   document.getElementById("nicofox-watching-loading").hidden = true;
