@@ -19,6 +19,7 @@ Some part of the extension is not done by Littlebtc, below is a list of them wit
  * [Silk Icons](http://www.famfamfam.com/lab/icons/silk/) 1.3 by Mark James (CC-by-2.5)
  * [Flag Icons](http://www.famfamfam.com/lab/icons/flags/) by Mark James (Public Domain)
  * [ForcibleLoader](http://www.libspark.org/wiki/yossy/ForcibleLoader) by BeInteractive! and Spark project (MIT License)
+ * [when](https://github.com/cujojs/when) by Brian Cavalier (MIT License)
 
 -------------------------------------------------------------------------------------------------
 
