@@ -260,13 +260,12 @@ DownloadUtils.nico.prototype = {
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
 
-    Components.utils.reportError("???");
     /* Due to the VideoInfoReader cache, we may find out we are not logged in here. */
     if (content.indexOf("closed=1") == 0) {
       if (!this._loginTried) {
         this._loginTried = true;
         Components.utils.import("resource://nicofox/NicoLogin.jsm");
-        NicoLogin.perform(this, "retryAfterLogin", "failAutoLogin");
+        NicoLogin.perform().then(this.retryAfterLogin.bind(this), this.failAutoLogin.bind(this));
       } else {
         this.pause();
       }
@@ -502,7 +501,7 @@ DownloadUtils.nico.prototype = {
     if (reason == "notloggedin" && !this._loginTried) {
       this._loginTried = true;
       Components.utils.import("resource://nicofox/NicoLogin.jsm");
-      NicoLogin.perform(this, "retryAfterLogin", "failAutoLogin");
+      NicoLogin.perform().then(this.retryAfterLogin.bind(this), this.failAutoLogin.bind(this));
     } else if (reason == "notloggedin") {
       showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorParseFailed"));
       this.pause();
