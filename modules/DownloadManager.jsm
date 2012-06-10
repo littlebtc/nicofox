@@ -132,13 +132,12 @@ function generateStatementCallback(callerName, thisObj, successCallback, failCal
     }
   }
   callback.handleError =  function(aError) {
-    Components.utils.reportError("NicoFox DownloadManager Down: Error during SQLite Queries on " + callerName + ":" + aError.message);
     thisObj[failCallback].call(thisObj);
   };
   callback.handleCompletion = function(aReason) {
     /* Check for completion reason */
     if (aReason != Ci.mozIStorageStatementCallback.REASON_FINISHED) {
-      Components.utils.reportError("NicoFox DownloadManager Down: Error during SQLite Queries on " + callerName + ", Reason:" + aReason);
+      thisObj[failCallback].call(thisObj);
       return;
     }
     /* Append extra parameters */
@@ -187,13 +186,11 @@ thumbnailFetcher.processItem = function() {
   if (this.undoneItems.length == 0) { return; }
   this.runningItem = this.undoneItems.shift();
   Components.utils.import("resource://nicofox/DownloadUtils.jsm");
-  Components.utils.reportError("Process " + this.runningItem.id);
   /* Check if the video files exists */
   var videoFilePath = this.runningItem.video_file;
   var videoFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
   videoFile.initWithPath(videoFilePath);
   if(!videoFile.exists()) {
-    Components.utils.reportError("notexist!");
     this.writeEmptyToDb();
     return;
   }
@@ -211,7 +208,6 @@ thumbnailFetcher.processItem = function() {
 };
 /* When thumbnail download is finished, write data into database, or append the item to retry when failed */
 thumbnailFetcher.thumbDone = function(failed) {
-  Components.utils.reportError("Running " + this.runningItem.id);
   if (!failed) {
     triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
     var statement = this.statementModel.clone();
@@ -233,7 +229,6 @@ thumbnailFetcher.thumbDone = function(failed) {
 
 /* For items that video file is missing, fill empty string into the thumbnail field.  */
 thumbnailFetcher.writeEmptyToDb = function() {
-  Components.utils.reportError("Running " + this.runningItem.id);
   triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
   var statement = this.statementModel.clone();
   statement.params.thumbnail_file = '';
@@ -245,7 +240,6 @@ thumbnailFetcher.helperDone = function() {}
 
 /* After database written, update progress, schedule for next process */
 thumbnailFetcher.finishWrite = function() {
-  Components.utils.reportError("Done " + this.runningItem.id);
   triggerDownloadListeners('thumbnailFetcherProgress', null, this.itemCount - this.undoneItems.length);
   if (this.undoneItems.length == 0) {
     this.running = false;
@@ -263,7 +257,6 @@ thumbnailFetcher.notify = function() {
 
 /* Respond for DownloadManager.fetchThumbnail error */
 thumbnailFetcher.dbFail = function() {
-  Components.utils.reportError("dbError");
 };
 
 
@@ -296,11 +289,9 @@ DownloadManagerPrivate.executeUpgrade = function(resultArray) {
     }
   }
   if (!needUpgrade) {
-    Components.utils.reportError("No Upgrade Required!");
     DownloadManagerPrivate.finishStartup();
     return;
   }
-  Components.utils.reportError("Need Upgrade!");
   /* Backup DB (may be failed!) */
   var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
   file.append("smilefox.sqlite");
@@ -308,7 +299,6 @@ DownloadManagerPrivate.executeUpgrade = function(resultArray) {
     file.copyTo(null, "smilefox-upgrade0.6-backup" + Date.parse(new Date()) + ".sqlite");
   } catch (e) {
     /* Do not block upgrade */
-    Components.utils.reportError("Unable to backup database from NicoFox 0.1.");
   }
   /* Use the way in http://www.sqlite.org/faq.html#q11 to regenerate table.
      executeAsync() with multiple statement will create a transaction, so no need to do this manually. */
@@ -371,7 +361,6 @@ DownloadManagerPrivate.dbFail = function() {
 
 /* Process the simple video info result from DownloadManager.addDownload(). */
 DownloadManagerPrivate.failAddingDownloadInfo = function(reason) {
-  Components.utils.reportError(reason);
   if (reason == "unavailable") {
     /* Pause all new downloads when connection is not available. */
     if (!paused) {
@@ -421,10 +410,7 @@ DownloadManagerPrivate.initializeDownload = function(info) {
  * XXX: will it better to split it out to several cases and cache statements, like what we do in 0.3.x?
  */ 
 DownloadManagerPrivate.updateDownload = function(id, params) {
-  if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
-    return;
-  }
+  if (!working) { return; }
   var sqlString = "UPDATE `smilefox` SET ";
   for (var key in params) {
     /* Prevent injection */
@@ -493,7 +479,6 @@ DownloadManager.startup = function() {
  * @param data New status for private browsing mode. Might be 'enter' or 'exit'. */
 DownloadManager.togglePrivateBrowsing = function(data) {
   inPrivateBrowsing = (data != 'exit');
-  Components.utils.reportError(inPrivateBrowsing);
   /* Pause all downloads. */
   DownloadManager.pauseAllDownloads();
   /* When exiting the private browsing mode, clear all items with in_private = 1 */
@@ -548,7 +533,6 @@ DownloadManager.fetchThumbnails = function() {
 /* Asynchronously get all items in the download manager */
 DownloadManager.getDownloads = function(thisObj, resultCallback, successCallback, failCallback) {
   if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
     thisObj[failCallback].call(thisObj);
     return;
   }
@@ -563,7 +547,6 @@ DownloadManager.getDownloads = function(thisObj, resultCallback, successCallback
 /* Get single download. XXX: Why return array instead of object? */
 DownloadManager.getDownload = function(id, thisObj, successCallback, failCallback) {
   if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
     thisObj[failCallback].call(thisObj);
     return;
   }
@@ -618,7 +601,6 @@ DownloadManager.retryDownload = function(id) {
  */
 DownloadManager.removeDownload = function(id) {
   if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
     thisObj[failCallback].call(thisObj);
     return;
   }
@@ -774,7 +756,6 @@ var downloadQueueRunner = {};
 /* During the startup (or re-startup when economy mode is off), fetch the queued items only */
 downloadQueueRunner.startup = function() {
   if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
     thisObj[failCallback].call(thisObj);
     return;
   }
@@ -795,7 +776,6 @@ downloadQueueRunner.prepareQueue = function(resultArray) {
 /* When economy timer off, add status = 4 (hi-quality pending) items */
 downloadQueueRunner.rescheduleEconomyItem = function() {
   if (!working) {
-    Components.utils.reportError("DownloadManager is not working. This should not be happened.");
     thisObj[failCallback].call(thisObj);
     return;
   }
@@ -830,7 +810,6 @@ downloadQueueRunner.removeEconomyItems = function() {
 /* Check and (re-)process some items enter/exit the queue. */
 downloadQueueRunner.process = function() {
   if (paused) { return; }
-  Components.utils.reportError(JSON.stringify(downloadQueue));
   while(downloadQueue.length > 0 && activeDownloadCount < downloadMax) {
     var item = downloadQueue.shift();
     /* If we are sure that economy mode is enabled (e.g. first hi-quality pending video falls into economy mode) , don't process it. */
@@ -872,7 +851,6 @@ downloadQueueRunner.initDownloader = function(id, videoEconomy, info) {
 
 /* Respond for downloadQueueRunner-related SQL error */
 downloadQueueRunner.dbFail = function() {
-  Components.utils.reportError("dbError");
 };
 
 /* Handle downloader (DownloadUtils.nico) events. In the function, this will be the downloader instance. */
@@ -942,7 +920,6 @@ function handleDownloaderEvent(type, content) {
     break;
     
     case "thumbnail_done":
-    Components.utils.reportError("!");
     triggerDownloadListeners("thumbnailAvailable", id, content);
     break;
 
