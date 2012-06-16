@@ -184,7 +184,7 @@ infoFetcher.readVideoPage = function(result) {
     /* For Harajuku & Taiwan edition */
     /* Convert it from toSource() type to JSON, and safely using it by JSON.parse */
     var videoString = regexMatch[2];
-    videoString = videoString.replace(/^\s+([0-9a-z]+)\:\s+/img, "\'$1\':").replace(/\'/g, '"');
+    videoString = videoString.replace(/^\s+([0-9a-z\_]+)\:\s+/img, "\'$1\':").replace(/\'/g, '"');
     var nicoData = {};
     try {
       nicoData = JSON.parse('{'+videoString+'}');
