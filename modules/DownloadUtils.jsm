@@ -11,136 +11,112 @@ var EXPORTED_SYMBOLS = [ "DownloadUtils" ];
 let DownloadUtils = {};
 
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/FileUtils.jsm");
+Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import("resource://nicofox/Core.jsm");
 Components.utils.import("resource://nicofox/Network.jsm");
 Components.utils.import("resource://nicofox/FileBundle.jsm");
+Components.utils.import("resource://nicofox/When.jsm");
 
-/* Helper to handle multiple nsIWebBrowserPersist requests at the same time
- * @param thisObj         The this object for the callback function.
- * @param callback        The callback function name to be call when all files downloaded in thisObj.
- */
-DownloadUtils.multipleHelper = function(thisObj, callback) {
-  this.doneCallback = function() {
-    thisObj[callback].call(thisObj);
-  };
-}
-DownloadUtils.multipleHelper.prototype = {
-  /* nsIWebBrowserPersist and nsIFile storage */
-  persists: [],
-  files: [],
-  /* Are we still allowed to adding files? */
-  adding: true,
-  /* How many downloads are we handling? */
-  downloadCount: 0,
-  /* Add a nsIWebBrowserPersist download request to the helper.
-   * @param url             URL to download, in string.
-   * @param referrer        The referrer to be sent, in string.
-   * @param postQueryString The query string for POST request in string, if not present, download will be a GET request.
-   * @param file            The nsIFile instance for the destination of the file.
-   * @param bypassCache     Whether to bypass the cached content
-   * @param thisObj         The this object for the callback function.
-   * @param callback        The callback function name to be call when this file downloaded in thisObj.
-   */
-  addDownload: function(url, referrer, postQueryString, file, bypassCache, thisObj, callback) {
-    this.downloadCount++;
-    /* URL process */
-    var refUri = null;
-    if (referrer) {
-      refUri = Services.io.newURI(referrer, null, null);
-    }
-    var uri = Services.io.newURI(url, null, null);
+/* A when.js promise wrapper to the nsIWebBrowserPersist
+ * @param options  Options for the persist, includes:
+ *                 url             - The URL to be persisted.
+ *                 referrer        - The referrer to be sent.
+ *                 postQueryString - The query string for POST request in string
+ *                                   If not present, download will be a GET request.
+ *                 file            - The nsIFile instance for the destination of the file.
+ *                 bypassCache     -    Whether to bypass the cached content
+ * */
+var persistWorker = function(options) {
+  /* Generate nsIURIs */
+  var refURI = null;
+  if (options.referrer) {
+    refURI = Services.io.newURI(options.referrer, null, null);
+  }
+  var URI = Services.io.newURI(options.url, null, null);
 
-    /* POST header processing */
-    var postData = null;
-    if (postQueryString) { 
-      var postStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
-      postStream.setData(postQueryString, postQueryString.length); // Brokes 1.8.*- compatibility 
+  this._persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
 
-      postData = Cc["@mozilla.org/network/mime-input-stream;1"].createInstance(Ci.nsIMIMEInputStream);
-  
-      postData.addHeader("Content-Type", "application/x-www-form-urlencoded");
-      postData.addContentLength = true;
-      postData.setData(postStream);
+  /* Force allow 3rd party cookies, to make NicoFox work when 3rd party cookies are disabled. (Bug 437174) */
+  var flags =  this._persist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
+               this._persist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
+               this._persist.PERSIST_FLAGS_FORCE_ALLOW_COOKIES |
+               this._persist.PERSIST_FLAGS_CLEANUP_ON_FAILURE;
+  if (options.bypassCache) {
+    flags = flags | this._persist.PERSIST_FLAGS_BYPASS_CACHE;
+  }
+  this._persist.persistFlags = flags;
+  /* POST header processing */
+  var postData = null;
+  if (options.postQueryString) {
+    var postStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
+    postStream.setData(options.postQueryString, options.postQueryString.length); // Brokes 1.8.*- compatibility
+
+    postData = Cc["@mozilla.org/network/mime-input-stream;1"].createInstance(Ci.nsIMIMEInputStream);
+
+    postData.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    postData.addContentLength = true;
+    postData.setData(postStream);
+  }
+  /* Create a cancelable deferred, then make this.then an alias to deferred.then */
+  this._deferred = When.cancelable(When.defer(), this.cancel.bind(this));
+  if (options.trackProgress) {
+    this._trackProgress = true;
+  }
+  this.then = this._deferred.then;
+  /* Do the job */
+  this._persist.progressListener = this;
+  this._persist.saveURI(URI, null, refURI, postData, null, options.file);
+};
+
+/* Implements nsIWebProgressListener */
+persistWorker.prototype.onStateChange = function (aWebProgress, aRequest, aStateFlags, aStatus) {
+  if (aStateFlags & 1) {
+    /* Check and process HTTP Errors
+	   * nsIChannel will throw NS_ERROR_NOT_AVAILABLE when there is no connection
+     * (even for requestSucceeded), so use the try-catch way  */
+    var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
+    try {
+      if (channel.responseStatus != 200) {
+        this._deferred.reject("httpError");
+        return;
+     }
+    } catch(e) {
+      this._unsuccessfulStart = true;
+      this._deferred.reject("connectionError");
+      return;
     }
-    /* Create nsIWebBrowserPersist and set flags */
-    /* Force allow 3rd party cookies, to make NicoFox work when 3rd party cookies are disabled. (Bug 437174) */
-    var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist);
-    var flags =  Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_FORCE_ALLOW_COOKIES |
-                 Ci.nsIWebBrowserPersist.PERSIST_FLAGS_CLEANUP_ON_FAILURE;
-    if (bypassCache) {
-      flags = flags | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE;
-    }  
-    persist.persistFlags = flags;
-    var _innerCallback = null;
-    if (thisObj && callback) {
-      _innerCallback = function(result) { thisObj[callback].call(thisObj, result); }
+  } else if (aStateFlags & 16) {
+    if (this._unsuccessfulStart) { return; }
+    /* Download failed. In this case, PERSIST_FLAGS_CLEANUP_ON_FAILURE will done the cleanup */
+	  if (aStatus != 0 /* NS_OK */) {
+      this._deferred.reject("fail");
+      return;
     }
-    /* Prepare progressListener and its callback */ 
-    persist.progressListener = {
-      _parentInstance: this,
-      _unsuccessfulStart: false,
-      callback: _innerCallback,
-      onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
-        if (aStateFlags & 1) {
-         /* Process HTTP Errors
-	        * nsIChannel will throw NS_ERROR_NOT_AVAILABLE when there is no connection
-          * (even for requestSucceeded), so use the try-catch way  */
-          var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
-          try {
-            if (channel.responseStatus != 200) {
-              throw new Error();
-            }
-          } catch(e) {
-            this._unsuccessfulStart = true;
-          }
-        }
-        if (aStateFlags & 16) { /* STATE_STOP = 16 */
-      	  if (this.callback) {
-            this.callback(this._unsuccessfulStart);
-          }
-      	  this._parentInstance.completeDownload.call(this._parentInstance);
-        }
-      },
-      onProgressChange: function() {},
-      onLocationChange: function() {},
-      onStatusChange: function() {},
-      onSecurityChange: function() {},
-    };
-    /* Proceed download and store the instance */
-    persist.saveURI(uri, null, refUri, postData, null, file);
-    this.persists.push(persist);
-  },
-  /* Called when all needed download are added. */
-  doneAdding: function() {
-    this.adding = false;
-    if (this.downloadCount == 0) {
-      this.finalize();
+    /* Donwnload incompleted or connection error or initial response is 403. Will not clean up file, we should do it manually. */
+    if (this._currentBytes != this._maxBytes) {
+      this._deferred.reject("incomplete");
+      return;
     }
-  },
-  /* Cancel all of the downloads at once */
-  cancelAll: function() {
-    this.persists.forEach(function (element, index, array) {
-      if (element) {
-        array[index].cancelSave(); 
-      }
-    });
-    delete(this.persists);
-  },
-  /* PRIVATE USE: */
-  /* When one download completed, check if all of the downloads are completed */
-  completeDownload: function() {
-    this.downloadCount--;
-    if (this.downloadCount == 0 && !this.adding) {
-      this.finalize();
-    }
-  },
-  /* After all downloads done.. */
-  finalize: function() {
-    delete(this.persists);
-    this.doneCallback();
-  },
+    this._deferred.resolve(this._maxBytes);
+  }
+};
+persistWorker.prototype.onProgressChange = function (aWebProgress, aRequest,
+                                                     aCurSelfProgress, aMaxSelfProgress,
+                                                     aCurTotalProgress, aMaxTotalProgress) {
+  if (!this._trackProgress) { return; }
+  this._currentBytes = aCurSelfProgress;
+  this._maxBytes = aMaxSelfProgress;
+  this._deferred.progress({currentBytes: this._currentBytes, maxBytes: this._maxBytes});
+};
+
+persistWorker.prototype.onLocationChange = function() {};
+persistWorker.prototype.onStatusChange = function() {};
+persistWorker.prototype.onSecurityChange = function() {};
+
+/* Cancel function. */
+persistWorker.prototype.cancel = function() {
+  this._persist.cancelSave();
 };
 
 /* Decode query string */
@@ -175,10 +151,9 @@ DownloadUtils.nico.prototype = {
   _getThumbnail: false,
   /* Store video download progress */
   _progressUpdatedAt: 0,
+  _videoDownloadWorker: null,
   _videoProgressUpdatedBytes: 0,
-  _videoCurrentBytes: 0,
-  _videoMaxBytes: 0,
-  _extraItemsDownloader: null,
+  _videoBytes: 0,
   
   /* Store /getflv/ result. */
   _getFlvParams: null,
@@ -198,7 +173,6 @@ DownloadUtils.nico.prototype = {
 
   /* Initialize download for specific URL. */
   init: function(url) {
-    Components.utils.reportError("Downloader Init!");
     this._getComment = Core.prefs.getBoolPref("download_comment");
     this._getThumbnail = Core.prefs.getBoolPref("download_thumbnail");
     
@@ -254,11 +228,10 @@ DownloadUtils.nico.prototype = {
 
   /* Response for getflv request */
   parseGetFlv: function(result) {
-    var url = result.url;
-    var content = result.data;
-    Components.utils.reportError("Downloader /getflv done!");
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
+
+    var content = result.data;
 
     /* Due to the VideoInfoReader cache, we may find out we are not logged in here. */
     if (content.indexOf("closed=1") == 0) {
@@ -272,7 +245,6 @@ DownloadUtils.nico.prototype = {
       return;
     }
 
-    Components.utils.reportError("???");
     /* Store getflv parameters for future use. */
     this._getFlvParams = decodeQueryString(content);
     /* :( for channel videos, we need to get the thread key */
@@ -284,18 +256,13 @@ DownloadUtils.nico.prototype = {
   },
   /* Store the thread key after request. */
   parseThreadKey: function(result) {
-    var url = result.url;
-    var content = result.data;
-
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
-    this._getThreadKeyParams = decodeQueryString(content);
+    this._getThreadKeyParams = decodeQueryString(result.data);
     this.prepareDownload();
   },
   /* After API parsing is fine, read info from API, prepare files, then start the download. */
   prepareDownload: function() {
-    Components.utils.reportError('preparing');
-    Components.utils.reportError(JSON.stringify(this._getFlvParams));
     /* Don't do anything if user had canceled */
     if (this._canceled) { return; }
     
@@ -348,113 +315,52 @@ DownloadUtils.nico.prototype = {
     this._filesCreated = true;
     /* Run the callback */
     this.callback("file_ready", params);
-    /* Do video download first */
-    this.getVideo();
-  },
-  /* Run Video Downloads. */
-  getVideo: function() {
-    /* Don't waste time */
-    if (this._canceled) { return; }
-    
-    /* Make URI and cache key */
-    var videoUri = Services.io.newURI(this._getFlvParams.url, null, null);
 
-    this._persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
-                    createInstance(Ci.nsIWebBrowserPersist);
-
-    /* Force allow 3rd party cookies, to make NicoFox work when 3rd party cookies are disabled. (Bug 437174) */
-    var flags =  this._persist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION |
-                 this._persist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-                 this._persist.PERSIST_FLAGS_FORCE_ALLOW_COOKIES |
-                 this._persist.PERSIST_FLAGS_CLEANUP_ON_FAILURE;
-    if (Core.prefs.getBoolPref("video_bypass_cache")) {
-      flags = flags | this._persist.PERSIST_FLAGS_BYPASS_CACHE; 
-    }
-    this._persist.persistFlags = flags; 
-
-    /* We need a listener to watch the download progress */
-    var listener = {
-      _parentInstance: this,
-      _unsuccessfulStart: false,
-      onStateChange: function (aWebProgress, aRequest, aStateFlags, aStatus) {
-        if (this._parentInstance._canceled) { return; }
-        if (aStateFlags & 1) {
-         /* Process HTTP Errors
-	        * nsIChannel will throw NS_ERROR_NOT_AVAILABLE when there is no connection
-          * (even for requestSucceeded), so use the try-catch way  */
-          var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
-          try {
-            if (channel.responseStatus != 200) {
-              Components.utils.reportError("Hit 403!");
-              throw new Error();
-            }
-            this._parentInstance.callback("start", {});
-          } catch(e) {
-            this._unsuccessfulStart = true;
-          }
-        }
-        else if (aStateFlags & 16) {
-          /* Download failed. In this case, PERSIST_FLAGS_CLEANUP_ON_FAILURE will done the cleanup */
-	        if (aStatus != 0 /* NS_OK */) {
-            this._parentInstance.failVideoDownload();
-            return;
-          }
-          /* Donwnload incompleted or connection error or initial response is 403. Will not clean up file, we should do it manually. */
-          if (this._unsuccessfulStart || this._parentInstance._videoCurrentBytes != this._parentInstance._videoMaxBytes) {
-            Components.utils.reportError("incomplete!");
-            this._parentInstance.failVideoDownload();
-            return;
-          }
-          /* Move finished file */
-          this._parentInstance._fileBundle.files.videoTemp.moveTo(null, this._parentInstance._fileBundle.files.video.leafName);
-          /* Proceed to get extra items */
-          this._parentInstance.callback("video_done", {});
-          this._parentInstance.getExtraItems();
-        }
-      },
-      onProgressChange: function (aWebProgress, aRequest,
-                                 aCurSelfProgress, aMaxSelfProgress,
-                                 aCurTotalProgress, aMaxTotalProgress) {
-        this._parentInstance._videoCurrentBytes = aCurSelfProgress;
-        this._parentInstance._videoMaxBytes = aMaxSelfProgress;
-
-        /* The following is modified from toolkit/components/downloads/nsDownloadManager.cpp: */
-        /* Don't send the notification too frequently */
-        var now = new Date().getTime();
-        var delta = now - this._progressUpdatedAt;
-        if (delta < 400) {
-          return;
-        }
-        this._progressUpdatedAt = now;
-        /* Calculate "smoothed average" speed. */
-        if (delta > 0) {
-          var newSpeed = (aCurSelfProgress - this._parentInstance._videoProgressUpdatedBytes) / delta * 1000;
-          if (this._parentInstance._videoProgressUpdatedBytes == 0) {
-            this._parentInstance.speed = newSpeed;
-          } else {
-            this._parentInstance.speed = this._parentInstance.speed * 0.9 + newSpeed * 0.1;
-          }
-        }
-        /* Update the bytes when "Progres updated", then send the callback. */
-        this._parentInstance._videoProgressUpdatedBytes = aCurSelfProgress;
-        this._parentInstance.callback('progress_change', {currentBytes: aCurSelfProgress, maxBytes: aMaxSelfProgress});
-      },
-      onLocationChange: function (aWebProgress, aRequest, aLocation) {},
-      onStatusChange  : function (aWebProgress, aRequest, aStatus, aMessage) {},
-      onSecurityChange: function (aWebProgress, aRequest, aState) {},
-    };
+    /* Store a timestamp for used in speed reporting */
     this._progressUpdatedAt = new Date().getTime();
-    this._persist.progressListener = listener;
-    this._persist.saveURI(videoUri, null, null, null, null, this._fileBundle.files.videoTemp);
-
+    /* Create a runner to do video downloads */
+    this._videoDownloadWorker = new persistWorker({ url: this._getFlvParams.url, file: this._fileBundle.files.videoTemp,
+                                                  bypassCache: Core.prefs.getBoolPref("video_bypass_cache"), trackProgress: true });
+    this._videoDownloadWorker.then(this.onVideoDownloadCompleted.bind(this), this.onVideoDownloadFailed.bind(this), this.onVideoDownloadProgress.bind(this));
+  },
+  onVideoDownloadCompleted: function(videoBytes) {
+    /* Record video size for future uses */
+    this._videoBytes = videoBytes;
+    /* Move finished file */
+    this._fileBundle.files.videoTemp.moveTo(null, this._fileBundle.files.video.leafName);
+    /* Proceed to get extra items */
+    this.callback("video_done", {});
+    this.getExtraItems();
   },
   /* Call when video downloads failed */
-  failVideoDownload: function() {
+  onVideoDownloadFailed: function() {
     this._canceled = true;
     if (this._fileBundle.files.videoTemp.exists()) {
       this._fileBundle.files.videoTemp.remove(false);
     }
     this.callback("video_fail", {});
+  },
+  onVideoDownloadProgress: function(progress) {
+    /* The following is modified from toolkit/components/downloads/nsDownloadManager.cpp: */
+    /* Don't send the notification too frequently */
+    var now = new Date().getTime();
+    var delta = now - this._progressUpdatedAt;
+    if (delta < 400) {
+      return;
+    }
+    this._progressUpdatedAt = now;
+    /* Calculate "smoothed average" speed. */
+    if (delta > 0) {
+      var newSpeed = (progress.currentBytes - this._videoProgressUpdatedBytes) / delta * 1000;
+      if (this._videoProgressUpdatedBytes == 0) {
+        this.speed = newSpeed;
+      } else {
+        this.speed = this.speed * 0.9 + newSpeed * 0.1;
+      }
+    }
+    /* Update the bytes when "Progres updated", then send the callback. */
+    this._videoProgressUpdatedBytes = progress.currentBytes;
+    this.callback("progress_change", progress);
   },
   /* Get extra items (e.g. comments, uploader comments, thumbnail) */
   getExtraItems: function() {
@@ -479,24 +385,29 @@ DownloadUtils.nico.prototype = {
       '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     }
     /* Get all extra items */
-    this._extraItemsDownloader = new DownloadUtils.multipleHelper(this, "completeAll");
+    var promises = [];
     if(this._getComment) {
-      this._extraItemsDownloader.addDownload(this._getFlvParams.ms, null , commentQueryString, this._fileBundle.files.comment, true, this, "processNicoComment");
+      /* Because we may need to modify the content in the comment XML file, Just read all contents and process it. */
+      promises.push(Network.fetchUrlAsync(this._getFlvParams.ms, commentQueryString).then(this.processNicoComment.bind(this)));
     }
     if(this._getUploaderComment) {
-      this._extraItemsDownloader.addDownload(this._getFlvParams.ms, null , uploaderCommentQueryString, this._fileBundle.files.uploaderComment, true);
+      promises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
     }
     if(this._getThumbnail && this._info.nicoData.thumbnail) {
-      this._extraItemsDownloader.addDownload(this._info.nicoData.thumbnail, null , null, this._fileBundle.files.thumbnail, true, this, "notifyThumbnailDone");
+      promises.push(new persistWorker({ url: this._info.nicoData.thumbnail, file: this._fileBundle.files.thumbnail }).then(this.notifyThumbnailDone.bind(this)));
     }
-    this._extraItemsDownloader.doneAdding();
+    When.all(promises).then(this.onExtraItemsCompleted.bind(this), this.onExtraItemsFailed.bind(this));
   },
-
-  completeAll: function() {
-    this.callback("completed", {"videoBytes":  this._videoMaxBytes});
+  /* Tell the callback that we had done everything. */
+  onExtraItemsCompleted: function() {
+    this.callback("completed", {"videoBytes":  this._videoBytes});
+  },
+  /* XXX: Handle this better */
+  onExtraItemsFailed: function() {
+    showUtilsAlert('Download failed', 'Cannot get extra items');
+    this.callback("fail", {});
   },
   failReadInfo: function(reason) {
-    Components.utils.reportError(reason);
     /* VideoInfoReader will report a reason. */
     if (reason == "notloggedin" && !this._loginTried) {
       this._loginTried = true;
@@ -532,8 +443,8 @@ DownloadUtils.nico.prototype = {
   pause: function() {
     this._canceled = true;
 
-    if(this._persist != undefined) {
-      this._persist.cancelSave();
+    if(this._videoDownloadWorker) {
+      this._videoDownloadWorker.cancel();
     }
     if (this._extraItemsDownloader) {
       this._extraItemsDownloader.cancelAll();
@@ -546,8 +457,8 @@ DownloadUtils.nico.prototype = {
   cancel: function() {
     this._canceled = true;
 
-    if(this._persist != undefined) {
-      this._persist.cancelSave();
+    if(this._videoDownloadWorker) {
+      this._videoDownloadWorker.cancel();
     }
     if (this._extraItemsDownloader) {
       this._extraItemsDownloader.cancelAll();
@@ -577,97 +488,63 @@ DownloadUtils.nico.prototype = {
     if (this._fileBundle.files.thumbnail) {
       this.callback("thumbnail_done", Services.io.newFileURI(this._fileBundle.files.thumbnail).spec);
     }
+    return true;
   },
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
-  processNicoComment: function() {
+  processNicoComment: function(result) {
     if (this.cancelled) { return; }
-    var boon_comment = Core.prefs.getBoolPref('boon_comment');
-    var replace_filters = Core.prefs.getBoolPref('replace_filters'); 
-    if (!boon_comment && !replace_filters) { return; }
+    var boonComment = Core.prefs.getBoolPref('boon_comment');
+    var replaceFilters = Core.prefs.getBoolPref('replace_filters');
+    var content = result.data.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
 
-    if (replace_filters && this._getFlvParams.ng_up) {
-      var ng_ups = this._getFlvParams.ng_up.split('&');
-
-      var filter_matches = [];
-      var filter_strings = [];
-      var filter_replaces = [];
-      for (var i = 0; i < ng_ups.length; i++) {
-        var array = ng_ups[i].split('=');
-	var target = decodeURIComponent(array[0]).replace(/([\\\^\$\*\+\?\.\(\)\:\?\=\!\|\{\}\,\[\]])/g, '\\$1');
-	var match = new RegExp(target, 'g'); // Case-sensitive
-	filter_strings.push(decodeURIComponent(array[0]));
-        filter_matches.push(match);
-        filter_replaces.push(decodeURIComponent(array[1]));
+    /* Parse the filter contents. */
+    if (replaceFilters && this._getFlvParams.ng_up) {
+      var ngUps = this._getFlvParams.ng_up.split('&');
+      var filterFinds = [];
+      var filterReplaceWiths = [];
+      for (var i = 0; i < ngUps.length; i++) {
+        var filterPair = ngUps[i].split('=');
+	      filterFinds.push(decodeURIComponent(filterPair[0]));
+        filterReplaceWiths.push(decodeURIComponent(filterPair[1]));
       }
-    }
-
-    this.ms_lock = true;
-    var xml_contents = "";
-    var charset = 'UTF-8';
-    var fistream = Cc["@mozilla.org/network/file-input-stream;1"]
-                  .createInstance(Ci.nsIFileInputStream);
-    fistream.init(this._fileBundle.files.comment, -1, 0, 0);
-    var is = Cc["@mozilla.org/intl/converter-input-stream;1"]
-             .createInstance(Ci.nsIConverterInputStream);
-    is.init(fistream, charset, 1024, 0xFFFD);
-
-    /* FIXME: Should we have a process of error prevent? */
-    if (!(is instanceof Components.interfaces.nsIUnicharLineInputStream)) { return; }
-
-    var line = {};
-    var xml_string = '';
-    var first_line = true;
-    var no_eof;
-    do {
-      no_eof = is.readLine(line);
-      if(first_line) {
-        /* For E4X Parsing, we will need partial of the first line */
-        first_line = false;
-	line.value = line.value.replace(/^(<\?xml version=\"1.0\" encoding=\"UTF-8\"\?>)/, '');
-      }
-
-      xml_string = xml_string + line.value + "\n";
-    } while (no_eof)
-    	
-    is.close();
-    fistream.close();
-
-    if (replace_filters && this._getFlvParams.ng_up) {
-
-      /* Go E4X and filter */
-      var xml_e4x = new XML(xml_string);
-      if (xml_e4x.chat) {
-        for (var i = 0; i < xml_e4x.chat.length(); i++) {
-          for (var j = 0; j < filter_strings.length; j++) {
-	    if (xml_e4x.chat[i].toString().indexOf(filter_strings[j]) != -1) {
-              xml_e4x.chat[i] = xml_e4x.chat[i].toString().replace(filter_matches[j], filter_replaces[j]);
-	    }  
+      /* Use E4X to parse XML contents, find string to be replaced. */
+      var xml = new XML(content);
+      if (xml.chat) {
+        for (var i = 0; i < xml.chat.length(); i++) {
+          var chatContent = xml.chat[i].toString();
+          for (var j = 0; j < filterFinds.length; j++) {
+            if (chatContent.indexOf(filterFinds[j]) != -1) {
+              xml.chat[i] = chatContent.replace(filterFinds[j], filterReplaceWiths[j], "g");
+            }
           }  
         }
       }
-      xml_string = xml_e4x.toXMLString();
-    }  
-    /* Write back to XML file */
-    var fostream = Cc["@mozilla.org/network/file-output-stream;1"]
-                   .createInstance(Components.interfaces.nsIFileOutputStream);
-    fostream.init(this._fileBundle.files.comment, 0x02 | 0x08 | 0x20, 0666, 0); 
-
-
-    var os = Cc["@mozilla.org/intl/converter-output-stream;1"]
-             .createInstance(Ci.nsIConverterOutputStream);
-
-    os.init(fostream, charset, 0, 0x0000);
-    if (boon_comment) {
-      os.writeString('<?xml version="1.0" encoding="UTF-8"?><!-- BoonSutazioData='+this.commentId+' -->'+"\n");
-    } else {
-      os.writeString('<?xml version="1.0" encoding="UTF-8"?>'+"\n");
+      content = xml.toXMLString();
     }
-    os.writeString(xml_string);
-    os.close();
-    fostream.close();
-    this.ms_lock = false;
-  },
+    /* Prepand XML declaration, add BoonSutazioData comments if boon_comment is enabled */
+    if (boonComment) {
+      content = content + '<?xml version="1.0" encoding="UTF-8"?><!-- BoonSutazioData='+this.commentId+' -->'+"\n";
+    } else {
+      content = content + '<?xml version="1.0" encoding="UTF-8"?>'+"\n";
+    }
+    /* Prepare the input/output stream to write back to file */
+    var outputStream = FileUtils.openSafeFileOutputStream(this._fileBundle.files.comment);
+    var os = Cc["@mozilla.org/intl/converter-output-stream;1"].createInstance(Ci.nsIConverterOutputStream);
+    var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
+    converter.charset = "utf-8";
+    var inputStream = converter.convertToInputStream(content);
 
+    var deferred = When.defer();
+    /* Write file asynchronously, then return the deferred object */
+    NetUtil.asyncCopy(inputStream, outputStream, function(aResult) {
+      if (!Components.isSuccessCode(aResult)) {
+        deferred.reject('comment_write_error');
+        return;
+      }
+      deferred.resolve();
+    });
+    return deferred;
+  }
 };
 
 /* A simple wrapper to nsIAlertsService */
