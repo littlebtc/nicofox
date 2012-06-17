@@ -12,16 +12,14 @@ const Ci = Components.interfaces;
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 /* Contstructor. Assign smilefox.sqlite as the database to vacuum. */
-function NicoFoxVacuumParticipant()
-{
+function NicoFoxVacuumParticipant() {
   Components.utils.import("resource://gre/modules/Services.jsm");
   var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
   file.append("smilefox.sqlite");
   this._dbConn = Services.storage.openDatabase(file);
 }
 
-NicoFoxVacuumParticipant.prototype =
-{
+NicoFoxVacuumParticipant.prototype = {
   classDescription: "Vacuum participant for NicoFox",
   classID: Components.ID("{c4468b7d-b273-4f0a-a729-3397022ab9c8}"),
   contractID: "@littleb.tc/nicofox-vacuum-participant;1",
@@ -29,20 +27,12 @@ NicoFoxVacuumParticipant.prototype =
   get expectedDatabasePageSize() Ci.mozIStorageConnection.DEFAULT_PAGE_SIZE,
   get databaseConnection() this._dbConn,
 
-  onBeginVacuum: function()
-  {
-    Components.utils.reportError("VACUUM on smilefox.sqlite start!");
+  onBeginVacuum: function() {
     return true;
   },
-  onEndVacuum: function(aSucceeded)
-  {
-    if (aSucceeded) {
-      Components.utils.reportError("VACUUM on smilefox.sqlite succeeded!");
-    } else {
-      Components.utils.reportError("VACUUM on smilefox.sqlite failed!");
-    }
+  onEndVacuum: function(aSucceeded) {
+    /* Do nothing even if failed */
   },
-
   QueryInterface: XPCOMUtils.generateQI([Ci.mozIStorageVacuumParticipant])
 };
 
