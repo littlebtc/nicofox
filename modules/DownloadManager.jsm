@@ -889,10 +889,6 @@ function handleDownloaderEvent(type, content) {
     downloadQueueRunner.rescheduleEconomyItem();
 	  break;
 
-    /* Video download is started */
-    case "start":
-    break;
-
     case "progress_change":
     /* Modified from toolkit/mozapps/downloads/content/downloads.js */
     /* Get the download status from gre.DownloadUtils */
