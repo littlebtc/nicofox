@@ -98,7 +98,6 @@ nicofox.panel.load = function() {
 nicofox.panel.waitForDb = function(waitCount) {
   /* XXX: How about UI? */
   if (nicofox.DownloadManager.working) {
-    Components.utils.reportError("!");
     this.init();
     return;
   }
@@ -640,7 +639,6 @@ nicofox.panel.listener.thumbnailAvailable = function(id, content) {
 };
 
 nicofox.panel.listener.downloadAdded = function(id, content) {
-  Components.utils.reportError("Panel: download added!" + id + JSON.stringify(content));
   var list = document.getElementById("smilefoxList");
   var listItem = document.createElement("richlistitem");
   /* Workaround: not to display the quality status at the first time */
@@ -650,7 +648,6 @@ nicofox.panel.listener.downloadAdded = function(id, content) {
   list.insertBefore(listItem, list.firstChild);
 };
 nicofox.panel.listener.downloadUpdated = function(id, content) {
-  Components.utils.reportError("Panel: download updated!" + id + JSON.stringify(content));
   var listItem = document.getElementById("smileFoxListItem"+ id);
   nicofox.panel.updateDownloadItem(listItem, content);
 };
