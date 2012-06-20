@@ -58,12 +58,14 @@ var persistWorker = function(options) {
     postData.addContentLength = true;
     postData.setData(postStream);
   }
-  /* Create a cancelable deferred, then make this.then an alias to deferred.then */
-  this._deferred = When.cancelable(When.defer(), this.cancel.bind(this));
+  /* Create a cancelable deferred */
+  this._deferred = When.cancelable(When.defer(), this.onDeferredCanceled.bind(this));
   if (options.trackProgress) {
     this._trackProgress = true;
   }
+  /* Export then and cancel */
   this.then = this._deferred.then;
+  this.cancel = this._deferred.cancel;
   /* Do the job */
   this._persist.progressListener = this;
   this._persist.saveURI(URI, null, refURI, postData, null, options.file);
@@ -114,8 +116,8 @@ persistWorker.prototype.onLocationChange = function() {};
 persistWorker.prototype.onStatusChange = function() {};
 persistWorker.prototype.onSecurityChange = function() {};
 
-/* Cancel function. */
-persistWorker.prototype.cancel = function() {
+/* Call cancelSave on persist when deferred is canceled. */
+persistWorker.prototype.onDeferredCanceled = function() {
   this._persist.cancelSave();
 };
 
@@ -154,6 +156,9 @@ DownloadUtils.nico.prototype = {
   _videoDownloadWorker: null,
   _videoProgressUpdatedBytes: 0,
   _videoBytes: 0,
+
+  /* Promises for extra items */
+  _extraItemPromises: [],
   
   /* Store /getflv/ result. */
   _getFlvParams: null,
@@ -334,6 +339,10 @@ DownloadUtils.nico.prototype = {
   },
   /* Call when video downloads failed */
   onVideoDownloadFailed: function() {
+    /* If it is because the download had been canceled, do nothing */
+    if (this._canceled) {
+      return;
+    }
     this._canceled = true;
     if (this._fileBundle.files.videoTemp.exists()) {
       this._fileBundle.files.videoTemp.remove(false);
@@ -385,25 +394,30 @@ DownloadUtils.nico.prototype = {
       '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     }
     /* Get all extra items */
-    var promises = [];
+    this._extraItemPromises = [];
     if(this._getComment) {
       /* Because we may need to modify the content in the comment XML file, Just read all contents and process it. */
-      promises.push(Network.fetchUrlAsync(this._getFlvParams.ms, commentQueryString).then(this.processNicoComment.bind(this)));
+      this._extraItemPromises.push(Network.fetchUrlAsync(this._getFlvParams.ms, commentQueryString).then(this.processNicoComment.bind(this)));
     }
     if(this._getUploaderComment) {
-      promises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
+      this._extraItemPromises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
     }
     if(this._getThumbnail && this._info.nicoData.thumbnail) {
-      promises.push(new persistWorker({ url: this._info.nicoData.thumbnail, file: this._fileBundle.files.thumbnail }).then(this.notifyThumbnailDone.bind(this)));
+      this._extraItemPromises.push(new persistWorker({ url: this._info.nicoData.thumbnail, file: this._fileBundle.files.thumbnail }));
     }
-    When.all(promises).then(this.onExtraItemsCompleted.bind(this), this.onExtraItemsFailed.bind(this));
+    When.all(this._extraItemPromises).then(this.onExtraItemsCompleted.bind(this), this.onExtraItemsFailed.bind(this));
   },
   /* Tell the callback that we had done everything. */
   onExtraItemsCompleted: function() {
+    this.callback("thumbnail_done", Services.io.newFileURI(this._fileBundle.files.thumbnail).spec);
     this.callback("completed", {"videoBytes":  this._videoBytes});
   },
   /* XXX: Handle this better */
   onExtraItemsFailed: function() {
+    /* If it is because the download had been canceled, do nothing */
+    if (this._canceled) {
+      return;
+    }
     showUtilsAlert('Download failed', 'Cannot get extra items');
     this.callback("fail", {});
   },
@@ -442,31 +456,36 @@ DownloadUtils.nico.prototype = {
   /* Cancel this download, then notify the callback to pause all downloads due to site connection problem */
   pause: function() {
     this._canceled = true;
-
-    if(this._videoDownloadWorker) {
-      this._videoDownloadWorker.cancel();
-    }
-    if (this._extraItemsDownloader) {
-      this._extraItemsDownloader.cancelAll();
-      this.removeFiles();
-    }
-
-    this.callback("pause",{});
+    this.cancelAllWorkers();
+    this.removeFiles();
+    this.callback("pause", {});
   },
   /* Cancel by download manager action */
   cancel: function() {
     this._canceled = true;
-
-    if(this._videoDownloadWorker) {
+    this.cancelAllWorkers();
+    this.removeFiles();
+    this.callback("cancel", {});
+  },
+  /* Cancel all promise workers and deferreds. */
+  cancelAllWorkers: function() {
+    /* If extra items are working, just cancel them */
+    if (this._extraItemPromises.length > 0) {
+      for (var i = 0; i < this._extraItemPromises.length; i++) {
+        var item = this._extraItemPromises[i];
+        if (item.cancel) {
+          /* When.js will throw error for completed promises, ignore them */
+          try {
+            item.cancel();
+          } catch(e) {
+          }
+        }
+      }
+    } else if(this._videoDownloadWorker) {
+      /* If not extra items are not touched, try to cancel the video download */
       this._videoDownloadWorker.cancel();
     }
-    if (this._extraItemsDownloader) {
-      this._extraItemsDownloader.cancelAll();
-      this.removeFiles();
-    }
-    this.callback("cancel",{});
   },
-
   /* Remove all downloaded files */
   removeFiles: function() {
     if (!this._filesCreated || !this._fileBundle) { return; }
@@ -483,16 +502,9 @@ DownloadUtils.nico.prototype = {
         this._fileBundle.files.thumbnail.remove(false);
     }
   },
-  /* When thumbnail file is done downloading, notify it (so the manager UI can display the thumbnail) */
-  notifyThumbnailDone: function() {
-    if (this._fileBundle.files.thumbnail) {
-      this.callback("thumbnail_done", Services.io.newFileURI(this._fileBundle.files.thumbnail).spec);
-    }
-    return true;
-  },
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
   processNicoComment: function(result) {
-    if (this.cancelled) { return; }
+    if (this._canceled) { return; }
     var boonComment = Core.prefs.getBoolPref('boon_comment');
     var replaceFilters = Core.prefs.getBoolPref('replace_filters');
     var content = result.data.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
