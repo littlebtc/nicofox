@@ -44,18 +44,8 @@ Network.fetchUrlAsync = function(url, postQueryString) {
       deferred.resolver.reject('NetworkError');
       return;
     }
-    /* Convert utf-8 input stream. From https://developer.mozilla.org/en/Code_snippets/File_I%2f%2fO */
-    var converterInputStream = Cc["@mozilla.org/intl/converter-input-stream;1"].createInstance(Ci.nsIConverterInputStream);
-    converterInputStream.init(aInputStream, "UTF-8", 1024, Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
-    var data = "";
-    let (str = {}) {
-      let read = 0;
-      do { 
-        read = converterInputStream.readString(4096, str);
-        data += str.value;
-      } while (read != 0);
-    }
-    converterInputStream.close();
+    /* Convert utf-8 input stream. */
+    var data = NetUtil.readInputStreamToString(aInputStream, aInputStream.available(), { "charset": "utf-8" });
     aInputStream.close();
     deferred.resolver.resolve({url: url, data: data, request: aRequest});
   };
