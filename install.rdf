@@ -4,7 +4,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>nicofox@littlebtc</em:id>
     <em:name>NicoFox</em:name>
-    <em:version>1.0b2</em:version>
+    <em:version>1.0b3pre</em:version>
     <em:description>Download videos with its comments from Nico Nico Douga and change your video watching experience!</em:description>
     <em:creator>Littlebtc</em:creator>
     <em:contributor>Logo and Icon designed by tdk4 in ptt.cc</em:contributor>
