@@ -376,10 +376,6 @@ DownloadUtils.nico.prototype = {
     if (this._canceled) {
       return;
     }
-    if (!this._getComment && !this._getUploaderComment && !this._getThumbnail) {
-      this.completeAll();
-      return;
-    }
     /* Fill the query string per thread key needed or not needed case */
     if (this._getFlvParams.needs_key) {
       var commentQueryString = 
