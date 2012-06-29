@@ -535,9 +535,9 @@ DownloadUtils.nico.prototype = {
     }
     /* Prepand XML declaration, add BoonSutazioData comments if boon_comment is enabled */
     if (boonComment) {
-      content = content + '<?xml version="1.0" encoding="UTF-8"?><!-- BoonSutazioData='+this.commentId+' -->'+"\n";
+      content = '<?xml version="1.0" encoding="UTF-8"?><!-- BoonSutazioData='+this.commentId+' -->'+"\n" + content;
     } else {
-      content = content + '<?xml version="1.0" encoding="UTF-8"?>'+"\n";
+      content = '<?xml version="1.0" encoding="UTF-8"?>'+"\n" + content;
     }
     /* Prepare the input/output stream to write back to file */
     var outputStream = FileUtils.openSafeFileOutputStream(this._fileBundle.files.comment);
