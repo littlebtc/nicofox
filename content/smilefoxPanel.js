@@ -37,7 +37,7 @@ nicofox.panel.onPopupShown = function(event) {
   nicofox.panel.hidden = false;
   /* Set the thumbnail display type. */
   var thumbnailDisplayType = document.getElementById("nicofoxThumbnailDisplay").value;
-  document.getElementById('smilefoxList').setAttribute('sfthumbdisplay', thumbnailDisplayType);
+  document.getElementById('nicofoxDownloadList').setAttribute('sfthumbdisplay', thumbnailDisplayType);
 
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
@@ -62,7 +62,7 @@ nicofox.panel.onPopupShown = function(event) {
     return;
   }
   nicofox.panel.load();
-  document.getElementById("smilefoxList").focus();
+  document.getElementById("nicofoxDownloadList").focus();
   
 };
 nicofox.panel.onPopupHidden = function(event) {
@@ -347,7 +347,7 @@ nicofox.panel.timerEvent.notify = function(timer) {
   }
   /* Load 5 items once and use document fragment to speed up */
   var fragment = document.createDocumentFragment();
-  var list = document.getElementById("smilefoxList");
+  var list = document.getElementById("nicofoxDownloadList");
   for (var j = 1; j <= 5; j++) {
     var result = nicofox.panel.itemsToLoad[nicofox.panel.timerEvent.loadIndex];
     /* When there is no new items available, break. */
@@ -381,12 +381,12 @@ nicofox.panel.timerEvent.notify = function(timer) {
 
 /* Set the thumbnail display type and set the value to the preference. */
 nicofox.panel.setThumbnailDisplay = function(value) {
-  document.getElementById('smilefoxList').setAttribute('sfthumbdisplay', value);
+  document.getElementById('nicofoxDownloadList').setAttribute('sfthumbdisplay', value);
 }
 
 /* A very simple "Search" feature implemented by hidding elements. */
 nicofox.panel.search = function(value) {
-  var list = document.getElementById("smilefoxList");
+  var list = document.getElementById("nicofoxDownloadList");
   var items = list.children;
   /* Split search terms. From chrome/toolkit/content/mozapps/downloads/downloads.js on mozilla-central. */
   this._searchTerms = value.replace(/^\s+|\s+$/g, "").toLowerCase().split(/\s+/);
@@ -431,7 +431,7 @@ nicofox.panel.generateContextMenu = function(aEvent) {
   if (aEvent.target.id != "smilefoxPopup") {
     return false;
   }
-  var selectedItem = document.getElementById("smilefoxList").selectedItem;
+  var selectedItem = document.getElementById("nicofoxDownloadList").selectedItem;
   if (!selectedItem) { return false; }
   
   /* Create context menu, depending on the video status */
@@ -639,7 +639,7 @@ nicofox.panel.listener.thumbnailAvailable = function(id, content) {
 };
 
 nicofox.panel.listener.downloadAdded = function(id, content) {
-  var list = document.getElementById("smilefoxList");
+  var list = document.getElementById("nicofoxDownloadList");
   var listItem = document.createElement("richlistitem");
   /* Workaround: not to display the quality status at the first time */
   content.video_economy = 0;
@@ -666,7 +666,7 @@ nicofox.panel.listener.downloadVideoCompleted = function(id, content) {
   listItem.setAttribute("sfdownloadstatus", nicofox.DownloadManager.cachedStrings.progressRelatedDownloading);
 };
 nicofox.panel.listener.downloadRemoved = function(id) {
-  var list = document.getElementById("smilefoxList");
+  var list = document.getElementById("nicofoxDownloadList");
   var listItem = document.getElementById("smileFoxListItem"+ id);
   if (!listItem) { return; }
   list.removeChild(listItem);

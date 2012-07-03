@@ -71,24 +71,24 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   background-size: 100% 100%;
 }
 
-#smilefoxList[sfthumbdisplay="larger"] .smilefoxDownloadThumbnail {
+#nicofoxDownloadList[sfthumbdisplay="larger"] .smilefoxDownloadThumbnail {
   width: 64px;
   height: 48px;
 }
-#smilefoxList[sfthumbdisplay="medium"] .smilefoxDownloadThumbnail {
+#nicofoxDownloadList[sfthumbdisplay="medium"] .smilefoxDownloadThumbnail {
   width: 48px;
   height: 36px;
 }
-#smilefoxList[sfthumbdisplay="smaller"] .smilefoxDownloadThumbnail {
+#nicofoxDownloadList[sfthumbdisplay="smaller"] .smilefoxDownloadThumbnail {
   width: 32px;
   height: 24px;
 }
-#smilefoxList[sfthumbdisplay="none"] .smilefoxDownloadThumbnail {
+#nicofoxDownloadList[sfthumbdisplay="none"] .smilefoxDownloadThumbnail {
   display: none;
 }
 
-#smilefoxList[sfthumbdisplay="smaller"] .smilefoxVideoStatus,
-#smilefoxList[sfthumbdisplay="none"]  .smilefoxVideoStatus {
+#nicofoxDownloadList[sfthumbdisplay="smaller"] .smilefoxVideoStatus,
+#nicofoxDownloadList[sfthumbdisplay="none"]  .smilefoxVideoStatus {
   display: none;
 }
 
