@@ -180,7 +180,7 @@ thumbnailFetcher.start = function(resultArray) {
   this.processItem();
 };
 /* Proccess a specific number of items at a time. (XXX: more to decrease the number of SQLite I/O fetches?)
- * Use DownloadUtils.multipleHelper and assign a callback to write the record back to SQLite.
+ * Use DownloadUtils.persistWorker and assign a callback to write the record back to SQLite.
  */
 thumbnailFetcher.processItem = function() {
   if (this.undoneItems.length == 0) { return; }
@@ -200,31 +200,33 @@ thumbnailFetcher.processItem = function() {
   /* XXX: is there exception? */
   var videoIdNum = parseInt(this.runningItem.video_id.substring(2), 10);
   var serverChooser = Math.ceil(Math.random() * 4);
-  var dlHelper = new DownloadUtils.multipleHelper(this, "helperDone");
-  dlHelper.addDownload("http://tn-skr" + serverChooser +".smilevideo.jp/smile?i=" + videoIdNum, "", null, thumbFile, false, this, "thumbDone");
   this.runningItem.thumbnail_file = thumbFilePath;
   this.runningItem.thumbnail_url = Services.io.newFileURI(thumbFile).spec;
-  dlHelper.doneAdding(); 
+  var downloadWorker = new DownloadUtils.persistWorker({
+    "url": "http://tn-skr" + serverChooser +".smilevideo.jp/smile?i=" + videoIdNum,
+    "file": thumbFile
+  });
+  downloadWorker.then(this.onThumbnailFetched.bind(this), this.onThumbnailFailed.bind(this));
 };
 /* When thumbnail download is finished, write data into database, or append the item to retry when failed */
-thumbnailFetcher.thumbDone = function(failed) {
-  if (!failed) {
-    triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
-    var statement = this.statementModel.clone();
-    statement.params.thumbnail_file = this.runningItem.thumbnail_file;
-    statement.params.id = this.runningItem.id;
-    var callback = generateStatementCallback("thumbnailFetcher.writeDb", this, "finishWrite", "dbFail")
-    statement.executeAsync(callback);
-  } else {
-    /* Only retry for one time */
-    if (!this.runningItem.retriedThumb) {
-      this.runningItem.retriedThumb = true;
-      this.itemCount++;
-      this.undoneItems.push(this.runningItem);
-      triggerDownloadListeners('thumbnailFetcherCount', null, this.itemCount);
-    }
-    this.finishWrite();
+thumbnailFetcher.onThumbnailFetched = function() {
+  triggerDownloadListeners('thumbnailAvailable', this.runningItem.id, this.runningItem.thumbnail_url);
+  var statement = this.statementModel.clone();
+  statement.params.thumbnail_file = this.runningItem.thumbnail_file;
+  statement.params.id = this.runningItem.id;
+  var callback = generateStatementCallback("thumbnailFetcher.writeDb", this, "finishWrite", "dbFail")
+  statement.executeAsync(callback);
+};
+/* When thumbnail download is failed, append the item to retry*/
+thumbnailFetcher.onThumbnailFailed = function() {
+  /* Only retry for one time */
+  if (!this.runningItem.retriedThumb) {
+    this.runningItem.retriedThumb = true;
+    this.itemCount++;
+    this.undoneItems.push(this.runningItem);
+    triggerDownloadListeners('thumbnailFetcherCount', null, this.itemCount);
   }
+  this.finishWrite();
 };
 
 /* For items that video file is missing, fill empty string into the thumbnail field.  */
@@ -236,7 +238,6 @@ thumbnailFetcher.writeEmptyToDb = function() {
   var callback = generateStatementCallback("thumbnailFetcher.writeDb", this, "finishWrite", "dbFail")
   statement.executeAsync(callback);
 };
-thumbnailFetcher.helperDone = function() {}
 
 /* After database written, update progress, schedule for next process */
 thumbnailFetcher.finishWrite = function() {

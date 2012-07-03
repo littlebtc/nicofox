@@ -121,6 +121,9 @@ persistWorker.prototype.onDeferredCanceled = function() {
   this._persist.cancelSave();
 };
 
+/* Export persistWorker (thumbnailFetcher at DownloadManager.jsm will need this) */
+DownloadUtils.persistWorker = persistWorker;
+
 /* Decode query string */
 function decodeQueryString(queryString) {
   var undecodedParams = queryString.split("&");
