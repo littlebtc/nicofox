@@ -525,6 +525,7 @@ DownloadUtils.nico.prototype = {
   processNicoComment: function(xhrDeferred, aEvent) {
     var xhr = aEvent.target;
     xhr.removeEventListener("load", this._xhrBoundedListeners.load, false);
+    xhr.removeEventListener("error", this._xhrBoundedListeners.error, false);
     if (this._canceled) { return; }
     /* If it is not a successful HTTP request, reject promise */
     if (xhr.status != 200) {
@@ -584,6 +585,7 @@ DownloadUtils.nico.prototype = {
   /* On XHR failure, remove listener and reject deferred promise */
   onCommentXMLError: function(xhrDeferred, aEvent) {
     var xhr = aEvent.target;
+    xhr.removeEventListener("load", this._xhrBoundedListeners.load, false);
     xhr.removeEventListener("error", this._xhrBoundedListeners.error, false);
     xhrDeferred.reject("xhrError");
   }
