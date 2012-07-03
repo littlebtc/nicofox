@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="chrome://nicofox/skin/overlay.css" type="text/css"?>
 <?xml-stylesheet href="chrome://nicofox/skin/smilefox.css" type="text/css"?>
 <!DOCTYPE overlay [
 <!ENTITY % nicofoxDTD SYSTEM "chrome://nicofox/locale/nicofox.dtd">
