@@ -185,17 +185,18 @@ DownloadUtils.nico.prototype = {
     this.url = url;
     /* Read video info again if cache is not expired */
     if (this._cachedInfo && new Date().getTime() - this._cachedInfo.loadTime < 60000) {
-      this.goParse(this._cachedInfo);
+      return this.goParse(this._cachedInfo);
     } else {
       Components.utils.import("resource://nicofox/VideoInfoReader.jsm");
       VideoInfoReader.readByUrl(this.url, false).then(this.goParse.bind(this), this.failReadInfo.bind(this));
+      return true;
     }
   },
   /* After reading the video info, call getflv API to get necessary info like video URL and comment thread id.  */
   goParse: function(info) {
     var url = info.url;
     /* Don't do anything if user had canceled */
-    if (this._canceled) { return; }
+    if (this._canceled) { return false; }
     /* Record the thumbnail URL */
     this._info = info;
 
@@ -205,7 +206,7 @@ DownloadUtils.nico.prototype = {
     if (this._fileBundle.occupied()) {
       showUtilsAlert(Core.strings.getString("errorTitle"), Core.strings.getString("errorFileExisted"));
       this.callback("fail", {});
-      return;
+      return false;
     }
     /* Is there any uploader's comment? */
     this.uploder_comment = false;	
@@ -229,6 +230,7 @@ DownloadUtils.nico.prototype = {
     }
     /* Send request */
     Network.fetchUrlAsync(requestUrl, postQueryString).then(this.parseGetFlv.bind(this), this.failParse.bind(this));
+    return true;
   },
 
   /* Response for getflv request */

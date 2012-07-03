@@ -822,9 +822,6 @@ downloadQueueRunner.process = function() {
     activeDownloadCount++;
     /* Start the download */
     downloadQueueRunner.initDownloader(item.id, item.video_economy, item.info);
-
-    /* Change the status to "downloading" in the database */
-    DownloadManagerPrivate.updateDownload(item.id, {"status": 7, "start_time": new Date().getTime()});
   }
   /* Call the listeners that queue had changed */
   triggerDownloadListeners("queueChanged", null, {});
@@ -846,7 +843,10 @@ downloadQueueRunner.initDownloader = function(id, videoEconomy, info) {
   if (info) {
     activeDownloads[id].downloader._cachedInfo = info;
   }
-  activeDownloads[id].downloader.init(activeDownloads[id].url);
+  /* Change the status to "downloading" in the database unless early failure */
+  if (activeDownloads[id].downloader.init(activeDownloads[id].url)) {
+    DownloadManagerPrivate.updateDownload(id, {"status": 7, "start_time": new Date().getTime()});
+  }
 };
 
 /* Respond for downloadQueueRunner-related SQL error */
