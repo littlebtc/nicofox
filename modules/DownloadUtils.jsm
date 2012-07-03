@@ -159,7 +159,9 @@ DownloadUtils.nico.prototype = {
 
   /* Promises for extra items */
   _extraItemPromises: [],
-  
+  /* Listener bind() storage */
+  _xhrBoundedListeners: {},
+
   /* Store /getflv/ result. */
   _getFlvParams: null,
   /* Store /getthreadkey/ result, this is a secret code used in channel/community videos (to prevent comment access?). */
@@ -394,8 +396,20 @@ DownloadUtils.nico.prototype = {
     /* Get all extra items */
     this._extraItemPromises = [];
     if(this._getComment) {
-      /* Because we may need to modify the content in the comment XML file, Just read all contents and process it. */
-      this._extraItemPromises.push(Network.fetchUrlAsync(this._getFlvParams.ms, commentQueryString).then(this.processNicoComment.bind(this)));
+      /* Because we may need to modify the content in the comment XML file, use nsIXMLHttpRequest to get contents and process it. */
+      /* TODO: Don't parse to XML if none of the contents need to be overwritten for performance */
+      const { XMLHttpRequest } = Services.appShell.hiddenDOMWindow;
+      var xhr = XMLHttpRequest();
+      var xhrDeferred = When.defer();
+      this._xhrBoundedListeners.load = this.processNicoComment.bind(this, xhrDeferred);
+      this._xhrBoundedListeners.error = this.onCommentXMLError.bind(this, xhrDeferred);
+      xhr.addEventListener("load", this._xhrBoundedListeners.load, false);
+      xhr.addEventListener("error", this._xhrBoundedListeners.error, false);
+      xhr.open("POST", this._getFlvParams.ms, true);
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhr.responseType = "document";
+      xhr.send(commentQueryString);
+      this._extraItemPromises.push(xhrDeferred);
     }
     if(this._getUploaderComment) {
       this._extraItemPromises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
@@ -503,11 +517,13 @@ DownloadUtils.nico.prototype = {
     }
   },
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
-  processNicoComment: function(result) {
+  processNicoComment: function(xhrDeferred, aEvent) {
+    var xhr = aEvent.target;
+    xhr.removeEventListener("load", this._xhrBoundedListeners.load, false);
     if (this._canceled) { return; }
+    var commentsDoc = xhr.responseXML;
     var boonComment = Core.prefs.getBoolPref('boon_comment');
     var replaceFilters = Core.prefs.getBoolPref('replace_filters');
-    var content = result.data.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
 
     /* Parse the filter contents. */
     if (replaceFilters && this._getFlvParams.ng_up) {
@@ -519,26 +535,26 @@ DownloadUtils.nico.prototype = {
 	      filterFinds.push(decodeURIComponent(filterPair[0]));
         filterReplaceWiths.push(decodeURIComponent(filterPair[1]));
       }
-      /* Use E4X to parse XML contents, find string to be replaced. */
-      var xml = new XML(content);
-      if (xml.chat) {
-        for (var i = 0; i < xml.chat.length(); i++) {
-          var chatContent = xml.chat[i].toString();
-          for (var j = 0; j < filterFinds.length; j++) {
-            if (chatContent.indexOf(filterFinds[j]) != -1) {
-              xml.chat[i] = chatContent.replace(filterFinds[j], filterReplaceWiths[j], "g");
-            }
-          }  
+      /* Transversal DOM tree and find string to be replaced. */
+      var chatNodes = commentsDoc.getElementsByTagName("chat");
+      for (var i = 0; i < chatNodes.length; i++) {
+        var chatNode = chatNodes[i];
+        var chatContent = chatNode.textContent;
+        for (var j = 0; j < filterFinds.length; j++) {
+          if (chatContent.indexOf(filterFinds[j]) != -1) {
+            chatContent = chatContent.replace(filterFinds[j], filterReplaceWiths[j], "g");
+          }
+          chatNode.textContent = chatContent;
         }
       }
-      content = xml.toXMLString();
     }
     /* Prepand XML declaration, add BoonSutazioData comments if boon_comment is enabled */
     if (boonComment) {
-      content = '<?xml version="1.0" encoding="UTF-8"?><!-- BoonSutazioData='+this.commentId+' -->'+"\n" + content;
-    } else {
-      content = '<?xml version="1.0" encoding="UTF-8"?>'+"\n" + content;
+      var boonCommentNode = commentsDoc.createComment(" BoonSutazioData="+this.commentId+" ");
+      commentsDoc.insertBefore(boonCommentNode, commentsDoc.firstChild);
     }
+    var xmlSerializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
+    var content = xmlSerializer.serializeToString(commentsDoc);
     /* Prepare the input/output stream to write back to file */
     var outputStream = FileUtils.openSafeFileOutputStream(this._fileBundle.files.comment);
     var os = Cc["@mozilla.org/intl/converter-output-stream;1"].createInstance(Ci.nsIConverterOutputStream);
@@ -546,16 +562,19 @@ DownloadUtils.nico.prototype = {
     converter.charset = "utf-8";
     var inputStream = converter.convertToInputStream(content);
 
-    var deferred = When.defer();
     /* Write file asynchronously, then return the deferred object */
     NetUtil.asyncCopy(inputStream, outputStream, function(aResult) {
       if (!Components.isSuccessCode(aResult)) {
-        deferred.reject('comment_write_error');
+        xhrDeferred.reject('comment_write_error');
         return;
       }
-      deferred.resolve();
+      xhrDeferred.resolve();
     });
-    return deferred;
+  },
+  /* On XHR failure, remove listener and reject deferred promise */
+  onCommentXMLError: function(xhrDeferred, aEvent) {
+    xhr.removeEventListener("error", this._xhrBoundedListeners.error, false);
+    xhrDeferred.reject("xhrError");
   }
 };
 
