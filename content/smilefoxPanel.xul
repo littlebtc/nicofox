@@ -95,7 +95,7 @@
           <spacer flex="1" />
           <button label="&paused.retry.label;" oncommand="nicofox.panel.resume();" />
         </hbox>
-        <richlistbox id="nicofoxDownloadList" context="smilefoxPopup"
+        <richlistbox id="nicofoxDownloadList" context="nicofoxDownloadItemPopup"
                      onkeypress="if (event.keyCode == KeyEvent.DOM_VK_RETURN) { nicofox.panel.commands.open(this.selectedItem); }"
                      onclick="if (event.button == 0 &amp;&amp; event.detail == 2) { nicofox.panel.commands.open(this.selectedItem); }"
                      flex="1">
@@ -104,28 +104,28 @@
           <label value="&options.label;" class="text-link" onclick="if (event.button == 0) nicofox.panel.openOptionsWindow();"/>
           <label value="&openPlayer.tooltiptext;" class="text-link" onclick="if (event.button == 0) nicofox.panel.openFileInPlayer();"/>
         </hbox>
-        <popupset id="smilefoxPopupset">
-          <menupopup id="smilefoxPopup" onpopupshowing="return nicofox.panel.generateContextMenu(event);" onpopuphiding="">
-            <menuitem label="&popup.missing.label;" accesskey="" id="smilefoxPopupMissing" disabled="true" />
-            <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="smilefoxPopupCancel"
+        <popupset id="nicofoxDownloadItemPopupset">
+          <menupopup id="nicofoxDownloadItemPopup" onpopupshowing="return nicofox.panel.generateContextMenu(event);" onpopuphiding="">
+            <menuitem label="&popup.missing.label;" accesskey="" id="nicofoxDownloadItemPopupMissing" disabled="true" />
+            <menuitem label="&popup.cancel.label;" accesskey="&popup.cancel.accesskey;" id="nicofoxDownloadItemPopupCancel"
                 oncommand= "nicofox.panel.commands.cancel(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="smilefoxPopupRetry"
+            <menuitem label="&popup.retry.label;" accesskey="&popup.retry.accesskey;" id="nicofoxDownloadItemPopupRetry"
                 oncommand= "nicofox.panel.commands.retry(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="smilefoxPopupOpen" default="true" 
+            <menuitem label="&popup.open.label;" accesskey="&popup.open.accesskey;" id="nicofoxDownloadItemPopupOpen" default="true" 
                 oncommand= "nicofox.panel.commands.open(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="smilefoxPopupOpenExternal"
+            <menuitem label="&popup.openExternal.label;" accesskey="&popup.openExternal.accesskey;" id="nicofoxDownloadItemPopupOpenExternal"
                 oncommand= "nicofox.panel.commands.openExternal(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" id="smilefoxPopupOpenFolder"
+            <menuitem label="&popup.openFolder.label;"  accesskey="&popup.openFolder.accesskey;" id="nicofoxDownloadItemPopupOpenFolder"
                 oncommand= "nicofox.panel.commands.openFolder(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <!--<menuitem label="&popup.moveFolder.label;"  accesskey="&popup.moveFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="smilefoxPopupMoveFolder"/>-->
-            <menuseparator id="smilefoxPopupSeparator1" />
-            <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="smilefoxPopupGo"
+            <!--<menuitem label="&popup.moveFolder.label;"  accesskey="&popup.moveFolder.accesskey;" oncommand="nicofox_ui.manager.popup_command.moveFolder();" id="nicofoxDownloadItemPopupMoveFolder"/>-->
+            <menuseparator id="nicofoxDownloadItemPopupSeparator1" />
+            <menuitem label="&popup.go.label;" accesskey="&popup.go.accesskey;" id="nicofoxDownloadItemPopupGo"
                 oncommand= "nicofox.panel.commands.goVideoPage(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="smilefoxPopupCopy"
+            <menuitem label="&popup.copy.label;" accesskey="&popup.copy.accesskey;" id="nicofoxDownloadItemPopupCopy"
                 oncommand= "nicofox.panel.commands.copyVideoUrl(document.getElementById('nicofoxDownloadList').selectedItem);"/>
-            <menuseparator  id="smilefoxPopupSeparator2"/>
-            <!--<menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="smilefoxPopupSelectAll" />-->
-            <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="smilefoxPopupRemove"
+            <menuseparator  id="nicofoxDownloadItemPopupSeparator2"/>
+            <!--<menuitem label="&popup.selectAll.label;" accesskey="&popup.selectAll.accesskey;" id="nicofoxDownloadItemPopupSelectAll" />-->
+            <menuitem label="&popup.remove.label;" accesskey="&popup.remove.accesskey;" id="nicofoxDownloadItemPopupRemove"
                 oncommand= "nicofox.panel.commands.remove(document.getElementById('nicofoxDownloadList').selectedItem);"/>
           </menupopup>
         </popupset>

@@ -428,14 +428,14 @@ nicofox.panel.displayContextMenuItems = [
 
 nicofox.panel.generateContextMenu = function(aEvent) {
   /* Check for context menu showing */
-  if (aEvent.target.id != "smilefoxPopup") {
+  if (aEvent.target.id != "nicofoxDownloadItemPopup") {
     return false;
   }
   var selectedItem = document.getElementById("nicofoxDownloadList").selectedItem;
   if (!selectedItem) { return false; }
   
   /* Create context menu, depending on the video status */
-  var popup = document.getElementById("smilefoxPopup");
+  var popup = document.getElementById("nicofoxDownloadItemPopup");
   var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
    
   var menuitems = popup.childNodes;
@@ -452,7 +452,7 @@ nicofox.panel.generateContextMenu = function(aEvent) {
   }
   var displayItems = nicofox.panel.displayContextMenuItems[sfStatus];
   for (var i = 0; i < displayItems.length; i++) {
-    document.getElementById("smilefoxPopup" + displayItems[i]).hidden = false;
+    document.getElementById("nicofoxDownloadItemPopup" + displayItems[i]).hidden = false;
   }
   return true;
 }
