@@ -405,7 +405,9 @@ DownloadUtils.nico.prototype = {
   },
   /* Tell the callback that we had done everything. */
   onExtraItemsCompleted: function() {
-    this.callback("thumbnail_done", Services.io.newFileURI(this._fileBundle.files.thumbnail).spec);
+    if (this._getThumbnail) {
+      this.callback("thumbnail_done", Services.io.newFileURI(this._fileBundle.files.thumbnail).spec);
+    }
     this.callback("completed", {"videoBytes":  this._videoBytes});
   },
   /* XXX: Handle this better */
