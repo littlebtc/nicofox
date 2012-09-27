@@ -401,18 +401,8 @@ DownloadUtils.nico.prototype = {
     if(this._getComment) {
       /* Because we may need to modify the content in the comment XML file, use nsIXMLHttpRequest to get contents and process it. */
       /* TODO: Don't parse to XML if none of the contents need to be overwritten for performance */
-      const { XMLHttpRequest } = Services.appShell.hiddenDOMWindow;
-      var xhr = XMLHttpRequest();
-      var xhrDeferred = When.defer();
-      this._xhrBoundedListeners.load = this.processNicoComment.bind(this, xhrDeferred);
-      this._xhrBoundedListeners.error = this.onCommentXMLError.bind(this, xhrDeferred);
-      xhr.addEventListener("load", this._xhrBoundedListeners.load, false);
-      xhr.addEventListener("error", this._xhrBoundedListeners.error, false);
-      xhr.open("POST", this._getFlvParams.ms, true);
-      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhr.responseType = "document";
-      xhr.send(commentQueryString);
-      this._extraItemPromises.push(xhrDeferred);
+      var xhrDeferred = Network.fetchXml(this._getFlvParams.ms, commentQueryString);
+      this._extraItemPromises.push(xhrDeferred.then(this.processNicoComment.bind(this)));
     }
     if(this._getUploaderComment) {
       this._extraItemPromises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
@@ -522,17 +512,9 @@ DownloadUtils.nico.prototype = {
     }
   },
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
-  processNicoComment: function(xhrDeferred, aEvent) {
-    var xhr = aEvent.target;
-    xhr.removeEventListener("load", this._xhrBoundedListeners.load, false);
-    xhr.removeEventListener("error", this._xhrBoundedListeners.error, false);
+  processNicoComment: function(result) {
     if (this._canceled) { return; }
-    /* If it is not a successful HTTP request, reject promise */
-    if (xhr.status != 200) {
-      xhrDeferred.reject("httperror");
-      return;
-    }
-    var commentsDoc = xhr.responseXML;
+    var commentsDoc = result.xml;
     var boonComment = Core.prefs.getBoolPref('boon_comment');
     var replaceFilters = Core.prefs.getBoolPref('replace_filters');
 
@@ -574,21 +556,16 @@ DownloadUtils.nico.prototype = {
     var inputStream = converter.convertToInputStream(content);
 
     /* Write file asynchronously, then return the deferred object */
+    var deferred = When.defer();
     NetUtil.asyncCopy(inputStream, outputStream, function(aResult) {
       if (!Components.isSuccessCode(aResult)) {
-        xhrDeferred.reject('comment_write_error');
+        deferred.reject('comment_write_error');
         return;
       }
-      xhrDeferred.resolve();
+      deferred.resolve();
     });
+    return deferred;
   },
-  /* On XHR failure, remove listener and reject deferred promise */
-  onCommentXMLError: function(xhrDeferred, aEvent) {
-    var xhr = aEvent.target;
-    xhr.removeEventListener("load", this._xhrBoundedListeners.load, false);
-    xhr.removeEventListener("error", this._xhrBoundedListeners.error, false);
-    xhrDeferred.reject("xhrError");
-  }
 };
 
 /* A simple wrapper to nsIAlertsService */

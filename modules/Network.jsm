@@ -54,4 +54,48 @@ Network.fetchUrlAsync = function(url, postQueryString) {
   NetUtil.asyncFetch(channel, callback);
   return deferred.promise;
 }
-
+/* Use XMLHttpRequest to get XML data. Will return a deferred promise. */
+Network.fetchXml = function(url, postQueryString) {
+  /* XHR in modules is a complex problem.
+   * Using nsIXMLHttpRequest instance is buggy for older Gecko,
+   * so the hiddenDOMWindow workaround is used. However,
+   * for newer Gecko, the Xray wrapper will block the XHR object,
+   * so first use hiddenDOMWindow, if XHR is not appeared, initialize an instance.
+   * https://bugzilla.mozilla.org/show_bug.cgi?id=756277 */
+  Components.utils.import("resource://gre/modules/Services.jsm");
+  const { XMLHttpRequest } = Services.appShell.hiddenDOMWindow;
+  if (typeof XMLHttpRequest === "function") {
+    var xhr = XMLHttpRequest();
+  } else {
+    var xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+  }
+  var deferred = When.defer();
+  /* Prepare the callback and deferred resolver in it */
+  var successCallback = function(aEvent) {
+    var result = aEvent.target;
+    result.removeEventListener("load", successCallback);
+    result.removeEventListener("error", failCallback);
+    if (result.status != 200) {
+      deferred.resolver.reject("httperror");
+      return;
+    }
+    deferred.resolver.resolve({url: url, xml: result.responseXML});
+  };
+  var failCallback = function(aEvent) {
+    var result = aEvent.target;
+    result.removeEventListener("load", successCallback);
+    result.removeEventListener("error", failCallback);
+    deferred.resolver.reject("xhrError");
+  };
+  /* Build xhr request, send then return the deferred object */
+  var method = (postQueryString)? "POST" : "GET";
+  xhr.open(method, url, true);
+  xhr.addEventListener("load", successCallback);
+  xhr.addEventListener("error", failCallback);
+  xhr.responseType = "document";
+  if (postQueryString) {
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  }
+  xhr.send(postQueryString);
+  return deferred;
+}
