@@ -66,9 +66,10 @@ var persistWorker = function(options) {
   /* Export then and cancel */
   this.then = this._deferred.then;
   this.cancel = this._deferred.cancel;
-  /* Do the job */
+  /* Do the job; An extra null due to bug 794602
+   * XXX: Private browsing aware */
   this._persist.progressListener = this;
-  this._persist.saveURI(URI, null, refURI, postData, null, options.file);
+  this._persist.saveURI(URI, null, refURI, postData, null, options.file, null);
 };
 
 /* Implements nsIWebProgressListener */
