@@ -97,5 +97,5 @@ Network.fetchXml = function(url, postQueryString) {
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   }
   xhr.send(postQueryString);
-  return deferred;
+  return deferred.promise;
 }

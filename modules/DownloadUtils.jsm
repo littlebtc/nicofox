@@ -64,7 +64,7 @@ var persistWorker = function(options) {
     this._trackProgress = true;
   }
   /* Export then and cancel */
-  this.then = this._deferred.then;
+  this.then = this._deferred.promise.then;
   this.cancel = this._deferred.cancel;
   /* Do the job; An extra null due to bug 794602
    * XXX: Private browsing aware */
@@ -81,27 +81,27 @@ persistWorker.prototype.onStateChange = function (aWebProgress, aRequest, aState
     var channel = aRequest.QueryInterface(Ci.nsIHttpChannel);
     try {
       if (channel.responseStatus != 200) {
-        this._deferred.reject("httpError");
+        this._deferred.resolver.reject("httpError");
         return;
      }
     } catch(e) {
       this._unsuccessfulStart = true;
-      this._deferred.reject("connectionError");
+      this._deferred.resolver.reject("connectionError");
       return;
     }
   } else if (aStateFlags & 16) {
     if (this._unsuccessfulStart) { return; }
     /* Download failed. In this case, PERSIST_FLAGS_CLEANUP_ON_FAILURE will done the cleanup */
 	  if (aStatus != 0 /* NS_OK */) {
-      this._deferred.reject("fail");
+      this._deferred.resolver.reject("fail");
       return;
     }
     /* Donwnload incompleted or connection error or initial response is 403. Will not clean up file, we should do it manually. */
     if (this._currentBytes != this._maxBytes) {
-      this._deferred.reject("incomplete");
+      this._deferred.resolver.reject("incomplete");
       return;
     }
-    this._deferred.resolve(this._maxBytes);
+    this._deferred.resolver.resolve(this._maxBytes);
   }
 };
 persistWorker.prototype.onProgressChange = function (aWebProgress, aRequest,
@@ -110,7 +110,7 @@ persistWorker.prototype.onProgressChange = function (aWebProgress, aRequest,
   if (!this._trackProgress) { return; }
   this._currentBytes = aCurSelfProgress;
   this._maxBytes = aMaxSelfProgress;
-  this._deferred.progress({currentBytes: this._currentBytes, maxBytes: this._maxBytes});
+  this._deferred.resolver.progress({currentBytes: this._currentBytes, maxBytes: this._maxBytes});
 };
 
 persistWorker.prototype.onLocationChange = function() {};
@@ -560,12 +560,12 @@ DownloadUtils.nico.prototype = {
     var deferred = When.defer();
     NetUtil.asyncCopy(inputStream, outputStream, function(aResult) {
       if (!Components.isSuccessCode(aResult)) {
-        deferred.reject('comment_write_error');
+        deferred.resolver.reject('comment_write_error');
         return;
       }
-      deferred.resolve();
+      deferred.resolver.resolve();
     });
-    return deferred;
+    return deferred.promise;
   },
 };
 

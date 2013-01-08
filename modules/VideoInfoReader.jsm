@@ -117,10 +117,10 @@ infoFetcher.enqueue = function(url) {
   var deferred = When.defer();
   /* Assign jobs to do when it is dequeued and prepare to return the promise. */
   Components.utils.import("resource://nicofox/Network.jsm");
-  var returnedPromise = deferred.then(function() { return Network.fetchUrlAsync(url, ''); }).then(this.readVideoPage.bind(this)).then(parseVideoInfo);
+  var returnedPromise = deferred.promise.then(function() { return Network.fetchUrlAsync(url, ''); }).then(this.readVideoPage.bind(this)).then(parseVideoInfo);
 
   /* Push it into queue */
-  this.queue.push(deferred);
+  this.queue.push(deferred.resolver);
 
   /* If the timer is not running, make it run in a specific delay */
   if (!this.timer.callback) {
