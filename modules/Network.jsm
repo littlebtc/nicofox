@@ -6,8 +6,6 @@ var EXPORTED_SYMBOLS = [ "Network" ];
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-const PR_UINT32_MAX = 0xffffffff;
-
 let Network = {};
 
 /* Import when.js */
