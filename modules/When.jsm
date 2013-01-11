@@ -1,377 +1,80 @@
-/* vim: sw=2 ts=2 sts=2 et filetype=javascript 
- * when.js from https://github.com/cujojs/when/blob/master/when.js */
+/* vim: sw=2 ts=2 sts=2 et filetype=javascript
+ */
+
+var EXPORTED_SYMBOLS =  ["When"];
+let When = {};
+
 /** @license MIT License (c) copyright B Cavalier & J Hann */
 
 /**
- * when
  * A lightweight CommonJS Promises/A and when() implementation
- *
  * when is part of the cujo.js family of libraries (http://cujojs.com/)
  *
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 1.2.0
+ * @version 1.7.1
  */
 
-var EXPORTED_SYMBOLS = [ "When" ];
-let When = {};
-
-(function(define) {
-define(function() {
-	var freeze, reduceArray, slice, undef;
+(function(define) { 'use strict';
+define(function () {
+	var reduceArray, slice, undef;
 
 	//
 	// Public API
 	//
 
-	when.defer     = defer;
-	when.reject    = reject;
-	when.isPromise = isPromise;
+	when.defer     = defer;     // Create a deferred
+	when.resolve   = resolve;   // Create a resolved promise
+	when.reject    = reject;    // Create a rejected promise
 
-	when.all       = all;
-	when.some      = some;
-	when.any       = any;
+	when.join      = join;      // Join 2 or more promises
 
-	when.map       = map;
-	when.reduce    = reduce;
+	when.all       = all;       // Resolve a list of promises
+	when.map       = map;       // Array.map() for promises
+	when.reduce    = reduce;    // Array.reduce() for promises
 
-	when.chain     = chain;
+	when.any       = any;       // One-winner race
+	when.some      = some;      // Multi-winner race
 
-	/** Object.freeze */
-	freeze = Object.freeze || function(o) { return o; };
+	when.chain     = chain;     // Make a promise trigger another resolver
 
-	/**
-	 * Trusted Promise constructor.  A Promise created from this constructor is
-	 * a trusted when.js promise.  Any other duck-typed promise is considered
-	 * untrusted.
-	 *
-	 * @constructor
-	 */
-	function Promise() {}
-
-	Promise.prototype = freeze({
-		always: function(alwaysback, progback) {
-			return this.then(alwaysback, alwaysback, progback);
-		},
-
-		otherwise: function(errback) {
-			return this.then(undef, errback);
-		}
-	});
-
-	/**
-	 * Create an already-resolved promise for the supplied value
-	 * @private
-	 *
-	 * @param value anything
-	 * @return {Promise}
-	 */
-	function resolved(value) {
-
-		var p = new Promise();
-
-		p.then = function(callback) {
-			var nextValue;
-			try {
-				if(callback) nextValue = callback(value);
-				return promise(nextValue === undef ? value : nextValue);
-			} catch(e) {
-				return rejected(e);
-			}
-		};
-
-		return freeze(p);
-	}
-
-	/**
-	 * Create an already-rejected {@link Promise} with the supplied
-	 * rejection reason.
-	 * @private
-	 *
-	 * @param reason rejection reason
-	 * @return {Promise}
-	 */
-	function rejected(reason) {
-
-		var p = new Promise();
-
-		p.then = function(callback, errback) {
-			var nextValue;
-			try {
-				if(errback) {
-					nextValue = errback(reason);
-					return promise(nextValue === undef ? reason : nextValue)
-				}
-
-				return rejected(reason);
-
-			} catch(e) {
-				return rejected(e);
-			}
-		};
-
-		return freeze(p);
-	}
-
-	/**
-	 * Returns a rejected promise for the supplied promiseOrValue. If
-	 * promiseOrValue is a value, it will be the rejection value of the
-	 * returned promise.  If promiseOrValue is a promise, its
-	 * completion value will be the rejected value of the returned promise
-	 *
-	 * @param promiseOrValue {*} the rejected value of the returned {@link Promise}
-	 *
-	 * @return {Promise} rejected {@link Promise}
-	 */
-	function reject(promiseOrValue) {
-		return when(promiseOrValue, function(value) {
-			return rejected(value);
-		});
-	}
-
-	/**
-	 * Creates a new, CommonJS compliant, Deferred with fully isolated
-	 * resolver and promise parts, either or both of which may be given out
-	 * safely to consumers.
-	 * The Deferred itself has the full API: resolve, reject, progress, and
-	 * then. The resolver has resolve, reject, and progress.  The promise
-	 * only has then.
-	 *
-	 * @memberOf when
-	 * @function
-	 *
-	 * @returns {Deferred}
-	 */
-	function defer() {
-		var deferred, promise, listeners, progressHandlers, _then, _progress, complete;
-
-		listeners = [];
-		progressHandlers = [];
-
-		/**
-		 * Pre-resolution then() that adds the supplied callback, errback, and progback
-		 * functions to the registered listeners
-		 *
-		 * @private
-		 *
-		 * @param [callback] {Function} resolution handler
-		 * @param [errback] {Function} rejection handler
-		 * @param [progback] {Function} progress handler
-		 *
-		 * @throws {Error} if any argument is not null, undefined, or a Function
-		 */
-		_then = function unresolvedThen(callback, errback, progback) {
-			var deferred = defer();
-
-			listeners.push(function(promise) {
-				promise.then(callback, errback)
-					.then(deferred.resolve, deferred.reject, deferred.progress);
-			});
-
-			progback && progressHandlers.push(progback);
-
-			return deferred.promise;
-		};
-
-		/**
-		 * Registers a handler for this {@link Deferred}'s {@link Promise}.  Even though all arguments
-		 * are optional, each argument that *is* supplied must be null, undefined, or a Function.
-		 * Any other value will cause an Error to be thrown.
-		 *
-		 * @memberOf Promise
-		 *
-		 * @param [callback] {Function} resolution handler
-		 * @param [errback] {Function} rejection handler
-		 * @param [progback] {Function} progress handler
-		 *
-		 * @throws {Error} if any argument is not null, undefined, or a Function
-		 */
-		function then(callback, errback, progback) {
-			return _then(callback, errback, progback);
-		}
-
-		/**
-		 * Resolves this {@link Deferred}'s {@link Promise} with val as the
-		 * resolution value.
-		 *
-		 * @memberOf Resolver
-		 *
-		 * @param val anything
-		 */
-		function resolve(val) {
-			complete(resolved(val));
-		}
-
-		/**
-		 * Rejects this {@link Deferred}'s {@link Promise} with err as the
-		 * reason.
-		 *
-		 * @memberOf Resolver
-		 *
-		 * @param err anything
-		 */
-		function reject(err) {
-			complete(rejected(err));
-		}
-
-		/**
-		 * @private
-		 * @param update
-		 */
-		_progress = function(update) {
-			var progress, i = 0;
-			while (progress = progressHandlers[i++]) progress(update);
-		};
-
-		/**
-		 * Emits a progress update to all progress observers registered with
-		 * this {@link Deferred}'s {@link Promise}
-		 *
-		 * @memberOf Resolver
-		 *
-		 * @param update anything
-		 */
-		function progress(update) {
-			_progress(update);
-		}
-
-		/**
-		 * Transition from pre-resolution state to post-resolution state, notifying
-		 * all listeners of the resolution or rejection
-		 *
-		 * @private
-		 *
-		 * @param completed {Promise} the completed value of this deferred
-		 */
-		complete = function(completed) {
-			var listener, i = 0;
-
-			// Replace _then with one that directly notifies with the result.
-			_then = completed.then;
-
-			// Replace complete so that this Deferred can only be completed
-			// once. Also Replace _progress, so that subsequent attempts to issue
-			// progress throw.
-			complete = _progress = function alreadyCompleted() {
-				// TODO: Consider silently returning here so that parties who
-				// have a reference to the resolver cannot tell that the promise
-				// has been resolved using try/catch
-				throw new Error("already completed");
-			};
-
-			// Free progressHandlers array since we'll never issue progress events
-			// for this promise again now that it's completed
-			progressHandlers = undef;
-
-			// Notify listeners
-			// Traverse all listeners registered directly with this Deferred
-
-			while (listener = listeners[i++]) {
-				listener(completed);
-			}
-
-			listeners = [];
-		};
-
-		/**
-		 * The full Deferred object, with both {@link Promise} and {@link Resolver}
-		 * parts
-		 * @class Deferred
-		 * @name Deferred
-		 */
-		deferred = {};
-
-		// Promise and Resolver parts
-		// Freeze Promise and Resolver APIs
-
-		promise = new Promise();
-		promise.then = deferred.then = then;
-
-		/**
-		 * The {@link Promise} for this {@link Deferred}
-		 * @memberOf Deferred
-		 * @name promise
-		 * @type {Promise}
-		 */
-		deferred.promise = freeze(promise);
-
-		/**
-		 * The {@link Resolver} for this {@link Deferred}
-		 * @memberOf Deferred
-		 * @name resolver
-		 * @class Resolver
-		 */
-		deferred.resolver = freeze({
-			resolve:  (deferred.resolve  = resolve),
-			reject:   (deferred.reject   = reject),
-			progress: (deferred.progress = progress)
-		});
-
-		return deferred;
-	}
-
-	/**
-	 * Determines if promiseOrValue is a promise or not.  Uses the feature
-	 * test from http://wiki.commonjs.org/wiki/Promises/A to determine if
-	 * promiseOrValue is a promise.
-	 *
-	 * @param promiseOrValue anything
-	 *
-	 * @returns {Boolean} true if promiseOrValue is a {@link Promise}
-	 */
-	function isPromise(promiseOrValue) {
-		return promiseOrValue && typeof promiseOrValue.then === 'function';
-	}
+	when.isPromise = isPromise; // Determine if a thing is a promise
 
 	/**
 	 * Register an observer for a promise or immediate value.
 	 *
-	 * @function
-	 * @name when
-	 * @namespace
-	 *
-	 * @param promiseOrValue anything
-	 * @param {Function} [callback] callback to be called when promiseOrValue is
-	 *   successfully resolved.  If promiseOrValue is an immediate value, callback
+	 * @param {*} promiseOrValue
+	 * @param {function?} [onFulfilled] callback to be called when promiseOrValue is
+	 *   successfully fulfilled.  If promiseOrValue is an immediate value, callback
 	 *   will be invoked immediately.
-	 * @param {Function} [errback] callback to be called when promiseOrValue is
+	 * @param {function?} [onRejected] callback to be called when promiseOrValue is
 	 *   rejected.
-	 * @param {Function} [progressHandler] callback to be called when progress updates
+	 * @param {function?} [onProgress] callback to be called when progress updates
 	 *   are issued for promiseOrValue.
-	 *
 	 * @returns {Promise} a new {@link Promise} that will complete with the return
 	 *   value of callback or errback or the completion value of promiseOrValue if
 	 *   callback and/or errback is not supplied.
 	 */
-	function when(promiseOrValue, callback, errback, progressHandler) {
-		// Get a promise for the input promiseOrValue
-		// See promise()
-		var trustedPromise = promise(promiseOrValue);
-
-		// Register promise handlers
-		return trustedPromise.then(callback, errback, progressHandler);
+	function when(promiseOrValue, onFulfilled, onRejected, onProgress) {
+		// Get a trusted promise for the input promiseOrValue, and then
+		// register promise handlers
+		return resolve(promiseOrValue).then(onFulfilled, onRejected, onProgress);
 	}
 
 	/**
 	 * Returns promiseOrValue if promiseOrValue is a {@link Promise}, a new Promise if
-	 * promiseOrValue is a foreign promise, or a new, already-resolved {@link Promise}
-	 * whose resolution value is promiseOrValue if promiseOrValue is an immediate value.
+	 * promiseOrValue is a foreign promise, or a new, already-fulfilled {@link Promise}
+	 * whose value is promiseOrValue if promiseOrValue is an immediate value.
 	 *
-	 * Note that this function is not safe to export since it will return its
-	 * input when promiseOrValue is a {@link Promise}
-	 *
-	 * @private
-	 *
-	 * @param promiseOrValue anything
-	 *
+	 * @param {*} promiseOrValue
 	 * @returns Guaranteed to return a trusted Promise.  If promiseOrValue is a when.js {@link Promise}
 	 *   returns promiseOrValue, otherwise, returns a new, already-resolved, when.js {@link Promise}
 	 *   whose resolution value is:
 	 *   * the resolution value of promiseOrValue if it's a foreign promise, or
 	 *   * promiseOrValue if it's a value
 	 */
-	function promise(promiseOrValue) {
+	function resolve(promiseOrValue) {
 		var promise, deferred;
 
 		if(promiseOrValue instanceof Promise) {
@@ -379,25 +82,25 @@ define(function() {
 			promise = promiseOrValue;
 
 		} else {
-			// It's not a when.js promise.  Check to see if it's a foreign promise
-			// or a value.
-
-			deferred = defer();
+			// It's not a when.js promise. See if it's a foreign promise or a value.
 			if(isPromise(promiseOrValue)) {
-				// It's a compliant promise, but we don't know where it came from,
-				// so we don't trust its implementation entirely.  Introduce a trusted
-				// middleman when.js promise
+				// It's a thenable, but we don't know where it came from, so don't trust
+				// its implementation entirely.  Introduce a trusted middleman when.js promise
+				deferred = defer();
 
-				// IMPORTANT: This is the only place when.js should ever call .then() on
-				// an untrusted promise.
-				promiseOrValue.then(deferred.resolve, deferred.reject, deferred.progress);
+				// IMPORTANT: This is the only place when.js should ever call .then() on an
+				// untrusted promise. Don't expose the return value to the untrusted promise
+				promiseOrValue.then(
+					function(value)  { deferred.resolve(value); },
+					function(reason) { deferred.reject(reason); },
+					function(update) { deferred.progress(update); }
+				);
+
 				promise = deferred.promise;
 
 			} else {
-				// It's a value, not a promise.  Create an already-resolved promise
-				// for it.
-				deferred.resolve(promiseOrValue);
-				promise = deferred.promise;
+				// It's a value, not a promise.  Create a resolved promise for it.
+				promise = fulfilled(promiseOrValue);
 			}
 		}
 
@@ -405,151 +108,415 @@ define(function() {
 	}
 
 	/**
-	 * Return a promise that will resolve when howMany of the supplied promisesOrValues
-	 * have resolved. The resolution value of the returned promise will be an array of
-	 * length howMany containing the resolutions values of the triggering promisesOrValues.
-	 *
-	 * @memberOf when
-	 *
-	 * @param promisesOrValues {Array} array of anything, may contain a mix
-	 *      of {@link Promise}s and values
-	 * @param howMany
-	 * @param [callback]
-	 * @param [errback]
-	 * @param [progressHandler]
-	 *
-	 * @returns {Promise}
+	 * Returns a rejected promise for the supplied promiseOrValue.  The returned
+	 * promise will be rejected with:
+	 * - promiseOrValue, if it is a value, or
+	 * - if promiseOrValue is a promise
+	 *   - promiseOrValue's value after it is fulfilled
+	 *   - promiseOrValue's reason after it is rejected
+	 * @param {*} promiseOrValue the rejected value of the returned {@link Promise}
+	 * @return {Promise} rejected {@link Promise}
 	 */
-	function some(promisesOrValues, howMany, callback, errback, progressHandler) {
+	function reject(promiseOrValue) {
+		return when(promiseOrValue, rejected);
+	}
+
+	/**
+	 * Trusted Promise constructor.  A Promise created from this constructor is
+	 * a trusted when.js promise.  Any other duck-typed promise is considered
+	 * untrusted.
+	 * @constructor
+	 * @name Promise
+	 */
+	function Promise(then) {
+		this.then = then;
+	}
+
+	Promise.prototype = {
+		/**
+		 * Register a callback that will be called when a promise is
+		 * fulfilled or rejected.  Optionally also register a progress handler.
+		 * Shortcut for .then(onFulfilledOrRejected, onFulfilledOrRejected, onProgress)
+		 * @param {function?} [onFulfilledOrRejected]
+		 * @param {function?} [onProgress]
+		 * @return {Promise}
+		 */
+		always: function(onFulfilledOrRejected, onProgress) {
+			return this.then(onFulfilledOrRejected, onFulfilledOrRejected, onProgress);
+		},
+
+		/**
+		 * Register a rejection handler.  Shortcut for .then(undefined, onRejected)
+		 * @param {function?} onRejected
+		 * @return {Promise}
+		 */
+		otherwise: function(onRejected) {
+			return this.then(undef, onRejected);
+		},
+
+		/**
+		 * Shortcut for .then(function() { return value; })
+		 * @param  {*} value
+		 * @return {Promise} a promise that:
+		 *  - is fulfilled if value is not a promise, or
+		 *  - if value is a promise, will fulfill with its value, or reject
+		 *    with its reason.
+		 */
+		yield: function(value) {
+			return this.then(function() {
+				return value;
+			});
+		},
+
+		/**
+		 * Assumes that this promise will fulfill with an array, and arranges
+		 * for the onFulfilled to be called with the array as its argument list
+		 * i.e. onFulfilled.spread(undefined, array).
+		 * @param {function} onFulfilled function to receive spread arguments
+		 * @return {Promise}
+		 */
+		spread: function(onFulfilled) {
+			return this.then(function(array) {
+				// array may contain promises, so resolve its contents.
+				return all(array, function(array) {
+					return onFulfilled.apply(undef, array);
+				});
+			});
+		}
+	};
+
+	/**
+	 * Create an already-resolved promise for the supplied value
+	 * @private
+	 *
+	 * @param {*} value
+	 * @return {Promise} fulfilled promise
+	 */
+	function fulfilled(value) {
+		var p = new Promise(function(onFulfilled) {
+			// TODO: Promises/A+ check typeof onFulfilled
+			try {
+				return resolve(onFulfilled ? onFulfilled(value) : value);
+			} catch(e) {
+				return rejected(e);
+			}
+		});
+
+		return p;
+	}
+
+	/**
+	 * Create an already-rejected {@link Promise} with the supplied
+	 * rejection reason.
+	 * @private
+	 *
+	 * @param {*} reason
+	 * @return {Promise} rejected promise
+	 */
+	function rejected(reason) {
+		var p = new Promise(function(_, onRejected) {
+			// TODO: Promises/A+ check typeof onRejected
+			try {
+				return onRejected ? resolve(onRejected(reason)) : rejected(reason);
+			} catch(e) {
+				return rejected(e);
+			}
+		});
+
+		return p;
+	}
+
+	/**
+	 * Creates a new, Deferred with fully isolated resolver and promise parts,
+	 * either or both of which may be given out safely to consumers.
+	 * The Deferred itself has the full API: resolve, reject, progress, and
+	 * then. The resolver has resolve, reject, and progress.  The promise
+	 * only has then.
+	 *
+	 * @return {Deferred}
+	 */
+	function defer() {
+		var deferred, promise, handlers, progressHandlers,
+			_then, _progress, _resolve;
+
+		/**
+		 * The promise for the new deferred
+		 * @type {Promise}
+		 */
+		promise = new Promise(then);
+
+		/**
+		 * The full Deferred object, with {@link Promise} and {@link Resolver} parts
+		 * @class Deferred
+		 * @name Deferred
+		 */
+		deferred = {
+			then:     then, // DEPRECATED: use deferred.promise.then
+			resolve:  promiseResolve,
+			reject:   promiseReject,
+			// TODO: Consider renaming progress() to notify()
+			progress: promiseProgress,
+
+			promise:  promise,
+
+			resolver: {
+				resolve:  promiseResolve,
+				reject:   promiseReject,
+				progress: promiseProgress
+			}
+		};
+
+		handlers = [];
+		progressHandlers = [];
+
+		/**
+		 * Pre-resolution then() that adds the supplied callback, errback, and progback
+		 * functions to the registered listeners
+		 * @private
+		 *
+		 * @param {function?} [onFulfilled] resolution handler
+		 * @param {function?} [onRejected] rejection handler
+		 * @param {function?} [onProgress] progress handler
+		 */
+		_then = function(onFulfilled, onRejected, onProgress) {
+			// TODO: Promises/A+ check typeof onFulfilled, onRejected, onProgress
+			var deferred, progressHandler;
+
+			deferred = defer();
+
+			progressHandler = typeof onProgress === 'function'
+				? function(update) {
+					try {
+						// Allow progress handler to transform progress event
+						deferred.progress(onProgress(update));
+					} catch(e) {
+						// Use caught value as progress
+						deferred.progress(e);
+					}
+				}
+				: function(update) { deferred.progress(update); };
+
+			handlers.push(function(promise) {
+				promise.then(onFulfilled, onRejected)
+					.then(deferred.resolve, deferred.reject, progressHandler);
+			});
+
+			progressHandlers.push(progressHandler);
+
+			return deferred.promise;
+		};
+
+		/**
+		 * Issue a progress event, notifying all progress listeners
+		 * @private
+		 * @param {*} update progress event payload to pass to all listeners
+		 */
+		_progress = function(update) {
+			processQueue(progressHandlers, update);
+			return update;
+		};
+
+		/**
+		 * Transition from pre-resolution state to post-resolution state, notifying
+		 * all listeners of the resolution or rejection
+		 * @private
+		 * @param {*} value the value of this deferred
+		 */
+		_resolve = function(value) {
+			value = resolve(value);
+
+			// Replace _then with one that directly notifies with the result.
+			_then = value.then;
+			// Replace _resolve so that this Deferred can only be resolved once
+			_resolve = resolve;
+			// Make _progress a noop, to disallow progress for the resolved promise.
+			_progress = noop;
+
+			// Notify handlers
+			processQueue(handlers, value);
+
+			// Free progressHandlers array since we'll never issue progress events
+			progressHandlers = handlers = undef;
+
+			return value;
+		};
+
+		return deferred;
+
+		/**
+		 * Wrapper to allow _then to be replaced safely
+		 * @param {function?} [onFulfilled] resolution handler
+		 * @param {function?} [onRejected] rejection handler
+		 * @param {function?} [onProgress] progress handler
+		 * @return {Promise} new promise
+		 */
+		function then(onFulfilled, onRejected, onProgress) {
+			// TODO: Promises/A+ check typeof onFulfilled, onRejected, onProgress
+			return _then(onFulfilled, onRejected, onProgress);
+		}
+
+		/**
+		 * Wrapper to allow _resolve to be replaced
+		 */
+		function promiseResolve(val) {
+			return _resolve(val);
+		}
+
+		/**
+		 * Wrapper to allow _reject to be replaced
+		 */
+		function promiseReject(err) {
+			return _resolve(rejected(err));
+		}
+
+		/**
+		 * Wrapper to allow _progress to be replaced
+		 */
+		function promiseProgress(update) {
+			return _progress(update);
+		}
+	}
+
+	/**
+	 * Determines if promiseOrValue is a promise or not.  Uses the feature
+	 * test from http://wiki.commonjs.org/wiki/Promises/A to determine if
+	 * promiseOrValue is a promise.
+	 *
+	 * @param {*} promiseOrValue anything
+	 * @returns {boolean} true if promiseOrValue is a {@link Promise}
+	 */
+	function isPromise(promiseOrValue) {
+		return promiseOrValue && typeof promiseOrValue.then === 'function';
+	}
+
+	/**
+	 * Initiates a competitive race, returning a promise that will resolve when
+	 * howMany of the supplied promisesOrValues have resolved, or will reject when
+	 * it becomes impossible for howMany to resolve, for example, when
+	 * (promisesOrValues.length - howMany) + 1 input promises reject.
+	 *
+	 * @param {Array} promisesOrValues array of anything, may contain a mix
+	 *      of promises and values
+	 * @param howMany {number} number of promisesOrValues to resolve
+	 * @param {function?} [onFulfilled] resolution handler
+	 * @param {function?} [onRejected] rejection handler
+	 * @param {function?} [onProgress] progress handler
+	 * @returns {Promise} promise that will resolve to an array of howMany values that
+	 * resolved first, or will reject with an array of (promisesOrValues.length - howMany) + 1
+	 * rejection reasons.
+	 */
+	function some(promisesOrValues, howMany, onFulfilled, onRejected, onProgress) {
 
 		checkCallbacks(2, arguments);
 
 		return when(promisesOrValues, function(promisesOrValues) {
 
-			var toResolve, results, ret, deferred, resolver, rejecter, handleProgress, len, i;
+			var toResolve, toReject, values, reasons, deferred, fulfillOne, rejectOne, progress, len, i;
 
 			len = promisesOrValues.length >>> 0;
 
 			toResolve = Math.max(0, Math.min(howMany, len));
-			results = [];
+			values = [];
+
+			toReject = (len - toResolve) + 1;
+			reasons = [];
+
 			deferred = defer();
-			ret = when(deferred, callback, errback, progressHandler);
-
-			// Wrapper so that resolver can be replaced
-			function resolve(val) {
-				resolver(val);
-			}
-
-			// Wrapper so that rejecter can be replaced
-			function reject(err) {
-				rejecter(err);
-			}
-
-			// Wrapper so that progress can be replaced
-			function progress(update) {
-				handleProgress(update);
-			}
-
-			function complete() {
-				resolver = rejecter = handleProgress = noop;
-			}
 
 			// No items in the input, resolve immediately
 			if (!toResolve) {
-				deferred.resolve(results);
+				deferred.resolve(values);
 
 			} else {
-				// Resolver for promises.  Captures the value and resolves
-				// the returned promise when toResolve reaches zero.
-				// Overwrites resolver var with a noop once promise has
-				// be resolved to cover case where n < promises.length
-				resolver = function(val) {
-					// This orders the values based on promise resolution order
-					// Another strategy would be to use the original position of
-					// the corresponding promise.
-					results.push(val);
+				progress = deferred.progress;
 
-					if (!--toResolve) {
-						complete();
-						deferred.resolve(results);
+				rejectOne = function(reason) {
+					reasons.push(reason);
+					if(!--toReject) {
+						fulfillOne = rejectOne = noop;
+						deferred.reject(reasons);
 					}
 				};
 
-				// Rejecter for promises.  Rejects returned promise
-				// immediately, and overwrites rejecter var with a noop
-				// once promise to cover case where n < promises.length.
-				// TODO: Consider rejecting only when N (or promises.length - N?)
-				// promises have been rejected instead of only one?
-				rejecter = function(err) {
-					complete();
-					deferred.reject(err);
+				fulfillOne = function(val) {
+					// This orders the values based on promise resolution order
+					// Another strategy would be to use the original position of
+					// the corresponding promise.
+					values.push(val);
+
+					if (!--toResolve) {
+						fulfillOne = rejectOne = noop;
+						deferred.resolve(values);
+					}
 				};
 
-				handleProgress = deferred.progress;
-
-				// TODO: Replace while with forEach
 				for(i = 0; i < len; ++i) {
 					if(i in promisesOrValues) {
-						when(promisesOrValues[i], resolve, reject, progress);
+						when(promisesOrValues[i], fulfiller, rejecter, progress);
 					}
 				}
 			}
 
-			return ret;
+			return deferred.then(onFulfilled, onRejected, onProgress);
+
+			function rejecter(reason) {
+				rejectOne(reason);
+			}
+
+			function fulfiller(val) {
+				fulfillOne(val);
+			}
+
 		});
+	}
+
+	/**
+	 * Initiates a competitive race, returning a promise that will resolve when
+	 * any one of the supplied promisesOrValues has resolved or will reject when
+	 * *all* promisesOrValues have rejected.
+	 *
+	 * @param {Array|Promise} promisesOrValues array of anything, may contain a mix
+	 *      of {@link Promise}s and values
+	 * @param {function?} [onFulfilled] resolution handler
+	 * @param {function?} [onRejected] rejection handler
+	 * @param {function?} [onProgress] progress handler
+	 * @returns {Promise} promise that will resolve to the value that resolved first, or
+	 * will reject with an array of all rejected inputs.
+	 */
+	function any(promisesOrValues, onFulfilled, onRejected, onProgress) {
+
+		function unwrapSingleResult(val) {
+			return onFulfilled ? onFulfilled(val[0]) : val[0];
+		}
+
+		return some(promisesOrValues, 1, unwrapSingleResult, onRejected, onProgress);
 	}
 
 	/**
 	 * Return a promise that will resolve only once all the supplied promisesOrValues
 	 * have resolved. The resolution value of the returned promise will be an array
 	 * containing the resolution values of each of the promisesOrValues.
-	 *
 	 * @memberOf when
 	 *
-	 * @param promisesOrValues {Array|Promise} array of anything, may contain a mix
+	 * @param {Array|Promise} promisesOrValues array of anything, may contain a mix
 	 *      of {@link Promise}s and values
-	 * @param [callback] {Function}
-	 * @param [errback] {Function}
-	 * @param [progressHandler] {Function}
-	 *
+	 * @param {function?} [onFulfilled] resolution handler
+	 * @param {function?} [onRejected] rejection handler
+	 * @param {function?} [onProgress] progress handler
 	 * @returns {Promise}
 	 */
-	function all(promisesOrValues, callback, errback, progressHandler) {
-
+	function all(promisesOrValues, onFulfilled, onRejected, onProgress) {
 		checkCallbacks(1, arguments);
-
-		return when(promisesOrValues, function(promisesOrValues) {
-			return _reduce(promisesOrValues, reduceIntoArray, []);
-		}).then(callback, errback, progressHandler);
-	}
-
-	function reduceIntoArray(current, val, i) {
-		current[i] = val;
-		return current;
+		return map(promisesOrValues, identity).then(onFulfilled, onRejected, onProgress);
 	}
 
 	/**
-	 * Return a promise that will resolve when any one of the supplied promisesOrValues
-	 * has resolved. The resolution value of the returned promise will be the resolution
-	 * value of the triggering promiseOrValue.
-	 *
-	 * @memberOf when
-	 *
-	 * @param promisesOrValues {Array|Promise} array of anything, may contain a mix
-	 *      of {@link Promise}s and values
-	 * @param [callback] {Function}
-	 * @param [errback] {Function}
-	 * @param [progressHandler] {Function}
-	 *
-	 * @returns {Promise}
+	 * Joins multiple promises into a single returned promise.
+	 * @return {Promise} a promise that will fulfill when *all* the input promises
+	 * have fulfilled, or will reject when *any one* of the input promises rejects.
 	 */
-	function any(promisesOrValues, callback, errback, progressHandler) {
-
-		function unwrapSingleResult(val) {
-			return callback ? callback(val[0]) : val[0];
-		}
-
-		return some(promisesOrValues, 1, unwrapSingleResult, errback, progressHandler);
+	function join(/* ...promises */) {
+		return map(arguments, identity);
 	}
 
 	/**
@@ -557,125 +524,97 @@ define(function() {
 	 * input to contain {@link Promise}s and/or values, and mapFunc may return
 	 * either a value or a {@link Promise}
 	 *
-	 * @memberOf when
-	 *
-	 * @param promise {Array|Promise} array of anything, may contain a mix
+	 * @param {Array|Promise} promise array of anything, may contain a mix
 	 *      of {@link Promise}s and values
-	 * @param mapFunc {Function} mapping function mapFunc(value) which may return
+	 * @param {function} mapFunc mapping function mapFunc(value) which may return
 	 *      either a {@link Promise} or value
-	 *
 	 * @returns {Promise} a {@link Promise} that will resolve to an array containing
 	 *      the mapped output values.
 	 */
 	function map(promise, mapFunc) {
 		return when(promise, function(array) {
-			return _map(array, mapFunc);
+			var results, len, toResolve, resolve, i, d;
+
+			// Since we know the resulting length, we can preallocate the results
+			// array to avoid array expansions.
+			toResolve = len = array.length >>> 0;
+			results = [];
+			d = defer();
+
+			if(!toResolve) {
+				d.resolve(results);
+			} else {
+
+				resolve = function resolveOne(item, i) {
+					when(item, mapFunc).then(function(mapped) {
+						results[i] = mapped;
+
+						if(!--toResolve) {
+							d.resolve(results);
+						}
+					}, d.reject);
+				};
+
+				// Since mapFunc may be async, get all invocations of it into flight
+				for(i = 0; i < len; i++) {
+					if(i in array) {
+						resolve(array[i], i);
+					} else {
+						--toResolve;
+					}
+				}
+
+			}
+
+			return d.promise;
+
 		});
-	}
-
-	/**
-	 * Private map helper to map an array of promises
-	 * @private
-	 *
-	 * @param promisesOrValues {Array}
-	 * @param mapFunc {Function}
-	 * @return {Promise}
-	 */
-	function _map(promisesOrValues, mapFunc) {
-
-		var results, len, i;
-
-		// Since we know the resulting length, we can preallocate the results
-		// array to avoid array expansions.
-		len = promisesOrValues.length >>> 0;
-		results = new Array(len);
-
-		// Since mapFunc may be async, get all invocations of it into flight
-		// asap, and then use reduce() to collect all the results
-		for(i = 0; i < len; i++) {
-			if(i in promisesOrValues)
-				results[i] = when(promisesOrValues[i], mapFunc);
-		}
-
-		// Could use all() here, but that would result in another array
-		// being allocated, i.e. map() would end up allocating 2 arrays
-		// of size len instead of just 1.  Since all() uses reduce()
-		// anyway, avoid the additional allocation by calling reduce
-		// directly.
-		return _reduce(results, reduceIntoArray, results);
 	}
 
 	/**
 	 * Traditional reduce function, similar to `Array.prototype.reduce()`, but
-	 * input may contain {@link Promise}s and/or values, and reduceFunc
-	 * may return either a value or a {@link Promise}, *and* initialValue may
-	 * be a {@link Promise} for the starting value.
+	 * input may contain promises and/or values, and reduceFunc
+	 * may return either a value or a promise, *and* initialValue may
+	 * be a promise for the starting value.
 	 *
-	 * @memberOf when
-	 *
-	 * @param promise {Array|Promise} array of anything, may contain a mix
-	 *      of {@link Promise}s and values.  May also be a {@link Promise} for
-	 *      an array.
-	 * @param reduceFunc {Function} reduce function reduce(currentValue, nextValue, index, total),
+	 * @param {Array|Promise} promise array or promise for an array of anything,
+	 *      may contain a mix of promises and values.
+	 * @param {function} reduceFunc reduce function reduce(currentValue, nextValue, index, total),
 	 *      where total is the total number of items being reduced, and will be the same
 	 *      in each call to reduceFunc.
-	 * @param initialValue starting value, or a {@link Promise} for the starting value
-	 *
 	 * @returns {Promise} that will resolve to the final reduced value
 	 */
-	function reduce(promise, reduceFunc, initialValue) {
+	function reduce(promise, reduceFunc /*, initialValue */) {
 		var args = slice.call(arguments, 1);
+
 		return when(promise, function(array) {
-			return _reduce.apply(undef, [array].concat(args));
-		});
-	}
+			var total;
 
-	/**
-	 * Private reduce to reduce an array of promises
-	 * @private
-	 *
-	 * @param promisesOrValues {Array}
-	 * @param reduceFunc {Function}
-	 * @param initialValue {*}
-	 * @return {Promise}
-	 */
-	function _reduce(promisesOrValues, reduceFunc, initialValue) {
+			total = array.length;
 
-		var total, args;
-
-		total = promisesOrValues.length;
-
-		// Skip promisesOrValues, since it will be used as 'this' in the call
-		// to the actual reduce engine below.
-
-		// Wrap the supplied reduceFunc with one that handles promises and then
-		// delegates to the supplied.
-
-		args = [
-			function (current, val, i) {
+			// Wrap the supplied reduceFunc with one that handles promises and then
+			// delegates to the supplied.
+			args[0] = function (current, val, i) {
 				return when(current, function (c) {
 					return when(val, function (value) {
 						return reduceFunc(c, value, i, total);
 					});
 				});
-			}
-		];
+			};
 
-		if (arguments.length > 2) args.push(initialValue);
-
-		return reduceArray.apply(promisesOrValues, args);
+			return reduceArray.apply(array, args);
+		});
 	}
 
 	/**
-	 * Ensure that resolution of promiseOrValue will complete resolver with the completion
-	 * value of promiseOrValue, or instead with resolveValue if it is provided.
-	 *
-	 * @memberOf when
+	 * Ensure that resolution of promiseOrValue will trigger resolver with the
+	 * value or reason of promiseOrValue, or instead with resolveValue if it is provided.
 	 *
 	 * @param promiseOrValue
-	 * @param resolver {Resolver}
-	 * @param [resolveValue] anything
-	 *
+	 * @param {Object} resolver
+	 * @param {function} resolver.resolve
+	 * @param {function} resolver.reject
+	 * @param {*} [resolveValue]
 	 * @returns {Promise}
 	 */
 	function chain(promiseOrValue, resolver, resolveValue) {
@@ -683,13 +622,13 @@ define(function() {
 
 		return when(promiseOrValue,
 			function(val) {
-				if(useResolveValue) val = resolveValue;
+				val = useResolveValue ? resolveValue : val;
 				resolver.resolve(val);
 				return val;
 			},
-			function(e) {
-				resolver.reject(e);
-				return rejected(e);
+			function(reason) {
+				resolver.reject(reason);
+				return rejected(reason);
 			},
 			resolver.progress
 		);
@@ -700,20 +639,37 @@ define(function() {
 	//
 
 	/**
+	 * Apply all functions in queue to value
+	 * @param {Array} queue array of functions to execute
+	 * @param {*} value argument passed to each function
+	 */
+	function processQueue(queue, value) {
+		var handler, i = 0;
+
+		while (handler = queue[i++]) {
+			handler(value);
+		}
+	}
+
+	/**
 	 * Helper that checks arrayOfCallbacks to ensure that each element is either
 	 * a function, or null or undefined.
-	 *
 	 * @private
-	 *
-	 * @param arrayOfCallbacks {Array} array to check
+	 * @param {number} start index at which to start checking items in arrayOfCallbacks
+	 * @param {Array} arrayOfCallbacks array to check
 	 * @throws {Error} if any element of arrayOfCallbacks is something other than
-	 * a Functions, null, or undefined.
+	 * a functions, null, or undefined.
 	 */
 	function checkCallbacks(start, arrayOfCallbacks) {
+		// TODO: Promises/A+ update type checking and docs
 		var arg, i = arrayOfCallbacks.length;
+
 		while(i > start) {
 			arg = arrayOfCallbacks[--i];
-			if (arg != null && typeof arg != 'function') throw new Error('callback is not a function');
+
+			if (arg != null && typeof arg != 'function') {
+				throw new Error('arg '+i+' must be a function');
+			}
 		}
 	}
 
@@ -730,6 +686,8 @@ define(function() {
 	// specifics and edge cases.
 	reduceArray = [].reduce ||
 		function(reduceFunc /*, initialValue */) {
+			/*jshint maxcomplexity: 7*/
+
 			// ES5 dictates that reduce.length === 1
 
 			// This implementation deviates from ES5 spec in the following ways:
@@ -738,6 +696,9 @@ define(function() {
 			var arr, args, reduced, len, i;
 
 			i = 0;
+			// This generates a jshint warning, despite being valid
+			// "Missing 'new' prefix when invoking a constructor."
+			// See https://github.com/jshint/jshint/issues/392
 			arr = Object(this);
 			len = arr.length >>> 0;
 			args = arguments;
@@ -766,12 +727,17 @@ define(function() {
 			// Do the actual reduce
 			for(;i < len; ++i) {
 				// Skip holes
-				if(i in arr)
+				if(i in arr) {
 					reduced = reduceFunc(reduced, arr[i], i, arr);
+				}
 			}
 
 			return reduced;
 		};
+
+	function identity(x) {
+		return x;
+	}
 
 	return when;
 });
@@ -817,22 +783,22 @@ define(function(when) {
         // Add a cancel method to the deferred to reject the delegate
         // with the special canceled indicator.
         deferred.cancel = function() {
-            delegate.reject(canceler(deferred));
+            return delegate.reject(canceler(deferred));
         };
 
         // Ensure that the original resolve, reject, and progress all forward
         // to the delegate
-        deferred.then(delegate.resolve, delegate.reject, delegate.progress);
+        deferred.promise.then(delegate.resolve, delegate.reject, delegate.progress);
 
         // Replace deferred's promise with the delegate promise
         deferred.promise = delegate.promise;
 
         // Also replace deferred.then to allow it to be called safely and
         // observe the cancellation
+		// TODO: Remove once deferred.then is removed
         deferred.then = delegate.promise.then;
 
         return deferred;
     };
-
 });
 })(function (factory) { When.cancelable = factory(When); });
