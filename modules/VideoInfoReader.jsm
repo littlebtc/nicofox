@@ -206,30 +206,31 @@ simpleInfoFetcher.enqueue = function(url) {
   /* Replace /getthumbinfo/ URL, change www.nicovideo.jp to ext.nicovideo.jp to avoid redirect. */
   var apiUrl = url.replace(/^http:\/\/www\./, "http://ext.").replace(/\/watch\//, "/api/getthumbinfo/");
   Components.utils.import("resource://nicofox/Network.jsm");
-  return Network.fetchUrlAsync(apiUrl, "").then(this.readVideoXML.bind(this, url));
+  return Network.fetchXml(apiUrl, "").then(this.readVideoXML.bind(this, url));
 }
 /* The responser to /getthumbinfo/ XML. (Using E4X) */
 simpleInfoFetcher.readVideoXML = function(originalUrl, result) {
-  var url = result.url;
-  var content = result.data;
-  content = content.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // bug 336551
-  var infoXML = new XML(content);
+  var infoDoc = result.xml;
+  var url = originalUrl;
   var info = {};
-  if (infoXML.@status != "ok") {
+  if (infoDoc.documentElement.getAttribute("status") != "ok") {
     var reason = "";
+    var errorCodeNode = infoDoc.querySelector("error code");
+    var errorCode = (errorCodeNode)? errorCodeNode.textContent : "";
+    Components.utils.reportError(errorCode);
     /* Read the error message */
-    if (infoXML.error.code.toString() == "COMMUNITY") {
+    if (errorCode == "COMMUNITY") {
       reason = "community";
-    } else if (infoXML.error.code.toString() == "NOT_FOUND") {
+    } else if (errorCode == "NOT_FOUND") {
       reason = "notfound";
-    } else if (infoXML.error.code.toString() == "DELETED") {
+    } else if (errorCode == "DELETED") {
       reason = "deleted";
     } else {
       reason = "xmlerr";
     }
     /* Community thread cannot be read from getthumbinfo, which should not be considered as an error. */
     if (reason != "community") {
-      throw 'reason'
+      throw reason;
     } else {
       /* Use the thread ID as title */
       info.nicoData = {
@@ -239,8 +240,8 @@ simpleInfoFetcher.readVideoXML = function(originalUrl, result) {
   } else {
     /* Try to match the info type similar as infoFetcher. */
     info.nicoData = {
-      title: infoXML.thumb.title.toString(),
-      thumbnail: infoXML.thumb.thumbnail_url.toString()
+      title: infoDoc.getElementsByTagName("title")[0].textContent,
+      thumbnail: infoDoc.getElementsByTagName("thumbnail_url")[0].textContent
     };
   }
   /* Note extra information including it is a simple one; then return */
