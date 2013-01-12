@@ -32,6 +32,10 @@ pref("extensions.nicofox.thumbnail_check", false);
 // New in 0.7a
 pref("extensions.nicofox.toolbar_check", false);
 
+// New in 1.0b4
+pref("extensions.nicofox.download_comment_zh-tw", true);
+pref("extensions.nicofox.download_comment_en-us", true);
+
 /////////////////////////////////////////// NicoMonkey
 // pref("extensions.nicofox.nicomonkey.enable", true); // Removed in 0.7a
 // pref("extensions.nicofox.nicomonkey.toolbar", true); // Removed in 0.7a

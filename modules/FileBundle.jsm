@@ -76,6 +76,8 @@ FileBundle.nico = function(info) {
   this.files.thumbnail = createFileInstanceWithPath(savePath, this.fileTitle + "[ThumbImg].jpeg");
   
   this.files.comment = createFileInstanceWithPath(savePath, this.fileTitle + ".xml");
+  this.files.commentZhTw = createFileInstanceWithPath(savePath, this.fileTitle + "[zh-tw].xml");
+  this.files.commentEnUs = createFileInstanceWithPath(savePath, this.fileTitle + "[en-us].xml");
   this.files.uploaderComment = createFileInstanceWithPath(savePath, this.fileTitle + "[Owner].xml");
 }
 
@@ -92,7 +94,7 @@ FileBundle.nico.prototype.occupied = function() {
   var variantExists = false;
   this.files.comment = createFileInstanceWithPath(savePath, this.fileTitle + ".xml");
   this.files.uploaderComment = createFileInstanceWithPath(savePath, this.fileTitle + "[Owner].xml");
-  if (this.files.comment.exists() || this.files.uploaderComment.exists()) {
+  if (this.files.comment.exists() || this.files.commentZhTw.exists() || this.files.commentEnUs.exists() || this.files.uploaderComment.exists()) {
     variantExists = true;
   } 
  

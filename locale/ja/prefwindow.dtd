@@ -17,9 +17,14 @@
 <!ENTITY downloader.save_path.browse.accesskey "B">
 <!ENTITY downloader.filename_scheme.label "ファイルの命名記法:">
 <!ENTITY downloader.filename_scheme.accesskey "N">
+<!ENTITY downloader.download_comment_variants "コメントダウンロード:">
+<!ENTITY downloader.download_comment.label "日本語">
+<!ENTITY downloader.download_comment.accesskey "J">
+<!ENTITY downloader.download_comment_en-us.label "英語（アメリカ合衆国）">
+<!ENTITY downloader.download_comment_en-us.accesskey "G">
+<!ENTITY downloader.download_comment_zh-tw.label "中国語（台湾）">
+<!ENTITY downloader.download_comment_zh-tw.accesskey "I">
 <!ENTITY downloader.also_download "以下のも一緒に落とす:">
-<!ENTITY downloader.download_comment.label "コメント">
-<!ENTITY downloader.download_comment.accesskey "C">
 <!ENTITY downloader.uploader_comment.label "投稿者コメント">
 <!ENTITY downloader.uploader_comment.accesskey "U">
 <!ENTITY downloader.download_thumbnail.label "サムネイル">

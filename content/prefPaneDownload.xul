@@ -7,6 +7,8 @@
       <preference id="pref-save_path" name="extensions.nicofox.save_path" type="file"/> 
       <preference id="pref-filename_scheme" name="extensions.nicofox.filename_scheme" accesskey="S" type="unichar" />
       <preference id="pref-download_comment" name="extensions.nicofox.download_comment" type="bool" />
+      <preference id="pref-download_comment_zh-tw" name="extensions.nicofox.download_comment_zh-tw" type="bool" />
+      <preference id="pref-download_comment_en-us" name="extensions.nicofox.download_comment_en-us" type="bool" />
       <preference id="pref-download_thumbnail" name="extensions.nicofox.download_thumbnail" type="bool" />
       <preference id="pref-download_max" name="extensions.nicofox.download_max" type="int" />
       <preference id="pref-video_bypass_cache" name="extensions.nicofox.video_bypass_cache" type="bool" />
@@ -37,9 +39,16 @@
             <textbox width="200" id="filename_scheme" preference="pref-filename_scheme" />
           </row>
           <row>
+            <label value="&downloader.download_comment_variants;" />
+            <hbox>
+              <checkbox id="download_comment" preference="pref-download_comment" label="&downloader.download_comment.label;" accesskey="&downloader.download_comment.accesskey;" />
+              <checkbox id="download_comment_zh-tw" preference="pref-download_comment_zh-tw" label="&downloader.download_comment_zh-tw.label;" accesskey="&downloader.download_comment_zh-tw.accesskey;" />
+              <checkbox id="download_comment_en-us" preference="pref-download_comment_en-us" label="&downloader.download_comment_en-us.label;" accesskey="&downloader.download_comment_en-us.accesskey;" />
+            </hbox>
+          </row>
+          <row>
             <label value="&downloader.also_download;" />
             <vbox>
-              <checkbox id="download_comment" preference="pref-download_comment" label="&downloader.download_comment.label;" accesskey="&downloader.download_comment.accesskey;" />
               <checkbox id="uploader_comment" preference="pref-uploader_comment" label="&downloader.uploader_comment.label;" accesskey="&downloader.uploader_comment.accesskey;" />
               <checkbox id="download_thumbnail" preference="pref-download_thumbnail" label="&downloader.download_thumbnail.label;" accesskey="&downloader.download_thumbnail.accesskey;" />
             </vbox>

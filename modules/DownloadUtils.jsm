@@ -153,6 +153,8 @@ DownloadUtils.nico.prototype = {
   _filesCreated: false,
   /* Whether to download comment, uploader comment or thumbnail? */
   _getComment: false,
+  _getCommentZhTw: false,
+  _getCommentEnUs: false,
   _getUploaderComment: false,
   _getThumbnail: false,
   /* Store video download progress */
@@ -185,6 +187,8 @@ DownloadUtils.nico.prototype = {
   /* Initialize download for specific URL. */
   init: function(url) {
     this._getComment = Core.prefs.getBoolPref("download_comment");
+    this._getCommentZhTw = Core.prefs.getBoolPref("download_comment_zh-tw");
+    this._getCommentEnUs = Core.prefs.getBoolPref("download_comment_en-us");
     this._getThumbnail = Core.prefs.getBoolPref("download_thumbnail");
     
     /* Save the URL to the instance */
@@ -316,8 +320,27 @@ DownloadUtils.nico.prototype = {
     params.video_file = this._fileBundle.files.video.path;
     params.video_economy = (this._economy)?1:0;
     params.video_type = this.videoType;
-    if(this._getComment) { 
+    var commentVariants = [];
+    if(this._getComment) {
       params.comment_file = this._fileBundle.files.comment.path;
+      commentVariants.push("ja");
+    }
+    // Older version compatibility: when only comments from other language were downloaded,
+    // use it in the comment_file field.
+    // Need to handle other cases like re-downloading comments if is is implemented.
+    if(this._getCommentZhTw) {
+      if (!this._getComment) {
+        params.comment_file = this._fileBundle.files.commentZhTw.path;
+      }
+      commentVariants.push("zh-tw");
+    }
+    if(this._getCommentEnUs) {
+      // Older version compatibility: when only zh-TW comments were downloaded, use it in the comment_file field.
+      // Need to handle other cases like re-downloading comments if is is implemented.
+      if (!this._getComment && !params.comment_file) {
+        params.comment_file = this._fileBundle.files.commentEnUs.path;
+      }
+      commentVariants.push("en-us");
     }
     if(this._getUploaderComment) {
       params.uploader_comment_file = this._fileBundle.files.uploaderComment.path;
@@ -325,6 +348,8 @@ DownloadUtils.nico.prototype = {
     if(this._getThumbnail) {
       params.thumbnail_file = this._fileBundle.files.thumbnail.path;
     }
+    // Write all comment variants into the info field.
+    params.info = JSON.stringify({ "comment_variants": commentVariants });
     this._filesCreated = true;
     /* Run the callback */
     this.callback("file_ready", params);
@@ -394,16 +419,30 @@ DownloadUtils.nico.prototype = {
       var commentQueryString = '<packet>'+
       '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>'+
       '</packet>';
+      var commentZhTwQueryString = '<packet>'+
+      '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'" language="2"/>'+
+      '</packet>';
+      var commentEnUsQueryString = '<packet>'+
+      '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'" language="1"/>'+
+      '</packet>';
       var uploaderCommentQueryString = 
       '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     }
     /* Get all extra items */
     this._extraItemPromises = [];
+    /* Because we may need to modify the content in the comment XML file, use nsIXMLHttpRequest to get contents and process it. */
+    /* TODO: Don't parse to XML if none of the contents need to be overwritten for performance */
     if(this._getComment) {
-      /* Because we may need to modify the content in the comment XML file, use nsIXMLHttpRequest to get contents and process it. */
-      /* TODO: Don't parse to XML if none of the contents need to be overwritten for performance */
       var xhrDeferred = Network.fetchXml(this._getFlvParams.ms, commentQueryString);
-      this._extraItemPromises.push(xhrDeferred.then(this.processNicoComment.bind(this)));
+      this._extraItemPromises.push(xhrDeferred.then(this.processNicoComment.bind(this, "ja")));
+    }
+    if(this._getCommentZhTw) {
+      var xhrDeferredZhTw = Network.fetchXml(this._getFlvParams.ms, commentZhTwQueryString);
+      this._extraItemPromises.push(xhrDeferredZhTw.then(this.processNicoComment.bind(this, "zh-tw")));
+    }
+    if(this._getCommentEnUs) {
+      var xhrDeferredEnUs = Network.fetchXml(this._getFlvParams.ms, commentEnUsQueryString);
+      this._extraItemPromises.push(xhrDeferredEnUs.then(this.processNicoComment.bind(this, "en-us")));
     }
     if(this._getUploaderComment) {
       this._extraItemPromises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
@@ -505,6 +544,12 @@ DownloadUtils.nico.prototype = {
     if(this._getComment && this._fileBundle.files.comment.exists()) { 
         this._fileBundle.files.comment.remove(false);
     }
+    if(this._getCommentZhTw && this._fileBundle.files.commentZhTw.exists()) {
+        this._fileBundle.files.commentZhTw.remove(false);
+    }
+    if(this._getCommentEnUs && this._fileBundle.files.commentEnUs.exists()) {
+        this._fileBundle.files.commentEnUs.remove(false);
+    }
     if(this._getUploaderComment && this._fileBundle.files.uploaderComment.exists()) { 
         this._fileBundle.files.uploaderComment.remove(false);
     }
@@ -513,7 +558,7 @@ DownloadUtils.nico.prototype = {
     }
   },
   /* Add <!--BoonSutazioData=Video.v --> to file, make BOON Player have ability to update; filter replace support */
-  processNicoComment: function(result) {
+  processNicoComment: function(variant, result) {
     if (this._canceled) { return; }
     var commentsDoc = result.xml;
     var boonComment = Core.prefs.getBoolPref('boon_comment');
@@ -550,7 +595,13 @@ DownloadUtils.nico.prototype = {
     var xmlSerializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
     var content = xmlSerializer.serializeToString(commentsDoc);
     /* Prepare the input/output stream to write back to file */
-    var outputStream = FileUtils.openSafeFileOutputStream(this._fileBundle.files.comment);
+    var commentFile = this._fileBundle.files.comment;
+    if (variant == "zh-tw") {
+      commentFile = this._fileBundle.files.commentZhTw;
+    } else if (variant == "en-us") {
+      commentFile = this._fileBundle.files.commentEnUs;
+    }
+    var outputStream = FileUtils.openSafeFileOutputStream(commentFile);
     var os = Cc["@mozilla.org/intl/converter-output-stream;1"].createInstance(Ci.nsIConverterOutputStream);
     var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
     converter.charset = "utf-8";

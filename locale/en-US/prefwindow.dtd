@@ -17,9 +17,14 @@
 <!ENTITY downloader.save_path.browse.accesskey "B">
 <!ENTITY downloader.filename_scheme.label "File Name Scheme:">
 <!ENTITY downloader.filename_scheme.accesskey "N">
+<!ENTITY downloader.download_comment_variants "Comments to Download:">
+<!ENTITY downloader.download_comment.label "Japanese">
+<!ENTITY downloader.download_comment.accesskey "J">
+<!ENTITY downloader.download_comment_en-us.label "English (United States)">
+<!ENTITY downloader.download_comment_en-us.accesskey "G">
+<!ENTITY downloader.download_comment_zh-tw.label "Chinese (Taiwan)">
+<!ENTITY downloader.download_comment_zh-tw.accesskey "I">
 <!ENTITY downloader.also_download "Also Download:">
-<!ENTITY downloader.download_comment.label "Comments">
-<!ENTITY downloader.download_comment.accesskey "C">
 <!ENTITY downloader.uploader_comment.label "Uploader Comments">
 <!ENTITY downloader.uploader_comment.accesskey "U">
 <!ENTITY downloader.download_thumbnail.label "Thumbnail">
