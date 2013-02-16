@@ -16,7 +16,8 @@ function load() {
 
   /* Prepare flashvars */
   var flashVars = "videoFile=" + encodeURIComponent(window.arguments[0].video) + 
-                  "&commentFile=" + encodeURIComponent(window.arguments[0].comment);
+                  "&commentFile=" + encodeURIComponent(window.arguments[0].comment) +
+                  "&commentVariants=" + encodeURIComponent(window.arguments[0].commentVariants);
   /* Add a html:object to embed the NicoFox Player SWF.
      It seems that the element will follow XUL Layout, so use flex="1" for auto-sizing.
      <html:object type="application/x-shockwave-flash" data="chrome://nicofox/content/nicofoxPlayer.swf" flex="1">

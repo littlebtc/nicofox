@@ -319,6 +319,9 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   if (typeof result.status == "number") {
     listItem.setAttribute("sfstatus", result.status);
   }
+  if (result.info) {
+    listItem.setAttribute("sfvariantinfo", result.info);
+  }
   /* For completed items, show more info. */
   if (result.max_bytes > 0 && result.status == 1) {
     var endTime = new Date(result.end_time);
@@ -470,14 +473,18 @@ nicofox.panel.commands = {
     
     /* Check if comment XML file exists */
     var commentUrl = "";
-    
-    if (selectedItem.hasAttribute("sfcommentfile")) {
+    var commentVariants = "";
+
+    if (selectedItem.hasAttribute("sfvariantinfo")) {
+      var variants = JSON.parse(selectedItem.getAttribute("sfvariantinfo")).comment_variants;
+      commentVariants = variants.join(",");
+    } else if (selectedItem.hasAttribute("sfcommentfile")) {
       var commentFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfcommentfile"));
       if (commentFile.exists()) {
         commentUrl = nicofox.Services.io.newFileURI(commentFile).spec;
       }
     }
-    window.openDialog('chrome://nicofox/content/nicofoxPlayer.xul', 'nicofox_swf', 'width=672, height=424, dialog=no, resizable=yes, centerscreen', {video: videoUrl, comment: commentUrl, title: selectedItem.getAttribute("sfvideotitle")});
+    window.openDialog('chrome://nicofox/content/nicofoxPlayer.xul', 'nicofox_swf', 'width=672, height=424, dialog=no, resizable=yes, centerscreen', {video: videoUrl, comment: commentUrl, commentVariants: commentVariants, title: selectedItem.getAttribute("sfvideotitle")});
   },
   /* Cancel */
   cancel: function(selectedItem) {
