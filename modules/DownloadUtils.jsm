@@ -225,17 +225,11 @@ DownloadUtils.nico.prototype = {
     }
     this.commentId = info.nicoData.v;
     this.videoId = info.nicoData.id;
-    /* Prepare request URL. Use flapi for Japan site, per-site API for tw/de/es */
-    var nonJapanMatch = /^http:\/\/(tw|de|es)/.exec(url);
     var requestUrl = "http://flapi.nicovideo.jp/api/getflv";
-    if (nonJapanMatch) {
-      requestUrl = "http://" + nonJapanMatch[1] + ".nicovideo.jp/api/getflv";
-    }
     var postQueryString = "ts=" + new Date().getTime() + "&v=" + this.commentId;
     /* When encountering SWF vidoes, request &as3=1 on Japan site:
-     * Maybe &as3=1 will hack the AVM1 SWF so that it can be loaded on new AS3-based player on Japan site.
-     * Requesting &as3=1 on non-Japan sites (which are using AS2-based player) will trigger a 403 error. :( */
-    if (this.videoId.indexOf("nm") == 0 && !nonJapanMatch) {
+     * &as3=1 may hack the AVM1 SWF so that it can be loaded on new AS3-based player on Japan site. */
+    if (this.videoId.indexOf("nm") == 0) {
       postQueryString += "&as3=1";
     }
     /* Send request */
@@ -413,6 +407,10 @@ DownloadUtils.nico.prototype = {
     if (this._getFlvParams.needs_key) {
       var commentQueryString = 
       '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20090904" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'"/><thread_leaves thread="'+ this._getFlvParams.thread_id +'" user_id="'+this._getFlvParams.user_id+'"  threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'">0-'+ Math.ceil(this._info.nicoData.length / 60) +':100</thread_leaves></packet>';
+      var commentZhTwQueryString =
+      '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20061206" res_from="-250" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'" language="2"/></packet>';
+      var commentEnUsQueryString =
+      '<packet><thread thread="'+ this._getFlvParams.thread_id +'" version="20061206" res_from="-250" user_id="'+this._getFlvParams.user_id+'" threadkey="'+this._getThreadKeyParams.threadkey+'" force_184="'+this._getThreadKeyParams.force_184+'" language="1"/></packet>';
       var uploaderCommentQueryString =
       '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     } else {
