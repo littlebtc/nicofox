@@ -39,6 +39,22 @@ nicofox.panel.onPopupShown = function(event) {
   var thumbnailDisplayType = document.getElementById("nicofoxThumbnailDisplay").value;
   document.getElementById('nicofoxDownloadList').setAttribute('sfthumbdisplay', thumbnailDisplayType);
 
+  /* Disable the following features on private window for now, since NicoFox is not privacy-aware now. */
+  if (nicofox.isInPrivateWindow) {
+    document.getElementById("nicofox-private-window-unsupported").hidden = false;
+    document.getElementById("nicofoxThumbnailDisplayBlock").hidden = true;
+    document.getElementById("nicofoxDownloadList").hidden = true;
+    document.getElementById("smilefox-search").hidden = true;
+    document.getElementById("nicofoxDownloadBottomActions").hidden = true;
+    document.getElementById("nicofox-library").firstChild.style.height = "auto";
+    /* Change the toolbutton state. */
+    var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
+    if (nicofoxToolbarButton) {
+      nicofoxToolbarButton.setAttribute("open", true);
+    }
+    return;
+  }
+
   /* Sometimes video info will be lost (e.g. after drop the tab to the new window), read again. */
   var browser = gBrowser.selectedBrowser;
   if (browser && browser.contentWindow) {
@@ -688,6 +704,9 @@ nicofox.panel.listener.downloadResumed = function(id) {
 nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1", "nsILocalFile", "initWithPath");
 /* XXX: Remove listener used only */
 nicofox.panel.unload = function() {
+  if (nicofox.isInPrivateWindow) {
+    return;
+  }
   if (nicofox.panel.timerEvent.callback) {
     nicofox.panel.timerEvent.cancel();
   }

@@ -6,12 +6,25 @@ if (!nicofox) {var nicofox = {};}
 Components.utils.import("resource://nicofox/Core.jsm", nicofox);
 Components.utils.import("resource://gre/modules/Services.jsm", nicofox);
 
+/* A indicator to determine whether we are in the private window.
+ * It will be properly set in nicofox.overlay.onLoad(). */
+nicofox.isInPrivateWindow = false;
+
 nicofox.overlay = {
   /* On browser window loading */
   onLoad: function() {
     window.removeEventListener("load", nicofox.overlay.onLoad, false);
     /* initialization code */
     nicofox.overlay.initialized = true;
+
+    /* Check the private window status */
+    var PrivateBrowsingUtils = false;
+    try {
+      PrivateBrowsingUtils = Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm", {}).PrivateBrowsingUtils;
+    } catch(e) {
+      /* Ignore old versions errors */
+    }
+    nicofox.isInPrivateWindow = (PrivateBrowsingUtils)? PrivateBrowsingUtils.isWindowPrivate(window) : false;
 
     /* For Firefox 4, append the toolbar button for the first time.
      * Modified from https://developer.mozilla.org/en/Code_snippets/Toolbar
@@ -32,9 +45,17 @@ nicofox.overlay = {
       }
       nicofox.Core.prefs.setBoolPref("toolbar_check", true);
     }
+
     /* Register panel initializer */
     document.getElementById("nicofox-library").addEventListener("popupshown", nicofox.panel.onPopupShown, false);
     document.getElementById("nicofox-library").addEventListener("popuphidden", nicofox.panel.onPopupHidden, false);
+
+    /* Disable the following features on private window for now, since NicoFox is not privacy-aware now. */
+    if (nicofox.isInPrivateWindow) {
+      document.getElementById("nicofox-context-seprator").hidden = true;
+      document.getElementById("nicofox-context-download").hidden = true;
+      return;
+    }
 
     /* Register context menu showing listener */
     var contextMenu = document.getElementById("contentAreaContextMenu");
@@ -64,6 +85,10 @@ nicofox.overlay = {
 
     document.getElementById("nicofox-library").removeEventListener("popupshown", nicofox.panel.onPopupShown, false);
     document.getElementById("nicofox-library").removeEventListener("popuphidden", nicofox.panel.onPopupHidden, false);
+
+    if (nicofox.isInPrivateWindow) {
+      return;
+    }
 
     nicofox.DownloadManager.removeListener(nicofox.listener);
     var contextMenu = document.getElementById("contentAreaContextMenu");

@@ -10,6 +10,8 @@
 <!ENTITY search.label "検索">
 <!ENTITY openPlayer.tooltiptext "Nicofox Playerで動画ファイルを再生する">
 <!ENTITY close.tooltiptext "NicoFoxダウンロードマネージャーを閉じる">
+<!ENTITY info.privateWindow.notSupported.title "NicoFox 暫時不支援在隱私視窗中使用。">
+<!ENTITY info.privateWindow.notSupported.link "未來的版本將會支援此功能。">
 <!ENTITY info.notWatching.welcome.title "NicoFox へようこそ！">
 <!ENTITY info.notWatching.welcome.description "動画ページを開いたら、動画インフォ、保存ボタンとツールサイトボタンはここに表示します。">
 <!ENTITY info.notWatching.welcome.goNicoSite "各言語のニコニコ動画のトップページ:">

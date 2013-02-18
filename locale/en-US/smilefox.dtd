@@ -10,6 +10,8 @@
 <!ENTITY search.label "Search">
 <!ENTITY openPlayer.tooltiptext "Open Video File in Player">
 <!ENTITY close.tooltiptext "Dismiss the manager">
+<!ENTITY info.privateWindow.notSupported.title "Private window is not currently supported by NicoFox.">
+<!ENTITY info.privateWindow.notSupported.link "It will be supported in future releases.">
 <!ENTITY info.notWatching.welcome.title "Welcome to NicoFox!">
 <!ENTITY info.notWatching.welcome.description "When you enter the video page, download button and tool sites will be displayed here.">
 <!ENTITY info.notWatching.welcome.goNicoSite "Go to Nico Nico Douga in the specific languages:">

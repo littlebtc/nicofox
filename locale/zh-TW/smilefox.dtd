@@ -10,6 +10,8 @@
 <!ENTITY search.label "搜尋">
 <!ENTITY openPlayer.tooltiptext "在撥放器開啟影片檔案">
 <!ENTITY close.tooltiptext "關閉管理員">
+<!ENTITY info.privateWindow.notSupported.title "NicoFox 暫時不支援隱私視窗。">
+<!ENTITY info.privateWindow.notSupported.link "未來的版本將會支援此功能。">
 <!ENTITY info.notWatching.welcome.title "歡迎使用 NicoFox！">
 <!ENTITY info.notWatching.welcome.description "當您開啟影片網頁時，影片資訊、下載按鈕和相關網站工具將會在這個區域顯示。">
 <!ENTITY info.notWatching.welcome.goNicoSite "進入不同語言的 NICONICO 動畫網站首頁：">
