@@ -17,7 +17,7 @@ Components.utils.import("resource://nicofox/When.jsm");
 
 /* Check the login result. */
 function checkResult(result) {
-  /* If the user is logged in successfully, a 302 redirect to http://www|tw.nicovideo.jp/ will be sent.
+  /* If the user is logged in successfully, a 302 redirect to http://www.nicovideo.jp/ will be sent.
    * So, check the original request for result */
   var channel = result.request.QueryInterface(Ci.nsIHttpChannel);
   if (channel.URI.spec.indexOf("https://secure.nicovideo.jp/") == 0) {

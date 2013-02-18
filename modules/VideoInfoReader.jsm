@@ -42,6 +42,8 @@ const PAGE_READ_INTERVAL = 10000; /* 10 secs */
  *
  * (b) Global site URL containing video ID
  *    e.g. http://tw.nicovideo.jp/watch/sm9
+ *     Note: As the closure of Taiwan site in 2012, there is currently no global sites.
+ *     This is still remained for compatibility with old contents.
  *
  *    - "tw": Taiwan version comments.
  *    - "de": German version comments.
@@ -71,15 +73,15 @@ function parseVideoInfo(result) {
   info.nicoData = nicoData;
 
   /* Idendity (a),(b) type URLs */
-  var videoIdUrlMatch = /^http:\/\/(www|tw)\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/.exec(url);
-  var commentIdUrlMatch = /^http:\/\/(www|tw)\.nicovideo\.jp\/watch\/([0-9]+)$/.exec(url);
+  var videoIdUrlMatch = /^http:\/\/www\.nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)$/.exec(url);
+  var commentIdUrlMatch = /^http:\/\/www\.nicovideo\.jp\/watch\/([0-9]+)$/.exec(url);
   if (videoIdUrlMatch && !nicoData.channelId) {
-    info.commentType = videoIdUrlMatch[1];
+    info.commentType = "www";
   } else if (videoIdUrlMatch) {
     /* XXX: soxxxxx will redirect to comment id URL, but can we dectect it?*/ 
     info.commentType = "ch" + nicoData.channelId;
   } else if (commentIdUrlMatch) {
-    info.commentId = commentIdUrlMatch[2];
+    info.commentId = commentIdUrlMatch[1];
     /* Carefully distinguish (c) type URLs */
     if (nicoData.isMymemory) {
       info.commentType = "mymemory" + info.commentId;

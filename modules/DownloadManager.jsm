@@ -566,7 +566,7 @@ DownloadManager.getDownload = function(id, thisObj, successCallback, failCallbac
  */
 DownloadManager.addDownload = function(url, cachedInfo) {
   /* XXX: URL Checker should not be here. */
-  if (!/^http:\/\/(?:www|tw)\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
+  if (!/^http:\/\/www\.nicovideo\.jp\/watch\/(?:[a-z]{0,2}[0-9]+)$/.test(url)) { return; }
   /* Use cached info if exists. */
   if (cachedInfo) {
     Components.utils.import("resource://nicofox/When.jsm");
