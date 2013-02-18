@@ -14,12 +14,11 @@
 <!ENTITY info.privateWindow.notSupported.link "未來的版本將會支援此功能。">
 <!ENTITY info.notWatching.welcome.title "NicoFox へようこそ！">
 <!ENTITY info.notWatching.welcome.description "動画ページを開いたら、動画インフォ、保存ボタンとツールサイトボタンはここに表示します。">
-<!ENTITY info.notWatching.welcome.goNicoSite "各言語のニコニコ動画のトップページ:">
+<!ENTITY info.notWatching.welcome.goNicoSite "ニコニコ動画のトップページ">
 <!ENTITY info.loading.title "動画インフォをロードします…">
 <!ENTITY info.failed.title "動画インフォの読み取りは失敗しました">
 <!ENTITY info.failed.description "データの再読み取りのため、JavaScriptを有効にして、ニコニコ動画のサイトにログインしてください。">
 <!ENTITY info.failed.tryDownload "すでにログインしてる場合は、動画の保存ができる場合もあります。">
-<!ENTITY info.watching.tools.languages "言語切り替え">
 <!ENTITY info.watching.tools.sites "ツールサイト">
 <!ENTITY thumbnail.display.label "サムネの表示:">
 <!ENTITY thumbnail.display.larger "大">

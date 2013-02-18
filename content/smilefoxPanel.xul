@@ -22,13 +22,7 @@
         <vbox id="nicofox-not-watching" class="nicofoxVideoInfoBox" hidden="true">
           <label class="nicofoxVideoInfoBoxTitle" value="&info.notWatching.welcome.title;" />
           <description>&info.notWatching.welcome.description;</description>
-          <description>&info.notWatching.welcome.goNicoSite;</description>
-          <hbox id="nicofox-not-watching-toolbar">
-            <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="nicofoxVideoToolItem"
-                   onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
-            <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="nicofoxVideoToolItem"
-                   onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-          </hbox>
+          <description class="text-link" onclick="nicofox.panel.videoTools.goSite(event, 'www');">&info.notWatching.welcome.goNicoSite;</description>
         </vbox>
         <vbox id="nicofox-watching-loading" class="nicofoxVideoInfoBox" hidden="true">
           <label value="&info.loading.title;" />
@@ -51,13 +45,7 @@
                 <!--<button id="nicofox-watching-add-tags" label="Add tags..." />-->
               </hbox>
               <hbox id="nicofox-watching-toolbar">
-                <label value="&info.watching.tools.languages;" />
-                <hbox align="center">
-                  <image style="-moz-image-region: rect(0px 16px 11px 0px);" class="nicofoxVideoToolItem"
-                         onclick="nicofox.panel.videoTools.goSite(event, 'www');" />
-                  <image style="-moz-image-region: rect(0px 32px 11px 16px);" class="nicofoxVideoToolItem"
-                         onclick="nicofox.panel.videoTools.goSite(event, 'tw');" />
-                </hbox>
+                <label id="nicofox-watching-thread" class="text-link" onclick="nicofox.panel.videoTools.goSite(event, 'www');"></label>
                 <label value="&info.watching.tools.sites;" />
                 <hbox>
                   <image style="-moz-image-region: rect(11px 16px 27px 0px);" class="nicofoxVideoToolItem"

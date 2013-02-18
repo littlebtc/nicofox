@@ -14,12 +14,11 @@
 <!ENTITY info.privateWindow.notSupported.link "未來的版本將會支援此功能。">
 <!ENTITY info.notWatching.welcome.title "歡迎使用 NicoFox！">
 <!ENTITY info.notWatching.welcome.description "當您開啟影片網頁時，影片資訊、下載按鈕和相關網站工具將會在這個區域顯示。">
-<!ENTITY info.notWatching.welcome.goNicoSite "進入不同語言的 NICONICO 動畫網站首頁：">
+<!ENTITY info.notWatching.welcome.goNicoSite "前往 NICONICO 動畫網站首頁">
 <!ENTITY info.loading.title "影片資訊讀取中...">
 <!ENTITY info.failed.title "影片資訊讀取失敗">
 <!ENTITY info.failed.description "若要重新讀取資訊，您需要登入 NICONICO 動畫並啟用 JavaScript。">
 <!ENTITY info.failed.tryDownload "如果您已經登入，仍然可以嘗試下載影片：">
-<!ENTITY info.watching.tools.languages "語言選擇">
 <!ENTITY info.watching.tools.sites "工具網站">
 <!ENTITY thumbnail.display.label "縮圖顯示:">
 <!ENTITY thumbnail.display.larger "大">

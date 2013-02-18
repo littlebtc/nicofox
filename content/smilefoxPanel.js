@@ -171,6 +171,7 @@ nicofox.panel.updateVideoInfo = function() {
         if (/http\:\/\//.test(info.nicoData.thumbnail)) {
           document.getElementById("nicofox-watching-thumb").src = info.nicoData.thumbnail;
         }
+        document.getElementById("nicofox-watching-thread").value = info.nicoData.id;
         /* NicoNico Farm only supports original Japanese site thread, we need to check it */
         document.getElementById("nicofox-watching-comment-tool").visible = /^[a-z]/.test(info.nicoData.v);
       }
