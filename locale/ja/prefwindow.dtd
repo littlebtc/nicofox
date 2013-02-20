@@ -17,7 +17,7 @@
 <!ENTITY downloader.save_path.browse.accesskey "B">
 <!ENTITY downloader.filename_scheme.label "ファイルの命名記法:">
 <!ENTITY downloader.filename_scheme.accesskey "N">
-<!ENTITY downloader.download_comment_variants "コメントダウンロード:">
+<!ENTITY downloader.download_comment_variants "コメント保存:">
 <!ENTITY downloader.download_comment.label "日本語">
 <!ENTITY downloader.download_comment.accesskey "J">
 <!ENTITY downloader.download_comment_en-us.label "英語（アメリカ合衆国）">
