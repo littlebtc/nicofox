@@ -225,6 +225,16 @@ DownloadUtils.nico.prototype = {
     }
     this.commentId = info.nicoData.v;
     this.videoId = info.nicoData.id;
+
+    /* My memory has no comment variants. So download comment if comment from any language is selected.
+     * XXX: Did we need to distingush the comment variant? */
+    if (info.nicoData.isMymemory) {
+      var getComment = this._getComment || this._getCommentZhTw || this._getCommentEnUs;
+      this._getComment = getComment;
+      this._getCommentZhTw = false;
+      this._getCommentEnUs = false;
+    }
+
     var requestUrl = "http://flapi.nicovideo.jp/api/getflv";
     var postQueryString = "ts=" + new Date().getTime() + "&v=" + this.commentId;
     /* When encountering SWF vidoes, request &as3=1 on Japan site:
