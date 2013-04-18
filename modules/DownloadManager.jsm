@@ -443,9 +443,12 @@ DownloadManager.startup = function() {
   prefObserver.register();
   
   /* Private Browsing checking XXX: 1.9.1b2- compatibility */
-  var privateSvc = Cc["@mozilla.org/privatebrowsing;1"].getService(Ci.nsIPrivateBrowsingService);
-  inPrivateBrowsing = privateSvc.privateBrowsingEnabled;  
-    
+  if (Ci.nsIPrivateBrowsingService) {
+    var privateSvc = Cc["@mozilla.org/privatebrowsing;1"].getService(Ci.nsIPrivateBrowsingService);
+    inPrivateBrowsing = privateSvc.privateBrowsingEnabled;
+  } else {
+    inPrivateBrowsing = false;
+  }
   /* Read the preference */
   downloadMax = Core.prefs.getIntPref("download_max");
 
