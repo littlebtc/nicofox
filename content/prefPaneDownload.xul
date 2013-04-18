@@ -25,14 +25,15 @@
         <columns>
           <column flex="1"/>
           <column flex="2"/>
-          <column flex="1"/>
         </columns>
         <rows>
           <row>
             <label value="&downloader.save_path.label;" accesskey="&downloader.save_path.accesskey;" control="save_path" />
-            <filefield id="save_path" preference="pref-save_path" preference-editable="true"
-                       onsyncfrompreference="return prefPaneDownload.displaySavePath();" />
-            <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="prefPaneDownload.chooseSavePath();" />
+            <hbox>
+              <filefield id="save_path" preference="pref-save_path" preference-editable="true"
+                         onsyncfrompreference="return prefPaneDownload.displaySavePath();" />
+              <button label="&downloader.save_path.browse.label;" accesskey="&downloader.save_path.browse.accesskey;" oncommand="prefPaneDownload.chooseSavePath();" />
+            </hbox>
           </row>
           <row>
             <label value="&downloader.filename_scheme.label;" accesskey="&downloader.filename_scheme.accesskey;" control="filename_scheme" />

@@ -20,7 +20,7 @@
 <!ENTITY downloader.download_comment_variants "コメント保存:">
 <!ENTITY downloader.download_comment.label "日本語">
 <!ENTITY downloader.download_comment.accesskey "J">
-<!ENTITY downloader.download_comment_en-us.label "英語（アメリカ合衆国）">
+<!ENTITY downloader.download_comment_en-us.label "英語（アメリカ）">
 <!ENTITY downloader.download_comment_en-us.accesskey "G">
 <!ENTITY downloader.download_comment_zh-tw.label "中国語（台湾）">
 <!ENTITY downloader.download_comment_zh-tw.accesskey "I">
