@@ -41,11 +41,13 @@
           </row>
           <row>
             <label value="&downloader.download_comment_variants;" />
-            <hbox>
-              <checkbox id="download_comment" preference="pref-download_comment" label="&downloader.download_comment.label;" accesskey="&downloader.download_comment.accesskey;" />
-              <checkbox id="download_comment_zh-tw" preference="pref-download_comment_zh-tw" label="&downloader.download_comment_zh-tw.label;" accesskey="&downloader.download_comment_zh-tw.accesskey;" />
+            <vbox>
+              <hbox>
+                <checkbox id="download_comment" preference="pref-download_comment" label="&downloader.download_comment.label;" accesskey="&downloader.download_comment.accesskey;" />
+                <checkbox id="download_comment_zh-tw" preference="pref-download_comment_zh-tw" label="&downloader.download_comment_zh-tw.label;" accesskey="&downloader.download_comment_zh-tw.accesskey;" />
+              </hbox>
               <checkbox id="download_comment_en-us" preference="pref-download_comment_en-us" label="&downloader.download_comment_en-us.label;" accesskey="&downloader.download_comment_en-us.accesskey;" />
-            </hbox>
+            </vbox>
           </row>
           <row>
             <label value="&downloader.also_download;" />
