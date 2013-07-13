@@ -153,7 +153,7 @@ infoFetcher.readVideoPage = function(result) {
   /* For Zero edition: Find watchAPIDataContainer */
   var regexMatchZero = content.match(/<div id\=\"watchAPIDataContainer\" style=\"display:none\">([^<]+)<\/div>/);
   /* For Harajuku & Taiwan edition: Find the Video parameter on the page */
-  var regexMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*)\}\;\s+(-->)?\s?<\/script>/);
+  var regexMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*?)\}\;\s+(-->)??\s?<\/script>/);
   if (!regexMatchZero && !regexMatch) {
     /* Two cases if Video is not present: (1) had User variable: error, anti-flood (2) has no User variable: not logged in */
     var reason = "";
