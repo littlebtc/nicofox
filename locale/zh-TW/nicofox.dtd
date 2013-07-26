@@ -1,4 +1,4 @@
-<!ENTITY smilefox.label "NicoFox 下載管理員">
-<!ENTITY smilefox.accesskey "N">
-<!ENTITY downloadLink.label "以 NicoFox 下載鏈結影片">
-<!ENTITY downloadLink.accesskey "N">
+<!ENTITY nicofox.downloadManager.label "NicoFox 下載管理員">
+<!ENTITY nicofox.downloadManager.accesskey "N">
+<!ENTITY nicofox.downloadLink.label "以 NicoFox 下載鏈結影片">
+<!ENTITY nicofox.downloadLink.accesskey "N">

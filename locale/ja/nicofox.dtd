@@ -1,4 +1,4 @@
-<!ENTITY smilefox.label "NicoFox ダウンロードマネージャー">
-<!ENTITY smilefox.accesskey "N">
-<!ENTITY downloadLink.label "NicoFox でリンクの動画をダウンロード">
-<!ENTITY downloadLink.accesskey "N">
+<!ENTITY nicofox.downloadManager.label "NicoFox ダウンロードマネージャー">
+<!ENTITY nicofox.downloadManager.accesskey "N">
+<!ENTITY nicofox.downloadLink.label "NicoFox でリンクの動画をダウンロード">
+<!ENTITY nicofox.downloadLink.accesskey "N">
