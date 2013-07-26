@@ -7,85 +7,85 @@
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
           xmlns:xbl="http://www.mozilla.org/xbl">
-  <binding id="smilefox-download-queued" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+  <binding id="nicofox-download-item-queued" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
       <xul:hbox flex="1" align="start">
-        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:image xbl:inherits="src=thumbnail" class="nicofoxDownloadItemThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1" align="start">
           <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" />
-          <xul:label value="&status.queued.label;" class="smilefoxVideoStatus" flex="1" />
+          <xul:label value="&status.queued.label;" class="nicofoxDownloadItemStatus" flex="1" />
         </xul:vbox>
       </xul:hbox>
     </content>
   </binding>
-  <binding id="smilefox-download-completed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+  <binding id="nicofox-download-item-completed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
       <xul:hbox flex="1" align="start">
-        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:image xbl:inherits="src=thumbnail" class="nicofoxDownloadItemThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:hbox flex="1">
             <xul:label flex="1" xbl:inherits="value=sfvideotitle" crop="end" />
             <xul:spacer flex="1" />
-            <xul:label xbl:inherits="hidden=sfhidelowquality" class="smilefoxLowQuality" value="&status.lowQuality.label;" />
+            <xul:label xbl:inherits="hidden=sfhidelowquality" class="nicofoxDownloadItemLowQuality" value="&status.lowQuality.label;" />
           </xul:hbox>
           <xul:hbox flex="1">
-            <xul:label xbl:inherits="value=sfvideoinfo" class="smilefoxVideoStatus" flex="1" />
+            <xul:label xbl:inherits="value=sfvideoinfo" class="nicofoxDownloadItemStatus" flex="1" />
           </xul:hbox>
         </xul:vbox>
       </xul:hbox>
     </content>
   </binding>
-  <binding id="smilefox-download-canceled" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+  <binding id="nicofox-download-item-canceled" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
       <xul:hbox flex="1" align="start">
-        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:image xbl:inherits="src=thumbnail" class="nicofoxDownloadItemThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1" align="start">
-          <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="smilefoxInactiveItem" />
-          <xul:label value="&status.canceled.label;" class="smilefoxVideoStatus smilefoxInactiveItem" flex="1" />
+          <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="nicofoxDownloadItemInactive" />
+          <xul:label value="&status.canceled.label;" class="nicofoxDownloadItemStatus nicofoxDownloadItemInactive" flex="1" />
         </xul:vbox>
       </xul:hbox>
     </content>
   </binding>
-  <binding id="smilefox-download-failed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+  <binding id="nicofox-download-item-failed" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
       <xul:hbox flex="1" align="start">
-        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:image xbl:inherits="src=thumbnail" class="nicofoxDownloadItemThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1" align="start">
-          <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="smilefoxInactiveItem" />
-          <xul:label value="&status.failed.label;" class="smilefoxVideoStatus smilefoxInactiveItem" flex="1" />
+          <xul:label xbl:inherits="value=sfvideotitle" crop="end" flex="1" class="nicofoxDownloadItemInactive" />
+          <xul:label value="&status.failed.label;" class="nicofoxDownloadItemStatus nicofoxDownloadItemInactive" flex="1" />
         </xul:vbox>
       </xul:hbox>
     </content>
   </binding>
-  <binding id="smilefox-download-scheduled" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+  <binding id="nicofox-download-item-scheduled" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
       <xul:hbox flex="1" align="start">
-        <xul:image xbl:inherits="src=thumbnail" class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:image xbl:inherits="src=thumbnail" class="nicofoxDownloadItemThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:hbox flex="1">
             <xul:label flex="1" xbl:inherits="value=sfvideotitle" crop="end" />
             <xul:spacer flex="1" />
-            <xul:label xbl:inherits="hidden=sfhidelowquality" class="smilefoxLowQuality" value="&status.lowQuality.label;" />
+            <xul:label xbl:inherits="hidden=sfhidelowquality" class="nicofoxDownloadItemLowQuality" value="&status.lowQuality.label;" />
           </xul:hbox>
           <xul:hbox flex="1">
-            <xul:label value="&status.scheduled.label;" class="smilefoxVideoStatus" flex="1"/>
+            <xul:label value="&status.scheduled.label;" class="nicofoxDownloadItemStatus" flex="1"/>
           </xul:hbox>
         </xul:vbox>
       </xul:hbox>
     </content>
   </binding>
-  <binding id="smilefox-download-downloading" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+  <binding id="nicofox-download-item-downloading" extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
     <content>
       <xul:hbox flex="1" align="start">      
-        <xul:image class="smilefoxDownloadThumbnail"/> <!--XXX: Why makes size fixed here? -->
+        <xul:image class="nicofoxDownloadItemThumbnail"/> <!--XXX: Why makes size fixed here? -->
         <xul:vbox flex="1">
           <xul:hbox flex="1">
             <xul:label flex="1" xbl:inherits="value=sfvideotitle" crop="end" />
             <xul:spacer flex="1" />
-            <xul:label xbl:inherits="hidden=sfhidelowquality" class="smilefoxLowQuality" value="&status.lowQuality.label;" />
+            <xul:label xbl:inherits="hidden=sfhidelowquality" class="nicofoxDownloadItemLowQuality" value="&status.lowQuality.label;" />
           </xul:hbox>
           <xul:progressmeter xbl:inherits="mode=progresstype,value=currentbytes,max=maxbytes" flex="1"/>
-          <xul:label xbl:inherits="value=sfdownloadstatus" class="smilefoxVideoStatus" crop="end" flex="1" />
+          <xul:label xbl:inherits="value=sfdownloadstatus" class="nicofoxDownloadItemStatus" crop="end" flex="1" />
         </xul:vbox>
       </xul:hbox>
     </content>
