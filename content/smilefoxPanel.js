@@ -293,7 +293,7 @@ nicofox.panel.doneGetDownloads = function() {
 
 /* Update the <listitem> when new download were added or the status had changed. */
 nicofox.panel.updateDownloadItem = function(listItem, result) {
-  listItem.setAttribute("type", "nicofox-download-list");
+  listItem.setAttribute("type", "nicofox-download");
   if (result.thumbnail_file) {
     var thumbFile = new nicofox.panel._fileInstance(result.thumbnail_file);
     if (thumbFile.exists()) {
