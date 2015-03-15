@@ -860,7 +860,7 @@ downloadQueueRunner.dbFail = function() {
 /* Handle downloader (DownloadUtils.nico) events. In the function, this will be the downloader instance. */
 function handleDownloaderEvent(type, content) {
   /* To prevent "stop" to be called when canceled */
-  if(this._canceled && type != "cancel" && type != "fail") { return; }
+  if(this._canceled && type != "cancel" && type != "fail" && type != "pause") { return; }
   var id = this.dbId;
   
   switch(type) {

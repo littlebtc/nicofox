@@ -41,66 +41,66 @@
 
 /* Panel UI: Downloads */
 /* Referenced from: toolkit/themes/pinstripe/mozapps/downloads/downloads.css */
-richlistitem[type="smilefox"] {
+richlistitem[type="nicofox-download"] {
   overflow-x: hidden;
   padding: 3px;
 }
-richlistitem[type="smilefox"][sfstatus="0"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-queued");
+richlistitem[type="nicofox-download"][dlstatus="0"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#nicofox-download-item-queued");
 }
-richlistitem[type="smilefox"][sfstatus="1"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-completed");
+richlistitem[type="nicofox-download"][dlstatus="1"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#nicofox-download-item-completed");
 }
-richlistitem[type="smilefox"][sfstatus="2"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-canceled");
+richlistitem[type="nicofox-download"][dlstatus="2"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#nicofox-download-item-canceled");
 }
-richlistitem[type="smilefox"][sfstatus="3"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-failed");
+richlistitem[type="nicofox-download"][dlstatus="3"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#nicofox-download-item-failed");
 }
-richlistitem[type="smilefox"][sfstatus="4"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-scheduled");
+richlistitem[type="nicofox-download"][dlstatus="4"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#nicofox-download-item-scheduled");
 }
-richlistitem[type="smilefox"]:not([selected="true"]):nth-child(odd) {
+richlistitem[type="nicofox-download"]:not([selected="true"]):nth-child(odd) {
   background-color: -moz-oddtreerow;
 }
-richlistitem[type="smilefox"][sfstatus="7"] {
-  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#smilefox-download-downloading");
+richlistitem[type="nicofox-download"][dlstatus="7"] {
+  -moz-binding: url("chrome://nicofox/content/smilefoxPanel.xml#nicofox-download-item-downloading");
 }
-.smilefoxDownloadThumbnail {
+.nicofoxDownloadItemThumbnail {
   background: url("chrome://nicofox/skin/thumb_missing.png") black;
   background-size: 100% 100%;
 }
 
-#nicofoxDownloadList[sfthumbdisplay="larger"] .smilefoxDownloadThumbnail {
+#nicofox-download-list[sfthumbdisplay="larger"] .nicofoxDownloadItemThumbnail {
   width: 64px;
   height: 48px;
 }
-#nicofoxDownloadList[sfthumbdisplay="medium"] .smilefoxDownloadThumbnail {
+#nicofox-download-list[sfthumbdisplay="medium"] .nicofoxDownloadItemThumbnail {
   width: 48px;
   height: 36px;
 }
-#nicofoxDownloadList[sfthumbdisplay="smaller"] .smilefoxDownloadThumbnail {
+#nicofox-download-list[sfthumbdisplay="smaller"] .nicofoxDownloadItemThumbnail {
   width: 32px;
   height: 24px;
 }
-#nicofoxDownloadList[sfthumbdisplay="none"] .smilefoxDownloadThumbnail {
+#nicofox-download-list[sfthumbdisplay="none"] .nicofoxDownloadItemThumbnail {
   display: none;
 }
 
-#nicofoxDownloadList[sfthumbdisplay="smaller"] .smilefoxVideoStatus,
-#nicofoxDownloadList[sfthumbdisplay="none"]  .smilefoxVideoStatus {
+#nicofox-download-list[sfthumbdisplay="smaller"] .nicofoxDownloadItemStatus,
+#nicofox-download-list[sfthumbdisplay="none"]  .nicofoxDownloadItemStatus {
   display: none;
 }
 
-.smilefoxVideoStatus {
+.nicofoxDownloadItemStatus {
   font-size: 90%;
 }
 
-.smilefoxInactiveItem {
+.nicofoxDownloadItemInactive {
   color: GrayText;
 }
 
-.smilefoxLowQuality {
+.nicofoxDownloadItemLowQuality {
   color: GrayText;
   font-size: 90%;
   border: 1px solid GrayText;
@@ -108,7 +108,7 @@ richlistitem[type="smilefox"][sfstatus="7"] {
   border-radius: 0.3em;
 }
 
-#smilefoxThumbNotice, #smilefoxThumbProgress, #smilefoxDownloadPaused {
+#nicofox-thumb-notice, #nicofox-thumb-progress, #nicofox-download-paused {
   padding: 0.2em;
   background: InfoBackground;
   color: InfoText;

@@ -17,7 +17,7 @@
   </stringbundleset>
   <!-- View Menu -->
   <menupopup id="menu_viewPopup">
-    <menuitem id="smilefox-entry" label="&smilefox.label;" accesskey="&smilefox.accesskey;" type="checkbox" checked="false" autocheck="false"
+    <menuitem id="nicofox_menuDownloadManager" label="&nicofox.downloadManager.label;" accesskey="&nicofox.downloadManager.accesskey;" type="checkbox" checked="false" autocheck="false"
              oncommand="nicofox.overlay.onMenuItemCommand(event);"
    position="2" />
   </menupopup>
@@ -36,7 +36,7 @@
   <menupopup id="contentAreaContextMenu">
     <menuseparator id="nicofox-context-seprator" />
     <menuitem id="nicofox-context-download" class="menuitem-iconic"
-              label="&downloadLink.label;" accesskey="&downloadLink.accesskey;"
+              label="&nicofox.downloadLink.label;" accesskey="&nicofox.downloadLink.accesskey;"
               oncommand="nicofox.overlay.downloadLink();"/>
   </menupopup>
 </overlay>

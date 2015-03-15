@@ -36,16 +36,16 @@ nicofox.panel.onPopupShown = function(event) {
   }
   nicofox.panel.hidden = false;
   /* Set the thumbnail display type. */
-  var thumbnailDisplayType = document.getElementById("nicofoxThumbnailDisplay").value;
-  document.getElementById('nicofoxDownloadList').setAttribute('sfthumbdisplay', thumbnailDisplayType);
+  var thumbnailDisplayType = document.getElementById("nicofox-thumbnail-display").value;
+  document.getElementById('nicofox-download-list').setAttribute('sfthumbdisplay', thumbnailDisplayType);
 
   /* Disable the following features on private window for now, since NicoFox is not privacy-aware now. */
   if (nicofox.isInPrivateWindow) {
     document.getElementById("nicofox-private-window-unsupported").hidden = false;
-    document.getElementById("nicofoxThumbnailDisplayBlock").hidden = true;
-    document.getElementById("nicofoxDownloadList").hidden = true;
-    document.getElementById("smilefox-search").hidden = true;
-    document.getElementById("nicofoxDownloadBottomActions").hidden = true;
+    document.getElementById("nicofox-thumbnail-display-block").hidden = true;
+    document.getElementById("nicofox-download-list").hidden = true;
+    document.getElementById("nicofox-download-search").hidden = true;
+    document.getElementById("nicofox-download-bottom-actions").hidden = true;
     document.getElementById("nicofox-library").firstChild.style.height = "auto";
     /* Change the toolbutton state. */
     var nicofoxToolbarButton = document.getElementById("nicofox-toolbar-button");
@@ -78,7 +78,7 @@ nicofox.panel.onPopupShown = function(event) {
     return;
   }
   nicofox.panel.load();
-  document.getElementById("nicofoxDownloadList").focus();
+  document.getElementById("nicofox-download-list").focus();
   
 };
 nicofox.panel.onPopupHidden = function(event) {
@@ -128,7 +128,7 @@ nicofox.panel.waitForDb = function(waitCount) {
 nicofox.panel.init = function() {
   /* Check whether DownloadManager is paused. */
   if (nicofox.DownloadManager.paused) {
-    document.getElementById("smilefoxDownloadPaused").hidden = false;
+    document.getElementById("nicofox-download-paused").hidden = false;
   }
   /* Listen to download events. */
   nicofox.DownloadManager.addListener(this.listener);
@@ -256,15 +256,15 @@ nicofox.panel.videoTools.goThridPartyToolSite = function(event, tool) {
 /* If there is not thumbnail file data stored in database, prompt user to download for all old records. */
 nicofox.panel.responseThumbnailCheck = function(resultArray) {
   if (resultArray[0].count > 0) {
-    document.getElementById("smilefoxThumbNotice").hidden = false;
+    document.getElementById("nicofox-thumb-notice").hidden = false;
   } else {
   }
 };
 
 /* Do when user agreed to use the thumbnail download function... */
 nicofox.panel.enableThumbnail = function() {
-  document.getElementById("smilefoxThumbNotice").hidden = true;
-  document.getElementById("smilefoxThumbProgress").hidden = false;
+  document.getElementById("nicofox-thumb-notice").hidden = true;
+  document.getElementById("nicofox-thumb-progress").hidden = false;
   /* Ask download manager to fetch thumbnails */
   nicofox.DownloadManager.fetchThumbnails();
 };
@@ -284,8 +284,8 @@ nicofox.panel.doneGetDownloads = function() {
   this.itemsToLoad.push({'end': true});
   /* Check whether to prompt user to download thumbnail */
   if (nicofox.DownloadManager.thumbFetching) {
-    document.getElementById("smilefoxThumbNotice").hidden = true;
-    document.getElementById("smilefoxThumbProgress").hidden = false;
+    document.getElementById("nicofox-thumb-notice").hidden = true;
+    document.getElementById("nicofox-thumb-progress").hidden = false;
   } else if (nicofox.Core.prefs.getBoolPref("download_thumbnail")) {
     nicofox.DownloadManager.checkThumbnail(this, "responseThumbnailCheck", "dbFail");
   }
@@ -293,7 +293,7 @@ nicofox.panel.doneGetDownloads = function() {
 
 /* Update the <listitem> when new download were added or the status had changed. */
 nicofox.panel.updateDownloadItem = function(listItem, result) {
-  listItem.setAttribute("type", "smilefox");
+  listItem.setAttribute("type", "nicofox-download");
   if (result.thumbnail_file) {
     var thumbFile = new nicofox.panel._fileInstance(result.thumbnail_file);
     if (thumbFile.exists()) {
@@ -334,7 +334,7 @@ nicofox.panel.updateDownloadItem = function(listItem, result) {
   }
   /* Avoid 0 to be considered as false */
   if (typeof result.status == "number") {
-    listItem.setAttribute("sfstatus", result.status);
+    listItem.setAttribute("dlstatus", result.status);
   }
   if (result.info) {
     listItem.setAttribute("sfvariantinfo", result.info);
@@ -367,7 +367,7 @@ nicofox.panel.timerEvent.notify = function(timer) {
   }
   /* Load 5 items once and use document fragment to speed up */
   var fragment = document.createDocumentFragment();
-  var list = document.getElementById("nicofoxDownloadList");
+  var list = document.getElementById("nicofox-download-list");
   for (var j = 1; j <= 5; j++) {
     var result = nicofox.panel.itemsToLoad[nicofox.panel.timerEvent.loadIndex];
     /* When there is no new items available, break. */
@@ -401,12 +401,12 @@ nicofox.panel.timerEvent.notify = function(timer) {
 
 /* Set the thumbnail display type and set the value to the preference. */
 nicofox.panel.setThumbnailDisplay = function(value) {
-  document.getElementById('nicofoxDownloadList').setAttribute('sfthumbdisplay', value);
+  document.getElementById('nicofox-download-list').setAttribute('sfthumbdisplay', value);
 }
 
 /* A very simple "Search" feature implemented by hidding elements. */
 nicofox.panel.search = function(value) {
-  var list = document.getElementById("nicofoxDownloadList");
+  var list = document.getElementById("nicofox-download-list");
   var items = list.children;
   /* Split search terms. From chrome/toolkit/content/mozapps/downloads/downloads.js on mozilla-central. */
   this._searchTerms = value.replace(/^\s+|\s+$/g, "").toLowerCase().split(/\s+/);
@@ -434,29 +434,29 @@ nicofox.panel.resume = function() {
  * Like /toolkit/mozapps/downloads/content/downloads.js on mozilla-central
  */
 nicofox.panel.displayContextMenuItems = [
-[ "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove"], /* 0 Waiting */
-[ "Open", "OpenExternal", "OpenFolder", /*"MoveFolder",*/ "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 1 Completed */ 
-[ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 2 Canceled */ 
-[ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 3 Failed */ 
-[ "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 4 Scheduled */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 5 Downloading */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 6 Downloading */ 
-[ "Cancel", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 7 Downloading */ 
+[ "go", "copy", "separator2", /*"select-all",*/ "remove"], /* 0 Waiting */
+[ "open", "open-external", "open-folder", /*"move-folder",*/ "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 1 Completed */
+[ "retry", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 2 Canceled */
+[ "retry", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 3 Failed */
+[ "retry", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 4 Scheduled */
+[ "cancel", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 5 Downloading */
+[ "cancel", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 6 Downloading */
+[ "cancel", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 7 Downloading */
 [], /*Reserved */
-[ "Missing", "Retry", "Separator1", "Go", "Copy", "Separator2", /*"SelectAll",*/ "Remove" ], /* 9 File Missing (hack) */ 
+[ "missing", "retry", "separator1", "go", "copy", "separator2", /*"select-all",*/ "remove" ], /* 9 File Missing (hack) */
 ];
 
 nicofox.panel.generateContextMenu = function(aEvent) {
   /* Check for context menu showing */
-  if (aEvent.target.id != "nicofoxDownloadItemPopup") {
+  if (aEvent.target.id != "nicofox-download-item-popup") {
     return false;
   }
-  var selectedItem = document.getElementById("nicofoxDownloadList").selectedItem;
+  var selectedItem = document.getElementById("nicofox-download-list").selectedItem;
   if (!selectedItem) { return false; }
   
   /* Create context menu, depending on the video status */
-  var popup = document.getElementById("nicofoxDownloadItemPopup");
-  var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+  var popup = document.getElementById("nicofox-download-item-popup");
+  var dlStatus = parseInt(selectedItem.getAttribute("dlstatus"), 10);
    
   var menuitems = popup.childNodes;
   for (var i = 0; i < menuitems.length; i++) {
@@ -466,13 +466,13 @@ nicofox.panel.generateContextMenu = function(aEvent) {
   /* Check for file missing case */
   if (selectedItem.hasAttribute("sfvideofile")) {
     var file = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
-    if (sfStatus == 1 && !file.exists()) {
-      sfStatus = 9;
+    if (dlStatus == 1 && !file.exists()) {
+      dlStatus = 9;
     }
   }
-  var displayItems = nicofox.panel.displayContextMenuItems[sfStatus];
+  var displayItems = nicofox.panel.displayContextMenuItems[dlStatus];
   for (var i = 0; i < displayItems.length; i++) {
-    document.getElementById("nicofoxDownloadItemPopup" + displayItems[i]).hidden = false;
+    document.getElementById("nicofox-download-item-popup-" + displayItems[i]).hidden = false;
   }
   return true;
 }
@@ -482,9 +482,9 @@ nicofox.panel.commands = {
   /* "Play with NicoFox Player" */
   open: function(selectedItem) {
     /* Open if the status is completed and file exists */
-    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    var dlStatus = parseInt(selectedItem.getAttribute("dlstatus"), 10);
     var videoFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
-    if (sfStatus != 1 || !videoFile.exists()) { return; }
+    if (dlStatus != 1 || !videoFile.exists()) { return; }
     
     var videoUrl = nicofox.Services.io.newFileURI(videoFile).spec;
     
@@ -511,15 +511,15 @@ nicofox.panel.commands = {
   /* Retry */
   retry: function(selectedItem) {
     var id = parseInt(selectedItem.getAttribute("sfid"), 10);
-    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
-    if (sfStatus == 2 || sfStatus == 3 || sfStatus == 4) {
+    var dlStatus = parseInt(selectedItem.getAttribute("dlstatus"), 10);
+    if (dlStatus == 2 || dlStatus == 3 || dlStatus == 4) {
       /* Retry when canceled, failed or scheduled */
       nicofox.DownloadManager.retryDownload(id);
     } else {
       /* Retry when video file does not exist. */
       if (selectedItem.hasAttribute("sfvideofile")) {
         var file = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
-        if (sfStatus == 1 && !file.exists()) {
+        if (dlStatus == 1 && !file.exists()) {
           nicofox.DownloadManager.retryDownload(id);
         }
       }
@@ -528,9 +528,9 @@ nicofox.panel.commands = {
   /* Open with External Player */
   openExternal: function(selectedItem) {
     /* Open if the status is completed and file exists */
-    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    var dlStatus = parseInt(selectedItem.getAttribute("dlstatus"), 10);
     var videoFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
-    if (sfStatus != 1 || !videoFile.exists()) { return; }
+    if (dlStatus != 1 || !videoFile.exists()) { return; }
     
     /* Select the external player if desired */
     var sfVideoType = selectedItem.getAttribute("sfvideotype");
@@ -561,9 +561,9 @@ nicofox.panel.commands = {
   /* Open in Folder (or "Reveal") */
   openFolder: function(selectedItem) {
     /* Open if the status is completed and file exists */
-    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
+    var dlStatus = parseInt(selectedItem.getAttribute("dlstatus"), 10);
     var videoFile = new nicofox.panel._fileInstance(selectedItem.getAttribute("sfvideofile"));
-    if (sfStatus != 1 || !videoFile.exists()) { return; }
+    if (dlStatus != 1 || !videoFile.exists()) { return; }
     try {
       videoFile.reveal();
     } catch(e) {
@@ -588,8 +588,8 @@ nicofox.panel.commands = {
   /* Remove selected item */
   remove: function(selectedItem) {
     var id = parseInt(selectedItem.getAttribute("sfid"), 10);
-    var sfStatus = parseInt(selectedItem.getAttribute("sfstatus"), 10);
-    if (sfStatus < 5 || sfStatus > 7) { /* Canceled or Failed */
+    var dlStatus = parseInt(selectedItem.getAttribute("dlstatus"), 10);
+    if (dlStatus < 5 || dlStatus > 7) { /* Canceled or Failed */
       nicofox.DownloadManager.removeDownload(id);
     }
   }
@@ -647,15 +647,15 @@ nicofox.panel.listener = {
 
 };
 nicofox.panel.listener.thumbnailFetcherCount = function(id, content) {
-  document.getElementById("smilefoxThumbProgressMeter").setAttribute("max", content);
-  document.getElementById("smilefoxThumbProgressMeter").setAttribute("value", 0);
+  document.getElementById("nicofox-thumb-progress-meter").setAttribute("max", content);
+  document.getElementById("nicofox-thumb-progress-meter").setAttribute("value", 0);
 };
 nicofox.panel.listener.thumbnailFetcherProgress = function(id, content) {
-  document.getElementById("smilefoxThumbProgressMeter").setAttribute("value", content);
+  document.getElementById("nicofox-thumb-progress-meter").setAttribute("value", content);
 };
 nicofox.panel.listener.thumbnailFetcherDone = function(id, content) {
-  document.getElementById("smilefoxThumbNotice").hidden = true;
-  document.getElementById("smilefoxThumbProgress").hidden = true;
+  document.getElementById("nicofox-thumb-notice").hidden = true;
+  document.getElementById("nicofox-thumb-progress").hidden = true;
 };
 nicofox.panel.listener.thumbnailAvailable = function(id, content) {
   var listItem = document.getElementById("smileFoxListItem" + id);
@@ -663,7 +663,7 @@ nicofox.panel.listener.thumbnailAvailable = function(id, content) {
 };
 
 nicofox.panel.listener.downloadAdded = function(id, content) {
-  var list = document.getElementById("nicofoxDownloadList");
+  var list = document.getElementById("nicofox-download-list");
   var listItem = document.createElement("richlistitem");
   /* Workaround: not to display the quality status at the first time */
   content.video_economy = 0;
@@ -690,16 +690,16 @@ nicofox.panel.listener.downloadVideoCompleted = function(id, content) {
   listItem.setAttribute("sfdownloadstatus", nicofox.DownloadManager.cachedStrings.progressRelatedDownloading);
 };
 nicofox.panel.listener.downloadRemoved = function(id) {
-  var list = document.getElementById("nicofoxDownloadList");
+  var list = document.getElementById("nicofox-download-list");
   var listItem = document.getElementById("smileFoxListItem"+ id);
   if (!listItem) { return; }
   list.removeChild(listItem);
 };
 nicofox.panel.listener.downloadPaused = function(id) {
-  document.getElementById("smilefoxDownloadPaused").hidden = false;
+  document.getElementById("nicofox-download-paused").hidden = false;
 };
 nicofox.panel.listener.downloadResumed = function(id) {
-  document.getElementById("smilefoxDownloadPaused").hidden = true;
+  document.getElementById("nicofox-download-paused").hidden = true;
 };
 /* Helper: Get a nsILocalFile instance from a path */
 nicofox.panel._fileInstance = Components.Constructor("@mozilla.org/file/local;1", "nsILocalFile", "initWithPath");

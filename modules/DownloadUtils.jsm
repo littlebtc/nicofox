@@ -69,7 +69,14 @@ var persistWorker = function(options) {
   /* Do the job; An extra null due to bug 794602
    * XXX: Private browsing aware */
   this._persist.progressListener = this;
-  this._persist.saveURI(URI, null, refURI, postData, null, options.file, null);
+  try {
+    this._persist.saveURI(URI, null, refURI, postData, null, options.file, null);
+  } catch(e) {
+    // Workaround for Firefox 36.
+    // Though there may be a lot of reason that saveURI throws,
+    // but it should work well in both older and newer version.
+    this._persist.saveURI(URI, null, refURI, null, postData, null, options.file, null);
+  }
 };
 
 /* Implements nsIWebProgressListener */
