@@ -1,0 +1,10 @@
+install: true
+script:
+- ./build.sh
+deploy:
+  provider: releases
+  api_key:
+    secure: SlJ9E91sJZx9ZJeBeGVU7HvgwC65jGD/e+UW/PYJ6aK3uJCcSg7pX+Onsaf9l0wHdTBthFbNOBv1WotPqoKy48mR97NdJgakNOlulJvRt1XtA3MDzYZkvH+oF4Tqh0sBY9eXBPigAN2UNnZ1+ymQsXPaC/3CHt/FnYZ8YikoP0FP9G7JwemAmfhgY0WeVF6cCmUrRjgfN0b9hU+qSpLt+EZ0vircYpKJtrmvty++fEY2a+IkZYT089T+qdJi9MDnBzembITyhIoux+8knV1BL/TIWHMAtOgpHaK0TKYdmG8CGjHELSnIhZPEevXB73WpZK9SUsppxdu/Fb84rys7rj0kaKdn1PXrA6Z/oKpZIerbxSqme6cEbEvVtj1awyLgqLF4ALNADGawhIrn25cerw4A0UOmTPhOOIwywRSdeO1r31X3ugezUsRbBzi++KPX90h8J3hDsClQLRXuIu3eI9q4/a8OHpohfQrKDaBbXN65yge7BR/ag+GiJEio7WN/dtxNC/FRd5cg05ablx1ddzmGA2GAygDF629z3dGhcMUNZmkYKm1An8nyjXAo64wPtVr25I5iS1K2G4PGC6tTxfLGKFqjhjg18YExzZ3+i3bL3kvnVP09mmzu4pVjJVNrAHt/y6KrBbBrYknZr/g1yA4jnl+ekPuiWo/HrzVfbwg=
+  file: nicofox.xpi
+  on:
+    repo: littlebtc/nicofox
