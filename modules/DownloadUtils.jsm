@@ -415,6 +415,19 @@ DownloadUtils.nico.prototype = {
     this._videoProgressUpdatedBytes = progress.currentBytes;
     this.callback("progress_change", progress);
   },
+  generateMsgAPIQueryString: function(language, fork) {
+    var langPart = (language)? ' language="'+ language +'"':'';
+    return '<packet>' +
+      '<thread thread="'+ this._getFlvParams.thread_id + '" version="20090904" ' +
+      'userkey="'+ this._getFlvParams.userkey +'" user_id="' + this._getFlvParams.user_id + '" '+
+      'scores="1" nicoru="1" with_global="1"' + langPart + '/>'+
+      '<thread_leaves thread="'+ this._getFlvParams.thread_id + '" '+
+      'userkey="'+ this._getFlvParams.userkey +'" user_id="' + this._getFlvParams.user_id + '" '+
+      'scores="1" nicoru="1"' + langPart + '>' +
+      '0-'+ Math.ceil(this._info.nicoData.length / 60) +':100,250' +
+      '</thread_leaves>'+
+      '</packet>';
+  },
   /* Get extra items (e.g. comments, uploader comments, thumbnail) */
   getExtraItems: function() {
     if (this._canceled) {
@@ -431,17 +444,11 @@ DownloadUtils.nico.prototype = {
       var uploaderCommentQueryString =
       '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
     } else {
-      var commentQueryString = '<packet>'+
-      '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>'+
-      '</packet>';
-      var commentZhTwQueryString = '<packet>'+
-      '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'" language="2"/>'+
-      '</packet>';
-      var commentEnUsQueryString = '<packet>'+
-      '<thread click_revision="0" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'" language="1"/>'+
-      '</packet>';
+      var commentQueryString = this.generateMsgAPIQueryString();
+      var commentZhTwQueryString = this.generateMsgAPIQueryString(2);
+      var commentEnUsQueryString = this.generateMsgAPIQueryString(1);
       var uploaderCommentQueryString = 
-      '<thread click_revision="0" fork="1" user_id="'+this._getFlvParams.user_id+'" res_from="-1000" version="20061206" thread="'+this._getFlvParams.thread_id+'"/>';
+      '<thread thread="'+this._getFlvParams.thread_id+'" version="20061206" res_from="-1000" fork="1" click_revision="-1" scores="1"/>';
     }
     /* Get all extra items */
     this._extraItemPromises = [];
@@ -460,7 +467,11 @@ DownloadUtils.nico.prototype = {
       this._extraItemPromises.push(xhrDeferredEnUs.then(this.processNicoComment.bind(this, "en-us")));
     }
     if(this._getUploaderComment) {
-      this._extraItemPromises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
+      // has_owner_thread will be a false alarm
+      // if the it is using nmsg.nicovideo.jp.
+      if (this._getFlvParams.ms.indexOf('nmsg') == -1) {
+        this._extraItemPromises.push(new persistWorker({ url: this._getFlvParams.ms, file: this._fileBundle.files.uploaderComment, postQueryString: uploaderCommentQueryString }));
+      }
     }
     if(this._getThumbnail && this._info.nicoData.thumbnail) {
       this._extraItemPromises.push(new persistWorker({ url: this._info.nicoData.thumbnail, file: this._fileBundle.files.thumbnail }));

@@ -12,7 +12,7 @@ let Network = {};
 Components.utils.import("resource://nicofox/When.jsm");
 
 /* Asynchrously fetch content of one URL */
-Network.fetchUrlAsync = function(url, postQueryString) {
+Network.fetchUrlAsync = function(url, postQueryString, isPOSTXML) {
   Components.utils.import("resource://gre/modules/Services.jsm");
   Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
@@ -26,7 +26,8 @@ Network.fetchUrlAsync = function(url, postQueryString) {
     var inputStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);  
     inputStream.setData(postQueryString, postQueryString.length); 
     if (channel instanceof Ci.nsIUploadChannel) {
-      channel.setUploadStream(inputStream, "application/x-www-form-urlencoded", -1);
+      var uploadType = (isPOSTXML)? "text/xml":"application/x-www-form-urlencoded";
+      channel.setUploadStream(inputStream, uploadType , -1);
     }
     /* setUploadStream resets to PUT, modify it */
     channel.requestMethod = "POST";
@@ -35,7 +36,6 @@ Network.fetchUrlAsync = function(url, postQueryString) {
   if (channel instanceof Ci.nsIHttpChannelInternal) {
     channel.forceAllowThirdPartyCookie = true;
   }
-
   /* Assign the callback */
   var callback = function(aInputStream, aResult, aRequest) {
     if (!Components.isSuccessCode(aResult)) {
@@ -57,7 +57,7 @@ Network.fetchUrlAsync = function(url, postQueryString) {
  * Q: Why not XHR? A: Buggy since Fx19+.
  * */
 Network.fetchXml = function(url, postQueryString) {
-  return Network.fetchUrlAsync(url, postQueryString).then(function (result) {
+  return Network.fetchUrlAsync(url, postQueryString, true).then(function (result) {
     var url = result.url;
     var content = result.data;
     var parser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
