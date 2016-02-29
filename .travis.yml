@@ -1,3 +1,4 @@
+language: bash
 install: true
 script:
 - ./build.sh
