@@ -9,3 +9,4 @@ deploy:
   file: nicofox.xpi
   on:
     repo: littlebtc/nicofox
+    tags: true
