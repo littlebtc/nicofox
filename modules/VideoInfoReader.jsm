@@ -331,8 +331,8 @@ VideoInfoReader.readBasicZeroInfo = function(contentDoc) {
   var idMatch = cmsWatchLink.getAttribute("href").match(/\/([a-z]{2}[0-9]+)$/);
   if (!idMatch) { return; }
   /* Check if the page is completedly loaded by checking whether the id can be matched */
-  var threadId = contentDoc.querySelector("#videoShareLinks .nicoru-button").getAttribute("data-thread");
-  if (threadId != vMatch[1] && idMatch[1] != vMatch[1]) { return; }
+  var shareId = contentDoc.querySelector(".twitter-share-button").dataset.url.match(/[a-z]{0,2}[0-9]+/)[0];
+  if (shareId != vMatch[1] && idMatch[1] != vMatch[1]) return;
   info.nicoData.v = vMatch[1];
   info.nicoData.id = idMatch[1];
   info.nicoData.thumbnail = contentDoc.getElementById("videoThumbnailImage").getAttribute("src");
