@@ -243,7 +243,7 @@ DownloadUtils.nico.prototype = {
     }
 
     var requestUrl = "http://flapi.nicovideo.jp/api/getflv";
-    var postQueryString = "ts=" + new Date().getTime() + "&v=" + this.commentId;
+    var postQueryString = "ts=" + new Date().getTime() + "&v=" + this.videoId;
     /* When encountering SWF vidoes, request &as3=1 on Japan site:
      * &as3=1 may hack the AVM1 SWF so that it can be loaded on new AS3-based player on Japan site. */
     if (this.videoId.indexOf("nm") == 0) {
