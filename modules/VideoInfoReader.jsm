@@ -103,6 +103,64 @@ function parseVideoInfo(result) {
   return info;
 }
 
+function html5ToNicoData(data) {
+  return {
+    v: data.video.id,
+    id: data.video.id,
+    title: data.video.title,
+    description: data.video.description,
+    is_translated: data.video.isTranslated,
+    title_original: data.video.originalTitle,
+    description_original: data.video.originalDescription,
+    thumbnail: data.video.thumbnailURL,
+    postedAt: data.video.postedDateTime,
+    length: data.video.duration,
+    viewCount: data.video.viewCount,
+    mylistCount: data.video.mylistCount,
+    commentCount: data.thread.commentCount,
+    mainCommunityId: data.community, // FIXME: is this correct?
+    communityId: data.thread.ids.community,
+    channelId: data.channel, // FIXME: is this correct?
+    isDeleted: data.video.isDeleted,
+    isMymemory: data.context.isMymemory,
+    isMonetized: data.video.isMonetized,
+    isR18: data.video.isR18,
+    is_adult: data.video.isAdult,
+    language: null, // FIXME: where is this?
+    area: null, // FIXME
+    can_translate: true, // FIXME,
+    video_translation_info: data.video.translation,
+    category: data.context.categoryName,
+    translator: data.video.translator,
+    thread_id: data.thread.ids.default,
+    main_genre: data.context.categoryKey,
+    has_owner_thread: data.thread.hasOwnerThread,
+    is_video_owner: data.context.isVideoOwner,
+    is_uneditable_tag: data.context.isTagUneditable,
+    commons_tree_exists: data.video.isCommonsTreeExists,
+    yesterday_rank: data.context.yesterdayRank,
+    highest_rank: data.context.highestRank,
+    for_bgm: null, // FIXME
+    is_nicowari: data.video.isNicowari,
+    is_public: data.video.isPublic,
+    is_official: data.video.isOfficial,
+    no_ichiba: data.video.isNoIchiba,
+    community_name: null, // FIXME
+    dicArticleURL: data.context.isDictionaryDisplayable ?
+      `http://dic.nicovideo.jp/v/${data.context.watchId}` : null, // FIXME
+    tagList: data.tags.map(tag => ({
+      id: tag.id,
+      tag: tag.name,
+      cat: tag.isCategory,
+      dic: tag.isDictionaryExists,
+      lck: +tag.isLocked + ""
+    })),
+    is_thread_owner: !!data.thread.hasOwnerThread,
+    width: data.video.width,
+    height: data.video.height
+  };
+}
+
 /* Inner reader to make asynchronous request to the video page, and response after read.
  * To control the total rate limit for video page reading from Nico Nico Douga,
  * A timer and a queue is created to do so.
@@ -154,7 +212,9 @@ infoFetcher.readVideoPage = function(result) {
   var regexMatchZero = content.match(/<div id\=\"watchAPIDataContainer\" style=\"display:none\">([^<]+)<\/div>/);
   /* For Harajuku & Taiwan edition: Find the Video parameter on the page */
   var regexMatch = content.match(/<script type\=\"text\/javascript\">\s?(<!--)?\s+var Video = \{([\s\S]*?)\}\;\s+(-->)??\s?<\/script>/);
-  if (!regexMatchZero && !regexMatch) {
+  // For html5
+  var regexMatchHtml5 = content.match(/<div[^>]*?data-api-data="([^"]+)/);
+  if (!regexMatchZero && !regexMatch && !regexMatchHtml5) {
     /* Two cases if Video is not present: (1) had User variable: error, anti-flood (2) has no User variable: not logged in */
     var reason = "";
     if (/var User = \{ id\: [0-9]+/.test(content)) {
@@ -169,17 +229,18 @@ infoFetcher.readVideoPage = function(result) {
     }
     throw reason;
   }
-  if (regexMatchZero) {
+  if (regexMatchZero || regexMatchHtml5) {
+    var matchString = (regexMatchZero || regexMatchHtml5)[1];
     /* For zero edition, unescape HTML then use JSON.parse */
     /* Dependency: nsIScriptableUnescapeHTML deprecated on Firefox 14 */
     var scriptableUnescapeHTML = Cc["@mozilla.org/feed-unescapehtml;1"].getService(Ci.nsIScriptableUnescapeHTML);
     try {
-      var videoString = scriptableUnescapeHTML.unescape(regexMatchZero[1]);
-      var nicoData = {};
-      nicoData = JSON.parse(videoString).videoDetail;
+      var videoString = scriptableUnescapeHTML.unescape(matchString);
+      var data = JSON.parse(videoString);
     } catch(e) {
       throw "jsonfail";
     }
+    var nicoData = regexMatchZero ? data.videoDetail : html5ToNicoData(data);
     var otherData = {};
     otherData.hasOwnerThread = Boolean(nicoData.has_owner_thread);
   } else {
@@ -282,17 +343,24 @@ VideoInfoReader.readFromPageDOM = function(unsafeWindow, contentDoc) {
 
   try {
     /* Consider as failed if cannot find #watchAPIDataContainer or #WATCHHEADER and wrappedJSObject.so on the page */
-    if(!contentDoc.getElementById("watchAPIDataContainer") && (!contentDoc.getElementById("WATCHHEADER") || !unsafeWindow.so)) {
+    if(!contentDoc.getElementById("watchAPIDataContainer") && (!contentDoc.getElementById("WATCHHEADER") || !unsafeWindow.so) && !contentDoc.querySelector("#js-initial-watch-data")) {
       throw "noplayer";
     }
 
     var otherData = {};
     otherData.hasOwnerThread = false;
     var zeroDataContainer = contentDoc.getElementById("watchAPIDataContainer");
-    if (zeroDataContainer) {
+    var html5DataContainer = contentDoc.querySelector("#js-initial-watch-data");
+    if (zeroDataContainer || html5DataContainer) {
       /* For Zero edition: Read data from DOM-stored JSON string on #watchAPIDataContainer. */
       try {
-        var nicoData = JSON.parse(zeroDataContainer.textContent).videoDetail;
+        var nicoData;
+        if (zeroDataContainer) {
+          nicoData = JSON.parse(zeroDataContainer.textContent).videoDetail;
+        } else {
+          var data = JSON.parse(html5DataContainer.dataset.apiData);
+          nicoData = html5ToNicoData(data);
+        }
       } catch(e) {
         throw "novideoobject";
       }
