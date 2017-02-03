@@ -497,6 +497,8 @@ DownloadUtils.nico.prototype = {
     this.callback("fail", {});
   },
   failReadInfo: function(reason) {
+    Components.utils.import("resource://gre/modules/Console.jsm");
+    console.log(reason);
     /* VideoInfoReader will report a reason. */
     if (reason == "notloggedin" && !this._loginTried) {
       this._loginTried = true;
